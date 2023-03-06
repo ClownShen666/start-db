@@ -40,6 +40,6 @@ class UdfFactory {
     System.out.println(sparkUdfMap)
   }
 
-  def getCalciteUdfMap: mutable.HashMap[String, UserDefinedFunction] = {calciteUdfMap}
-  def getSparkUdfMap: mutable.HashMap[String, UserDefinedFunction] = {sparkUdfMap}
+  def getCalciteUdfMap: mutable.HashMap[String, UserDefinedFunction] = { calciteUdfMap }
+  def getSparkUdfMap: mutable.HashMap[String, UserDefinedFunction] = { sparkUdfMap }
 }
