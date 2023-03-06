@@ -44,6 +44,7 @@ object SparkQueryExecutor extends LazyLogging {
       val sft = MetadataUtil.makeSchemaName(table.getId)
       loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
     }
+    //spark.udf.register("plusOne", )
     val df = spark.sql(sql)
     SparkResultExporterFactory.getInstance(param.getExportType).exportData(param.getSqlId, df)
   }

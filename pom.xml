@@ -20,6 +20,7 @@
         <module>cupid-db-spark</module>
         <module>cupid-db-store</module>
         <module>cupid-db-flink</module>
+        <module>cupid-db-udf-register</module>
     </modules>
 
     <properties>
