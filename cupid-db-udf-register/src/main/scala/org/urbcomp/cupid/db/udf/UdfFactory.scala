@@ -18,19 +18,28 @@ import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
 class UdfFactory {
-  private var udfMap = mutable.HashMap.empty[String, UserDefinedFunction]
+  private var calciteUdfMap = mutable.HashMap.empty[String, UserDefinedFunction]
+  private var sparkUdfMap = mutable.HashMap.empty[String, UserDefinedFunction]
 
   {
     val reflections = new Reflections("org.urbcomp.cupid.db.udf")
     val clazz = reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]]
     clazz.forEach(cla => {
-      val nameMethod = cla.getDeclaredMethod("name")
-      val name: String = nameMethod.invoke(cla.newInstance()).asInstanceOf[String]
-      val functionMethod = cla.getDeclaredMethod("function")
+      val instance = cla.newInstance()
+      val name: String = cla.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
       val udf: UserDefinedFunction =
-        functionMethod.invoke(cla.newInstance()).asInstanceOf[UserDefinedFunction]
-      udfMap += (name -> udf)
+        cla.getDeclaredMethod("function").invoke(instance).asInstanceOf[UserDefinedFunction]
+      if (cla.getDeclaredMethod("registerCalcite").invoke(instance).asInstanceOf[Boolean]) {
+        calciteUdfMap += (name -> udf)
+      }
+      if (cla.getDeclaredMethod("registerSpark").invoke(instance).asInstanceOf[Boolean]) {
+        sparkUdfMap += (name -> udf)
+      }
     })
+    System.out.println(calciteUdfMap)
+    System.out.println(sparkUdfMap)
   }
 
+  def getCalciteUdfMap: mutable.HashMap[String, UserDefinedFunction] = {calciteUdfMap}
+  def getSparkUdfMap: mutable.HashMap[String, UserDefinedFunction] = {sparkUdfMap}
 }

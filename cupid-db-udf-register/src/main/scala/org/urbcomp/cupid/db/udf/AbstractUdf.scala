@@ -15,6 +15,8 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 abstract class AbstractUdf {
 
   def name(): String
+  def registerCalcite(): Boolean
+  def registerSpark(): Boolean
   def function(): UserDefinedFunction
 
 }
