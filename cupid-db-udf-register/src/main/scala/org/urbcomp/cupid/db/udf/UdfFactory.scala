@@ -12,16 +12,24 @@
 package org.urbcomp.cupid.db.udf
 import org.apache.spark.sql.expressions.UserDefinedFunction
 
-import scala.reflect.runtime.{universe => ru}
+import org.reflections.Reflections
+
+import scala.collection.convert.ImplicitConversions._
+import scala.collection.mutable
 
 class UdfFactory {
-  private var udfList: List[AbstractUdf] = List()
+  private var udfMap = mutable.HashMap.empty[String, UserDefinedFunction]
 
   {
-    val tpe = ru.typeOf[AbstractUdf]
-    val clazz = tpe.typeSymbol.asClass
-    clazz.knownDirectSubclasses.foreach(println)
-    //udfList ++= clazz.knownDirectSubclasses.toList
+    val reflections = new Reflections("org.urbcomp.cupid.db.udf")
+    val clazz = reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]]
+    clazz.forEach(cla => {
+      val nameMethod = cla.getDeclaredMethod("name")
+      val name: String = nameMethod.invoke(cla.newInstance()).asInstanceOf[String]
+      val functionMethod = cla.getDeclaredMethod("function")
+      val udf: UserDefinedFunction = functionMethod.invoke(cla.newInstance()).asInstanceOf[UserDefinedFunction]
+      udfMap += (name -> udf)
+    })
   }
 
 }

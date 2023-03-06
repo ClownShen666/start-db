@@ -12,8 +12,9 @@
 package org.urbcomp.cupid.db.udf
 import org.apache.spark.sql.expressions.UserDefinedFunction
 
-abstract class AbstractUdf(name: String) {
+abstract class AbstractUdf {
 
+  def name(): String
   def function(): UserDefinedFunction
 
 }
