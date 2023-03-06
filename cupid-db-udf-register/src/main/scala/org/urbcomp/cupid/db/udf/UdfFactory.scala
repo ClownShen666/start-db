@@ -27,7 +27,8 @@ class UdfFactory {
       val nameMethod = cla.getDeclaredMethod("name")
       val name: String = nameMethod.invoke(cla.newInstance()).asInstanceOf[String]
       val functionMethod = cla.getDeclaredMethod("function")
-      val udf: UserDefinedFunction = functionMethod.invoke(cla.newInstance()).asInstanceOf[UserDefinedFunction]
+      val udf: UserDefinedFunction =
+        functionMethod.invoke(cla.newInstance()).asInstanceOf[UserDefinedFunction]
       udfMap += (name -> udf)
     })
   }
