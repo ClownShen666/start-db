@@ -34,6 +34,7 @@
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-udf-register</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>protobuf-java</artifactId>
