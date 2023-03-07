@@ -15,7 +15,12 @@ import org.apache.calcite.schema.impl.{AggregateFunctionImpl, TableFunctionImpl}
 import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
 import org.urbcomp.cupid.db.udf.UdfFactory
-import org.urbcomp.cupid.db.udtf.{DBSCANClustering, Fibonacci, StayPointDetect, TimeIntervalTrajectorySegment}
+import org.urbcomp.cupid.db.udtf.{
+  DBSCANClustering,
+  Fibonacci,
+  StayPointDetect,
+  TimeIntervalTrajectorySegment
+}
 
 import java.util
 
