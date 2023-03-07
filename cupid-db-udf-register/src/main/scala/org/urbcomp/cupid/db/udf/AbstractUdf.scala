@@ -12,7 +12,7 @@
 package org.urbcomp.cupid.db.udf
 import org.apache.spark.sql.expressions.UserDefinedFunction
 
-abstract class AbstractUdf {
+trait AbstractUdf {
 
   def name(): String
   def registerCalcite(): Boolean

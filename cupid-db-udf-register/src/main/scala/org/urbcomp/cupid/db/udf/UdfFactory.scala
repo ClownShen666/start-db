@@ -10,10 +10,9 @@
  */
 
 package org.urbcomp.cupid.db.udf
+
 import org.apache.spark.sql.expressions.UserDefinedFunction
-
 import org.reflections.Reflections
-
 import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
@@ -36,8 +35,6 @@ class UdfFactory {
         sparkUdfMap += (name -> udf)
       }
     })
-    System.out.println(calciteUdfMap)
-    System.out.println(sparkUdfMap)
   }
 
   def getCalciteUdfMap: mutable.HashMap[String, UserDefinedFunction] = { calciteUdfMap }
