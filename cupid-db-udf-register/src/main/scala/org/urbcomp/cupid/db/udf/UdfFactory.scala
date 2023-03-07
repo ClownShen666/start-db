@@ -23,16 +23,16 @@ class UdfFactory {
 
   {
     val reflections = new Reflections("org.urbcomp.cupid.db.udf")
-    val clazz = reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]]
-    clazz.forEach(cla => {
-      val instance = cla.newInstance()
-      val name: String = cla.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
+    val classes = reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]]
+    classes.forEach(clazz => {
+      val instance = clazz.newInstance()
+      val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
       val udf: UserDefinedFunction =
-        cla.getDeclaredMethod("function").invoke(instance).asInstanceOf[UserDefinedFunction]
-      if (cla.getDeclaredMethod("registerCalcite").invoke(instance).asInstanceOf[Boolean]) {
+        clazz.getDeclaredMethod("function").invoke(instance).asInstanceOf[UserDefinedFunction]
+      if (clazz.getDeclaredMethod("registerCalcite").invoke(instance).asInstanceOf[Boolean]) {
         calciteUdfMap += (name -> udf)
       }
-      if (cla.getDeclaredMethod("registerSpark").invoke(instance).asInstanceOf[Boolean]) {
+      if (clazz.getDeclaredMethod("registerSpark").invoke(instance).asInstanceOf[Boolean]) {
         sparkUdfMap += (name -> udf)
       }
     })
