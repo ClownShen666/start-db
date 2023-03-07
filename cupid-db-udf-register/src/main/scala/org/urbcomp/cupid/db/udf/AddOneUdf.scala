@@ -16,7 +16,7 @@ import org.apache.spark.sql.functions.udf
 
 class AddOneUdf extends AbstractUdf {
 
-  override def name(): String = "PlusOne"
+  override def name(): String = "AddOne"
   override def registerCalcite(): Boolean = true
   override def registerSpark(): Boolean = true
   override def function(): UserDefinedFunction =

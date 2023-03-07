@@ -13,12 +13,12 @@ package org.urbcomp.cupid.db.spark
 
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{SparkSession, functions}
 import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.util.{MetadataUtil, SparkSqlParam}
-import org.urbcomp.cupid.db.udf.UdfFactory
+import org.urbcomp.cupid.db.udf.{UdfFactory, AverageUdaf}
 
 object SparkQueryExecutor extends LazyLogging {
 
