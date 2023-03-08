@@ -40,9 +40,6 @@ object SparkQueryExecutor extends LazyLogging {
       val sft = MetadataUtil.makeSchemaName(table.getId)
       loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
     }
-    new UdfFactory().getSparkUdfMap.foreach {
-      case (name, udf) => spark.udf.register(name, udf)
-    }
     val df = spark.sql(sql)
     SparkResultExporterFactory.getInstance(param.getExportType).exportData(df)
   }
@@ -66,7 +63,11 @@ object SparkQueryExecutor extends LazyLogging {
     val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
     if (enableHiveSupport) builder.enableHiveSupport()
-    builder.getOrCreate()
+    val spark = builder.getOrCreate()
+    new UdfFactory().getSparkUdfMap.foreach {
+      case (name, udf) => spark.udf.register(name, udf)
+    }
+    spark
   }
 
   def buildSparkConf(): SparkConf = {
