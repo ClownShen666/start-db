@@ -11,17 +11,9 @@
 
 package org.urbcomp.cupid.db.udf
 
-import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions.udf
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+object DataEngine extends Enumeration {
+  type engine = Value
 
-class AddOneUdf extends AbstractUdf {
-
-  override def name(): String = "AddOne"
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  override def function(): UserDefinedFunction =
-    udf((x: Int) => {
-      x + 1
-    })
-
+  val Calcite: DataEngine.Value = Value("Calcite")
+  val Spark: DataEngine.Value = Value("Spark")
 }

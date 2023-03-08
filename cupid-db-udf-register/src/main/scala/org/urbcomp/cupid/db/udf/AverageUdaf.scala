@@ -13,6 +13,7 @@ package org.urbcomp.cupid.db.udf
 
 import org.apache.spark.sql.{Encoder, Encoders, functions}
 import org.apache.spark.sql.expressions.{Aggregator, UserDefinedFunction}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 case class AverageData(var sum: Long, var count: Long)
 
@@ -43,9 +44,7 @@ object AverageUdaf extends Aggregator[Long, AverageData, Double] {
 class AverageUdaf extends AbstractUdf {
   override def name(): String = "Average"
 
-  override def registerCalcite(): Boolean = true
-
-  override def registerSpark(): Boolean = true
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   override def function(): UserDefinedFunction = functions.udaf(AverageUdaf)
 }
