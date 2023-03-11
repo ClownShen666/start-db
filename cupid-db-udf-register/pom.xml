@@ -41,5 +41,20 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+           <groupId>org.scala-lang</groupId>
+           <artifactId>scala-compiler</artifactId>
+           <version>${scala.version}</version>
+        </dependency>
     </dependencies>
 </project>
