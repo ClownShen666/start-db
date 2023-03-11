@@ -17,6 +17,6 @@ public class UdfFactoryTest {
     @Test
     public void testUdfFactory() {
         UdfFactory factory = new UdfFactory();
-        System.out.println(factory.getEngineUdfMap());
+        assert (factory.getEngineUdfMap().size() == 2);
     }
 }

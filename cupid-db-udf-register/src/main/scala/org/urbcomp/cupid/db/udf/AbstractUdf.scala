@@ -10,12 +10,12 @@
  */
 
 package org.urbcomp.cupid.db.udf
-import org.apache.spark.sql.expressions.UserDefinedFunction
+
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 trait AbstractUdf {
 
   def name(): String
-  def registerEngines(): List[DataEngine.Value]
-  def function(): UserDefinedFunction
-
+  def udfType(): UdfType.Value
+  def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 }

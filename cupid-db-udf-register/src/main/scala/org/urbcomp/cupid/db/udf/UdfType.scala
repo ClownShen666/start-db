@@ -11,19 +11,10 @@
 
 package org.urbcomp.cupid.db.udf
 
-import org.apache.spark.sql.functions.udf
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.UdfType.Udf
+object UdfType extends Enumeration {
+  type udfType = Value
 
-class AddOneUdf extends Serializable with AbstractUdf {
-
-  override def name(): String = "AddOne"
-
-  override def udfType(): UdfType.Value = Udf
-
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  def udfImpl(): Function1[Int, Int] = (x: Int) => x + 1
-
-  def udfEntryName(): String = "udfImpl"
+  val Udf: UdfType.Value = Value("Udf")
+  val Udaf: UdfType.Value = Value("Udaf")
+  val Udtf: UdfType.Value = Value("Udtf")
 }
