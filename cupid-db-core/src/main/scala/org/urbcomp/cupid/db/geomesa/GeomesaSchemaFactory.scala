@@ -18,7 +18,10 @@ import org.urbcomp.cupid.db.udf.{UdfFactory, UdfType}
 import org.urbcomp.cupid.db.udtf.{
   DBSCANClustering,
   Fibonacci,
+  KMeansClustering,
   StayPointDetect,
+  HybridTrajectorySegment,
+  StayPointTrajectorySegment,
   TimeIntervalTrajectorySegment
 }
 
@@ -83,6 +86,14 @@ class GeomesaSchemaFactory extends SchemaFactory {
       TableFunctionImpl.create(TimeIntervalTrajectorySegment.TIMEINTERVALSEGMENT_TABLE_METHOD)
     )
     schemaPlus.add(
+      "st_traj_stayPointSegment",
+      TableFunctionImpl.create(StayPointTrajectorySegment.STAYPOINTSEGMENT_TABLE_METHOD)
+    )
+    schemaPlus.add(
+      "st_traj_hybridSegment",
+      TableFunctionImpl.create(HybridTrajectorySegment.HYBRID_SEGMENT_TABLE_METHOD)
+    )
+    schemaPlus.add(
       "st_traj_stayPointDetect",
       TableFunctionImpl.create(StayPointDetect.STAY_POINT_DETECTION_TABLE_METHOD)
     )
@@ -91,6 +102,10 @@ class GeomesaSchemaFactory extends SchemaFactory {
       TableFunctionImpl.create(DBSCANClustering.DBSCAN_CLUSTERING_TABLE_METHOD)
     )
     schemaPlus.add("st_collect_list", AggregateFunctionImpl.create(classOf[CollectList]))
+    schemaPlus.add(
+      "st_kmeans_clustering",
+      TableFunctionImpl.create(KMeansClustering.KMEANS_CLUSTERING_TABLE_METHOD)
+    )
   }
 
 }

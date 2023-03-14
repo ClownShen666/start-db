@@ -30,7 +30,8 @@ import org.urbcomp.cupid.db.parser.dql.{
   SqlShowCreateTable,
   SqlShowDatabases,
   SqlShowStatus,
-  SqlShowTables
+  SqlShowTables,
+  SqlShowIndex
 }
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser._
@@ -61,6 +62,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     case c: DropDatabaseStmtContext    => visitDropDatabaseStmt(c)
     case c: ShowDatabasesStmtContext   => visitShowDatabasesStmt(c)
     case c: ShowCreateTableStmtContext => visitShowCreateTableStmt(c)
+    case c: ShowIndexStmtContext       => visitShowIndexStmt(c)
     case c: ShowStatusStmtContext      => visitShowStatusStmt(c)
     case c: DropTableStmtContext       => visitDropTableStmt(c)
     case c: UseStmtContext             => visitUseStmt(c)
@@ -539,6 +541,12 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_timeIntervalSegment")) {
       val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
+    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointSegment")) {
+      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
+      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
+    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_hybridSegment")) {
+      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
+      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
     } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointDetect")) {
       val nodeList = List(
         new SqlIdentifier("startTime", pos),
@@ -546,7 +554,8 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
         new SqlIdentifier("gpsPoints", pos)
       ).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_dbscan_clustering")) {
+    } else if (ctx.ident().getText.equalsIgnoreCase("st_dbscan_clustering")
+               || ctx.ident().getText.equalsIgnoreCase("st_kmeans_clustering")) {
       val nodeList = List(
         new SqlIdentifier("cluster", pos),
         new SqlIdentifier("clusterCentroid", pos),
@@ -668,6 +677,10 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
   override def visitShowTablesStmt(ctx: ShowTablesStmtContext): SqlNode = {
     new SqlShowTables(pos, new SqlIdentifier(MetadataUtil.combineUserDbKey(user, db), pos))
+  }
+
+  override def visitShowIndexStmt(ctx: ShowIndexStmtContext): SqlNode = {
+    new SqlShowIndex(pos, visitIdent(ctx.tableName().ident()))
   }
 
   /////////////////////////////////////////////////////////////////////////

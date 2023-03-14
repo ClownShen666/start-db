@@ -48,13 +48,13 @@ public class TimeIntervalTrajectorySegment {
         TimeIntervalTrajectorySegment.class,
         "st_traj_timeIntervalSegment",
         Trajectory.class,
-        int.class
+        double.class
 
     );
 
     public ScannableTable st_traj_timeIntervalSegment(
         Trajectory trajectory,
-        int maxTimeIntervalInSec
+        double maxTimeIntervalInSec
     ) {
         return new ScannableTable() {
 
