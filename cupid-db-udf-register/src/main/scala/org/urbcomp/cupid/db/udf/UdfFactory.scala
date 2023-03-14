@@ -12,11 +12,10 @@
 package org.urbcomp.cupid.db.udf
 
 import org.reflections.Reflections
-
 import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
-class UdfFactory {
+class UdfFactory extends Serializable {
   private var engineUdfMap = mutable.HashMap[String, mutable.Map[String, Class[_ <: AbstractUdf]]]()
 
   {

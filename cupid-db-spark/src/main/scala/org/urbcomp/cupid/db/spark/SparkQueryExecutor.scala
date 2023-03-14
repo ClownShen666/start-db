@@ -14,9 +14,7 @@ package org.urbcomp.cupid.db.spark
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.catalyst.ScalaReflection
-import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions.udf
-import org.apache.spark.sql.{SparkSession, functions}
+import org.apache.spark.sql.SparkSession
 import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
@@ -72,12 +70,10 @@ object SparkQueryExecutor extends LazyLogging {
     new UdfFactory().getUdfMap("Spark").foreach {
       case (name, clazz) => {
         val instance = clazz.newInstance()
-        val udfEntryName: String =
-          clazz.getDeclaredMethod("udfEntryName").invoke(instance).asInstanceOf[String]
-        val method = clazz.getDeclaredMethod(udfEntryName).invoke(instance)
+        val method = clazz.getDeclaredMethod("udfWrapper").invoke(instance)
         val rm = ScalaReflection.mirror
         val functionType =
-          rm.classSymbol(clazz).typeSignature.decl(TermName(udfEntryName)).asMethod.returnType
+          rm.classSymbol(clazz).typeSignature.decl(TermName("udfWrapper")).asMethod.returnType
         def typeToTypeTag[T](tpe: Type): TypeTag[T] =
           TypeTag(rm, new api.TypeCreator {
             def apply[U <: api.Universe with Singleton](m: api.Mirror[U]): U#Type =
