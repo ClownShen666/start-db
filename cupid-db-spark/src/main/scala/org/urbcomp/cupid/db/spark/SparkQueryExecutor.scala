@@ -86,260 +86,156 @@ object SparkQueryExecutor extends LazyLogging {
           })
         method match {
           case method: scala.Function0[rt] => {
-            val List(returnType) = functionType.typeArgs
-            spark.udf.register(name, method)(typeToTypeTag[rt](returnType))
-          }
-          case method: Function1[x1, rt] => {
-            val List(argType, returnType) = functionType.typeArgs
-            spark.udf
-              .register(name, method)(typeToTypeTag[rt](returnType), typeToTypeTag[x1](argType))
+            spark.udf.register(name, method)(typeToTypeTag[rt](functionType.typeArgs(0)))
           }
           case method: Function2[x1, x2, rt] => {
-            val List(arg1Type, arg2Type, returnType) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type)
+              typeToTypeTag[rt](functionType.typeArgs(2)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1))
             )
           }
           case method: Function3[x1, x2, x3, rt] => {
-            val List(arg1Type, arg2Type, arg3Type, returnType) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type)
+              typeToTypeTag[rt](functionType.typeArgs(3)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2))
             )
           }
           case method: Function4[x1, x2, x3, x4, rt] => {
-            val List(arg1Type, arg2Type, arg3Type, arg4Type, returnType) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type)
+              typeToTypeTag[rt](functionType.typeArgs(4)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3))
             )
           }
           case method: Function5[x1, x2, x3, x4, x5, rt] => {
-            val List(arg1Type, arg2Type, arg3Type, arg4Type, arg5Type, returnType) =
-              functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type)
+              typeToTypeTag[rt](functionType.typeArgs(5)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4))
             )
           }
           case method: Function6[x1, x2, x3, x4, x5, x6, rt] => {
-            val List(arg1Type, arg2Type, arg3Type, arg4Type, arg5Type, arg6Type, returnType) =
-              functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type)
+              typeToTypeTag[rt](functionType.typeArgs(6)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5))
             )
           }
           case method: Function7[x1, x2, x3, x4, x5, x6, x7, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type)
+              typeToTypeTag[rt](functionType.typeArgs(7)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6))
             )
           }
           case method: Function8[x1, x2, x3, x4, x5, x6, x7, x8, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type)
+              typeToTypeTag[rt](functionType.typeArgs(8)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7))
             )
           }
           case method: Function9[x1, x2, x3, x4, x5, x6, x7, x8, x9, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type)
+              typeToTypeTag[rt](functionType.typeArgs(9)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8))
             )
           }
           case method: Function10[x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type)
+              typeToTypeTag[rt](functionType.typeArgs(10)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9))
             )
           }
           case method: Function11[x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type)
+              typeToTypeTag[rt](functionType.typeArgs(11)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10))
             )
           }
           case method: Function12[x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type)
+              typeToTypeTag[rt](functionType.typeArgs(12)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11))
             )
           }
           case method: Function13[x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, rt] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type)
+              typeToTypeTag[rt](functionType.typeArgs(13)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12))
             )
           }
           case method: Function14[
@@ -359,39 +255,22 @@ object SparkQueryExecutor extends LazyLogging {
                 x14,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type)
+              typeToTypeTag[rt](functionType.typeArgs(14)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13))
             )
           }
           case method: Function15[
@@ -412,41 +291,23 @@ object SparkQueryExecutor extends LazyLogging {
                 x15,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type)
+              typeToTypeTag[rt](functionType.typeArgs(15)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14))
             )
           }
           case method: Function16[
@@ -468,43 +329,24 @@ object SparkQueryExecutor extends LazyLogging {
                 x16,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type)
+              typeToTypeTag[rt](functionType.typeArgs(16)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15))
             )
           }
           case method: Function17[
@@ -527,45 +369,25 @@ object SparkQueryExecutor extends LazyLogging {
                 x17,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type)
+              typeToTypeTag[rt](functionType.typeArgs(17)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16))
             )
           }
           case method: Function18[
@@ -589,47 +411,26 @@ object SparkQueryExecutor extends LazyLogging {
                 x18,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              arg18Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type),
-              typeToTypeTag[x18](arg18Type)
+              typeToTypeTag[rt](functionType.typeArgs(18)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16)),
+              typeToTypeTag[x18](functionType.typeArgs(17))
             )
           }
           case method: Function19[
@@ -654,49 +455,27 @@ object SparkQueryExecutor extends LazyLogging {
                 x19,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              arg18Type,
-              arg19Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type),
-              typeToTypeTag[x18](arg18Type),
-              typeToTypeTag[x19](arg19Type)
+              typeToTypeTag[rt](functionType.typeArgs(19)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16)),
+              typeToTypeTag[x18](functionType.typeArgs(17)),
+              typeToTypeTag[x19](functionType.typeArgs(18))
             )
           }
           case method: Function20[
@@ -722,51 +501,28 @@ object SparkQueryExecutor extends LazyLogging {
                 x20,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              arg18Type,
-              arg19Type,
-              arg20Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type),
-              typeToTypeTag[x18](arg18Type),
-              typeToTypeTag[x19](arg19Type),
-              typeToTypeTag[x20](arg20Type)
+              typeToTypeTag[rt](functionType.typeArgs(20)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16)),
+              typeToTypeTag[x18](functionType.typeArgs(17)),
+              typeToTypeTag[x19](functionType.typeArgs(18)),
+              typeToTypeTag[x20](functionType.typeArgs(19))
             )
           }
           case method: Function21[
@@ -793,53 +549,29 @@ object SparkQueryExecutor extends LazyLogging {
                 x21,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              arg18Type,
-              arg19Type,
-              arg20Type,
-              arg21Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type),
-              typeToTypeTag[x18](arg18Type),
-              typeToTypeTag[x19](arg19Type),
-              typeToTypeTag[x20](arg20Type),
-              typeToTypeTag[x21](arg21Type)
+              typeToTypeTag[rt](functionType.typeArgs(21)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16)),
+              typeToTypeTag[x18](functionType.typeArgs(17)),
+              typeToTypeTag[x19](functionType.typeArgs(18)),
+              typeToTypeTag[x20](functionType.typeArgs(19)),
+              typeToTypeTag[x21](functionType.typeArgs(20))
             )
           }
           case method: Function22[
@@ -867,55 +599,30 @@ object SparkQueryExecutor extends LazyLogging {
                 x22,
                 rt
               ] => {
-            val List(
-              arg1Type,
-              arg2Type,
-              arg3Type,
-              arg4Type,
-              arg5Type,
-              arg6Type,
-              arg7Type,
-              arg8Type,
-              arg9Type,
-              arg10Type,
-              arg11Type,
-              arg12Type,
-              arg13Type,
-              arg14Type,
-              arg15Type,
-              arg16Type,
-              arg17Type,
-              arg18Type,
-              arg19Type,
-              arg20Type,
-              arg21Type,
-              arg22Type,
-              returnType
-            ) = functionType.typeArgs
             spark.udf.register(name, method)(
-              typeToTypeTag[rt](returnType),
-              typeToTypeTag[x1](arg1Type),
-              typeToTypeTag[x2](arg2Type),
-              typeToTypeTag[x3](arg3Type),
-              typeToTypeTag[x4](arg4Type),
-              typeToTypeTag[x5](arg5Type),
-              typeToTypeTag[x6](arg6Type),
-              typeToTypeTag[x7](arg7Type),
-              typeToTypeTag[x8](arg8Type),
-              typeToTypeTag[x9](arg9Type),
-              typeToTypeTag[x10](arg10Type),
-              typeToTypeTag[x11](arg11Type),
-              typeToTypeTag[x12](arg12Type),
-              typeToTypeTag[x13](arg13Type),
-              typeToTypeTag[x14](arg14Type),
-              typeToTypeTag[x15](arg15Type),
-              typeToTypeTag[x16](arg16Type),
-              typeToTypeTag[x17](arg17Type),
-              typeToTypeTag[x18](arg18Type),
-              typeToTypeTag[x19](arg19Type),
-              typeToTypeTag[x20](arg20Type),
-              typeToTypeTag[x21](arg21Type),
-              typeToTypeTag[x22](arg22Type)
+              typeToTypeTag[rt](functionType.typeArgs(22)),
+              typeToTypeTag[x1](functionType.typeArgs(0)),
+              typeToTypeTag[x2](functionType.typeArgs(1)),
+              typeToTypeTag[x3](functionType.typeArgs(2)),
+              typeToTypeTag[x4](functionType.typeArgs(3)),
+              typeToTypeTag[x5](functionType.typeArgs(4)),
+              typeToTypeTag[x6](functionType.typeArgs(5)),
+              typeToTypeTag[x7](functionType.typeArgs(6)),
+              typeToTypeTag[x8](functionType.typeArgs(7)),
+              typeToTypeTag[x9](functionType.typeArgs(8)),
+              typeToTypeTag[x10](functionType.typeArgs(9)),
+              typeToTypeTag[x11](functionType.typeArgs(10)),
+              typeToTypeTag[x12](functionType.typeArgs(11)),
+              typeToTypeTag[x13](functionType.typeArgs(12)),
+              typeToTypeTag[x14](functionType.typeArgs(13)),
+              typeToTypeTag[x15](functionType.typeArgs(14)),
+              typeToTypeTag[x16](functionType.typeArgs(15)),
+              typeToTypeTag[x17](functionType.typeArgs(16)),
+              typeToTypeTag[x18](functionType.typeArgs(17)),
+              typeToTypeTag[x19](functionType.typeArgs(18)),
+              typeToTypeTag[x20](functionType.typeArgs(19)),
+              typeToTypeTag[x21](functionType.typeArgs(20)),
+              typeToTypeTag[x22](functionType.typeArgs(21))
             )
           }
         }
