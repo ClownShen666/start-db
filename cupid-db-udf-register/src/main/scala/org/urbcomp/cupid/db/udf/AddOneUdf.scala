@@ -23,7 +23,10 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def udfImpl(): Function1[Int, Int] = (x: Int) => x + 1
+  def udfImpl(x: Int): Int = { x + 1 }
 
   def udfEntryName(): String = "udfImpl"
+
+  // Must use this variable to register in Spark
+  def udfWrapper: Function1[Int, Int] = udfImpl
 }

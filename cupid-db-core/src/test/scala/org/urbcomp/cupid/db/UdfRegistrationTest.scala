@@ -11,7 +11,7 @@
 
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.{assertNull, assertTrue}
+import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
@@ -36,7 +36,9 @@ class UdfRegistrationTest extends AbstractCalciteFunctionTest {
     val resultSet =
       statement.executeQuery("select dat, AddOne(dat) from test2")
     while (resultSet.next()) {
-      System.out.println(resultSet.getObject(1).toString)
+      val u = resultSet.getObject(1).toString.toInt
+      val v = resultSet.getObject(2).toString.toInt
+      assertEquals(0, u + 1 - v)
     }
   }
 }
