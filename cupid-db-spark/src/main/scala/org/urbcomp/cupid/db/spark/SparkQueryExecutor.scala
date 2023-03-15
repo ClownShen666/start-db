@@ -85,8 +85,14 @@ object SparkQueryExecutor extends LazyLogging {
               tpe.asInstanceOf[U#Type]
           })
         method match {
-          case method: scala.Function0[rt] => {
+          case method: Function0[rt] => {
             spark.udf.register(name, method)(typeToTypeTag[rt](functionType.typeArgs(0)))
+          }
+          case method: Function1[x1, rt] => {
+            spark.udf.register(name, method)(
+              typeToTypeTag[rt](functionType.typeArgs(1)),
+              typeToTypeTag[x1](functionType.typeArgs(0))
+            )
           }
           case method: Function2[x1, x2, rt] => {
             spark.udf.register(name, method)(
@@ -625,6 +631,7 @@ object SparkQueryExecutor extends LazyLogging {
               typeToTypeTag[x22](functionType.typeArgs(21))
             )
           }
+          case _ => logger.warn("Not register function " + name + " due to pattern mismatch!")
         }
       }
     }
