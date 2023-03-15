@@ -17,7 +17,6 @@
 package org.urbcomp.cupid.db.spark
 
 import com.typesafe.scalalogging.LazyLogging
-
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.SparkSession
