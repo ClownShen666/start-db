@@ -28,24 +28,21 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-      structType: StructType,
-      transforms: Array[Transform],
-      map: util.Map[String, String]
-  ): Table =
+                         structType: StructType,
+                         transforms: Array[Transform],
+                         map: util.Map[String, String]
+                       ): Table =
     new RemoteTable(map)
 }
 
 class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
   override def newWriteBuilder(logicalWriteInfo: LogicalWriteInfo): WriteBuilder = {
-    val options = logicalWriteInfo.options()
-    println("options:" + options)
     new RemoteWriteBuilder(map)
   }
 
   override def name(): String = "RemoteWrite"
 
   override def schema(): StructType = {
-    println("schema")
     new StructType().add("col1", StringType).add("col2", StringType)
   }
 
@@ -54,7 +51,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-    extends WriteBuilder
+  extends WriteBuilder
     with SupportsOverwrite {
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
 
@@ -62,37 +59,46 @@ class RemoteWriteBuilder(options: util.Map[String, String])
 }
 
 class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
+
+  private val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance(options)
+
   override def createBatchWriterFactory(info: PhysicalWriteInfo): DataWriterFactory =
-    new RemoteDataWriterFactory(options)
+    new RemoteDataWriterFactory(options, remoteWriter)
 
-  override def commit(messages: Array[WriterCommitMessage]): Unit = {}
+  override def commit(messages: Array[WriterCommitMessage]): Unit = {
+    remoteWriter.commit()
+  }
 
-  override def abort(messages: Array[WriterCommitMessage]): Unit = {}
+  override def abort(messages: Array[WriterCommitMessage]): Unit = {
+    remoteWriter.abort()
+  }
 }
 
-class RemoteDataWriterFactory(options: util.Map[String, String]) extends DataWriterFactory {
-  override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] =
-    new RemoteWriter(options)
+class RemoteDataWriterFactory(options: util.Map[String, String], remoteWriter: IRemoteWriter) extends DataWriterFactory {
+  override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
+    new RemoteWriter(options, remoteWriter)
+  }
 }
 
-class RemoteWriter(options: util.Map[String, String]) extends DataWriter[InternalRow] {
+class RemoteWriter(options: util.Map[String, String], remoteWriter: IRemoteWriter) extends DataWriter[InternalRow] {
 
   override def write(record: InternalRow): Unit = {
     val s = record.getString(0)
     println(options.get("op1") + ",row: " + s)
+    remoteWriter.writeOne(record)
   }
 
   override def commit(): WriterCommitMessage = {
-    println("commit")
+    remoteWriter.writeOneCommit()
     WriteSucceed
   }
 
   override def abort(): Unit = {
-    println("abort")
+    remoteWriter.writeOneAbort()
   }
 
   override def close(): Unit = {
-    println("close")
+    remoteWriter.writeOneClose()
   }
 }
 
