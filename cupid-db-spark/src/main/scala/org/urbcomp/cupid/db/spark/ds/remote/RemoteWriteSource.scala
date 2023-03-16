@@ -28,10 +28,10 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-                         structType: StructType,
-                         transforms: Array[Transform],
-                         map: util.Map[String, String]
-                       ): Table =
+      structType: StructType,
+      transforms: Array[Transform],
+      map: util.Map[String, String]
+  ): Table =
     new RemoteTable(map)
 }
 
@@ -51,7 +51,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-  extends WriteBuilder
+    extends WriteBuilder
     with SupportsOverwrite {
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
 
@@ -74,13 +74,15 @@ class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
   }
 }
 
-class RemoteDataWriterFactory(options: util.Map[String, String], remoteWriter: IRemoteWriter) extends DataWriterFactory {
+class RemoteDataWriterFactory(options: util.Map[String, String], remoteWriter: IRemoteWriter)
+    extends DataWriterFactory {
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
     new RemoteWriter(options, remoteWriter)
   }
 }
 
-class RemoteWriter(options: util.Map[String, String], remoteWriter: IRemoteWriter) extends DataWriter[InternalRow] {
+class RemoteWriter(options: util.Map[String, String], remoteWriter: IRemoteWriter)
+    extends DataWriter[InternalRow] {
 
   override def write(record: InternalRow): Unit = {
     val s = record.getString(0)
