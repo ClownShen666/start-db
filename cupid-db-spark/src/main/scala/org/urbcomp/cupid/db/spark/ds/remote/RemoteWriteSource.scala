@@ -16,7 +16,7 @@ import org.apache.spark.sql.connector.catalog.{SupportsWrite, Table, TableCapabi
 import org.apache.spark.sql.connector.expressions.Transform
 import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.sources.Filter
-import org.apache.spark.sql.types.{StringType, StructType}
+import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import java.util
@@ -28,11 +28,15 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-      structType: StructType,
-      transforms: Array[Transform],
-      map: util.Map[String, String]
-  ): Table =
+                         structType: StructType,
+                         transforms: Array[Transform],
+                         map: util.Map[String, String]
+                       ): Table =
     new RemoteTable(map)
+}
+
+object RemoteWriteSource {
+  val SCHEMA_KEY = "schema"
 }
 
 class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
@@ -43,7 +47,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
   override def name(): String = "RemoteWrite"
 
   override def schema(): StructType = {
-    new StructType().add("col1", StringType).add("col2", StringType)
+    DataType.fromJson(map.get(RemoteWriteSource.SCHEMA_KEY)).asInstanceOf[StructType]
   }
 
   override def capabilities(): util.Set[TableCapability] =
@@ -51,7 +55,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-    extends WriteBuilder
+  extends WriteBuilder
     with SupportsOverwrite {
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
 
@@ -75,18 +79,16 @@ class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
 }
 
 class RemoteDataWriterFactory(options: util.Map[String, String], remoteWriter: IRemoteWriter)
-    extends DataWriterFactory {
+  extends DataWriterFactory {
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
     new RemoteWriter(options, remoteWriter)
   }
 }
 
 class RemoteWriter(options: util.Map[String, String], remoteWriter: IRemoteWriter)
-    extends DataWriter[InternalRow] {
+  extends DataWriter[InternalRow] {
 
   override def write(record: InternalRow): Unit = {
-    val s = record.getString(0)
-    println(options.get("op1") + ",row: " + s)
     remoteWriter.writeOne(record)
   }
 

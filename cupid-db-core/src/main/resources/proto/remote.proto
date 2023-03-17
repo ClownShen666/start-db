@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package org.urbcomp.cupid.db.spark.data;
+
+service RemoteService {
+  rpc sendSchema (SchemaRequest) returns (SchemaResponse) {}
+
+  rpc sendRow (stream RowRequest) returns (RowResponse) {}
+}
+
+message SchemaRequest {
+  string sqlId = 1;
+  string schemaJson = 2;
+}
+
+message SchemaResponse {
+  string message = 1;
+}
+
+message RowRequest {
+  string sqlId = 1;
+}
+
+message RowResponse {
+
+}

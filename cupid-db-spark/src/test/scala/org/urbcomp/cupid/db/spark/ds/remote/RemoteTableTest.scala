@@ -34,8 +34,34 @@ class RemoteTableTest extends FunSuite {
       .write
       .format("org.urbcomp.cupid.db.spark.ds.remote.RemoteWriteSource")
       .mode(SaveMode.Overwrite)
-      .option("op1", "v1")
-      .option("op2", "v2")
+      .option(RemoteWriteSource.SCHEMA_KEY, df.schema.json)
+      .option("sqlId", "v2")
       .save()
+  }
+
+  test("test StructType serialize") {
+    import org.apache.spark.sql.types._
+
+    val structType = StructType(
+      Seq(
+        StructField("name", StringType),
+        StructField("age", IntegerType),
+        StructField("email", StringType)
+      )
+    )
+
+    // {
+    // "type":"struct",
+    // "fields":
+    // [{"name":"name","type":"string","nullable":true,"metadata":{}},
+    // {"name":"age","type":"integer","nullable":true,"metadata":{}},
+    // {"name":"email","type":"string","nullable":true,"metadata":{}}]
+    // }
+    val json = structType.json
+    println(json)
+
+    val structType1 = DataType.fromJson(json).asInstanceOf[StructType]
+
+    assertResult(structType.length)(structType1.length)
   }
 }
