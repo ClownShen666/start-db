@@ -21,10 +21,10 @@ import org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest
 import org.urbcomp.cupid.db.spark.data.RemoteClient
 
 /**
- * 使用grpc的原因是支持流式传输
- *
- * @author jimo
- * */
+  * 使用grpc的原因是支持流式传输
+  *
+  * @author jimo
+  * */
 class GrpcRemoteWriter(options: java.util.Map[String, String]) extends IRemoteWriter {
 
   private val remoteClient = new RemoteClient()

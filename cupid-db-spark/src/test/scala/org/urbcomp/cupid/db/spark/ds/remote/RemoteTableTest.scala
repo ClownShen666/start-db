@@ -70,7 +70,5 @@ class RemoteTableTest extends FunSuite {
     assertResult(structType.length)(structType1.length)
   }
 
-  test("grpc test") {
-
-  }
+  test("grpc test") {}
 }

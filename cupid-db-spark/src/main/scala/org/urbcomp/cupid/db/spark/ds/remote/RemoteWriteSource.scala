@@ -34,10 +34,10 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-                         structType: StructType,
-                         transforms: Array[Transform],
-                         map: util.Map[String, String]
-                       ): Table =
+      structType: StructType,
+      transforms: Array[Transform],
+      map: util.Map[String, String]
+  ): Table =
     new RemoteTable(map)
 }
 
@@ -61,7 +61,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-  extends WriteBuilder
+    extends WriteBuilder
     with SupportsOverwrite {
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
 
@@ -70,7 +70,8 @@ class RemoteWriteBuilder(options: util.Map[String, String])
 
 class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
 
-  private val remoteWriter: IRemoteWriter = RemoteWriter.remoteWriter //IRemoteWriter.getInstance(options)
+  private val remoteWriter
+      : IRemoteWriter = RemoteWriter.remoteWriter //IRemoteWriter.getInstance(options)
 
   override def createBatchWriterFactory(info: PhysicalWriteInfo): DataWriterFactory =
     new RemoteDataWriterFactory(options)
@@ -84,15 +85,13 @@ class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
   }
 }
 
-class RemoteDataWriterFactory(options: util.Map[String, String])
-  extends DataWriterFactory {
+class RemoteDataWriterFactory(options: util.Map[String, String]) extends DataWriterFactory {
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
     new RemoteWriter(options)
   }
 }
 
-class RemoteWriter(options: util.Map[String, String])
-  extends DataWriter[InternalRow] {
+class RemoteWriter(options: util.Map[String, String]) extends DataWriter[InternalRow] {
 
   println("初始化Writer")
 
