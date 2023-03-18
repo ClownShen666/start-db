@@ -1,14 +1,19 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.urbcomp.cupid.db.spark.ds.remote
 
 import org.apache.spark.sql.catalyst.InternalRow
@@ -18,6 +23,7 @@ import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
+import org.urbcomp.cupid.db.spark.data.RemoteClient
 
 import java.util
 import scala.collection.JavaConverters._
@@ -64,10 +70,10 @@ class RemoteWriteBuilder(options: util.Map[String, String])
 
 class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
 
-  private val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance(options)
+  private val remoteWriter: IRemoteWriter = RemoteWriter.remoteWriter //IRemoteWriter.getInstance(options)
 
   override def createBatchWriterFactory(info: PhysicalWriteInfo): DataWriterFactory =
-    new RemoteDataWriterFactory(options, remoteWriter)
+    new RemoteDataWriterFactory(options)
 
   override def commit(messages: Array[WriterCommitMessage]): Unit = {
     remoteWriter.commit()
@@ -78,32 +84,38 @@ class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
   }
 }
 
-class RemoteDataWriterFactory(options: util.Map[String, String], remoteWriter: IRemoteWriter)
+class RemoteDataWriterFactory(options: util.Map[String, String])
   extends DataWriterFactory {
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
-    new RemoteWriter(options, remoteWriter)
+    new RemoteWriter(options)
   }
 }
 
-class RemoteWriter(options: util.Map[String, String], remoteWriter: IRemoteWriter)
+class RemoteWriter(options: util.Map[String, String])
   extends DataWriter[InternalRow] {
 
+  println("初始化Writer")
+
   override def write(record: InternalRow): Unit = {
-    remoteWriter.writeOne(record)
+    RemoteWriter.remoteWriter.writeOne(record)
   }
 
   override def commit(): WriterCommitMessage = {
-    remoteWriter.writeOneCommit()
+    RemoteWriter.remoteWriter.writeOneCommit()
     WriteSucceed
   }
 
   override def abort(): Unit = {
-    remoteWriter.writeOneAbort()
+    RemoteWriter.remoteWriter.writeOneAbort()
   }
 
   override def close(): Unit = {
-    remoteWriter.writeOneClose()
+    RemoteWriter.remoteWriter.writeOneClose()
   }
+}
+
+object RemoteWriter {
+  val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance(null)
 }
 
 object WriteSucceed extends WriterCommitMessage {}

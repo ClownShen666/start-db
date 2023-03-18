@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package org.urbcomp.cupid.db.spark.data;
 
@@ -9,16 +9,16 @@ service RemoteService {
 }
 
 message SchemaRequest {
-  string sqlId = 1;
-  string schemaJson = 2;
+  required string sqlId = 1;
+  required string schemaJson = 2;
 }
 
 message SchemaResponse {
-  string message = 1;
+  optional string res = 1;
 }
 
 message RowRequest {
-  string sqlId = 1;
+  required string sqlId = 1;
 }
 
 message RowResponse {

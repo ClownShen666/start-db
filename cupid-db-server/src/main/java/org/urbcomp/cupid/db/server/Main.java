@@ -27,6 +27,11 @@ import org.urbcomp.cupid.db.server.daemon.DaemonManager;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+
+        final RemoteServer remoteServer = new RemoteServer(8848);
+        remoteServer.start();
+        remoteServer.blockUntilShutdown();
+
         String[] params = { DbMetaFactory.class.getCanonicalName() };
         final HttpServer server = org.apache.calcite.avatica.server.Main.start(
             params,
