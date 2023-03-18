@@ -21,27 +21,27 @@ import org.apache.spark.sql.catalyst.InternalRow
 import java.util
 
 /**
-  * 写接口抽象,实现可考虑不同协议和序列化
-  *
-  * @author jimo
-  * */
+ * 写接口抽象,实现可考虑不同协议和序列化
+ *
+ * @author jimo
+ * */
 trait IRemoteWriter extends Serializable {
 
   /**
-    * 最终提交时
-    */
+   * 最终提交时
+   */
   def commit()
 
   /**
-    * 最终意外终止
-    */
+   * 最终意外终止
+   */
   def abort()
 
   def writeOne(record: InternalRow)
 
   /**
-    * 写一条数据writeOne之后调用, 调用顺序是 commit/abort -> close
-    */
+   * 写一条数据writeOne之后调用, 调用顺序是 commit/abort -> close
+   */
   def writeOneCommit()
 
   def writeOneAbort()
@@ -51,7 +51,13 @@ trait IRemoteWriter extends Serializable {
 
 object IRemoteWriter {
 
-  def getInstance(options: util.Map[String, String]): IRemoteWriter = {
-    new GrpcRemoteWriter(options)
+  /**
+   * 为什么要通过静态变量来传递参数？
+   * 因为通过构造方法传不进来
+   */
+  var options: util.Map[String, String] = _
+
+  def getInstance(): IRemoteWriter = {
+    new GrpcRemoteWriter
   }
 }

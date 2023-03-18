@@ -12,6 +12,10 @@
 cd cupid-db-core
 
 D:\software\protoc-2.5.0-win32\protoc.exe --java_out=src/main/java src/main/resources/proto/grpc_remote.proto
-D:\software\protoc-2.5.0-win32\bin\protoc.exe --plugin=protoc-gen-grpc-java="D:\software\protoc-gen-grpc-java-1.36.3-windows-x86_64.exe" --grpc-java_out=src/main/java src/main/resources/proto/grpc_remote.proto
+D:\software\protoc-2.5.0-win32\protoc.exe --plugin=protoc-gen-grpc-java="D:\software\protoc-gen-grpc-java-1.36.3-windows-x86_64.exe" --grpc-java_out=src/main/java src/main/resources/proto/grpc_remote.proto
+
+D:\software\protoc-3.6.1-win32\bin\protoc.exe --java_out=src/main/java src/main/resources/proto/grpc_remote.proto
+D:\software\protoc-3.6.1-win32\bin\protoc.exe --plugin=protoc-gen-grpc-java="D:\software\protoc-gen-grpc-java-1.36.3-windows-x86_64.exe" --grpc-java_out=src/main/java src/main/resources/proto/grpc_remote.proto
+
 ```
 

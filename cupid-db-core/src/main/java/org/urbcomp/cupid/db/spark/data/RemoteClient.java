@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,12 +33,16 @@ public class RemoteClient implements Serializable {
         this(ManagedChannelBuilder.forAddress("localhost", 8848).usePlaintext().build());
     }
 
+    public RemoteClient(int port) {
+        this(ManagedChannelBuilder.forAddress("localhost", port).usePlaintext().build());
+    }
+
     public RemoteClient(Channel channel) {
         this.blockingStub = RemoteServiceGrpc.newBlockingStub(channel);
         RemoteServiceGrpc.RemoteServiceStub asyncStub = RemoteServiceGrpc.newStub(channel);
 
         final StreamObserver<GrpcRemote.RowResponse> streamObserver = new StreamObserver<
-            GrpcRemote.RowResponse>() {
+                GrpcRemote.RowResponse>() {
 
             @Override
             public void onNext(GrpcRemote.RowResponse rowResponse) {

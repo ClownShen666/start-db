@@ -23,7 +23,6 @@ import org.apache.spark.sql.connector.write._
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
-import org.urbcomp.cupid.db.spark.data.RemoteClient
 
 import java.util
 import scala.collection.JavaConverters._
@@ -34,10 +33,10 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-      structType: StructType,
-      transforms: Array[Transform],
-      map: util.Map[String, String]
-  ): Table =
+                         structType: StructType,
+                         transforms: Array[Transform],
+                         map: util.Map[String, String]
+                       ): Table =
     new RemoteTable(map)
 }
 
@@ -61,8 +60,9 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-    extends WriteBuilder
+  extends WriteBuilder
     with SupportsOverwrite {
+
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
 
   override def overwrite(filters: Array[Filter]): WriteBuilder = this
@@ -70,30 +70,27 @@ class RemoteWriteBuilder(options: util.Map[String, String])
 
 class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
 
-  private val remoteWriter
-      : IRemoteWriter = RemoteWriter.remoteWriter //IRemoteWriter.getInstance(options)
+  IRemoteWriter.options = options
 
   override def createBatchWriterFactory(info: PhysicalWriteInfo): DataWriterFactory =
-    new RemoteDataWriterFactory(options)
+    new RemoteDataWriterFactory()
 
   override def commit(messages: Array[WriterCommitMessage]): Unit = {
-    remoteWriter.commit()
+    RemoteWriter.remoteWriter.commit()
   }
 
   override def abort(messages: Array[WriterCommitMessage]): Unit = {
-    remoteWriter.abort()
+    RemoteWriter.remoteWriter.abort()
   }
 }
 
-class RemoteDataWriterFactory(options: util.Map[String, String]) extends DataWriterFactory {
+class RemoteDataWriterFactory extends DataWriterFactory {
   override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
-    new RemoteWriter(options)
+    new RemoteWriter()
   }
 }
 
-class RemoteWriter(options: util.Map[String, String]) extends DataWriter[InternalRow] {
-
-  println("初始化Writer")
+class RemoteWriter extends DataWriter[InternalRow] {
 
   override def write(record: InternalRow): Unit = {
     RemoteWriter.remoteWriter.writeOne(record)
@@ -114,7 +111,10 @@ class RemoteWriter(options: util.Map[String, String]) extends DataWriter[Interna
 }
 
 object RemoteWriter {
-  val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance(null)
+  /**
+   * 这里用静态方式的原因是：RemoteWriter 里的grpc连接无法序列化
+   */
+  val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance()
 }
 
 object WriteSucceed extends WriterCommitMessage {}

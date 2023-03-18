@@ -17,24 +17,37 @@
 package org.urbcomp.cupid.db.spark.ds.remote
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest
+import org.urbcomp.cupid.db.spark.data.GrpcRemote.{RowRequest, SchemaRequest}
 import org.urbcomp.cupid.db.spark.data.RemoteClient
 
+import java.util
+import java.util.concurrent.TimeUnit
+
 /**
-  * 使用grpc的原因是支持流式传输
-  *
-  * @author jimo
-  * */
-class GrpcRemoteWriter(options: java.util.Map[String, String]) extends IRemoteWriter {
+ * 使用grpc的原因是支持流式传输
+ *
+ * @author jimo
+ * */
+class GrpcRemoteWriter extends IRemoteWriter {
 
-  private val remoteClient = new RemoteClient()
+  private val options: util.Map[String, String] = IRemoteWriter.options
+  private val remoteClient: RemoteClient = new RemoteClient(8848)
+  private val sqlId = options.get("sqlId")
 
-  override def commit(): Unit = remoteClient.commit()
+  // 先发送schema
+  remoteClient.sendSchema(SchemaRequest.newBuilder()
+    .setSqlId(sqlId).setSchemaJson(options.get(RemoteWriteSource.SCHEMA_KEY)).build())
+
+  override def commit(): Unit = {
+    remoteClient.commit()
+    // 留时间flush数据
+    TimeUnit.SECONDS.sleep(1)
+  }
 
   override def abort(): Unit = remoteClient.error()
 
   override def writeOne(record: InternalRow): Unit = {
-    remoteClient.sendRow(RowRequest.newBuilder().setSqlId("sqlid").build())
+    remoteClient.sendRow(RowRequest.newBuilder().setSqlId(sqlId).build())
   }
 
   override def writeOneCommit(): Unit = {}
@@ -42,24 +55,4 @@ class GrpcRemoteWriter(options: java.util.Map[String, String]) extends IRemoteWr
   override def writeOneAbort(): Unit = remoteClient.error()
 
   override def writeOneClose(): Unit = {}
-//  /**
-//   * 最终提交时
-//   */
-//  override def commit(): Unit = {}
-//
-//  /**
-//   * 最终意外终止
-//   */
-//  override def abort(): Unit = {}
-//
-//  override def writeOne(record: InternalRow): Unit = {}
-//
-//  /**
-//   * 写一条数据writeOne之后调用, 调用顺序是 commit/abort -> close
-//   */
-//  override def writeOneCommit(): Unit = {}
-//
-//  override def writeOneAbort(): Unit = {}
-//
-//  override def writeOneClose(): Unit = {}
 }
