@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,15 +10,14 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.server;
 
-import io.grpc.Grpc;
-import io.grpc.InsecureServerCredentials;
 import io.grpc.Server;
+import io.grpc.ServerBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.urbcomp.cupid.db.spark.data.RemoteServiceImpl;
 
@@ -36,9 +35,14 @@ public class RemoteServer {
 
     public RemoteServer(int port) {
         this.port = port;
-        this.server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
-            .addService(new RemoteServiceImpl())
-            .build();
+        // 高版本用法
+//        this.server = Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
+//            .addService(new RemoteServiceImpl())
+//            .build();
+
+        this.server = ServerBuilder.forPort(port)
+                .addService(new RemoteServiceImpl())
+                .build();
     }
 
     public void start() throws IOException {

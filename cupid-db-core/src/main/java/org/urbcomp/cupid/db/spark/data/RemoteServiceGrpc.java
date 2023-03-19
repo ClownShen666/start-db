@@ -1,11 +1,24 @@
 package org.urbcomp.cupid.db.spark.data;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
+import static io.grpc.stub.ClientCalls.asyncBidiStreamingCall;
+import static io.grpc.stub.ClientCalls.asyncClientStreamingCall;
+import static io.grpc.stub.ClientCalls.asyncServerStreamingCall;
+import static io.grpc.stub.ClientCalls.asyncUnaryCall;
+import static io.grpc.stub.ClientCalls.blockingServerStreamingCall;
+import static io.grpc.stub.ClientCalls.blockingUnaryCall;
+import static io.grpc.stub.ClientCalls.futureUnaryCall;
+import static io.grpc.stub.ServerCalls.asyncBidiStreamingCall;
+import static io.grpc.stub.ServerCalls.asyncClientStreamingCall;
+import static io.grpc.stub.ServerCalls.asyncServerStreamingCall;
+import static io.grpc.stub.ServerCalls.asyncUnaryCall;
+import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
+import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.36.3)",
+    value = "by gRPC proto compiler (version 1.19.0)",
     comments = "Source: src/main/resources/proto/grpc_remote.proto")
 public final class RemoteServiceGrpc {
 
@@ -28,21 +41,22 @@ public final class RemoteServiceGrpc {
     if ((getSendSchemaMethod = RemoteServiceGrpc.getSendSchemaMethod) == null) {
       synchronized (RemoteServiceGrpc.class) {
         if ((getSendSchemaMethod = RemoteServiceGrpc.getSendSchemaMethod) == null) {
-          RemoteServiceGrpc.getSendSchemaMethod = getSendSchemaMethod =
+          RemoteServiceGrpc.getSendSchemaMethod = getSendSchemaMethod = 
               io.grpc.MethodDescriptor.<org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest, org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "sendSchema"))
+              .setFullMethodName(generateFullMethodName(
+                  "org.urbcomp.cupid.db.spark.data.RemoteService", "sendSchema"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse.getDefaultInstance()))
-              .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("sendSchema"))
-              .build();
+                  .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("sendSchema"))
+                  .build();
+          }
         }
-      }
-    }
-    return getSendSchemaMethod;
+     }
+     return getSendSchemaMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest,
@@ -59,35 +73,29 @@ public final class RemoteServiceGrpc {
     if ((getSendRowMethod = RemoteServiceGrpc.getSendRowMethod) == null) {
       synchronized (RemoteServiceGrpc.class) {
         if ((getSendRowMethod = RemoteServiceGrpc.getSendRowMethod) == null) {
-          RemoteServiceGrpc.getSendRowMethod = getSendRowMethod =
+          RemoteServiceGrpc.getSendRowMethod = getSendRowMethod = 
               io.grpc.MethodDescriptor.<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest, org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.CLIENT_STREAMING)
-              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "sendRow"))
+              .setFullMethodName(generateFullMethodName(
+                  "org.urbcomp.cupid.db.spark.data.RemoteService", "sendRow"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse.getDefaultInstance()))
-              .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("sendRow"))
-              .build();
+                  .setSchemaDescriptor(new RemoteServiceMethodDescriptorSupplier("sendRow"))
+                  .build();
+          }
         }
-      }
-    }
-    return getSendRowMethod;
+     }
+     return getSendRowMethod;
   }
 
   /**
    * Creates a new async stub that supports all call types for the service
    */
   public static RemoteServiceStub newStub(io.grpc.Channel channel) {
-    io.grpc.stub.AbstractStub.StubFactory<RemoteServiceStub> factory =
-      new io.grpc.stub.AbstractStub.StubFactory<RemoteServiceStub>() {
-        @java.lang.Override
-        public RemoteServiceStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
-          return new RemoteServiceStub(channel, callOptions);
-        }
-      };
-    return RemoteServiceStub.newStub(factory, channel);
+    return new RemoteServiceStub(channel);
   }
 
   /**
@@ -95,14 +103,7 @@ public final class RemoteServiceGrpc {
    */
   public static RemoteServiceBlockingStub newBlockingStub(
       io.grpc.Channel channel) {
-    io.grpc.stub.AbstractStub.StubFactory<RemoteServiceBlockingStub> factory =
-      new io.grpc.stub.AbstractStub.StubFactory<RemoteServiceBlockingStub>() {
-        @java.lang.Override
-        public RemoteServiceBlockingStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
-          return new RemoteServiceBlockingStub(channel, callOptions);
-        }
-      };
-    return RemoteServiceBlockingStub.newStub(factory, channel);
+    return new RemoteServiceBlockingStub(channel);
   }
 
   /**
@@ -110,14 +111,7 @@ public final class RemoteServiceGrpc {
    */
   public static RemoteServiceFutureStub newFutureStub(
       io.grpc.Channel channel) {
-    io.grpc.stub.AbstractStub.StubFactory<RemoteServiceFutureStub> factory =
-      new io.grpc.stub.AbstractStub.StubFactory<RemoteServiceFutureStub>() {
-        @java.lang.Override
-        public RemoteServiceFutureStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
-          return new RemoteServiceFutureStub(channel, callOptions);
-        }
-      };
-    return RemoteServiceFutureStub.newStub(factory, channel);
+    return new RemoteServiceFutureStub(channel);
   }
 
   /**
@@ -128,28 +122,28 @@ public final class RemoteServiceGrpc {
      */
     public void sendSchema(org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest request,
         io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse> responseObserver) {
-      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSendSchemaMethod(), responseObserver);
+      asyncUnimplementedUnaryCall(getSendSchemaMethod(), responseObserver);
     }
 
     /**
      */
     public io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest> sendRow(
         io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse> responseObserver) {
-      return io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall(getSendRowMethod(), responseObserver);
+      return asyncUnimplementedStreamingCall(getSendRowMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
             getSendSchemaMethod(),
-            io.grpc.stub.ServerCalls.asyncUnaryCall(
+            asyncUnaryCall(
               new MethodHandlers<
                 org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest,
                 org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse>(
                   this, METHODID_SEND_SCHEMA)))
           .addMethod(
             getSendRowMethod(),
-            io.grpc.stub.ServerCalls.asyncClientStreamingCall(
+            asyncClientStreamingCall(
               new MethodHandlers<
                 org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest,
                 org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse>(
@@ -160,15 +154,19 @@ public final class RemoteServiceGrpc {
 
   /**
    */
-  public static final class RemoteServiceStub extends io.grpc.stub.AbstractAsyncStub<RemoteServiceStub> {
-    private RemoteServiceStub(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+  public static final class RemoteServiceStub extends io.grpc.stub.AbstractStub<RemoteServiceStub> {
+    private RemoteServiceStub(io.grpc.Channel channel) {
+      super(channel);
+    }
+
+    private RemoteServiceStub(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected RemoteServiceStub build(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+    protected RemoteServiceStub build(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       return new RemoteServiceStub(channel, callOptions);
     }
 
@@ -176,7 +174,7 @@ public final class RemoteServiceGrpc {
      */
     public void sendSchema(org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest request,
         io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse> responseObserver) {
-      io.grpc.stub.ClientCalls.asyncUnaryCall(
+      asyncUnaryCall(
           getChannel().newCall(getSendSchemaMethod(), getCallOptions()), request, responseObserver);
     }
 
@@ -184,44 +182,52 @@ public final class RemoteServiceGrpc {
      */
     public io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest> sendRow(
         io.grpc.stub.StreamObserver<org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse> responseObserver) {
-      return io.grpc.stub.ClientCalls.asyncClientStreamingCall(
+      return asyncClientStreamingCall(
           getChannel().newCall(getSendRowMethod(), getCallOptions()), responseObserver);
     }
   }
 
   /**
    */
-  public static final class RemoteServiceBlockingStub extends io.grpc.stub.AbstractBlockingStub<RemoteServiceBlockingStub> {
-    private RemoteServiceBlockingStub(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+  public static final class RemoteServiceBlockingStub extends io.grpc.stub.AbstractStub<RemoteServiceBlockingStub> {
+    private RemoteServiceBlockingStub(io.grpc.Channel channel) {
+      super(channel);
+    }
+
+    private RemoteServiceBlockingStub(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected RemoteServiceBlockingStub build(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+    protected RemoteServiceBlockingStub build(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       return new RemoteServiceBlockingStub(channel, callOptions);
     }
 
     /**
      */
     public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse sendSchema(org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest request) {
-      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+      return blockingUnaryCall(
           getChannel(), getSendSchemaMethod(), getCallOptions(), request);
     }
   }
 
   /**
    */
-  public static final class RemoteServiceFutureStub extends io.grpc.stub.AbstractFutureStub<RemoteServiceFutureStub> {
-    private RemoteServiceFutureStub(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+  public static final class RemoteServiceFutureStub extends io.grpc.stub.AbstractStub<RemoteServiceFutureStub> {
+    private RemoteServiceFutureStub(io.grpc.Channel channel) {
+      super(channel);
+    }
+
+    private RemoteServiceFutureStub(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected RemoteServiceFutureStub build(
-        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+    protected RemoteServiceFutureStub build(io.grpc.Channel channel,
+        io.grpc.CallOptions callOptions) {
       return new RemoteServiceFutureStub(channel, callOptions);
     }
 
@@ -229,7 +235,7 @@ public final class RemoteServiceGrpc {
      */
     public com.google.common.util.concurrent.ListenableFuture<org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse> sendSchema(
         org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest request) {
-      return io.grpc.stub.ClientCalls.futureUnaryCall(
+      return futureUnaryCall(
           getChannel().newCall(getSendSchemaMethod(), getCallOptions()), request);
     }
   }

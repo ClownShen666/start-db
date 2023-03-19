@@ -6,18 +6,12 @@ package org.urbcomp.cupid.db.spark.data;
 public final class GrpcRemote {
   private GrpcRemote() {}
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
-  }
-
-  public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
-    registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  public interface SchemaRequestOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.urbcomp.cupid.db.spark.data.SchemaRequest)
-      com.google.protobuf.MessageOrBuilder {
+  public interface SchemaRequestOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // required string sqlId = 1;
     /**
      * <code>required string sqlId = 1;</code>
      */
@@ -32,6 +26,7 @@ public final class GrpcRemote {
     com.google.protobuf.ByteString
         getSqlIdBytes();
 
+    // required string schemaJson = 2;
     /**
      * <code>required string schemaJson = 2;</code>
      */
@@ -49,33 +44,36 @@ public final class GrpcRemote {
   /**
    * Protobuf type {@code org.urbcomp.cupid.db.spark.data.SchemaRequest}
    */
-  public  static final class SchemaRequest extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:org.urbcomp.cupid.db.spark.data.SchemaRequest)
-      SchemaRequestOrBuilder {
-  private static final long serialVersionUID = 0L;
+  public static final class SchemaRequest extends
+      com.google.protobuf.GeneratedMessage
+      implements SchemaRequestOrBuilder {
     // Use SchemaRequest.newBuilder() to construct.
-    private SchemaRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private SchemaRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private SchemaRequest() {
-      sqlId_ = "";
-      schemaJson_ = "";
+    private SchemaRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SchemaRequest defaultInstance;
+    public static SchemaRequest getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public SchemaRequest getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private SchemaRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -87,23 +85,21 @@ public final class GrpcRemote {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              sqlId_ = bs;
+              sqlId_ = input.readBytes();
               break;
             }
             case 18: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              schemaJson_ = bs;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
+              schemaJson_ = input.readBytes();
               break;
             }
           }
@@ -112,7 +108,7 @@ public final class GrpcRemote {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -123,17 +119,32 @@ public final class GrpcRemote {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor;
     }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest.class, org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest.Builder.class);
     }
 
+    public static com.google.protobuf.Parser<SchemaRequest> PARSER =
+        new com.google.protobuf.AbstractParser<SchemaRequest>() {
+      public SchemaRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SchemaRequest(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SchemaRequest> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
+    // required string sqlId = 1;
     public static final int SQLID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object sqlId_;
+    private java.lang.Object sqlId_;
     /**
      * <code>required string sqlId = 1;</code>
      */
@@ -174,8 +185,9 @@ public final class GrpcRemote {
       }
     }
 
+    // required string schemaJson = 2;
     public static final int SCHEMAJSON_FIELD_NUMBER = 2;
-    private volatile java.lang.Object schemaJson_;
+    private java.lang.Object schemaJson_;
     /**
      * <code>required string schemaJson = 2;</code>
      */
@@ -216,12 +228,14 @@ public final class GrpcRemote {
       }
     }
 
+    private void initFields() {
+      sqlId_ = "";
+      schemaJson_ = "";
+    }
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasSqlId()) {
         memoizedIsInitialized = 0;
@@ -235,91 +249,44 @@ public final class GrpcRemote {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, sqlId_);
+        output.writeBytes(1, getSqlIdBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, schemaJson_);
+        output.writeBytes(2, getSchemaJsonBytes());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
-    @java.lang.Override
+    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSize;
+      int size = memoizedSerializedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, sqlId_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getSqlIdBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, schemaJson_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getSchemaJsonBytes());
       }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest)) {
-        return super.equals(obj);
-      }
-      org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest other = (org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest) obj;
-
-      boolean result = true;
-      result = result && (hasSqlId() == other.hasSqlId());
-      if (hasSqlId()) {
-        result = result && getSqlId()
-            .equals(other.getSqlId());
-      }
-      result = result && (hasSchemaJson() == other.hasSchemaJson());
-      if (hasSchemaJson()) {
-        result = result && getSchemaJson()
-            .equals(other.getSchemaJson());
-      }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
     }
 
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasSqlId()) {
-        hash = (37 * hash) + SQLID_FIELD_NUMBER;
-        hash = (53 * hash) + getSqlId().hashCode();
-      }
-      if (hasSchemaJson()) {
-        hash = (37 * hash) + SCHEMAJSON_FIELD_NUMBER;
-        hash = (53 * hash) + getSchemaJson().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -343,59 +310,46 @@ public final class GrpcRemote {
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    @java.lang.Override
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
     public static Builder newBuilder(org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -403,16 +357,14 @@ public final class GrpcRemote {
      * Protobuf type {@code org.urbcomp.cupid.db.spark.data.SchemaRequest}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.urbcomp.cupid.db.spark.data.SchemaRequest)
-        org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequestOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequestOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor;
       }
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -425,16 +377,18 @@ public final class GrpcRemote {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         sqlId_ = "";
@@ -444,18 +398,19 @@ public final class GrpcRemote {
         return this;
       }
 
-      @java.lang.Override
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest getDefaultInstanceForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest build() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -464,7 +419,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest buildPartial() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest result = new org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest(this);
         int from_bitField0_ = bitField0_;
@@ -482,39 +436,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return (Builder) super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest) {
           return mergeFrom((org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest)other);
@@ -536,23 +457,22 @@ public final class GrpcRemote {
           schemaJson_ = other.schemaJson_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         if (!hasSqlId()) {
+          
           return false;
         }
         if (!hasSchemaJson()) {
+          
           return false;
         }
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -562,7 +482,7 @@ public final class GrpcRemote {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
+          throw e;
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -572,6 +492,7 @@ public final class GrpcRemote {
       }
       private int bitField0_;
 
+      // required string sqlId = 1;
       private java.lang.Object sqlId_ = "";
       /**
        * <code>required string sqlId = 1;</code>
@@ -585,12 +506,9 @@ public final class GrpcRemote {
       public java.lang.String getSqlId() {
         java.lang.Object ref = sqlId_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            sqlId_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          sqlId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -648,6 +566,7 @@ public final class GrpcRemote {
         return this;
       }
 
+      // required string schemaJson = 2;
       private java.lang.Object schemaJson_ = "";
       /**
        * <code>required string schemaJson = 2;</code>
@@ -661,12 +580,9 @@ public final class GrpcRemote {
       public java.lang.String getSchemaJson() {
         java.lang.Object ref = schemaJson_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            schemaJson_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          schemaJson_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -723,63 +639,22 @@ public final class GrpcRemote {
         onChanged();
         return this;
       }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
 
       // @@protoc_insertion_point(builder_scope:org.urbcomp.cupid.db.spark.data.SchemaRequest)
     }
 
-    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.SchemaRequest)
-    private static final org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest();
+      defaultInstance = new SchemaRequest(true);
+      defaultInstance.initFields();
     }
 
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<SchemaRequest>
-        PARSER = new com.google.protobuf.AbstractParser<SchemaRequest>() {
-      @java.lang.Override
-      public SchemaRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SchemaRequest(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<SchemaRequest> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<SchemaRequest> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaRequest getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
+    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.SchemaRequest)
   }
 
-  public interface SchemaResponseOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.urbcomp.cupid.db.spark.data.SchemaResponse)
-      com.google.protobuf.MessageOrBuilder {
+  public interface SchemaResponseOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // optional string res = 1;
     /**
      * <code>optional string res = 1;</code>
      */
@@ -797,32 +672,36 @@ public final class GrpcRemote {
   /**
    * Protobuf type {@code org.urbcomp.cupid.db.spark.data.SchemaResponse}
    */
-  public  static final class SchemaResponse extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:org.urbcomp.cupid.db.spark.data.SchemaResponse)
-      SchemaResponseOrBuilder {
-  private static final long serialVersionUID = 0L;
+  public static final class SchemaResponse extends
+      com.google.protobuf.GeneratedMessage
+      implements SchemaResponseOrBuilder {
     // Use SchemaResponse.newBuilder() to construct.
-    private SchemaResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private SchemaResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private SchemaResponse() {
-      res_ = "";
+    private SchemaResponse(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final SchemaResponse defaultInstance;
+    public static SchemaResponse getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public SchemaResponse getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private SchemaResponse(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -834,17 +713,16 @@ public final class GrpcRemote {
             case 0:
               done = true;
               break;
-            case 10: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000001;
-              res_ = bs;
-              break;
-            }
             default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              res_ = input.readBytes();
               break;
             }
           }
@@ -853,7 +731,7 @@ public final class GrpcRemote {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -864,17 +742,32 @@ public final class GrpcRemote {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor;
     }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse.class, org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse.Builder.class);
     }
 
+    public static com.google.protobuf.Parser<SchemaResponse> PARSER =
+        new com.google.protobuf.AbstractParser<SchemaResponse>() {
+      public SchemaResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new SchemaResponse(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SchemaResponse> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
+    // optional string res = 1;
     public static final int RES_FIELD_NUMBER = 1;
-    private volatile java.lang.Object res_;
+    private java.lang.Object res_;
     /**
      * <code>optional string res = 1;</code>
      */
@@ -915,87 +808,49 @@ public final class GrpcRemote {
       }
     }
 
+    private void initFields() {
+      res_ = "";
+    }
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, res_);
+        output.writeBytes(1, getResBytes());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
-    @java.lang.Override
+    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSize;
+      int size = memoizedSerializedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, res_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getResBytes());
       }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse)) {
-        return super.equals(obj);
-      }
-      org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse other = (org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse) obj;
-
-      boolean result = true;
-      result = result && (hasRes() == other.hasRes());
-      if (hasRes()) {
-        result = result && getRes()
-            .equals(other.getRes());
-      }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
     }
 
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasRes()) {
-        hash = (37 * hash) + RES_FIELD_NUMBER;
-        hash = (53 * hash) + getRes().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1019,59 +874,46 @@ public final class GrpcRemote {
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    @java.lang.Override
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
     public static Builder newBuilder(org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1079,16 +921,14 @@ public final class GrpcRemote {
      * Protobuf type {@code org.urbcomp.cupid.db.spark.data.SchemaResponse}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.urbcomp.cupid.db.spark.data.SchemaResponse)
-        org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponseOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponseOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor;
       }
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1101,16 +941,18 @@ public final class GrpcRemote {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         res_ = "";
@@ -1118,18 +960,19 @@ public final class GrpcRemote {
         return this;
       }
 
-      @java.lang.Override
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse getDefaultInstanceForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse build() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -1138,7 +981,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse buildPartial() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse result = new org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse(this);
         int from_bitField0_ = bitField0_;
@@ -1152,39 +994,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return (Builder) super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse) {
           return mergeFrom((org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse)other);
@@ -1201,17 +1010,14 @@ public final class GrpcRemote {
           res_ = other.res_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1221,7 +1027,7 @@ public final class GrpcRemote {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
+          throw e;
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -1231,6 +1037,7 @@ public final class GrpcRemote {
       }
       private int bitField0_;
 
+      // optional string res = 1;
       private java.lang.Object res_ = "";
       /**
        * <code>optional string res = 1;</code>
@@ -1244,12 +1051,9 @@ public final class GrpcRemote {
       public java.lang.String getRes() {
         java.lang.Object ref = res_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            res_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          res_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1306,63 +1110,22 @@ public final class GrpcRemote {
         onChanged();
         return this;
       }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
 
       // @@protoc_insertion_point(builder_scope:org.urbcomp.cupid.db.spark.data.SchemaResponse)
     }
 
-    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.SchemaResponse)
-    private static final org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse();
+      defaultInstance = new SchemaResponse(true);
+      defaultInstance.initFields();
     }
 
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<SchemaResponse>
-        PARSER = new com.google.protobuf.AbstractParser<SchemaResponse>() {
-      @java.lang.Override
-      public SchemaResponse parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SchemaResponse(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<SchemaResponse> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<SchemaResponse> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.urbcomp.cupid.db.spark.data.GrpcRemote.SchemaResponse getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
+    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.SchemaResponse)
   }
 
-  public interface RowRequestOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.urbcomp.cupid.db.spark.data.RowRequest)
-      com.google.protobuf.MessageOrBuilder {
+  public interface RowRequestOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // required string sqlId = 1;
     /**
      * <code>required string sqlId = 1;</code>
      */
@@ -1380,32 +1143,36 @@ public final class GrpcRemote {
   /**
    * Protobuf type {@code org.urbcomp.cupid.db.spark.data.RowRequest}
    */
-  public  static final class RowRequest extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:org.urbcomp.cupid.db.spark.data.RowRequest)
-      RowRequestOrBuilder {
-  private static final long serialVersionUID = 0L;
+  public static final class RowRequest extends
+      com.google.protobuf.GeneratedMessage
+      implements RowRequestOrBuilder {
     // Use RowRequest.newBuilder() to construct.
-    private RowRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private RowRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private RowRequest() {
-      sqlId_ = "";
+    private RowRequest(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RowRequest defaultInstance;
+    public static RowRequest getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public RowRequest getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private RowRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1417,17 +1184,16 @@ public final class GrpcRemote {
             case 0:
               done = true;
               break;
-            case 10: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000001;
-              sqlId_ = bs;
-              break;
-            }
             default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              sqlId_ = input.readBytes();
               break;
             }
           }
@@ -1436,7 +1202,7 @@ public final class GrpcRemote {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1447,17 +1213,32 @@ public final class GrpcRemote {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor;
     }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest.class, org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest.Builder.class);
     }
 
+    public static com.google.protobuf.Parser<RowRequest> PARSER =
+        new com.google.protobuf.AbstractParser<RowRequest>() {
+      public RowRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RowRequest(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RowRequest> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
+    // required string sqlId = 1;
     public static final int SQLID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object sqlId_;
+    private java.lang.Object sqlId_;
     /**
      * <code>required string sqlId = 1;</code>
      */
@@ -1498,12 +1279,13 @@ public final class GrpcRemote {
       }
     }
 
+    private void initFields() {
+      sqlId_ = "";
+    }
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasSqlId()) {
         memoizedIsInitialized = 0;
@@ -1513,76 +1295,37 @@ public final class GrpcRemote {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, sqlId_);
+        output.writeBytes(1, getSqlIdBytes());
       }
-      unknownFields.writeTo(output);
+      getUnknownFields().writeTo(output);
     }
 
-    @java.lang.Override
+    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSize;
+      int size = memoizedSerializedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, sqlId_);
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getSqlIdBytes());
       }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest)) {
-        return super.equals(obj);
-      }
-      org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest other = (org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest) obj;
-
-      boolean result = true;
-      result = result && (hasSqlId() == other.hasSqlId());
-      if (hasSqlId()) {
-        result = result && getSqlId()
-            .equals(other.getSqlId());
-      }
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
     }
 
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasSqlId()) {
-        hash = (37 * hash) + SQLID_FIELD_NUMBER;
-        hash = (53 * hash) + getSqlId().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1606,59 +1349,46 @@ public final class GrpcRemote {
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    @java.lang.Override
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
     public static Builder newBuilder(org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1666,16 +1396,14 @@ public final class GrpcRemote {
      * Protobuf type {@code org.urbcomp.cupid.db.spark.data.RowRequest}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.urbcomp.cupid.db.spark.data.RowRequest)
-        org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequestOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequestOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor;
       }
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1688,16 +1416,18 @@ public final class GrpcRemote {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         sqlId_ = "";
@@ -1705,18 +1435,19 @@ public final class GrpcRemote {
         return this;
       }
 
-      @java.lang.Override
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest getDefaultInstanceForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest build() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -1725,7 +1456,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest buildPartial() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest result = new org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest(this);
         int from_bitField0_ = bitField0_;
@@ -1739,39 +1469,6 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return (Builder) super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest) {
           return mergeFrom((org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest)other);
@@ -1788,20 +1485,18 @@ public final class GrpcRemote {
           sqlId_ = other.sqlId_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         if (!hasSqlId()) {
+          
           return false;
         }
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1811,7 +1506,7 @@ public final class GrpcRemote {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
+          throw e;
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -1821,6 +1516,7 @@ public final class GrpcRemote {
       }
       private int bitField0_;
 
+      // required string sqlId = 1;
       private java.lang.Object sqlId_ = "";
       /**
        * <code>required string sqlId = 1;</code>
@@ -1834,12 +1530,9 @@ public final class GrpcRemote {
       public java.lang.String getSqlId() {
         java.lang.Object ref = sqlId_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            sqlId_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          sqlId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1896,91 +1589,54 @@ public final class GrpcRemote {
         onChanged();
         return this;
       }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
 
       // @@protoc_insertion_point(builder_scope:org.urbcomp.cupid.db.spark.data.RowRequest)
     }
 
-    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.RowRequest)
-    private static final org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest();
+      defaultInstance = new RowRequest(true);
+      defaultInstance.initFields();
     }
 
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<RowRequest>
-        PARSER = new com.google.protobuf.AbstractParser<RowRequest>() {
-      @java.lang.Override
-      public RowRequest parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RowRequest(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<RowRequest> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<RowRequest> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowRequest getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
+    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.RowRequest)
   }
 
-  public interface RowResponseOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:org.urbcomp.cupid.db.spark.data.RowResponse)
-      com.google.protobuf.MessageOrBuilder {
+  public interface RowResponseOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
   }
   /**
    * Protobuf type {@code org.urbcomp.cupid.db.spark.data.RowResponse}
    */
-  public  static final class RowResponse extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:org.urbcomp.cupid.db.spark.data.RowResponse)
-      RowResponseOrBuilder {
-  private static final long serialVersionUID = 0L;
+  public static final class RowResponse extends
+      com.google.protobuf.GeneratedMessage
+      implements RowResponseOrBuilder {
     // Use RowResponse.newBuilder() to construct.
-    private RowResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private RowResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private RowResponse() {
+    private RowResponse(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RowResponse defaultInstance;
+    public static RowResponse getDefaultInstance() {
+      return defaultInstance;
     }
 
+    public RowResponse getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
+        getUnknownFields() {
       return this.unknownFields;
     }
     private RowResponse(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
+      initFields();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -1992,8 +1648,8 @@ public final class GrpcRemote {
               done = true;
               break;
             default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -2004,7 +1660,7 @@ public final class GrpcRemote {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
+            e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2015,80 +1671,63 @@ public final class GrpcRemote {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor;
     }
 
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse.class, org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse.Builder.class);
     }
 
-    private byte memoizedIsInitialized = -1;
+    public static com.google.protobuf.Parser<RowResponse> PARSER =
+        new com.google.protobuf.AbstractParser<RowResponse>() {
+      public RowResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RowResponse(input, extensionRegistry);
+      }
+    };
+
     @java.lang.Override
+    public com.google.protobuf.Parser<RowResponse> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       memoizedIsInitialized = 1;
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      unknownFields.writeTo(output);
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
     }
 
-    @java.lang.Override
+    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSize;
+      int size = memoizedSerializedSize;
       if (size != -1) return size;
 
       size = 0;
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse)) {
-        return super.equals(obj);
-      }
-      org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse other = (org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse) obj;
-
-      boolean result = true;
-      result = result && unknownFields.equals(other.unknownFields);
-      return result;
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
     }
 
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2112,59 +1751,46 @@ public final class GrpcRemote {
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
+      return PARSER.parseFrom(input);
     }
     public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
+      return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    @java.lang.Override
+    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
     public static Builder newBuilder(org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      return newBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
+    public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -2172,16 +1798,14 @@ public final class GrpcRemote {
      * Protobuf type {@code org.urbcomp.cupid.db.spark.data.RowResponse}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:org.urbcomp.cupid.db.spark.data.RowResponse)
-        org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponseOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponseOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor;
       }
 
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -2194,33 +1818,36 @@ public final class GrpcRemote {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
+      private static Builder create() {
+        return new Builder();
+      }
+
       public Builder clear() {
         super.clear();
         return this;
       }
 
-      @java.lang.Override
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse getDefaultInstanceForType() {
         return org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse build() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse result = buildPartial();
         if (!result.isInitialized()) {
@@ -2229,46 +1856,12 @@ public final class GrpcRemote {
         return result;
       }
 
-      @java.lang.Override
       public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse buildPartial() {
         org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse result = new org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse(this);
         onBuilt();
         return result;
       }
 
-      @java.lang.Override
-      public Builder clone() {
-        return (Builder) super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return (Builder) super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return (Builder) super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return (Builder) super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return (Builder) super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse) {
           return mergeFrom((org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse)other);
@@ -2280,17 +1873,14 @@ public final class GrpcRemote {
 
       public Builder mergeFrom(org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse other) {
         if (other == org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse.getDefaultInstance()) return this;
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
+        this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2300,7 +1890,7 @@ public final class GrpcRemote {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
+          throw e;
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -2308,85 +1898,44 @@ public final class GrpcRemote {
         }
         return this;
       }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
 
       // @@protoc_insertion_point(builder_scope:org.urbcomp.cupid.db.spark.data.RowResponse)
     }
 
-    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.RowResponse)
-    private static final org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse();
+      defaultInstance = new RowResponse(true);
+      defaultInstance.initFields();
     }
 
-    public static org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<RowResponse>
-        PARSER = new com.google.protobuf.AbstractParser<RowResponse>() {
-      @java.lang.Override
-      public RowResponse parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RowResponse(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<RowResponse> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<RowResponse> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
+    // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.RowResponse)
   }
 
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
   }
-  private static  com.google.protobuf.Descriptors.FileDescriptor
+  private static com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {
@@ -2395,50 +1944,44 @@ public final class GrpcRemote {
       "\rSchemaRequest\022\r\n\005sqlId\030\001 \002(\t\022\022\n\nschemaJ" +
       "son\030\002 \002(\t\"\035\n\016SchemaResponse\022\013\n\003res\030\001 \001(\t" +
       "\"\033\n\nRowRequest\022\r\n\005sqlId\030\001 \002(\t\"\r\n\013RowResp" +
-      "onse2\352\001\n\rRemoteService\022o\n\nsendSchema\022..o" +
-      "rg.urbcomp.cupid.db.spark.data.SchemaReq" +
-      "uest\032/.org.urbcomp.cupid.db.spark.data.S" +
-      "chemaResponse\"\000\022h\n\007sendRow\022+.org.urbcomp" +
-      ".cupid.db.spark.data.RowRequest\032,.org.ur" +
-      "bcomp.cupid.db.spark.data.RowResponse\"\000(" +
-      "\001"
+      "onse"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor,
+              new java.lang.String[] { "SqlId", "SchemaJson", });
+          internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor,
+              new java.lang.String[] { "Res", });
+          internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor,
+              new java.lang.String[] { "SqlId", });
+          internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor =
+            getDescriptor().getMessageTypes().get(3);
+          internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor,
+              new java.lang.String[] { });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_org_urbcomp_cupid_db_spark_data_SchemaRequest_descriptor,
-        new java.lang.String[] { "SqlId", "SchemaJson", });
-    internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_org_urbcomp_cupid_db_spark_data_SchemaResponse_descriptor,
-        new java.lang.String[] { "Res", });
-    internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor,
-        new java.lang.String[] { "SqlId", });
-    internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor,
-        new java.lang.String[] { });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

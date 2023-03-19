@@ -35,7 +35,7 @@ class RemoteTableTest extends FunSuite {
     val df =
       session.createDataFrame(Seq(("a", "a2"), ("b", "b2"), ("c", "c2"))).toDF("col1", "col2")
 
-    df.coalesce(2)
+    df.coalesce(1)
       .write
       .format("org.urbcomp.cupid.db.spark.ds.remote.RemoteWriteSource")
       .mode(SaveMode.Overwrite)

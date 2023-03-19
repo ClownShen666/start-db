@@ -24,10 +24,10 @@ import java.util
 import java.util.concurrent.TimeUnit
 
 /**
- * 使用grpc的原因是支持流式传输
- *
- * @author jimo
- * */
+  * 使用grpc的原因是支持流式传输
+  *
+  * @author jimo
+  * */
 class GrpcRemoteWriter extends IRemoteWriter {
 
   private val options: util.Map[String, String] = IRemoteWriter.options
@@ -35,8 +35,13 @@ class GrpcRemoteWriter extends IRemoteWriter {
   private val sqlId = options.get("sqlId")
 
   // 先发送schema
-  remoteClient.sendSchema(SchemaRequest.newBuilder()
-    .setSqlId(sqlId).setSchemaJson(options.get(RemoteWriteSource.SCHEMA_KEY)).build())
+  remoteClient.sendSchema(
+    SchemaRequest
+      .newBuilder()
+      .setSqlId(sqlId)
+      .setSchemaJson(options.get(RemoteWriteSource.SCHEMA_KEY))
+      .build()
+  )
 
   override def commit(): Unit = {
     remoteClient.commit()

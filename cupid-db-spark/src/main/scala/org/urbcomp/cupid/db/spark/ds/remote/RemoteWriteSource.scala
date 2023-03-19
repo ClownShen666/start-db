@@ -33,10 +33,10 @@ class RemoteWriteSource extends TableProvider {
     getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
 
   override def getTable(
-                         structType: StructType,
-                         transforms: Array[Transform],
-                         map: util.Map[String, String]
-                       ): Table =
+      structType: StructType,
+      transforms: Array[Transform],
+      map: util.Map[String, String]
+  ): Table =
     new RemoteTable(map)
 }
 
@@ -60,7 +60,7 @@ class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
 }
 
 class RemoteWriteBuilder(options: util.Map[String, String])
-  extends WriteBuilder
+    extends WriteBuilder
     with SupportsOverwrite {
 
   override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
@@ -111,9 +111,10 @@ class RemoteWriter extends DataWriter[InternalRow] {
 }
 
 object RemoteWriter {
+
   /**
-   * 这里用静态方式的原因是：RemoteWriter 里的grpc连接无法序列化
-   */
+    * 这里用静态方式的原因是：RemoteWriter 里的grpc连接无法序列化
+    */
   val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance()
 }
 
