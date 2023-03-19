@@ -33,8 +33,8 @@ public class RemoteClient implements Serializable {
         this(ManagedChannelBuilder.forAddress("localhost", 8848).usePlaintext().build());
     }
 
-    public RemoteClient(int port) {
-        this(ManagedChannelBuilder.forAddress("localhost", port).usePlaintext().build());
+    public RemoteClient(String host, int port) {
+        this(ManagedChannelBuilder.forAddress(host, port).usePlaintext().build());
     }
 
     public RemoteClient(Channel channel) {

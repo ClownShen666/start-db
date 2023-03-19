@@ -16,13 +16,21 @@
  */
 package org.urbcomp.cupid.db.spark.ds.remote
 
+import io.grpc.inprocess.InProcessServerBuilder
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.scalatest.FunSuite
+import org.urbcomp.cupid.db.spark.data.{RemoteServer, RemoteServiceImpl}
 
 class RemoteTableTest extends FunSuite {
 
   test("remote source") {
+    val serverName = InProcessServerBuilder.generateName()
+    val server = new RemoteServer(
+      InProcessServerBuilder.forName(serverName).addService(new RemoteServiceImpl).build()
+    )
+    server.start()
+
     val conf = new SparkConf()
 
     val session = SparkSession
@@ -40,7 +48,8 @@ class RemoteTableTest extends FunSuite {
       .format("org.urbcomp.cupid.db.spark.ds.remote.RemoteWriteSource")
       .mode(SaveMode.Overwrite)
       .option(RemoteWriteSource.SCHEMA_KEY, df.schema.json)
-      .option("sqlId", "v2")
+      .option("sqlId", "sqlIdYa")
+      .option("InProcessChannelForTest", serverName)
       .save()
   }
 

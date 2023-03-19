@@ -23,6 +23,10 @@ public class SparkSqlParam extends SqlParam {
 
     public static final ThreadLocal<SparkSqlParam> CACHE = new ThreadLocal<>();
 
+    public static final String SQL_ID_KEY = "sqlId";
+    public static final String REMOTE_PORT_KEY = "port";
+    public static final String REMOTE_HOST_KEY = "hostname";
+
     private String hbaseZookeepers;
     /**
      * 是否异步执行

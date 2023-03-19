@@ -16,9 +16,11 @@
  */
 package org.urbcomp.cupid.db.spark.ds.remote
 
+import io.grpc.inprocess.InProcessChannelBuilder
 import org.apache.spark.sql.catalyst.InternalRow
 import org.urbcomp.cupid.db.spark.data.GrpcRemote.{RowRequest, SchemaRequest}
 import org.urbcomp.cupid.db.spark.data.RemoteClient
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
 import java.util
 import java.util.concurrent.TimeUnit
@@ -31,8 +33,17 @@ import java.util.concurrent.TimeUnit
 class GrpcRemoteWriter extends IRemoteWriter {
 
   private val options: util.Map[String, String] = IRemoteWriter.options
-  private val remoteClient: RemoteClient = new RemoteClient(8848)
-  private val sqlId = options.get("sqlId")
+  private val remoteClient: RemoteClient =
+    if (options.get("InProcessChannelForTest") == null)
+      new RemoteClient(
+        options.getOrDefault(SparkSqlParam.REMOTE_HOST_KEY, "localhost"),
+        options.getOrDefault(SparkSqlParam.REMOTE_PORT_KEY, "8848").toInt
+      )
+    else
+      new RemoteClient(
+        InProcessChannelBuilder.forName(options.get("InProcessChannelForTest")).build()
+      )
+  private val sqlId = options.get(SparkSqlParam.SQL_ID_KEY)
 
   // 先发送schema
   remoteClient.sendSchema(

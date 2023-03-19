@@ -20,6 +20,7 @@ import org.apache.calcite.avatica.server.AvaticaJsonHandler;
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.jdbc.DbMetaFactory;
 import org.urbcomp.cupid.db.server.daemon.DaemonManager;
+import org.urbcomp.cupid.db.spark.data.RemoteServer;
 
 /**
  * @author jimo
