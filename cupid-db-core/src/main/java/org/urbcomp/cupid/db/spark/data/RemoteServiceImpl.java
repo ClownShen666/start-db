@@ -45,7 +45,9 @@ public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
         return new StreamObserver<GrpcRemote.RowRequest>() {
             @Override
             public void onNext(GrpcRemote.RowRequest rowRequest) {
-                System.out.println("收到一条数据：" + rowRequest.getSqlId());
+                System.out.println(
+                    "收到一条数据：" + rowRequest.getSqlId() + ", bytes=" + rowRequest.getData()
+                );
             }
 
             @Override

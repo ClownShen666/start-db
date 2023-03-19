@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark.res
+package org.urbcomp.cupid.db.datatype;
 
-import org.apache.spark.sql.DataFrame
-import org.urbcomp.cupid.db.util.SparkSqlParam
+import com.esotericsoftware.kryo.Kryo;
 
 /**
-  * the interface to export spark dataframe data
-  *
-  * @author jimo
-  * */
-trait ISparkResultExporter {
+ * @author jimo
+ **/
+public class KryoHelper {
 
-  def exportData(param: SparkSqlParam, data: DataFrame): Unit
+    public static Kryo getKryo() {
+        final Kryo kryo = new Kryo();
+        kryo.setReferences(false);
+        // register serializer
+        return kryo;
+    }
 }

@@ -19,15 +19,15 @@ package org.urbcomp.cupid.db.spark.res
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.datatype.DataTypeField
-import org.urbcomp.cupid.db.util.JacksonUtil
+import org.urbcomp.cupid.db.util.{JacksonUtil, SparkSqlParam}
 
 /**
   * @author jimo
   * */
 class SparkResult2HdfsExporter extends ISparkResultExporter {
 
-  override def exportData(sqlId: String, data: DataFrame): Unit = {
-
+  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
+    val sqlId = param.getSqlId
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
 
     val typeFields =

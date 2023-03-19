@@ -19,8 +19,9 @@ message SchemaResponse {
 
 message RowRequest {
   required string sqlId = 1;
+  required bytes data = 2;
 }
 
 message RowResponse {
-
+ optional string res = 1;
 }

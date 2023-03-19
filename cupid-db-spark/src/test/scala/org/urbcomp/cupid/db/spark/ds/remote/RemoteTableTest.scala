@@ -21,6 +21,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.{SaveMode, SparkSession}
 import org.scalatest.FunSuite
 import org.urbcomp.cupid.db.spark.data.{RemoteServer, RemoteServiceImpl}
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
 class RemoteTableTest extends FunSuite {
 
@@ -48,7 +49,7 @@ class RemoteTableTest extends FunSuite {
       .format("org.urbcomp.cupid.db.spark.ds.remote.RemoteWriteSource")
       .mode(SaveMode.Overwrite)
       .option(RemoteWriteSource.SCHEMA_KEY, df.schema.json)
-      .option("sqlId", "sqlIdYa")
+      .option(SparkSqlParam.SQL_ID_KEY, "sqlIdYa")
       .option("InProcessChannelForTest", serverName)
       .save()
   }

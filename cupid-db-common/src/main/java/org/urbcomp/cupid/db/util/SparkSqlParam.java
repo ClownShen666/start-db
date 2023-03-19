@@ -33,6 +33,9 @@ public class SparkSqlParam extends SqlParam {
      */
     private boolean async;
 
+    private String remoteHost;
+    private int remotePort;
+
     public String getHbaseZookeepers() {
         return hbaseZookeepers;
     }
@@ -47,5 +50,21 @@ public class SparkSqlParam extends SqlParam {
 
     public void setAsync(boolean async) {
         this.async = async;
+    }
+
+    public String getRemoteHost() {
+        return remoteHost;
+    }
+
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
+    public int getRemotePort() {
+        return remotePort;
+    }
+
+    public void setRemotePort(int remotePort) {
+        this.remotePort = remotePort;
     }
 }

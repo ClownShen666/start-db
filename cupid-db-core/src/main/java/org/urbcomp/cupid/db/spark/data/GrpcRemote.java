@@ -1259,6 +1259,17 @@ public final class GrpcRemote {
          * <code>required string sqlId = 1;</code>
          */
         com.google.protobuf.ByteString getSqlIdBytes();
+
+        // required bytes data = 2;
+        /**
+         * <code>required bytes data = 2;</code>
+         */
+        boolean hasData();
+
+        /**
+         * <code>required bytes data = 2;</code>
+         */
+        com.google.protobuf.ByteString getData();
     }
 
     /**
@@ -1319,6 +1330,11 @@ public final class GrpcRemote {
                         case 10: {
                             bitField0_ |= 0x00000001;
                             sqlId_ = input.readBytes();
+                            break;
+                        }
+                        case 18: {
+                            bitField0_ |= 0x00000002;
+                            data_ = input.readBytes();
                             break;
                         }
                     }
@@ -1408,8 +1424,27 @@ public final class GrpcRemote {
             }
         }
 
+        // required bytes data = 2;
+        public static final int DATA_FIELD_NUMBER = 2;
+        private com.google.protobuf.ByteString data_;
+
+        /**
+         * <code>required bytes data = 2;</code>
+         */
+        public boolean hasData() {
+            return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+
+        /**
+         * <code>required bytes data = 2;</code>
+         */
+        public com.google.protobuf.ByteString getData() {
+            return data_;
+        }
+
         private void initFields() {
             sqlId_ = "";
+            data_ = com.google.protobuf.ByteString.EMPTY;
         }
 
         private byte memoizedIsInitialized = -1;
@@ -1419,6 +1454,10 @@ public final class GrpcRemote {
             if (isInitialized != -1) return isInitialized == 1;
 
             if (!hasSqlId()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasData()) {
                 memoizedIsInitialized = 0;
                 return false;
             }
@@ -1432,6 +1471,9 @@ public final class GrpcRemote {
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 output.writeBytes(1, getSqlIdBytes());
             }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                output.writeBytes(2, data_);
+            }
             getUnknownFields().writeTo(output);
         }
 
@@ -1444,6 +1486,9 @@ public final class GrpcRemote {
             size = 0;
             if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 size += com.google.protobuf.CodedOutputStream.computeBytesSize(1, getSqlIdBytes());
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                size += com.google.protobuf.CodedOutputStream.computeBytesSize(2, data_);
             }
             size += getUnknownFields().getSerializedSize();
             memoizedSerializedSize = size;
@@ -1589,6 +1634,8 @@ public final class GrpcRemote {
                 super.clear();
                 sqlId_ = "";
                 bitField0_ = (bitField0_ & ~0x00000001);
+                data_ = com.google.protobuf.ByteString.EMPTY;
+                bitField0_ = (bitField0_ & ~0x00000002);
                 return this;
             }
 
@@ -1623,6 +1670,10 @@ public final class GrpcRemote {
                     to_bitField0_ |= 0x00000001;
                 }
                 result.sqlId_ = sqlId_;
+                if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+                    to_bitField0_ |= 0x00000002;
+                }
+                result.data_ = data_;
                 result.bitField0_ = to_bitField0_;
                 onBuilt();
                 return result;
@@ -1645,12 +1696,19 @@ public final class GrpcRemote {
                     sqlId_ = other.sqlId_;
                     onChanged();
                 }
+                if (other.hasData()) {
+                    setData(other.getData());
+                }
                 this.mergeUnknownFields(other.getUnknownFields());
                 return this;
             }
 
             public final boolean isInitialized() {
                 if (!hasSqlId()) {
+
+                    return false;
+                }
+                if (!hasData()) {
 
                     return false;
                 }
@@ -1754,6 +1812,46 @@ public final class GrpcRemote {
                 return this;
             }
 
+            // required bytes data = 2;
+            private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+
+            /**
+             * <code>required bytes data = 2;</code>
+             */
+            public boolean hasData() {
+                return ((bitField0_ & 0x00000002) == 0x00000002);
+            }
+
+            /**
+             * <code>required bytes data = 2;</code>
+             */
+            public com.google.protobuf.ByteString getData() {
+                return data_;
+            }
+
+            /**
+             * <code>required bytes data = 2;</code>
+             */
+            public Builder setData(com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000002;
+                data_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required bytes data = 2;</code>
+             */
+            public Builder clearData() {
+                bitField0_ = (bitField0_ & ~0x00000002);
+                data_ = getDefaultInstance().getData();
+                onChanged();
+                return this;
+            }
+
             // @@protoc_insertion_point(builder_scope:org.urbcomp.cupid.db.spark.data.RowRequest)
         }
 
@@ -1765,7 +1863,24 @@ public final class GrpcRemote {
         // @@protoc_insertion_point(class_scope:org.urbcomp.cupid.db.spark.data.RowRequest)
     }
 
-    public interface RowResponseOrBuilder extends com.google.protobuf.MessageOrBuilder {}
+    public interface RowResponseOrBuilder extends com.google.protobuf.MessageOrBuilder {
+
+        // optional string res = 1;
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        boolean hasRes();
+
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        java.lang.String getRes();
+
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        com.google.protobuf.ByteString getResBytes();
+    }
 
     /**
      * Protobuf type {@code org.urbcomp.cupid.db.spark.data.RowResponse}
@@ -1805,6 +1920,7 @@ public final class GrpcRemote {
             com.google.protobuf.ExtensionRegistryLite extensionRegistry
         ) throws com.google.protobuf.InvalidProtocolBufferException {
             initFields();
+            int mutable_bitField0_ = 0;
             com.google.protobuf.UnknownFieldSet.Builder unknownFields =
                 com.google.protobuf.UnknownFieldSet.newBuilder();
             try {
@@ -1819,6 +1935,11 @@ public final class GrpcRemote {
                             if (!parseUnknownField(input, unknownFields, extensionRegistry, tag)) {
                                 done = true;
                             }
+                            break;
+                        }
+                        case 10: {
+                            bitField0_ |= 0x00000001;
+                            res_ = input.readBytes();
                             break;
                         }
                     }
@@ -1863,7 +1984,54 @@ public final class GrpcRemote {
             return PARSER;
         }
 
-        private void initFields() {}
+        private int bitField0_;
+        // optional string res = 1;
+        public static final int RES_FIELD_NUMBER = 1;
+        private java.lang.Object res_;
+
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        public boolean hasRes() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        public java.lang.String getRes() {
+            java.lang.Object ref = res_;
+            if (ref instanceof java.lang.String) {
+                return (java.lang.String) ref;
+            } else {
+                com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+                java.lang.String s = bs.toStringUtf8();
+                if (bs.isValidUtf8()) {
+                    res_ = s;
+                }
+                return s;
+            }
+        }
+
+        /**
+         * <code>optional string res = 1;</code>
+         */
+        public com.google.protobuf.ByteString getResBytes() {
+            java.lang.Object ref = res_;
+            if (ref instanceof java.lang.String) {
+                com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
+                    (java.lang.String) ref
+                );
+                res_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        private void initFields() {
+            res_ = "";
+        }
 
         private byte memoizedIsInitialized = -1;
 
@@ -1878,6 +2046,9 @@ public final class GrpcRemote {
         public void writeTo(com.google.protobuf.CodedOutputStream output)
             throws java.io.IOException {
             getSerializedSize();
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeBytes(1, getResBytes());
+            }
             getUnknownFields().writeTo(output);
         }
 
@@ -1888,6 +2059,9 @@ public final class GrpcRemote {
             if (size != -1) return size;
 
             size = 0;
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream.computeBytesSize(1, getResBytes());
+            }
             size += getUnknownFields().getSerializedSize();
             memoizedSerializedSize = size;
             return size;
@@ -2030,6 +2204,8 @@ public final class GrpcRemote {
 
             public Builder clear() {
                 super.clear();
+                res_ = "";
+                bitField0_ = (bitField0_ & ~0x00000001);
                 return this;
             }
 
@@ -2058,6 +2234,13 @@ public final class GrpcRemote {
             public org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse buildPartial() {
                 org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse result =
                     new org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse(this);
+                int from_bitField0_ = bitField0_;
+                int to_bitField0_ = 0;
+                if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+                    to_bitField0_ |= 0x00000001;
+                }
+                result.res_ = res_;
+                result.bitField0_ = to_bitField0_;
                 onBuilt();
                 return result;
             }
@@ -2076,6 +2259,11 @@ public final class GrpcRemote {
             public Builder mergeFrom(org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse other) {
                 if (other == org.urbcomp.cupid.db.spark.data.GrpcRemote.RowResponse
                     .getDefaultInstance()) return this;
+                if (other.hasRes()) {
+                    bitField0_ |= 0x00000001;
+                    res_ = other.res_;
+                    onChanged();
+                }
                 this.mergeUnknownFields(other.getUnknownFields());
                 return this;
             }
@@ -2100,6 +2288,84 @@ public final class GrpcRemote {
                         mergeFrom(parsedMessage);
                     }
                 }
+                return this;
+            }
+
+            private int bitField0_;
+
+            // optional string res = 1;
+            private java.lang.Object res_ = "";
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public boolean hasRes() {
+                return ((bitField0_ & 0x00000001) == 0x00000001);
+            }
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public java.lang.String getRes() {
+                java.lang.Object ref = res_;
+                if (!(ref instanceof java.lang.String)) {
+                    java.lang.String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+                    res_ = s;
+                    return s;
+                } else {
+                    return (java.lang.String) ref;
+                }
+            }
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public com.google.protobuf.ByteString getResBytes() {
+                java.lang.Object ref = res_;
+                if (ref instanceof String) {
+                    com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
+                        (java.lang.String) ref
+                    );
+                    res_ = b;
+                    return b;
+                } else {
+                    return (com.google.protobuf.ByteString) ref;
+                }
+            }
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public Builder setRes(java.lang.String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000001;
+                res_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public Builder clearRes() {
+                bitField0_ = (bitField0_ & ~0x00000001);
+                res_ = getDefaultInstance().getRes();
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>optional string res = 1;</code>
+             */
+            public Builder setResBytes(com.google.protobuf.ByteString value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000001;
+                res_ = value;
+                onChanged();
                 return this;
             }
 
@@ -2134,8 +2400,8 @@ public final class GrpcRemote {
                 + "roto\022\037org.urbcomp.cupid.db.spark.data\"2\n"
                 + "\rSchemaRequest\022\r\n\005sqlId\030\001 \002(\t\022\022\n\nschemaJ"
                 + "son\030\002 \002(\t\"\035\n\016SchemaResponse\022\013\n\003res\030\001 \001(\t"
-                + "\"\033\n\nRowRequest\022\r\n\005sqlId\030\001 \002(\t\"\r\n\013RowResp"
-                + "onse" };
+                + "\")\n\nRowRequest\022\r\n\005sqlId\030\001 \002(\t\022\014\n\004data\030\002 "
+                + "\002(\014\"\032\n\013RowResponse\022\013\n\003res\030\001 \001(\t" };
         com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
             new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
                 public com.google.protobuf.ExtensionRegistry assignDescriptors(
@@ -2161,14 +2427,14 @@ public final class GrpcRemote {
                     internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_fieldAccessorTable =
                         new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
                             internal_static_org_urbcomp_cupid_db_spark_data_RowRequest_descriptor,
-                            new java.lang.String[] { "SqlId", }
+                            new java.lang.String[] { "SqlId", "Data", }
                         );
                     internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor =
                         getDescriptor().getMessageTypes().get(3);
                     internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_fieldAccessorTable =
                         new com.google.protobuf.GeneratedMessage.FieldAccessorTable(
                             internal_static_org_urbcomp_cupid_db_spark_data_RowResponse_descriptor,
-                            new java.lang.String[] {}
+                            new java.lang.String[] { "Res", }
                         );
                     return null;
                 }

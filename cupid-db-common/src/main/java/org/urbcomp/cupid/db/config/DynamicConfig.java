@@ -16,6 +16,10 @@
  */
 package org.urbcomp.cupid.db.config;
 
+import lombok.extern.slf4j.Slf4j;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +29,7 @@ import java.util.Properties;
  *
  * @author jimo
  **/
+@Slf4j
 public class DynamicConfig {
 
     public static final String DB_SPARK_JARS = "livy.spark.db.jars";
@@ -33,6 +38,22 @@ public class DynamicConfig {
 
     public static void updateProperties(String key, String value) {
         properties.put(key, value);
+    }
+
+    /**
+     * 不要统一域名，而是当前机器的IP，因为数据要发回提交spark任务的机器
+     */
+    public static String getRemoteServerHostname() {
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            log.warn("get hostname error", e);
+            return "localhost";
+        }
+    }
+
+    public static int getRemoteServerPort() {
+        return Integer.parseInt(properties.getProperty("server.remote.port", "8848"));
     }
 
     public static String getLivyUrl() {
