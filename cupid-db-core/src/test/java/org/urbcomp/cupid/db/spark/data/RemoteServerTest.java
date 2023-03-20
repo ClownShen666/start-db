@@ -19,16 +19,20 @@ package org.urbcomp.cupid.db.spark.data;
 import com.google.protobuf.ByteString;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import org.apache.spark.sql.catalyst.expressions.UnsafeRow;
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.junit.Test;
+import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer;
+import org.urbcomp.cupid.db.spark.reader.SparkDataReadCache;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * ref https://github.com/grpc/grpc-java/blob/v1.19.x/examples/src/test/java/io/grpc/examples/routeguide/RouteGuideServerTest.java
@@ -60,8 +64,8 @@ public class RemoteServerTest {
                 .setSchemaJson(structType.json())
                 .build()
         );
-        final UnsafeRow row = new UnsafeRow(2);
-        row.setInt(0, 1);
+
+        final GenericInternalRow row = new GenericInternalRow(new Object[] { 18, "jimo" });
         final byte[] bytes = SparkDataSerializer.serialize(row, structType);
         final ByteString byteStringRow = ByteString.copyFrom(bytes);
         remoteClient.sendRow(
@@ -77,5 +81,10 @@ public class RemoteServerTest {
         remoteClient.commit();
 
         TimeUnit.SECONDS.sleep(1);
+
+        // check value
+        final SparkDataReadCache sparkDataReadCache = new SparkDataReadCache();
+        final MetadataResult<Object> res = sparkDataReadCache.read(sqlId);
+        assertEquals(2, res.columns.size());
     }
 }

@@ -34,4 +34,15 @@ public class DataConvertFactory {
                 return val;
         }
     }
+
+    public static Class<?> strTypeToClass(String typeName) {
+        switch (typeName) {
+            case "integer":
+            case "int":
+                return int.class;
+            case "string":
+            default:
+                return String.class;
+        }
+    }
 }

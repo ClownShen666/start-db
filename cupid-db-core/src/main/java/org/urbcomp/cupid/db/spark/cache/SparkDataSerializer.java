@@ -20,8 +20,10 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.apache.spark.sql.catalyst.InternalRow;
+import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.KryoHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -38,7 +40,11 @@ public class SparkDataSerializer {
         final int numFields = input.readInt();
         Object[] row = new Object[numFields];
         for (int i = 0; i < numFields; i++) {
-            final Object o = KRYO.readObject(input, Object.class);
+            final String typeName = input.readString();
+            final Object o = KRYO.readObjectOrNull(
+                input,
+                DataConvertFactory.strTypeToClass(typeName)
+            );
             row[i] = o;
         }
         return row;
@@ -50,7 +56,13 @@ public class SparkDataSerializer {
         output.writeInt(numFields);
         final StructField[] fieldType = schema.fields();
         for (int i = 0; i < numFields; i++) {
-            KRYO.writeObject(output, row.get(i, fieldType[i].dataType()));
+            final DataType dataType = fieldType[i].dataType();
+            output.writeString(dataType.typeName());
+            KRYO.writeObjectOrNull(
+                output,
+                row.get(i, dataType),
+                DataConvertFactory.strTypeToClass(dataType.typeName())
+            );
         }
         return output.toBytes();
     }

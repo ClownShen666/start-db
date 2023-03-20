@@ -18,6 +18,7 @@ package org.urbcomp.cupid.db.spark.data;
 
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import org.urbcomp.cupid.db.spark.cache.ResultCacheFactory;
 
 @Slf4j
 public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
@@ -27,9 +28,7 @@ public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
         GrpcRemote.SchemaRequest request,
         StreamObserver<GrpcRemote.SchemaResponse> responseObserver
     ) {
-        final String sqlId = request.getSqlId();
-        final String schemaJson = request.getSchemaJson();
-        System.out.println("收到schema：" + schemaJson);
+        ResultCacheFactory.getGlobalInstance().addSchema(request);
 
         final GrpcRemote.SchemaResponse response = GrpcRemote.SchemaResponse.newBuilder()
             .setRes("ok")
@@ -45,9 +44,7 @@ public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
         return new StreamObserver<GrpcRemote.RowRequest>() {
             @Override
             public void onNext(GrpcRemote.RowRequest rowRequest) {
-                System.out.println(
-                    "收到一条数据：" + rowRequest.getSqlId() + ", bytes=" + rowRequest.getData()
-                );
+                ResultCacheFactory.getGlobalInstance().addRow(rowRequest);
             }
 
             @Override
