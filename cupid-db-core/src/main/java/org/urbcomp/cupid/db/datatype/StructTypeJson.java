@@ -16,28 +16,29 @@
  */
 package org.urbcomp.cupid.db.datatype;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.urbcomp.cupid.db.util.JacksonUtil;
 
-import java.util.Map;
+import java.util.List;
 
 /**
- * 抽象的数据类型
+ * 反序列化StructType
  *
  * @author jimo
  **/
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DataTypeField {
-
-    private String name;
-    /**
-     * integer, string...
-     */
+public class StructTypeJson {
     private String type;
-    private boolean nullable;
 
-    private Map<String, Object> metadata;
+    private List<DataTypeField> fields;
+
+    public static List<DataTypeField> deserializeJson(String json) {
+        try {
+            final StructTypeJson struct = JacksonUtil.MAPPER.readValue(json, StructTypeJson.class);
+            return struct.getFields();
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 }

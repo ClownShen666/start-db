@@ -14,30 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.datatype;
+package org.urbcomp.cupid.db.spark.cache;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.urbcomp.cupid.db.datatype.DataTypeField;
+import org.urbcomp.cupid.db.spark.data.GrpcRemote;
 
-import java.util.Map;
+import java.util.List;
 
 /**
- * 抽象的数据类型
+ * 缓存spark返回的数据的接口
+ * <p>
+ * 每个请求有唯一sqlId，该缓存的实现需要考虑很多请求的结果.
+ * </p>
  *
  * @author jimo
  **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DataTypeField {
+public interface IResultCache {
 
-    private String name;
-    /**
-     * integer, string...
-     */
-    private String type;
-    private boolean nullable;
+    void addRow(GrpcRemote.RowRequest request);
 
-    private Map<String, Object> metadata;
+    void addSchema(GrpcRemote.SchemaRequest schemaRequest);
+
+    List<DataTypeField> schema(String sqlId);
+
+    List<Object[]> values(String sqlId);
 }

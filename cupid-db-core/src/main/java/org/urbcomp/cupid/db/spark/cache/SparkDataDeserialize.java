@@ -14,30 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.datatype;
+package org.urbcomp.cupid.db.spark.cache;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Map;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import org.urbcomp.cupid.db.datatype.KryoHelper;
 
 /**
- * 抽象的数据类型
- *
  * @author jimo
  **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DataTypeField {
+public class SparkDataDeserialize {
 
-    private String name;
-    /**
-     * integer, string...
-     */
-    private String type;
-    private boolean nullable;
+    private final static Kryo KRYO = KryoHelper.getKryo();
 
-    private Map<String, Object> metadata;
+    public static Object[] deserialize(byte[] bytes) {
+        final Input input = new Input(bytes);
+        final int numFields = input.readInt();
+        Object[] row = new Object[numFields];
+        for (int i = 0; i < numFields; i++) {
+            final Object o = KRYO.readObject(input, Object.class);
+            row[i] = o;
+        }
+        return row;
+    }
 }

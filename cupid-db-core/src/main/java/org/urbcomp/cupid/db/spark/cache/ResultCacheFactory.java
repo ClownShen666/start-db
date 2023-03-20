@@ -14,30 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.datatype;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.Map;
+package org.urbcomp.cupid.db.spark.cache;
 
 /**
- * 抽象的数据类型
+ * create result cache
  *
  * @author jimo
  **/
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class DataTypeField {
+public class ResultCacheFactory {
 
-    private String name;
-    /**
-     * integer, string...
-     */
-    private String type;
-    private boolean nullable;
+    // by config
+    private final static IResultCache CACHE = new ResultCacheByMap();
 
-    private Map<String, Object> metadata;
+    public static IResultCache getGlobalInstance() {
+        return CACHE;
+    }
 }
