@@ -18,12 +18,18 @@ package org.urbcomp.cupid.db.spark.cache;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import org.apache.spark.sql.catalyst.InternalRow;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.urbcomp.cupid.db.datatype.KryoHelper;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author jimo
  **/
-public class SparkDataDeserialize {
+public class SparkDataSerializer {
 
     private final static Kryo KRYO = KryoHelper.getKryo();
 
@@ -36,5 +42,16 @@ public class SparkDataDeserialize {
             row[i] = o;
         }
         return row;
+    }
+
+    public static byte[] serialize(InternalRow row, StructType schema) {
+        final Output output = new Output(new ByteArrayOutputStream());
+        final int numFields = row.numFields();
+        output.writeInt(numFields);
+        final StructField[] fieldType = schema.fields();
+        for (int i = 0; i < numFields; i++) {
+            KRYO.writeObject(output, row.get(i, fieldType[i].dataType()));
+        }
+        return output.toBytes();
     }
 }

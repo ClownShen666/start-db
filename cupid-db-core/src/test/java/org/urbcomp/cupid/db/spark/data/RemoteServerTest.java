@@ -16,9 +16,16 @@
  */
 package org.urbcomp.cupid.db.spark.data;
 
+import com.google.protobuf.ByteString;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import org.apache.spark.sql.catalyst.expressions.UnsafeRow;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.junit.Test;
+import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -40,13 +47,29 @@ public class RemoteServerTest {
             InProcessChannelBuilder.forName(name).directExecutor().build()
         );
 
-        remoteClient.sendSchema(
-            GrpcRemote.SchemaRequest.newBuilder().setSqlId("").setSchemaJson("").build()
+        final StructType structType = new StructType(
+            new StructField[] {
+                new StructField("age", DataTypes.IntegerType, true, Metadata.empty()),
+                new StructField("name", DataTypes.StringType, true, Metadata.empty()) }
         );
 
-        remoteClient.sendRow(GrpcRemote.RowRequest.newBuilder().setSqlId("1").build());
-        remoteClient.sendRow(GrpcRemote.RowRequest.newBuilder().setSqlId("2").build());
-        remoteClient.sendRow(GrpcRemote.RowRequest.newBuilder().setSqlId("3").build());
+        final String sqlId = "1";
+        remoteClient.sendSchema(
+            GrpcRemote.SchemaRequest.newBuilder().setSqlId(sqlId).setSchemaJson(structType.json()).build()
+        );
+        final UnsafeRow row = new UnsafeRow(2);
+        row.setInt(0, 1);
+        final byte[] bytes = SparkDataSerializer.serialize(row, structType);
+        final ByteString byteStringRow = ByteString.copyFrom(bytes);
+        remoteClient.sendRow(
+            GrpcRemote.RowRequest.newBuilder().setSqlId(sqlId).setData(byteStringRow).build()
+        );
+        remoteClient.sendRow(
+            GrpcRemote.RowRequest.newBuilder().setSqlId(sqlId).setData(byteStringRow).build()
+        );
+        remoteClient.sendRow(
+            GrpcRemote.RowRequest.newBuilder().setSqlId(sqlId).setData(byteStringRow).build()
+        );
 
         remoteClient.commit();
 

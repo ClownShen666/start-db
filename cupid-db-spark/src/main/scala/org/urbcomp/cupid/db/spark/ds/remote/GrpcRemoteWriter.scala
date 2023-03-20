@@ -16,19 +16,16 @@
  */
 package org.urbcomp.cupid.db.spark.ds.remote
 
-import com.esotericsoftware.kryo.Kryo
-import com.esotericsoftware.kryo.io.Output
 import com.google.protobuf.ByteString
 import io.grpc.inprocess.InProcessChannelBuilder
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.types.{DataType, StructField, StructType}
+import org.apache.spark.sql.types.{DataType, StructType}
 import org.urbcomp.cupid.db.config.DynamicConfig.{getRemoteServerHostname, getRemoteServerPort}
-import org.urbcomp.cupid.db.datatype.KryoHelper
+import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer
 import org.urbcomp.cupid.db.spark.data.GrpcRemote.{RowRequest, SchemaRequest}
 import org.urbcomp.cupid.db.spark.data.RemoteClient
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
-import java.io.ByteArrayOutputStream
 import java.util
 import java.util.concurrent.TimeUnit
 
@@ -53,8 +50,7 @@ class GrpcRemoteWriter extends IRemoteWriter {
   private val sqlId = options.get(SparkSqlParam.SQL_ID_KEY)
 
   private val schemaJson: String = options.get(RemoteWriteSource.SCHEMA_KEY)
-  private val schema: Seq[StructField] = DataType.fromJson(schemaJson).asInstanceOf[StructType]
-  private val kryo: Kryo = KryoHelper.getKryo
+  private val schema: StructType = DataType.fromJson(schemaJson).asInstanceOf[StructType]
 
   // 先发送schema
   remoteClient.sendSchema(
@@ -74,12 +70,7 @@ class GrpcRemoteWriter extends IRemoteWriter {
   override def abort(): Unit = remoteClient.error()
 
   override def writeOne(record: InternalRow): Unit = {
-    val output = new Output(new ByteArrayOutputStream())
-    output.writeInt(record.numFields)
-    for (i <- 0 until record.numFields) {
-      kryo.writeObject(output, record.get(i, schema(i).dataType))
-    }
-    val bytes = output.toBytes
+    val bytes = SparkDataSerializer.serialize(record, schema)
     remoteClient.sendRow(
       RowRequest.newBuilder().setSqlId(sqlId).setData(ByteString.copyFrom(bytes)).build()
     )

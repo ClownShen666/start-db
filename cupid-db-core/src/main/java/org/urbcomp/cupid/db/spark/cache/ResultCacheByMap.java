@@ -39,7 +39,7 @@ public class ResultCacheByMap implements IResultCache {
     public void addRow(GrpcRemote.RowRequest request) {
         final String sqlId = request.getSqlId();
         ROW_CACHE.computeIfAbsent(sqlId, s -> new ArrayList<>(8))
-            .add(SparkDataDeserialize.deserialize(request.getData().toByteArray()));
+            .add(SparkDataSerializer.deserialize(request.getData().toByteArray()));
     }
 
     @Override
