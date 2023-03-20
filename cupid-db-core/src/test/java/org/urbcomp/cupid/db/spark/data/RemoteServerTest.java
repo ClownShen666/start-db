@@ -55,7 +55,10 @@ public class RemoteServerTest {
 
         final String sqlId = "1";
         remoteClient.sendSchema(
-            GrpcRemote.SchemaRequest.newBuilder().setSqlId(sqlId).setSchemaJson(structType.json()).build()
+            GrpcRemote.SchemaRequest.newBuilder()
+                .setSqlId(sqlId)
+                .setSchemaJson(structType.json())
+                .build()
         );
         final UnsafeRow row = new UnsafeRow(2);
         row.setInt(0, 1);
