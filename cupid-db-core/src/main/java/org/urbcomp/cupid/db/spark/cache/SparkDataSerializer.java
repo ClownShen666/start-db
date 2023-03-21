@@ -23,6 +23,7 @@ import org.apache.spark.sql.catalyst.InternalRow;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import org.apache.spark.unsafe.types.UTF8String;
 import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.KryoHelper;
 
@@ -58,9 +59,13 @@ public class SparkDataSerializer {
         for (int i = 0; i < numFields; i++) {
             final DataType dataType = fieldType[i].dataType();
             output.writeString(dataType.typeName());
+            Object data = row.get(i, dataType);
+            if (data instanceof UTF8String) {
+                data = data.toString();
+            }
             KRYO.writeObjectOrNull(
                 output,
-                row.get(i, dataType),
+                data,
                 DataConvertFactory.strTypeToClass(dataType.typeName())
             );
         }

@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.spark.res
 
+import com.alibaba.fastjson.{JSON, JSONObject}
+import org.apache.spark.sql.types.Metadata
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.datatype.DataTypeField
@@ -31,7 +33,10 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
 
     val typeFields =
-      data.schema.fields.map(s => new DataTypeField(s.name, s.dataType.simpleString, s.nullable))
+      data.schema.fields.map(
+        s =>
+          new DataTypeField(s.name, s.dataType.simpleString, s.nullable, metadataToMap(s.metadata))
+      )
     val fieldJson = JacksonUtil.MAPPER.writeValueAsString(typeFields)
     import data.sparkSession.implicits._
     val schemaDf = List(fieldJson).toDF()
@@ -48,5 +53,10 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
       .option("header", value = false)
       .option("sep", DynamicConfig.getHdfsDataSplitter)
       .csv(hdfsPath + DynamicConfig.getResultDataName(sqlId))
+  }
+
+  def metadataToMap(md: Metadata): java.util.Map[String, Object] = {
+    val json = md.json
+    JSON.parseObject(json)
   }
 }
