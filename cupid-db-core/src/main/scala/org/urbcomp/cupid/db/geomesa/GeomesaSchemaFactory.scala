@@ -107,19 +107,10 @@ class GeomesaSchemaFactory extends SchemaFactory {
       TableFunctionImpl.create(DBSCANClustering.DBSCAN_CLUSTERING_TABLE_METHOD)
     )
     schemaPlus.add("st_collect_list", AggregateFunctionImpl.create(classOf[CollectList]))
-<<<<<<< HEAD
-<<<<<<< HEAD
     schemaPlus.add(
       "st_kmeans_clustering",
       TableFunctionImpl.create(KMeansClustering.KMEANS_CLUSTERING_TABLE_METHOD)
     )
-=======
-    /*new UdfFactory().getCalciteUdfMap.foreach {
-      case (name, udf) => schemaPlus.add(name, )
-    }*/
->>>>>>> 60d3d6a (add)
-=======
->>>>>>> c455d35 (add)
   }
 
 }
