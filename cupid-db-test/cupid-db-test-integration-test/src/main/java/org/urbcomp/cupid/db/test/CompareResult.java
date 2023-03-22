@@ -1,19 +1,22 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.urbcomp.cupid.db.test;
 
-import java.util.ArrayList;
-
-import static org.urbcomp.cupid.db.test.GetData.dataTransform;
+import java.util.List;
 
 public class CompareResult {
 
@@ -21,34 +24,30 @@ public class CompareResult {
      * 比较字符串数组格式的实际实际结果与预期结果
      *
      * @param actualArray 实际返回内容
-     * @param expectArray 预期返回内容
+     * @param expectedArray 预期返回内容
      * */
-    public static void compareArrayData(
-        ArrayList<String> actualArray,
-        ArrayList<String> expectArray
-    ) throws Exception {
-        // 比较预期异常信息
-        if (expectArray.get(0).startsWith("error:")) {
-            String expect = expectArray.get(0);
-            String actual = actualArray.get(0);
-            expect = expect.replace("error:", "").trim();
-            if (actual.contains(expect)) {
-                throw new Exception("异常不符合预期");
-            }
-            // 比较预期结果
-        } else {
-            if (actualArray.size() == expectArray.size()) {
-                throw new Exception("预期结果数与实际返回结果数不一致");
-            }
-            for (int i = 1; i < actualArray.size(); i++) {
-                // 预期数据的替换
-                String expectStr = dataTransform(expectArray.toString());
-                // 判断实际返回的每一行数据是否都在预期值中
-                if (expectStr.contains(actualArray.get(i))) {
-                    throw new Exception("返回数据有误");
-                }
+    public static void compareResult(List<String> actualArray, List<String> expectedArray)
+        throws Exception {
+        if (actualArray.size() != expectedArray.size()) {
+            throw new Exception("预期结果数与实际返回结果数不一致");
+        }
+        for (int i = 0; i < actualArray.size(); i++) {
+            if (!actualArray.get(i).equals(expectedArray.get(i))) {
+                throw new Exception("返回数据有误");
             }
         }
     }
 
+    /**
+     * 比较实际异常与预期异常
+     *
+     * @param actualArray 实际异常
+     * @param expectedArray 预期异常
+     * */
+    public static void compareException(List<String> actualArray, List<String> expectedArray)
+        throws Exception {
+        if (!actualArray.get(0).contains(expectedArray.get(0))) {
+            throw new Exception("异常不符合预期");
+        }
+    }
 }

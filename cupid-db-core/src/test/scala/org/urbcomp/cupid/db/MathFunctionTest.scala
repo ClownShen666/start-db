@@ -1,14 +1,19 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertEquals
@@ -40,9 +45,9 @@ class MathFunctionTest extends AbstractCalciteFunctionTest {
     */
   test("log1p") {
     val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log1p(1)")
+    val resultSet = statement.executeQuery("select log1p('1.5')")
     resultSet.next()
-    assertEquals(0.6931471805599453, resultSet.getObject(1))
+    assertEquals(0.9162907318741551, resultSet.getObject(1))
   }
 
   /**
@@ -50,9 +55,9 @@ class MathFunctionTest extends AbstractCalciteFunctionTest {
     */
   test("log2") {
     val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log2(8)")
+    val resultSet = statement.executeQuery("select log2('8.6')")
     resultSet.next()
-    assertEquals(3.0, resultSet.getObject(1))
+    assertEquals(3.1043366598147353, resultSet.getObject(1))
   }
 
   /**
@@ -84,5 +89,4 @@ class MathFunctionTest extends AbstractCalciteFunctionTest {
     resultSet.next()
     assertEquals(57.29577951308232, resultSet.getObject(1))
   }
-
 }

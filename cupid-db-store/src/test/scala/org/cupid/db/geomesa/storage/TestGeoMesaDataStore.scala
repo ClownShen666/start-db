@@ -1,14 +1,19 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.cupid.db.geomesa.storage
 
 import org.geotools.data.Query
@@ -45,8 +50,6 @@ import org.locationtech.geomesa.utils.index.ByteArrays
 import org.locationtech.geomesa.utils.stats.Stat
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
-import java.time.ZonedDateTime
-import java.util.Date
 import scala.collection.SortedSet
 
 class TestGeoMesaDataStore(looseBBox: Boolean)
@@ -184,9 +187,6 @@ object TestGeoMesaDataStore {
       projection: Option[QueryReferenceSystems]
   ) extends QueryPlan[TestGeoMesaDataStore] {
 
-    private var queryBeginTime: Date = _
-    private var queryEndTime: Date = _
-
     override type Results = SimpleFeature
 
     override val resultsToFeatures: ResultsToFeatures[SimpleFeature] =
@@ -210,18 +210,7 @@ object TestGeoMesaDataStore {
           }
         }
       }
-
       matches.iterator
-    }
-
-    private def getZonedDateTime(t: Option[ZonedDateTime]): ZonedDateTime = t match {
-      case Some(t) => t
-      case None    => throw new NoSuchElementException(s"Expected zonedDateTime value but got empty")
-    }
-
-    private def getFilterValue(s: Option[Filter]): Filter = s match {
-      case Some(s) => s
-      case None    => throw new NoSuchElementException(s"Expected filter value but got empty")
     }
 
     override def explain(explainer: Explainer, prefix: String): Unit = {

@@ -1,14 +1,19 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.{assertEquals, assertNotNull}
@@ -28,6 +33,7 @@ class RoadFunctionTest extends AbstractCalciteFunctionTest {
   val rsGeoJson: String = rs.toGeoJSON
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val tGeo: String = trajectory.toGeoJSON
+  val rnGeoJson: String = rn.toGeoJSON
 
   test("st_rn_shortestPath") {
     val statement = connect.createStatement
@@ -171,5 +177,24 @@ class RoadFunctionTest extends AbstractCalciteFunctionTest {
         "\"tid\":\"afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0\"}}",
       resultSet.getObject(1)
     )
+  }
+  test("st_rn_reachableConvexHull") {
+    val statement = connect.createStatement
+    val resultSet =
+      statement.executeQuery(
+        "select st_rn_reachableConvexHull(st_rn_fromGeoJson(\'" + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \"Drive\")"
+      )
+    resultSet.next()
+    assertNotNull(resultSet.getObject(1))
+  }
+
+  test("st_rn_reachableConcavexHull") {
+    val statement = connect.createStatement
+    val resultSet =
+      statement.executeQuery(
+        "select st_rn_reachableConcaveHull(st_rn_fromGeoJson(\'" + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \"Drive\")"
+      )
+    resultSet.next()
+    assertNotNull(resultSet.getObject(1))
   }
 }

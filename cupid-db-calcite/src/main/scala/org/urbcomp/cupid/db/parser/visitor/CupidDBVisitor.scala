@@ -1,14 +1,19 @@
-/*
- * Copyright 2022 ST-Lab
+/* 
+ * Copyright (C) 2022  ST-Lab
  *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU General Public License version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- */
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.urbcomp.cupid.db.parser.visitor
 
 import org.antlr.v4.runtime.ParserRuleContext
@@ -29,9 +34,9 @@ import org.urbcomp.cupid.db.parser.ddl.{
 import org.urbcomp.cupid.db.parser.dql.{
   SqlShowCreateTable,
   SqlShowDatabases,
+  SqlShowIndex,
   SqlShowStatus,
-  SqlShowTables,
-  SqlShowIndex
+  SqlShowTables
 }
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser._
@@ -164,7 +169,9 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       else null
     if (null != orderBy || null != fetch) {
       new SqlOrderBy(pos, query, orderBy, offset, fetch)
-    } else query
+    } else {
+      query
+    }
   }
 
   def visitOverFunction(ctx: ExprFuncOverClauseContext, aggBasicCall: SqlBasicCall): SqlNode = {
@@ -262,9 +269,10 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     else getSqlJoin(contexts, ctx, flag = false)
   }
 
-  override def visitFromClause(ctx: FromClauseContext): SqlNode =
+  override def visitFromClause(ctx: FromClauseContext): SqlNode = {
     if (ctx.fromJoinClause().isEmpty) visitFromTableClause(ctx.fromTableClause())
     else visitFromTableJoinClause(ctx.fromJoinClause().asScala.reverse, ctx)
+  }
 
   override def visitFromTableNameClause(ctx: FromTableNameClauseContext): SqlNode =
     ctx.fromAliasClause() match {
@@ -537,7 +545,6 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
       val nodeList = List(new SqlIdentifier("result", pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-
     } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_timeIntervalSegment")) {
       val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
