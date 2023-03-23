@@ -27,6 +27,7 @@ import org.urbcomp.cupid.db.util.{MetadataUtil, SparkSqlParam}
 import org.urbcomp.cupid.db.udf.UdfFactory
 import scala.reflect.runtime.universe._
 import scala.reflect.api
+import org.urbcomp.cupid.db.udf.DataEngine.Spark
 
 object SparkQueryExecutor extends LazyLogging {
 
@@ -72,7 +73,7 @@ object SparkQueryExecutor extends LazyLogging {
     if (isLocal) builder.master("local[*]")
     if (enableHiveSupport) builder.enableHiveSupport()
     val spark = builder.getOrCreate()
-    new UdfFactory().getUdfMap("Spark").foreach {
+    new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) => {
         val instance = clazz.newInstance()
         val method = clazz.getDeclaredMethod("udfWrapper").invoke(instance)

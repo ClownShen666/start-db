@@ -34,6 +34,7 @@ import java.lang.reflect.Method
 import java.util
 import org.apache.calcite.schema.Function
 import lombok.extern.slf4j.Slf4j
+import org.urbcomp.cupid.db.udf.DataEngine.Calcite
 
 /**
   * Schema Factory of Geomesa
@@ -61,7 +62,7 @@ class GeomesaSchemaFactory extends SchemaFactory {
 
   @Slf4j
   private def initUdf(schemaPlus: SchemaPlus): Unit = {
-    new UdfFactory().getUdfMap("Calcite").foreach {
+    new UdfFactory().getUdfMap(Calcite).foreach {
       case (name, clazz) => {
         val instance = clazz.newInstance()
         val udfType: UdfType.Value =

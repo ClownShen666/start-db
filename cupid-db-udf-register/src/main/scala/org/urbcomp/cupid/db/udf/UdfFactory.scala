@@ -21,13 +21,14 @@ import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
 class UdfFactory extends Serializable {
-  private var engineUdfMap = mutable.HashMap[String, mutable.Map[String, Class[_ <: AbstractUdf]]]()
+  private var engineUdfMap =
+    mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]]()
 
   {
     val reflections = new Reflections("org.urbcomp.cupid.db.udf")
-    val classes =
+    val udfClasses =
       reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]].toList
-    classes.forEach(clazz => {
+    udfClasses.forEach(clazz => {
       val instance = clazz.newInstance()
       val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
       val registerEngines: List[DataEngine.Value] =
@@ -36,17 +37,18 @@ class UdfFactory extends Serializable {
           .invoke(instance)
           .asInstanceOf[List[DataEngine.Value]]
       registerEngines.foreach { engine =>
-        val engineStr = engine.toString
-        if (!engineUdfMap.contains(engineStr))
-          engineUdfMap += (engineStr -> mutable.Map[String, Class[_ <: AbstractUdf]]())
-        engineUdfMap(engineStr) += (name -> clazz)
+        if (!engineUdfMap.contains(engine))
+          engineUdfMap += (engine -> mutable.Map[String, Class[_ <: AbstractUdf]]())
+        engineUdfMap(engine) += (name -> clazz)
       }
     })
   }
 
-  def getUdfMap(engineName: String): mutable.Map[String, Class[_ <: AbstractUdf]] = {
-    engineUdfMap.getOrElse(engineName, mutable.Map[String, Class[_ <: AbstractUdf]]())
+  def getUdfMap(engine: DataEngine.Value): mutable.Map[String, Class[_ <: AbstractUdf]] = {
+    engineUdfMap.getOrElse(engine, mutable.Map[String, Class[_ <: AbstractUdf]]())
   }
-  def getEngineUdfMap: mutable.HashMap[String, mutable.Map[String, Class[_ <: AbstractUdf]]] =
+  def getEngineUdfMap
+      : mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]] =
     engineUdfMap
+
 }

@@ -46,4 +46,15 @@ public class CupidSparkDriverTest {
         param.setSqlId("testSqlId");
         SparkQueryExecutor.execute(param, null);
     }
+
+    @Test
+    public void testUdf() {
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setSql("select AddOne(10)");
+        param.setExportType(DataExportType.PRINT);
+        param.setLocal(true);
+        SparkQueryExecutor.execute(param, null);
+    }
 }
