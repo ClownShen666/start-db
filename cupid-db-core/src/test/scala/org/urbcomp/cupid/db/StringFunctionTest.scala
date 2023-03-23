@@ -83,6 +83,9 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select concat('1', '2')")
     resultSet.next()
     assertEquals("12", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select concat(null, '2')")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("reverse") {
@@ -90,6 +93,9 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select reverse('abcde')")
     resultSet.next()
     assertEquals("edcba", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select reverse('null')")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("ltrim") {
@@ -97,6 +103,9 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select ltrim('  abcde ')")
     resultSet.next()
     assertEquals("abcde ", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select ltrim(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("rtrim") {

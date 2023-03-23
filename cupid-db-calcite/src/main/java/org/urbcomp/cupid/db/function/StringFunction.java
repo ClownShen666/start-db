@@ -32,21 +32,25 @@ import java.security.NoSuchAlgorithmException;
 public class StringFunction {
     @CupidDBFunction("concat")
     public String concat(String str1, String str2) {
+        if(str1 == null || str2 == null) return null;
         return str1.concat(str2);
     }
 
     @CupidDBFunction("reverse")
     public String reverse(String str) {
+        if(str == null) return null;
         return new StringBuffer(str).reverse().toString();
     }
 
     @CupidDBFunction("trim")
     public String trim(String str) {
+        if(str == null) return null;
         return str.trim();
     }
 
     @CupidDBFunction("ltrim")
     public String ltrim(String str) {
+        if(str == null) return null;
         int i = 0;
         int n = str.length();
         while (i < n && str.charAt(i) == ' ')
@@ -56,6 +60,7 @@ public class StringFunction {
 
     @CupidDBFunction("rtrim")
     public String rtrim(String str) {
+        if(str == null) return null;
         int i = str.length() - 1;
         while (i >= 0 && str.charAt(i) == ' ')
             --i;
@@ -99,7 +104,8 @@ public class StringFunction {
     }
 
     @CupidDBFunction("length")
-    public int length(String str) {
+    public Object length(String str) {
+        if(str == null) return null;
         int n = str.length();
         int length = n;
         for (int i = 0; i < n; ++i) {
@@ -110,17 +116,20 @@ public class StringFunction {
     }
 
     @CupidDBFunction("charLength")
-    public int charLength(String str) {
+    public Object charLength(String str) {
+        if(str == null) return null;
         return str.length();
     }
 
     @CupidDBFunction("locate")
-    public int locate(String substr, String str) {
+    public Object locate(String substr, String str) {
+        if(substr == null || str == null) return null;
         return str.indexOf(substr) + 1;
     }
 
     @CupidDBFunction("locate")
-    public int locate(String substr, String str, int pos) {
+    public Object locate(String substr, String str, int pos) {
+      //  if(substr == null || str == null || pos == null)
         return str.indexOf(substr, pos) + 1;
     }
 
