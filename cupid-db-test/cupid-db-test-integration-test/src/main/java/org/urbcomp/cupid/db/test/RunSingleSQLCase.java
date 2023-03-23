@@ -52,7 +52,7 @@ public class RunSingleSQLCase {
         Connection conn;
         try {
             conn = DriverManager.getConnection(
-                "jdbc:cupid-db:url=http://127.0.0.1:8000",
+                "jdbc:cupid-db:url=http://localhost:8000",
                 "root",
                 "cupid-db"
             );

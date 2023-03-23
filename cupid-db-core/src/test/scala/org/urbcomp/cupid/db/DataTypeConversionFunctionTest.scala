@@ -25,6 +25,9 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select castToInteger('1234')")
     resultSet.next()
     assertEquals(1234, resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select castToInteger(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("castToLong") {
@@ -32,6 +35,9 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select castToLong('12344')")
     resultSet.next()
     assertEquals(12344L, resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select castToLong(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("castToFloat") {
@@ -39,6 +45,9 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select castToFloat('123.1')")
     resultSet.next()
     assertEquals(123.1f, resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select castToFloat(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("castToDouble") {
@@ -46,6 +55,9 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select castToDouble('123444555.3')")
     resultSet.next()
     assertEquals(123444555.3d, resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select castToDouble(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   test("castToBoolean") {
@@ -78,9 +90,9 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
 
   test("parseDouble") {
     val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select parseDouble('1234')")
+    val resultSet = statement.executeQuery("select parseDouble('1.7976931348623157E308')")
     resultSet.next()
-    assertEquals(1234d, resultSet.getObject(1))
+    assertEquals(1.7976931348623157e308, resultSet.getObject(1))
   }
 
 }
