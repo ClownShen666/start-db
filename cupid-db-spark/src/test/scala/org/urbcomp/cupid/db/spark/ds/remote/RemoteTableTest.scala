@@ -73,7 +73,6 @@ class RemoteTableTest extends FunSuite {
     // {"name":"email","type":"string","nullable":true,"metadata":{}}]
     // }
     val json = structType.json
-    println(json)
 
     val structType1 = DataType.fromJson(json).asInstanceOf[StructType]
 

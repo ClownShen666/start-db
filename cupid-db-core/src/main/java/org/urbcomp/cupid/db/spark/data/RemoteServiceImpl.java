@@ -54,7 +54,6 @@ public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
 
             @Override
             public void onCompleted() {
-                System.out.println("结束了");
                 responseObserver.onNext(GrpcRemote.RowResponse.newBuilder().build());
                 responseObserver.onCompleted();
             }

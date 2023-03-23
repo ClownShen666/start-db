@@ -66,6 +66,7 @@
         <specs2.version>4.9.2</specs2.version>
         <httpclient.version>4.5.14</httpclient.version>
         <mockito.version>3.12.4</mockito.version>
+        <grpc.version>1.19.0</grpc.version>
     </properties>
 
     <dependencyManagement>
