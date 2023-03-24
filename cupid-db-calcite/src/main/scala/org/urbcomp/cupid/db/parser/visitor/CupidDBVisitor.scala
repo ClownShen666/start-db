@@ -44,7 +44,7 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser._
 import org.urbcomp.cupid.db.parser.visitor.CupidDBVisitor._
 import org.urbcomp.cupid.db.schema.IndexType
 import org.urbcomp.cupid.db.udf.DataEngine.Calcite
-import org.urbcomp.cupid.db.udf.{UdfFactory, UdfType}
+import org.urbcomp.cupid.db.udf.UdfFactory
 import org.urbcomp.cupid.db.util.{MetadataUtil, StringUtil}
 
 import java.util
