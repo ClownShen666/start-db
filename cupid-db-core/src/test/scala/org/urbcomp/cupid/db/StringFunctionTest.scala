@@ -126,7 +126,13 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val statement = connect.createStatement
     val resultSet = statement.executeQuery("select lpad('abcde', 2, 'a')")
     resultSet.next()
-    assertEquals("aaabcde", resultSet.getObject(1))
+    assertEquals("ab", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select lpad(null, 5, 'a')")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
+    val resultSet3 = statement.executeQuery("select lpad('abcde', 6, 'a')")
+    resultSet3.next()
+    assertEquals("aabcde", resultSet3.getObject(1))
   }
 
   test("rpad1") {
@@ -140,7 +146,13 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val statement = connect.createStatement
     val resultSet = statement.executeQuery("select rpad('abcde', 1, 'e')")
     resultSet.next()
-    assertEquals("abcdee", resultSet.getObject(1))
+    assertEquals("a", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select rpad('abcde', 6, 'e')")
+    resultSet2.next()
+    assertEquals("abcdee", resultSet2.getObject(1))
+    val resultSet3 = statement.executeQuery("select rpad('abcde', 6, null)")
+    resultSet3.next()
+    assertEquals(null, resultSet3.getObject(1))
   }
 
   //TODO 多字节字符测试

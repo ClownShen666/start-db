@@ -69,6 +69,7 @@ public class StringFunction {
 
     @CupidDBFunction("lpad")
     public String lpad(String str, int len) {
+        if (str == null) return null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; ++i) {
             sb.append(' ');
@@ -78,15 +79,15 @@ public class StringFunction {
 
     @CupidDBFunction("lpad")
     public String lpad(String str, int len, String pad) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(pad);
-        }
-        return sb + str;
+        String res = pad(str, len, pad);
+        if (res == null) return null;
+        if (res.length() == len) return res;
+        return res + str;
     }
 
     @CupidDBFunction("rpad")
     public String rpad(String str, int len) {
+        if (str == null) return null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; ++i) {
             sb.append(' ');
@@ -96,11 +97,10 @@ public class StringFunction {
 
     @CupidDBFunction("rpad")
     public String rpad(String str, int len, String pad) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(pad);
-        }
-        return str + sb;
+        String res = pad(str, len, pad);
+        if (res == null) return null;
+        if (res.length() == len) return res;
+        return str + pad(str, len, pad);
     }
 
     @CupidDBFunction("length")
@@ -129,7 +129,7 @@ public class StringFunction {
 
     @CupidDBFunction("locate")
     public Object locate(String substr, String str, int pos) {
-        // if(substr == null || str == null || pos == null)
+        if (substr == null || str == null) return null;
         return str.indexOf(substr, pos) + 1;
     }
 
@@ -164,5 +164,15 @@ public class StringFunction {
             code[k++] = hexDigits[byte0 & 0xf];
         }
         return new String(code);
+    }
+
+    private String pad(String str, int len, String pad) {
+        if (str == null || pad == null) return null;
+        if (len <= str.length()) return str.substring(0, len);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len - str.length(); ++i) {
+            sb.append(pad);
+        }
+        return sb.toString();
     }
 }
