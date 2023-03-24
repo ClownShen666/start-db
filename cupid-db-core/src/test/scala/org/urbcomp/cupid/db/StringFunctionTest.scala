@@ -93,7 +93,7 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select reverse('abcde')")
     resultSet.next()
     assertEquals("edcba", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select reverse('null')")
+    val resultSet2 = statement.executeQuery("select reverse(null)")
     resultSet2.next()
     assertEquals(null, resultSet2.getObject(1))
   }
