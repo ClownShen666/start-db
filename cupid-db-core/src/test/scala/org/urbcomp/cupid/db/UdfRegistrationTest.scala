@@ -28,15 +28,15 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   */
 class UdfRegistrationTest extends AbstractCalciteFunctionTest {
 
-  test("udf registration test2") {
+  test("udf registration test") {
     val statement = connect.createStatement()
-    statement.executeUpdate("DROP TABLE IF EXISTS test2")
-    statement.executeUpdate("create table test2 (dat Int)")
-    statement.executeUpdate("insert into table test2 values (1)")
-    statement.executeUpdate("insert into table test2 values (2)")
-    statement.executeUpdate("insert into table test2 values (7)")
+    statement.executeUpdate("DROP TABLE IF EXISTS test3")
+    statement.executeUpdate("create table test3 (dat Int)")
+    statement.executeUpdate("insert into table test3 values (1)")
+    statement.executeUpdate("insert into table test3 values (2)")
+    statement.executeUpdate("insert into table test3 values (7)")
     val resultSet =
-      statement.executeQuery("select dat, AddOne(dat) from test2")
+      statement.executeQuery("select dat, AddOne(dat) from test3")
     while (resultSet.next()) {
       val u = resultSet.getObject(1).toString.toInt
       val v = resultSet.getObject(2).toString.toInt
