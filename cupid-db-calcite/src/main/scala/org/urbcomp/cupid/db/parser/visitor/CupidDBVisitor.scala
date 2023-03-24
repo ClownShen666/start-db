@@ -19,6 +19,7 @@ package org.urbcomp.cupid.db.parser.visitor
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.misc.Interval
 import org.apache.calcite.sql._
+import org.apache.calcite.sql.`type`.SqlTypeName
 import org.apache.calcite.sql.ddl.{SqlDdlNodes, SqlDropSchema, SqlDropTable}
 import org.apache.calcite.sql.fun.{SqlCase, SqlStdOperatorTable}
 import org.apache.calcite.sql.parser.SqlParserPos
@@ -42,6 +43,8 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser._
 import org.urbcomp.cupid.db.parser.visitor.CupidDBVisitor._
 import org.urbcomp.cupid.db.schema.IndexType
+import org.urbcomp.cupid.db.udf.DataEngine.Calcite
+import org.urbcomp.cupid.db.udf.{UdfFactory, UdfType}
 import org.urbcomp.cupid.db.util.{MetadataUtil, StringUtil}
 
 import java.util
@@ -542,6 +545,19 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     * @return add alias sqlnode
     */
   def handleFunction(ctx: ExprFuncContext, res: SqlBasicCall): SqlNode = {
+    var udtfOutputColumns = mutable.HashMap.empty[String, List[String]]
+    new UdfFactory().getUdtfMap(Calcite).foreach {
+      case (name, clazz) => {
+        val instance = clazz.newInstance()
+        val outputColumns: List[(String, SqlTypeName)] =
+          clazz
+            .getDeclaredMethod("outputColumns")
+            .invoke(instance)
+            .asInstanceOf[List[(String, SqlTypeName)]]
+        udtfOutputColumns += (name.toLowerCase -> outputColumns.map(_._1))
+      }
+    }
+
     if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
       val nodeList = List(new SqlIdentifier("result", pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
@@ -569,7 +585,13 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
         new SqlIdentifier("clusterBoundary", pos)
       ).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else res
+    } else {
+      val text = ctx.ident().getText.toLowerCase
+      if (udtfOutputColumns.contains(text)) {
+        val nodeList = udtfOutputColumns(text).map(new SqlIdentifier(_, pos)).asJava
+        new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
+      } else res
+    }
   }
 
   override def visitUseStmt(ctx: UseStmtContext): SqlUseDatabase = {

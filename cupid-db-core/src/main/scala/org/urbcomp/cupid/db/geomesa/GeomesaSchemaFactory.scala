@@ -17,9 +17,9 @@
 package org.urbcomp.cupid.db.geomesa
 
 import org.apache.calcite.schema.impl.{AggregateFunctionImpl, ScalarFunctionImpl, TableFunctionImpl}
-import org.apache.calcite.schema.{ScalarFunction, Schema, SchemaFactory, SchemaPlus}
+import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
-import org.urbcomp.cupid.db.udf.{UdfFactory, UdfType}
+import org.urbcomp.cupid.db.udf.UdfFactory
 import org.urbcomp.cupid.db.udtf.{
   DBSCANClustering,
   Fibonacci,
@@ -65,22 +65,20 @@ class GeomesaSchemaFactory extends SchemaFactory {
     new UdfFactory().getUdfMap(Calcite).foreach {
       case (name, clazz) => {
         val instance = clazz.newInstance()
-        val udfType: UdfType.Value =
-          clazz.getDeclaredMethod("udfType").invoke(instance).asInstanceOf[UdfType.Value]
-        var function: Function = null
-        if (udfType == UdfType.Udf) {
-          val udfEntryName: String =
-            clazz.getDeclaredMethod("udfEntryName").invoke(instance).asInstanceOf[String]
-          function = ScalarFunctionImpl.create(clazz, udfEntryName)
-        } else if (udfType == UdfType.Udaf) function = AggregateFunctionImpl.create(clazz)
-        else {
-          val udfEntryName: String =
-            clazz.getDeclaredMethod("udfEntryName").invoke(instance).asInstanceOf[String]
-          function = TableFunctionImpl.create(clazz, udfEntryName)
-        }
-        if (function == null) {} else {
-          schemaPlus.add(name, function)
-        }
+        val udfCalciteEntryName: String =
+          clazz.getDeclaredMethod("udfCalciteEntryName").invoke(instance).asInstanceOf[String]
+        val function: Function = ScalarFunctionImpl.create(clazz, udfCalciteEntryName)
+        if (function != null) schemaPlus.add(name, function)
+      }
+    }
+    new UdfFactory().getUdtfMap(Calcite).foreach {
+      case (name, clazz) => {
+        val instance = clazz.newInstance()
+        val inputColumnsCount: Int =
+          clazz.getDeclaredMethod("inputColumnsCount").invoke(instance).asInstanceOf[Int]
+        val function: Function =
+          TableFunctionImpl.create(clazz, "udtfCalciteEntry" + inputColumnsCount.toString)
+        if (function != null) schemaPlus.add(name, function)
       }
     }
   }

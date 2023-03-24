@@ -28,9 +28,6 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   */
 class UdfRegistrationTest extends AbstractCalciteFunctionTest {
 
-  val trajectory: Trajectory = ModelGenerator.generateTrajectory()
-  val tGeo: String = trajectory.toGeoJSON
-
   test("udf registration test2") {
     val statement = connect.createStatement()
     statement.executeUpdate("DROP TABLE IF EXISTS test2")

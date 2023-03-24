@@ -35,7 +35,8 @@ object SparkQueryExecutor extends LazyLogging {
     if (param != null) SparkSqlParam.CACHE.set(param)
     var spark = sparkSession
 
-    if (spark == null) spark = getSparkSession(param.isLocal, enableHiveSupport = false)
+    if (spark == null)
+      spark = getSparkSession(param.isLocal, enableHiveSupport = param.isEnableHiveSupport)
 
     val sql = param.getSql
     CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
@@ -76,10 +77,12 @@ object SparkQueryExecutor extends LazyLogging {
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) => {
         val instance = clazz.newInstance()
-        val method = clazz.getDeclaredMethod("udfWrapper").invoke(instance)
+        val udfSparkEntryName: String =
+          clazz.getDeclaredMethod("udfSparkEntryName").invoke(instance).asInstanceOf[String]
+        val method = clazz.getDeclaredMethod(udfSparkEntryName).invoke(instance)
         val rm = ScalaReflection.mirror
         val functionType =
-          rm.classSymbol(clazz).typeSignature.decl(TermName("udfWrapper")).asMethod.returnType
+          rm.classSymbol(clazz).typeSignature.decl(TermName(udfSparkEntryName)).asMethod.returnType
         def typeToTypeTag[T](tpe: Type): TypeTag[T] =
           TypeTag(rm, new api.TypeCreator {
             def apply[U <: api.Universe with Singleton](m: api.Mirror[U]): U#Type =
@@ -634,6 +637,12 @@ object SparkQueryExecutor extends LazyLogging {
           }
           case _ => logger.warn("Not register function " + name + " due to pattern mismatch!")
         }
+      }
+    }
+    new UdfFactory().getUdtfMap(Spark).foreach {
+      case (name, clazz) => {
+        val instance = clazz.newInstance()
+        spark.sql("CREATE TEMPORARY FUNCTION " + name + " as '" + clazz.getName + "'")
       }
     }
     spark

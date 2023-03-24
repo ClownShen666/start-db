@@ -67,7 +67,7 @@
         <specs2.version>4.9.2</specs2.version>
         <httpclient.version>4.5.14</httpclient.version>
         <mockito.version>3.12.4</mockito.version>
-        <reflection.version>0.9.10</reflection.version>
+        <reflection.version>0.10.2</reflection.version>
         <hive.version>2.3.0</hive.version>
     </properties>
 

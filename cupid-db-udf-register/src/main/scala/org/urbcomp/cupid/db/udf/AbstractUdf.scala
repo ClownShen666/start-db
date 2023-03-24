@@ -21,6 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 trait AbstractUdf {
 
   def name(): String
-  def udfType(): UdfType.Value
   def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  def udfCalciteEntryName(): String
+  def udfSparkEntryName(): String
 }

@@ -25,19 +25,19 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
-import scala.collection.JavaConverters._
 
 import java.util
+import scala.collection.JavaConverters._
 
-class StringSplitUdtf extends AbstractUdtf with Serializable {
+class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
 
-  override def name(): String = "StringSplit"
+  override def name(): String = "StringSplitTwice"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def inputColumnsCount(): Int = 1
+  override def inputColumnsCount(): Int = 2
   override def outputColumns(): List[(String, SqlTypeName)] =
-    List(("StringName", SqlTypeName.VARCHAR))
+    List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.VARCHAR))
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
     //判断传入的参数是否只有一个
@@ -51,32 +51,26 @@ class StringSplitUdtf extends AbstractUdtf with Serializable {
     val fieldNames = outputColumns().map(_._1).asJava
     val fieldOIs = new util.ArrayList[ObjectInspector]
     fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
+    fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
     ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs)
   }
 
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val strings: Array[String] = objects(0).toString.split(" ")
-    var ret = new Array[Array[AnyRef]](strings.length)
-    var idx = 0
-    for (elem <- strings) {
-      val tmp = new Array[AnyRef](1)
-      tmp(0) = elem
-      ret(idx) = tmp
-      idx += 1
-    }
-    ret
-  }
-
-  /*override def process(objects: Array[AnyRef]): Unit = {
-    val strings: Array[String] = objects(0).toString.split(" ")
-    for (elem <- strings) {
-      val tmp = new Array[String](1)
-      tmp(0) = elem
-      forward(tmp)
+    val delimiter = objects(0).toString
+    val input = objects(1).toString
+    if (input.isEmpty) new Array[Array[AnyRef]](0)
+    else {
+      val test = input.split(delimiter)
+      var ret = new Array[Array[AnyRef]](test.length)
+      var idx = 0
+      for (i <- 0 until test.length) {
+        val result = test(i).split(":")
+        ret(idx) = result.asInstanceOf[Array[AnyRef]]
+        idx += 1
+      }
+      ret
     }
   }
-
-  override def close(): Unit = {}*/
 
   override protected def process(objects: Array[AnyRef]): Unit = {
     val ret = udtfImpl(objects)
