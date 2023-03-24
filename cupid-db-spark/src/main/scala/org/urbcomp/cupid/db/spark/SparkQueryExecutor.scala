@@ -39,19 +39,24 @@ object SparkQueryExecutor extends LazyLogging {
       spark = getSparkSession(param.isLocal, enableHiveSupport = param.isEnableHiveSupport)
 
     val sql = param.getSql
-    CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
-      val userName = SparkSqlParam.CACHE.get().getUserName
-      val dbTableNames = i.split("\\.")
-      val dbName = dbTableNames(0)
-      val tableName = dbTableNames(1)
-      val catalogName = MetadataUtil.makeCatalog(userName, dbName)
-      val table = MetadataAccessUtil.getTable(userName, dbName, tableName)
-      if (table == null) throw new IllegalArgumentException("Table Not Exists: " + i)
-      val sft = MetadataUtil.makeSchemaName(table.getId)
-      loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
+    try {
+      CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
+        val userName = SparkSqlParam.CACHE.get().getUserName
+        val dbTableNames = i.split("\\.")
+        val dbName = dbTableNames(0)
+        val tableName = dbTableNames(1)
+        val catalogName = MetadataUtil.makeCatalog(userName, dbName)
+        val table = MetadataAccessUtil.getTable(userName, dbName, tableName)
+        if (table == null) throw new IllegalArgumentException("Table Not Exists: " + i)
+        val sft = MetadataUtil.makeSchemaName(table.getId)
+        loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
+      }
+      val df = spark.sql(sql)
+      SparkResultExporterFactory.getInstance(param.getExportType).exportData(param.getSqlId, df)
+    } finally {
+      spark.stop()
+      SparkSession.clearActiveSession()
     }
-    val df = spark.sql(sql)
-    SparkResultExporterFactory.getInstance(param.getExportType).exportData(param.getSqlId, df)
   }
 
   def loadTable(
