@@ -92,7 +92,7 @@ class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
     val statement = connect.createStatement
     val resultSet = statement.executeQuery("select parseDouble('12345678901234567890')")
     resultSet.next()
-    assertEquals(12345678901234567890D, resultSet.getObject(1))
+    assertEquals(12345678901234567890d, resultSet.getObject(1))
   }
 
 }
