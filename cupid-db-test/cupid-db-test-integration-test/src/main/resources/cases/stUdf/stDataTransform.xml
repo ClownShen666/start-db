@@ -1,309 +1,281 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--  通用空间数据类型转换  测试用例  -->
 <testCase>
-
+    <resultXml>stDataTransform_result.xml</resultXml>
     <!--  传入给定点的geoJson，返回点  st_pointFromGeoJSON(geoJson: String): Point  -->
     <case>
         <sql type="query">select st_pointFromGeoJson(?);</sql>
-        <assertion expected="stDt_001.xml">
-            ['{
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "properties": {"direction": "forward"},
-                        "geometry": {
-                        "type": "Point",
-                        "coordinates": [105.380859375,31.57853542647338]
-                        }
-                    }
-                ]
-            }']
-        </assertion>
+        <arguments resultID="1">['{ "type": "Point", "coordinates": [1.0 2.0] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  传入给定线的geoJson，返回线  st_lineStringFromGeoJSON(geoJson: String): LineString  -->
     <case>
-        <sql type="query">_lineFromGeoJson(?);</sql>
-        <assertion expected="stDt_002.xml">
-            ['{
-                "type":"Feature",
-                "properties":{},
-                "geometry":{
-                    "type":"LineString",
-                    "coordinates":[
-                        [105.6005859375,30.65681556429287],
-                        [107.95166015624999,31.98944183792288],
-                        [109.3798828125,30.031055426540206],
-                        [107.7978515625,29.935895213372444]]
-                }
-            }']
-        </assertion>
+        <sql type="query">select st_lineStringFromGeoJson(?);</sql>
+        <arguments resultID="2">['{ "type":"LineString", "coordinates":[ [0.0 1.0],[1.0 2.0] ] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  传入给定面的geoJson，返回面  st_polygonFromGeoJSON(geoJson: String): Polygon  -->
     <case>
         <sql type="query">select st_PolygonFromGeoJson(?);</sql>
-        <assertion expected="stDt_003.xml">
-            ['{
-                "type":"Feature",
-                "properties":{},
-                "geometry":{
-                    "type":"Polygon",
-                    "coordinates":[[
-                        [106.10595703125,33.33970700424026],
-                        [106.32568359375,32.41706632846282],
-                        [108.03955078125,32.2313896627376],
-                        [108.25927734375,33.15594830078649],
-                        [106.10595703125,33.33970700424026]]]
-                }
-            }']
-        </assertion>
+        <arguments resultID="ignore">['{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  st_mPointFromGeoJSON(geoJson: String): MultiPoint  -->
     <case>
-        <sql type="query">select st_pointFromGeoJson(?);</sql>
-        <assertion expected="stDt_004.xml">
-            ['{
-                "type": "MultiPoint",
-                "coordinates": [
-                    [100.0, 0.0],
-                    [101.0, 1.0] ]
-            }']
-        </assertion>
+        <sql type="query">select st_mPointFromGeoJson(?);</sql>
+        <arguments resultID="3">['{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  st_mLineStringFromGeoJSON(geoJson: String): MultiLineString  -->
     <case>
-        <sql type="query">select st_pointFromGeoJson(?);</sql>
-        <assertion expected="stDt_005.xml">
-            ['{
-                "type": "MultiLineString",
-                "coordinates": [
-                    [[100.0, 0.0], [101.0, 1.0]],
-                    [[102.0, 2.0], [103.0, 3.0]]]
-            }']
-        </assertion>
+        <sql type="query">select st_mLineStringFromGeoJson(?);</sql>
+        <arguments resultID="ignore">[st_asGeoJSON(st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }'))]</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  st_mPolygonFromGeoJSON(geoJson: String): MultiPolygon  -->
     <case>
-        <sql type="query">select st_pointFromGeoJson(?);</sql>
-        <assertion expected="stDt_006.xml">
-            ['{
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],
-                    [[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],
-                    [[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]]
-            }']
-        </assertion>
+        <sql type="query">select st_mPolygonFromGeoJson(?);</sql>
+        <arguments resultID="ignore">['{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  给定Geometry的GeoJSON字符串，生成对应类型的几何对象  st_geomFromGeoJSON(geojsonGeometry: String): Geometry  -->
     <case>
         <sql type="query">select st_geomFromGeoJSON(?);</sql>
-        <assertion expected="stDt_007.xml">
-            ['{
-                "type":"Point",
-                "coordinates": [106.10595703125,33.33970700424026]
-            }']
-        </assertion>
+        <arguments resultID="4">['{ "type":"Point", "coordinates": [1 2] }']</arguments>
+        <arguments resultID="5">['{ "type":"LineString", "coordinates":[ [0.0 1.0],[1.0 2.0] ] }']</arguments>
+        <arguments resultID="ignore">['{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }']</arguments>
+        <arguments resultID="6">['{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }']</arguments>
+        <arguments resultID="7">['{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }']</arguments>
+        <arguments resultID="ignore">['{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }']</arguments>
+        <arguments exception="ClassCastException">[1]</arguments>
     </case>
-
     <!--  生成geom对应的GeoJSON形式  st_asGeoJSON(geom: Geometry): String  -->
     <case>
         <sql type="query">select st_asGeoJSON(?);</sql>
-        <assertion expected="stDt_008.xml">
-            [st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]
-        </assertion>
+        <arguments resultID="8">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="9">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments resultID="10">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments resultID="11">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')]</arguments>
+        <arguments resultID="12">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')]</arguments>
+        <arguments resultID="13">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将POINT的WKT转为POINT对象  st_pointFromWKT(wktString: String): Point  -->
     <case>
         <sql type="query">select st_PointFromWkt(?);</sql>
-        <assertion expected="stDt_009.xml">['POINT(114.134488 22.614742)']</assertion>
+        <arguments resultID="14">['POINT(1 2)']</arguments>
+        <arguments resultID="15">['LINESTRING(0 0,1 1,2 2)']</arguments>
+        <arguments resultID="16">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将lineString的WKT转为POINT对象  st_lineStringFromWKT(wktString: String): LineString  -->
     <case>
         <sql type="query">select st_lineStringFromWkt(?);</sql>
-        <assertion expected="stDt_010.xml">['LINESTRING(0 0,1 1,2 2)']</assertion>
+        <arguments resultID="17">['POINT(1 2)']</arguments>
+        <arguments resultID="18">['LINESTRING(0 0,1 1,2 2)']</arguments>
+        <arguments resultID="19">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将polygon的WKT转为POINT对象  st_polygonFromWKT(wktString: String): Polygon  -->
     <case>
         <sql type="query">select st_polygonFromWkt(?);</sql>
-        <assertion expected="stDt_011.xml">['POLYGON ((1 2, 1 4, 3 4, 3 2, 1 2))']</assertion>
+        <arguments resultID="20">['POINT(1 2)']</arguments>
+        <arguments resultID="ignore">['POLYGON(0 0,4 0,4 4,0 4,0 0)']</arguments>
+        <arguments resultID="21">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将mPoint的WKT转为POINT对象  st_mPointFromWKT(wktString: String): MultiPolygon  -->
     <case>
         <sql type="query">select st_mPointFromWkt(?);</sql>
-        <assertion expected="stDt_012.xml">['MULTIPOINT(3.5 5.6, 4.8 10.5)']</assertion>
+        <arguments resultID="22">['MULTIPOINT(3.5 5.6, 4.8 10.5)']</arguments>
+        <arguments resultID="23">['POINT(1 2)']</arguments>
+        <arguments resultID="24">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将mLineString的WKT转为POINT对象  st_mLineStringFromWKT(wktString: String): MultiLineString  -->
     <case>
         <sql type="query">select st_mLineStringFromWkt(?);</sql>
-        <assertion expected="stDt_013.xml">
-            ['MULTILINESTRING((3 4,10 50,20 25),(-5 -8,-10 -8,-15 -4))']
-        </assertion>
+        <arguments resultID="25">['MULTILINESTRING((3 4,10 50,20 25),(-5 -8,-10 -8,-15 -4))']</arguments>
+        <arguments resultID="26">['LINESTRING(0 0,1 1,2 2)']</arguments>
+        <arguments resultID="27">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将mPolygon的WKT转为POINT对象  st_mPolygonFromWKT(wktString: String): MultiPolygon  -->
     <case>
         <sql type="query">select st_mPolygonFromWkt(?);</sql>
-        <assertion expected="stDt_014.xml">
-            ['MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))']
-        </assertion>
+        <arguments resultID="ignore">['MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)))']</arguments>
+        <arguments resultID="ignore">['POLYGON(0 0,4 0,4 4,0 4,0 0)']</arguments>
+        <arguments resultID="28">['']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将空间数据类型的WKT转为Geometry对象  st_geomFromWKT(wktString: String): Geometry  -->
     <case>
         <sql type="query">select st_geomFromWkt(?);</sql>
-        <assertion expected="stDt_015.xml">['POINT(114.134488 22.614742)']</assertion>
+        <arguments resultID="29">['POINT(1 2)']</arguments>
+        <arguments resultID="30">['LINESTRING(0 0,1 1,2 2)']</arguments>
+        <arguments resultID="ignore">['POLYGON(0 0,4 0,4 4,0 4,0 0)']</arguments>
+        <arguments resultID="31">['MULTIPOINT(3.5 5.6, 4.8 10.5)']</arguments>
+        <arguments resultID="32">['MULTILINESTRING((3 4,10 50,20 25),(-5 -8,-10 -8,-15 -4))']</arguments>
+        <arguments resultID="ignore">['MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)))']</arguments>
+        <arguments exception="ParseException">[1]</arguments>
     </case>
-
     <!--  将geom对象转为WKT字符串  st_asWKT(geom: Geometry): String  -->
     <case>
         <sql type="query">select st_asWkt(?);</sql>
-        <assertion expected="stDt_016.xml">[st_makePoint(1, 2)']</assertion>
+        <arguments resultID="33">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="34">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments resultID="35">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments resultID="36">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')]</arguments>
+        <arguments resultID="37">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')]</arguments>
+        <arguments resultID="38">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的Point  st_pointFromWKB(wkb: Binary): Point  -->
     <case>
         <sql type="query">select st_pointFromWkb(?);</sql>
-        <assertion expected="stDt_017.xml">[st_asWKB(st_makePoint(1,2)]</assertion>
+        <arguments resultID="39">[st_asWKB(st_makePoint(1, 2))]</arguments>
+        <arguments resultID="40">[st_asWKB(st_geomFromWKT('LINESTRING(0 0,1 1,2 2)'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的LINESTRING  st_lineStringFromWKB(wkb: Binary): LineString  -->
     <case>
         <sql type="query">select st_linestringFromWkb(?);</sql>
-        <assertion expected="stDt_018.xml">
-            [st_asWKB(st_geomFromWkt('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)'))]
-        </assertion>
+        <arguments resultID="41">[st_asWKB(st_makePoint(1, 2))]</arguments>
+        <arguments resultID="42">[st_asWKB(st_geomFromWKT('LINESTRING(0 0,1 1,2 2)'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的Polygon  st_polygonFromWKB(wkb: Binary): Polygon  -->
     <case>
         <sql type="query">select st_polygonFromWKB(?);</sql>
-        <assertion expected="stDt_019.xml">
-            [st_asWKB(st_geomFromWkt('POLYGON ((1 2, 1 4, 3 4, 3 2, 1 2))'))]
-        </assertion>
+        <arguments resultID="43">[st_asWKB(st_makePoint(1, 2))]</arguments>
+        <arguments resultID="ignore">[st_asWKB(st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的mPoint  st_mPointFromWKB(wkb: Binary): MultiPoint  -->
     <case>
         <sql type="query">select st_mPointFromWKB(?);</sql>
-        <assertion expected="stDt_020.xml">
-            [st_asWKB(st_geomFromWkt('MULTIPOINT(3.5 5.6, 4.8 10.5)'))]
-        </assertion>
+        <arguments resultID="45">[st_asWKB(st_makePoint(1, 2))]</arguments>
+        <arguments resultID="46">[st_asWKB(st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的mLineString  st_mLineStringFromWKB(wkb: Binary): MultiLineString  -->
     <case>
         <sql type="query">select st_mLineStringFromWKB(?);</sql>
-        <assertion expected="stDt_021.xml">
-            [st_asWKB(st_geomFromWkt('MULTILINESTRING((3 4,10 50,20 25),(-5 -8,-10 -8,-15 -4))'))]
-        </assertion>
+        <arguments resultID="47">[st_asWKB(st_geomFromWKT('LINESTRING(0 0,1 1,2 2)'))]</arguments>
+        <arguments resultID="48">[st_asWKB(st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  创建与给定WKB表示相对应的mPolygon  st_mPolygonFromWKB(wkb: Binary): MultiPolygon  -->
     <case>
         <sql type="query">select st_mPolygonFromWKB(?);</sql>
-        <assertion expected="stDt_022.xml">
-            [st_asWKB(st_geomFromWkt('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))'))]
-        </assertion>
+        <arguments resultID="49">[st_asWKB(st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }'))]</arguments>
+        <arguments resultID="ignore">[st_asWKB(st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  根据已知的二进制表示(WKB)创建几何图形  st_geomFromWKB(wkb: Binary): Geometry  -->
     <case>
         <sql type="query">select st_geomFromWkb(?);</sql>
-        <assertion expected="stDt_023.xml">
-            [st_asWKB(st_makeBbox(1, 2, 3, 4))]
-        </assertion>
+        <arguments resultID="50">[st_asWKB(st_makePoint(1, 2))]</arguments>
+        <arguments resultID="51">[st_asWKB(st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }'))]</arguments>
+        <arguments resultID="52">[st_asWKB(st_geomFromWKT('LINESTRING(0 0,1 1,2 2)'))]</arguments>
+        <arguments resultID="53">[st_asWKB(st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }'))]</arguments>
+        <arguments resultID="ignore">[st_asWKB(st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }'))]</arguments>
+        <arguments resultID="ignore">[st_asWKB(st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }'))]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  生成geom对应的WKB形式（字节数组）  st_asWKB(geom: Geometry): Binary  -->
     <case>
         <sql type="query">select st_asWKB(?);</sql>
-        <assertion expected="stDt_024.xml">[st_geomFromWKT('Point(0 0)')]</assertion>
+        <arguments resultID="54">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="55">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments resultID="56">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments resultID="57">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')]</arguments>
+        <arguments resultID="58">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')]</arguments>
+        <arguments resultID="59">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回由Geohash字符串（base-32 编码方式）定义的Polygon的几何中心，精度为prec位
             st_pointFromGeoHash(geohash: String, prec: Integer): Point  -->
     <case>
         <sql type="query">select st_pointFromGeoHash(?, ?);</sql>
-        <assertion expected="stDt_025.xml">['ezs42'][25]</assertion>
+        <arguments resultID="60">['ezs42'][25]</arguments>
+        <arguments exception="MismatchedInputException">[1]['']</arguments>
     </case>
-
-    <!--  根据提供值返回Geometry， prec 精度
+    <!--  传入geoHash和精度返回Geometry
         st_geomFromGeoHash(geoHash: String, prec: Integer): Geometry  -->
     <case>
-        <sql type="query">select st_geomFromGeoHash(?, ?);</sql>
-        <assertion expected="stDt_026.xml">
-            [st_asGeoHash(st_makePoint(1,2),4)]
-            [4]
-        </assertion>
+        <sql type="ignore">select st_geomFromGeoHash(?, ?);</sql>
+        <arguments resultID="61">[st_asGeoHash(st_makePoint(1,2),30)][30]</arguments>
+        <arguments resultID="62">[st_asGeoHash(st_geomFromWKT('LINESTRING(0 0,1 1,2 2)'),30)][30]</arguments>
+        <arguments resultID="63">[st_asGeoHash(st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }'),30)][30]</arguments>
+        <arguments resultID="64">[st_asGeoHash(st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }'),30)][30]</arguments>
+        <arguments resultID="65">[st_asGeoHash(st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }'),30)][30]</arguments>
+        <arguments resultID="66">[st_asGeoHash(st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }'),30)][30]</arguments>
+        <arguments exception="MismatchedInputException">[1]['']</arguments>
     </case>
-
     <!--  根据Geometry， geoHash位数 精度返回hash值  st_asGeoHash(geom: Geometry, prec: Integer): String  -->
     <case>
-        <sql type="query">select st_geoHash(?, ?);</sql>
-        <assertion expected="stDt_027.xml">
-            [st_makePoint(1,2)]
-            [8]
-        </assertion>
+        <sql type="query">select st_asGeoHash(?, ?);</sql>
+        <arguments resultID="67">[st_makePoint(1,2)][30]</arguments>
+        <arguments resultID="68">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')][30]</arguments>
+        <arguments resultID="69">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')][30]</arguments>
+        <arguments resultID="70">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')][30]</arguments>
+        <arguments resultID="71">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')][30]</arguments>
+        <arguments resultID="72">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')][30]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  将geom 转为Point对象  st_castToPoint(geom: Geometry): Point  -->
     <case>
         <sql type="query">select st_castToPoint(?);</sql>
-        <assertion expected="stDt_028.xml">[st_geomFromWKT('POINT(1 1)')]</assertion>
+        <arguments resultID="73">[st_geomFromWKT('POINT(1 1)')]</arguments>
+        <arguments resultID="74">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为LineString对象  st_castToLineString(geom: Geometry): LineString  -->
     <case>
         <sql type="query">select st_castToLineString(?);</sql>
-        <assertion expected="stDt_029.xml">[st_geomFromWKT('LINESTRING(1 1,2 2)')]</assertion>
+        <arguments resultID="75">[st_makePoint(1,2)]</arguments>
+        <arguments resultID="76">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为Polygon对象  st_castToPolygon(geom: Geometry): Polygon  -->
     <case>
         <sql type="query">select st_castToPolygon(?);</sql>
-        <assertion expected="stDt_030.xml">[st_geomFromWKT('POLYGON((1 1,1 2,2 2,2 1,1 1))')]</assertion>
+        <arguments resultID="77">[st_makePoint(1,2)]</arguments>
+        <arguments resultID="ignore">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为mPoint对象  st_castToMPoint(geom: Geometry): MultiPoint  -->
     <case>
         <sql type="query">select st_castToMPoint(?);</sql>
-        <assertion expected="stDt_031.xml">[st_geomFromWKT('MULTIPOINT(3.5 5.6, 4.8 10.5)')]</assertion>
+        <arguments resultID="78">[st_makePoint(1,2)]</arguments>
+        <arguments resultID="79">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为MLineString对象  st_castToMLineString(geom: Geometry): MultiLineString  -->
     <case>
         <sql type="query">select st_castToMLineString(?);</sql>
-        <assertion expected="stDt_032.xml">
-            [st_geomFromWKT('MULTILINESTRING((3 4,10 50,20 25),(-5 -8,-10 -8,-15 -4))')]
-        </assertion>
+        <arguments resultID="80">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments resultID="81">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为mPolygon对象  st_castToMPolygon(geom: Geometry): MultiPolygon  -->
     <case>
-        <sql type="query">select st_castToPolygon(?);</sql>
-        <assertion expected="stDt_033.xml">
-            [st_geomFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))))')]
-        </assertion>
+        <sql type="query">select st_castToMPolygon(?);</sql>
+        <arguments resultID="82">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments resultID="ignore">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  将geom 转为Geometry对象st_castToGeometry(geom: Geometry): Geometry  -->
     <case>
         <sql type="query">select st_castToGeometry(?);</sql>
-        <assertion expected="stDt_034.xml">[st_geomFromWKT('POINT(1 1)')]</assertion>
+        <arguments resultID="83">[st_makePoint(1,2)]</arguments>
+        <arguments resultID="84">[st_mPointFromGeoJson('{ "type": "MultiPoint", "coordinates": [ [0 1], [2 3] ] }')]</arguments>
+        <arguments resultID="85">[st_geomFromWKT('LINESTRING(0 0,1 1,2 2)')]</arguments>
+        <arguments resultID="86">[st_mLineStringFromGeoJson('{ "type": "MultiLineString", "coordinates": [ [ [1.0 1.0], [2.0 2.0] ], [ [1.0 2.0], [2.0 3.0] ] ] }')]</arguments>
+        <arguments resultID="ignore">[st_PolygonFromGeoJson('{ "type": "Polygon", "coordinates": [ [[0 0], [4 0], [4 4], [0 4], [0 0]] ] }')]</arguments>
+        <arguments resultID="ignore">[st_mPolygonFromGeoJson('{ "type": "MultiPolygon", "coordinates": [ [[[0 0], [4 0], [4 4], [0 4], [0 0]]], [[[2 2], [6 2], [6 6], [2 6], [2 2]]] ] }')]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
-
 </testCase>

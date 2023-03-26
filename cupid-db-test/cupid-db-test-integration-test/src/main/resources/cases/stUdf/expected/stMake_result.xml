@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<expectedResult>
+    <result id="1">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[110.0, 40.0]}</row>
+        </column>
+    </result>
+
+</expectedResult>

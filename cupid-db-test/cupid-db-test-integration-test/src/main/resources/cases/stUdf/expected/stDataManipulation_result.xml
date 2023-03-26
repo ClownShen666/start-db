@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<expectedResult>
+    <result id="1">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[4.0, 6.0]}</row>
+        </column>
+    </result>
+    <result id="2">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=LineString, coordinates=[[3.0, 5.0], [4.0, 6.0]]}</row>
+        </column>
+    </result>
+    <result id="3">
+        <column name="EXPR$0" type="double">
+            <row>1.0</row>
+        </column>
+    </result>
+    <result id="4">
+        <column name="EXPR$0" type="double">
+            <row>2.0</row>
+        </column>
+    </result>
+    <result id="5">
+        <column name="EXPR$0" type="int">
+            <row>1</row>
+        </column>
+    </result>
+    <result id="6">
+        <column name="EXPR$0" type="int">
+            <row>2</row>
+        </column>
+    </result>
+    <result id="7">
+        <column name="EXPR$0" type="int">
+            <row>5</row>
+        </column>
+    </result>
+    <result id="8">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[0.0, 1.0]}</row>
+        </column>
+    </result>
+    <result id="9">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[1.0, 0.0]}</row>
+        </column>
+    </result>
+    <result id="10">
+        <column name="EXPR$0" type="point">
+            <row>null</row>
+        </column>
+    </result>
+    <result id="11">
+        <column name="EXPR$0" type="point">
+            <row>null</row>
+        </column>
+    </result>
+    <result id="12">
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
+        </column>
+    </result>
+    <result id="13">
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
+        </column>
+    </result>
+    <result id="14">
+        <column name="EXPR$0" type="double">
+            <row>16.0</row>
+        </column>
+    </result>
+    <result id="15">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="16">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[0.5, 1.5]}</row>
+        </column>
+    </result>
+    <result id="17">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[2.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="18">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="19">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="20">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[4.0, 4.0]}</row>
+        </column>
+    </result>
+    <result id="21">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[0.5, 1.5]}</row>
+        </column>
+    </result>
+    <result id="22">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[1.0, 1.0]}</row>
+        </column>
+    </result>
+    <result id="23">
+        <column name="EXPR$0" type="point">
+            <row>{type=Point, coordinates=[4.0, 4.0]}</row>
+        </column>
+    </result>
+    <result id="24">
+        <column name="EXPR$0" type="double">
+            <row>5.656854249492381</row>
+        </column>
+    </result>
+    <result id="25">
+        <column name="EXPR$0" type="double">
+            <row>5.656854249492381</row>
+        </column>
+    </result>
+    <result id="26">
+        <column name="EXPR$0" type="double">
+            <row>2.23606797749979</row>
+        </column>
+    </result>
+    <result id="27">
+        <column name="EXPR$0" type="double">
+            <row>0.7071067811865476</row>
+        </column>
+    </result>
+    <result id="28">
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
+        </column>
+    </result>
+    <result id="29">
+        <column name="EXPR$0" type="double">
+            <row>1.4142135623730951</row>
+        </column>
+    </result>
+    <result id="30">
+        <column name="EXPR$0" type="double">
+            <row>628183.8089202238</row>
+        </column>
+    </result>
+    <result id="31">
+        <column name="EXPR$0" type="double">
+            <row>785408.7178117323</row>
+        </column>
+    </result>
+    <result id="32">
+        <column name="EXPR$0" type="double">
+            <row>867809.7561453198</row>
+        </column>
+    </result>
+    <result id="33">
+        <column name="EXPR$0" type="double">
+            <row>111195.07973436874</row>
+        </column>
+    </result>
+    <result id="34">
+        <column name="EXPR$0" type="double">
+            <row>157249.59776813342</row>
+        </column>
+    </result>
+    <result id="35">
+        <column name="EXPR$0" type="double">
+            <row>785768.3026627928</row>
+        </column>
+    </result>
+    <result id="36">
+        <column name="EXPR$0" type="double">
+            <row>626801.6729372697</row>
+        </column>
+    </result>
+    <result id="37">
+        <column name="EXPR$0" type="double">
+            <row>783677.0777770529</row>
+        </column>
+    </result>
+    <result id="38">
+        <column name="EXPR$0" type="double">
+            <row>865370.8928787916</row>
+        </column>
+    </result>
+    <result id="39">
+        <column name="EXPR$0" type="double">
+            <row>110574.38855779878</row>
+        </column>
+    </result>
+    <result id="40">
+        <column name="EXPR$0" type="double">
+            <row>156899.56829134029</row>
+        </column>
+    </result>
+    <result id="41">
+        <column name="EXPR$0" type="double">
+            <row>784028.7398090297</row>
+        </column>
+    </result>
+    <result id="42">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="43">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[0.5, 1.5]}</row>
+        </column>
+    </result>
+    <result id="44">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[3.0, 4.0]}</row>
+        </column>
+    </result>
+    <result id="45">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[0.5, 1.5]}</row>
+        </column>
+    </result>
+    <result id="46">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=LineString, coordinates=[[1.0, 1.0], [2.0, 2.0]]}</row>
+        </column>
+    </result>
+    <result id="47">
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
+        </column>
+    </result>
+    <result id="48">
+        <column name="EXPR$0" type="double">
+            <row>1.4142135623730951</row>
+        </column>
+    </result>
+    <result id="49">
+        <column name="EXPR$0" type="double">
+            <row>16.0</row>
+        </column>
+    </result>
+    <result id="50">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="51">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=LineString, coordinates=[[0.0, 1.0], [1.0, 2.0]]}</row>
+        </column>
+    </result>
+    <result id="52">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=LineString, coordinates=[[0.0, 1.0], [1.0, 2.0]]}</row>
+        </column>
+    </result>
+    <result id="53">
+        <column name="EXPR$0" type="boolean">
+            <row>true</row>
+        </column>
+    </result>
+    <result id="54">
+        <column name="EXPR$0" type="boolean">
+            <row>true</row>
+        </column>
+    </result>
+    <result id="55">
+        <column name="EXPR$0" type="boolean">
+            <row>true</row>
+        </column>
+    </result>
+    <result id="56">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=Point, coordinates=[1.0, 2.0]}</row>
+        </column>
+    </result>
+    <result id="57">
+        <column name="EXPR$0" type="geometry">
+            <row>{type=LineString, coordinates=[[0.0, 1.0], [1.0, 2.0]]}</row>
+        </column>
+    </result>
+</expectedResult>

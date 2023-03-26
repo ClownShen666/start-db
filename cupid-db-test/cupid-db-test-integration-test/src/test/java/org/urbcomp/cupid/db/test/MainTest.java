@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.urbcomp.cupid.db.test.GetData.getResultArray;
 import static org.urbcomp.cupid.db.test.GetCasePathByXML.getSqlCaseXMLs;
+import static org.urbcomp.cupid.db.test.GetData.setResultIDbyOrder;
 import static org.urbcomp.cupid.db.test.RunSingleSQLCase.runSingleCase;
 import static org.urbcomp.cupid.db.test.RunSingleSQLCase.getConnect;
 
@@ -80,8 +81,9 @@ public class MainTest {
     public void singleSQLCaseTest() throws Exception {
         // 执行单个xml测试用例文件
         String xmlResource = Objects.requireNonNull(
-            RunSingleSQLCase.class.getClassLoader().getResource("cases/udf/math.xml")
+            RunSingleSQLCase.class.getClassLoader().getResource("cases/stUdf/stDataTransform.xml")
         ).getPath();
+        setResultIDbyOrder(xmlResource);
         runSingleCase(xmlResource);
     }
 
