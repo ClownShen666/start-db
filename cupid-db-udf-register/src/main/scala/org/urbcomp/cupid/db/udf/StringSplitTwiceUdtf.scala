@@ -71,11 +71,4 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
       ret
     }
   }
-
-  override protected def process(objects: Array[AnyRef]): Unit = {
-    val ret = udtfImpl(objects)
-    for (elem <- ret) {
-      forward(elem)
-    }
-  }
 }

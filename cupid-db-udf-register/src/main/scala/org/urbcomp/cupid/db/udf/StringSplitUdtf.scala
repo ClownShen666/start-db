@@ -66,22 +66,4 @@ class StringSplitUdtf extends AbstractUdtf with Serializable {
     }
     ret
   }
-
-  /*override def process(objects: Array[AnyRef]): Unit = {
-    val strings: Array[String] = objects(0).toString.split(" ")
-    for (elem <- strings) {
-      val tmp = new Array[String](1)
-      tmp(0) = elem
-      forward(tmp)
-    }
-  }
-
-  override def close(): Unit = {}*/
-
-  override protected def process(objects: Array[AnyRef]): Unit = {
-    val ret = udtfImpl(objects)
-    for (elem <- ret) {
-      forward(elem)
-    }
-  }
 }
