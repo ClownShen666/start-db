@@ -26,7 +26,7 @@ import org.apache.calcite.sql.{SqlCall, SqlNode}
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-abstract class AbstractUdtf extends GenericUDTF {
+trait AbstractUdtf extends GenericUDTF {
 
   def name(): String
 
@@ -2119,7 +2119,7 @@ abstract class AbstractUdtf extends GenericUDTF {
   override protected def process(objects: Array[AnyRef]): Unit = {
     val ret = udtfImpl(objects)
     for (elem <- ret) {
-      forward(elem)
+      super.forward(elem)
     }
   }
 
