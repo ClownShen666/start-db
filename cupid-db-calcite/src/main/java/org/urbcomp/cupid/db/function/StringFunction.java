@@ -32,21 +32,25 @@ import java.security.NoSuchAlgorithmException;
 public class StringFunction {
     @CupidDBFunction("concat")
     public String concat(String str1, String str2) {
+        if (str1 == null || str2 == null) return null;
         return str1.concat(str2);
     }
 
     @CupidDBFunction("reverse")
     public String reverse(String str) {
+        if (str == null) return null;
         return new StringBuffer(str).reverse().toString();
     }
 
     @CupidDBFunction("trim")
     public String trim(String str) {
+        if (str == null) return null;
         return str.trim();
     }
 
     @CupidDBFunction("ltrim")
     public String ltrim(String str) {
+        if (str == null) return null;
         int i = 0;
         int n = str.length();
         while (i < n && str.charAt(i) == ' ')
@@ -56,6 +60,7 @@ public class StringFunction {
 
     @CupidDBFunction("rtrim")
     public String rtrim(String str) {
+        if (str == null) return null;
         int i = str.length() - 1;
         while (i >= 0 && str.charAt(i) == ' ')
             --i;
@@ -64,6 +69,7 @@ public class StringFunction {
 
     @CupidDBFunction("lpad")
     public String lpad(String str, int len) {
+        if (str == null) return null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; ++i) {
             sb.append(' ');
@@ -73,15 +79,15 @@ public class StringFunction {
 
     @CupidDBFunction("lpad")
     public String lpad(String str, int len, String pad) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(pad);
-        }
-        return sb + str;
+        String res = pad(str, len, pad);
+        if (res == null) return null;
+        if (res.length() == len) return res;
+        return res + str;
     }
 
     @CupidDBFunction("rpad")
     public String rpad(String str, int len) {
+        if (str == null) return null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; ++i) {
             sb.append(' ');
@@ -91,15 +97,15 @@ public class StringFunction {
 
     @CupidDBFunction("rpad")
     public String rpad(String str, int len, String pad) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(pad);
-        }
-        return str + sb;
+        String res = pad(str, len, pad);
+        if (res == null) return null;
+        if (res.length() == len) return res;
+        return str + pad(str, len, pad);
     }
 
     @CupidDBFunction("length")
-    public int length(String str) {
+    public Object length(String str) {
+        if (str == null) return null;
         int n = str.length();
         int length = n;
         for (int i = 0; i < n; ++i) {
@@ -110,17 +116,20 @@ public class StringFunction {
     }
 
     @CupidDBFunction("charLength")
-    public int charLength(String str) {
+    public Object charLength(String str) {
+        if (str == null) return null;
         return str.length();
     }
 
     @CupidDBFunction("locate")
-    public int locate(String substr, String str) {
+    public Object locate(String substr, String str) {
+        if (substr == null || str == null) return null;
         return str.indexOf(substr) + 1;
     }
 
     @CupidDBFunction("locate")
-    public int locate(String substr, String str, int pos) {
+    public Object locate(String substr, String str, int pos) {
+        if (substr == null || str == null) return null;
         return str.indexOf(substr, pos) + 1;
     }
 
@@ -155,5 +164,15 @@ public class StringFunction {
             code[k++] = hexDigits[byte0 & 0xf];
         }
         return new String(code);
+    }
+
+    private String pad(String str, int len, String pad) {
+        if (str == null || pad == null) return null;
+        if (len <= str.length()) return str.substring(0, len);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < len - str.length(); ++i) {
+            sb.append(pad);
+        }
+        return sb.toString();
     }
 }
