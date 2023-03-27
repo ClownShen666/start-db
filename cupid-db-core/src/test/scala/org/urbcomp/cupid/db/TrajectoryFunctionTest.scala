@@ -163,7 +163,7 @@ class TrajectoryFunctionTest extends AbstractCalciteFunctionTest {
   test("st_traj_stayPointSegment") {
     val statement = connect.createStatement()
     val trajectorySeg: Trajectory =
-      ModelGenerator.generateTrajectory("./data/stayPointSegmentationTraj.txt")
+      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
     val tGeoSeg: String = trajectorySeg.toGeoJSON
     val resultSet =
       statement.executeQuery(
@@ -183,7 +183,7 @@ class TrajectoryFunctionTest extends AbstractCalciteFunctionTest {
   test("st_traj_hybridSegment") {
     val statement = connect.createStatement()
     val trajectorySeg: Trajectory =
-      ModelGenerator.generateTrajectory("./data/stayPointSegmentationTraj.txt")
+      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
     val tGeoSeg: String = trajectorySeg.toGeoJSON
     val resultSet =
       statement.executeQuery(
@@ -202,7 +202,7 @@ class TrajectoryFunctionTest extends AbstractCalciteFunctionTest {
   test("st_traj_stayPointDetect") {
     val statement = connect.createStatement()
     val trajectoryStp: Trajectory =
-      ModelGenerator.generateTrajectory("./data/stayPointSegmentationTraj.txt")
+      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
     val tGeoStp: String = trajectoryStp.toGeoJSON
     val resultSet1 = statement.executeQuery(
       "select st_traj_stayPointDetect(st_traj_fromGeoJSON(\'" + tGeoStp + "\'),10,10)"
