@@ -67,6 +67,7 @@
         <httpclient.version>4.5.14</httpclient.version>
         <mockito.version>3.12.4</mockito.version>
         <grpc.version>1.19.0</grpc.version>
+        <kryo.version>5.3.0</kryo.version>
     </properties>
 
     <dependencyManagement>
