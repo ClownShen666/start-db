@@ -37,8 +37,10 @@ import java.util.List;
 public class GeometricConstructorFunction {
     @CupidDBFunction("st_makePoint")
     public Point st_makePoint(BigDecimal x, BigDecimal y) {
+        double X = x.doubleValue(), Y = y.doubleValue();
+        if (X > 180 || X < -180 || Y > 90 || Y < -90) return null;
         GeometryFactory geometryFactory = GeometryFactoryUtils.defaultGeometryFactory();
-        return geometryFactory.createPoint(new Coordinate(x.doubleValue(), y.doubleValue()));
+        return geometryFactory.createPoint(new Coordinate(X, Y));
     }
 
     @CupidDBFunction("st_makeLineString")

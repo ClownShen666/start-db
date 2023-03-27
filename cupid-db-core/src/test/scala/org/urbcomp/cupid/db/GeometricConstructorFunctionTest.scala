@@ -51,6 +51,7 @@ class GeometricConstructorFunctionTest extends AbstractCalciteFunctionTest {
       statement.executeQuery("select st_makeBBox(st_makePoint(1, 2), st_makePoint(3, 4))")
     resultSet.next()
     assertEquals("POLYGON ((1 2, 1 4, 3 4, 3 2, 1 2))", resultSet.getObject(1).toString)
+
   }
 
   test("st_makeCircle(center, radiusInM)") {
