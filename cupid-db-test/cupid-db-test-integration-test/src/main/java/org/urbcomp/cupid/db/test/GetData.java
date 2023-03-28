@@ -17,11 +17,13 @@
 package org.urbcomp.cupid.db.test;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.dom4j.*;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +124,36 @@ public class GetData {
             }
         }
         return expectedArray;
+    }
+
+    /**
+     * 自动将xml文件中的resultID值按数字递增顺序重新赋值
+     *
+     * @param xmlPath xml文件路径
+     */
+    public static void setResultIDbyOrder(String xmlPath) throws DocumentException {
+        // 获取根标签
+        SAXReader saxReader = new SAXReader();
+        Document document = saxReader.read(xmlPath);
+        Element rootElement = document.getRootElement();
+
+        // 获取所有具有resultID属性的结点，并按顺序重新赋值
+        List<Node> nodes = (rootElement.selectNodes(" //*[@resultID != 'ignore']"));
+        int i = 1;
+        for (Node node : nodes) {
+            Element element = (Element) node;
+            element.setAttributeValue("resultID", Integer.toString(i++));
+        }
+
+        // 将document转化为xml文件
+        try (FileWriter out = new FileWriter(xmlPath)) {
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            format.setIndentSize(4);
+            XMLWriter writer = new XMLWriter(out, format);
+            writer.write(document);
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        }
     }
 
     /**
