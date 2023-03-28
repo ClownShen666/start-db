@@ -16,16 +16,14 @@
  */
 package org.urbcomp.cupid.db.udf
 
-import org.apache.spark.sql.SparkSession
 import org.reflections.Reflections
-
 import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
 class UdfFactory extends Serializable {
-  private var engineUdfMap =
+  private val engineUdfMap =
     mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]]()
-  private var engineUdtfMap =
+  private val engineUdtfMap =
     mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdtf]]]()
 
   {

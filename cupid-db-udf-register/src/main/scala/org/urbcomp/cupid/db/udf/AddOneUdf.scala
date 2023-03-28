@@ -30,5 +30,5 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   def udfImpl(x: Int): Int = { x + 1 }
 
-  def udfWrapper: Function1[Int, Int] = udfImpl
+  def udfWrapper: Int => Int = udfImpl
 }

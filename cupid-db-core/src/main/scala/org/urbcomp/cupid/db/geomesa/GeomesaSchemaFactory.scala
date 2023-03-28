@@ -67,7 +67,7 @@ class GeomesaSchemaFactory extends SchemaFactory {
 
   private def initUdf(schemaPlus: SchemaPlus): Unit = {
     new UdfFactory().getUdfMap(Calcite).foreach {
-      case (name, clazz) => {
+      case (name, clazz) =>
         val instance = clazz.newInstance()
         val udfCalciteEntryName: String =
           clazz.getDeclaredMethod("udfCalciteEntryName").invoke(instance).asInstanceOf[String]
@@ -78,10 +78,9 @@ class GeomesaSchemaFactory extends SchemaFactory {
         } else {
           log.warn("Calcite cannot register udf " + name)
         }
-      }
     }
     new UdfFactory().getUdtfMap(Calcite).foreach {
-      case (name, clazz) => {
+      case (name, clazz) =>
         val instance = clazz.newInstance()
         val inputColumnsCount: Int =
           clazz.getDeclaredMethod("inputColumnsCount").invoke(instance).asInstanceOf[Int]
@@ -93,7 +92,6 @@ class GeomesaSchemaFactory extends SchemaFactory {
         } else {
           log.warn("Calcite cannot register udtf " + name)
         }
-      }
     }
   }
 

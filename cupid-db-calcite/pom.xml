@@ -22,7 +22,7 @@
             <artifactId>cupid-db-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-udf-register</artifactId>
             <version>${project.version}</version>
@@ -34,13 +34,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>${reflection.version}</version>

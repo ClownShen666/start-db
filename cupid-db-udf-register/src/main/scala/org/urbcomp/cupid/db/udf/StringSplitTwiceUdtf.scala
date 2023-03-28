@@ -35,14 +35,14 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def inputColumnsCount(): Int = 2
+  override def inputColumnsCount: Int = 2
   override def outputColumns(): List[(String, SqlTypeName)] =
     List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.VARCHAR))
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
     //判断传入的参数是否只有一个
-    if (argOIs.length != inputColumnsCount()) {
-      throw new UDFArgumentException("有且只能有" + inputColumnsCount() + "个参数")
+    if (argOIs.length != inputColumnsCount) {
+      throw new UDFArgumentException("有且只能有" + inputColumnsCount + "个参数")
     }
     //判断参数类型
     if (argOIs(0).getCategory != ObjectInspector.Category.PRIMITIVE) {
@@ -56,12 +56,12 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
   }
 
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val delimiter = objects(0).toString
+    val delimiter = objects.head.toString
     val input = objects(1).toString
     if (input.isEmpty) new Array[Array[AnyRef]](0)
     else {
       val test = input.split(delimiter)
-      var ret = new Array[Array[AnyRef]](test.length)
+      val ret = new Array[Array[AnyRef]](test.length)
       var idx = 0
       for (i <- 0 until test.length) {
         val result = test(i).split(":")

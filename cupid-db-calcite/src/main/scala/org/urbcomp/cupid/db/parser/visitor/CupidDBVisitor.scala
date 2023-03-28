@@ -545,9 +545,9 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     * @return add alias sqlnode
     */
   def handleFunction(ctx: ExprFuncContext, res: SqlBasicCall): SqlNode = {
-    var udtfOutputColumns = mutable.HashMap.empty[String, List[String]]
+    val udtfOutputColumns = mutable.HashMap.empty[String, List[String]]
     new UdfFactory().getUdtfMap(Calcite).foreach {
-      case (name, clazz) => {
+      case (name, clazz) =>
         val instance = clazz.newInstance()
         val outputColumns: List[(String, SqlTypeName)] =
           clazz
@@ -555,7 +555,6 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
             .invoke(instance)
             .asInstanceOf[List[(String, SqlTypeName)]]
         udtfOutputColumns += (name.toLowerCase -> outputColumns.map(_._1))
-      }
     }
 
     if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
