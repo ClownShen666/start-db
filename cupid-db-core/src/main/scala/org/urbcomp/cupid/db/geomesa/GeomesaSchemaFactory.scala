@@ -16,9 +16,10 @@
  */
 package org.urbcomp.cupid.db.geomesa
 
-import org.apache.calcite.schema.impl.{AggregateFunctionImpl, TableFunctionImpl}
+import org.apache.calcite.schema.impl.{AggregateFunctionImpl, ScalarFunctionImpl, TableFunctionImpl}
 import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
+import org.urbcomp.cupid.db.udf.UdfFactory
 import org.urbcomp.cupid.db.udtf.{
   DBSCANClustering,
   Fibonacci,
@@ -29,7 +30,13 @@ import org.urbcomp.cupid.db.udtf.{
   TimeIntervalTrajectorySegment
 }
 
+import java.lang.reflect.Method
 import java.util
+import org.apache.calcite.schema.Function
+import lombok.extern.slf4j.Slf4j
+import org.urbcomp.cupid.db.udf.DataEngine.Calcite
+import org.slf4j.Logger
+import org.urbcomp.cupid.db.util.LogUtil
 
 /**
   * Schema Factory of Geomesa
@@ -37,14 +44,55 @@ import java.util
   * @author zaiyuan
   * @since 0.1.0
   */
+@Slf4j
 class GeomesaSchemaFactory extends SchemaFactory {
+  val log: Logger = LogUtil.getLogger
+
   override def create(
       schemaPlus: SchemaPlus,
       schemaName: String,
       operands: util.Map[String, AnyRef]
   ): Schema = {
+    initUdf(schemaPlus)
     initTableFunction(schemaPlus)
     new GeomesaSchema
+  }
+
+  def findMethod[T](clazz: Class[T], name: String): Boolean = {
+    clazz.getMethods.foreach { method: Method =>
+      if (method.getName == name && !method.isBridge) return true
+    }
+    false
+  }
+
+  private def initUdf(schemaPlus: SchemaPlus): Unit = {
+    new UdfFactory().getUdfMap(Calcite).foreach {
+      case (name, clazz) =>
+        val instance = clazz.newInstance()
+        val udfCalciteEntryName: String =
+          clazz.getDeclaredMethod("udfCalciteEntryName").invoke(instance).asInstanceOf[String]
+        val function: Function = ScalarFunctionImpl.create(clazz, udfCalciteEntryName)
+        if (function != null) {
+          log.warn("Calcite registers udf " + name)
+          schemaPlus.add(name, function)
+        } else {
+          log.warn("Calcite cannot register udf " + name)
+        }
+    }
+    new UdfFactory().getUdtfMap(Calcite).foreach {
+      case (name, clazz) =>
+        val instance = clazz.newInstance()
+        val inputColumnsCount: Int =
+          clazz.getDeclaredMethod("inputColumnsCount").invoke(instance).asInstanceOf[Int]
+        val function: Function =
+          TableFunctionImpl.create(clazz, "udtfCalciteEntry" + inputColumnsCount.toString)
+        if (function != null) {
+          log.warn("Calcite registers udtf " + name)
+          schemaPlus.add(name, function)
+        } else {
+          log.warn("Calcite cannot register udtf " + name)
+        }
+    }
   }
 
   private def initTableFunction(schemaPlus: SchemaPlus): Unit = {

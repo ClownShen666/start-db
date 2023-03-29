@@ -50,6 +50,8 @@ public class SqlParam {
 
     private String sqlId;
 
+    private boolean enableHiveSupport;
+
     public SqlParam() {}
 
     public SqlParam(String userName, String dbName) {
@@ -115,5 +117,13 @@ public class SqlParam {
 
     public void setSqlId(String sqlId) {
         this.sqlId = sqlId;
+    }
+
+    public boolean isEnableHiveSupport() {
+        return enableHiveSupport;
+    }
+
+    public void setEnableHiveSupport(boolean enableHiveSupport) {
+        this.enableHiveSupport = enableHiveSupport;
     }
 }

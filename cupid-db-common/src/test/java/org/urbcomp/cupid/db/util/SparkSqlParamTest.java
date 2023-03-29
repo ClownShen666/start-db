@@ -40,10 +40,11 @@ public class SparkSqlParamTest {
         param.setLocal(true);
         param.setSql(sql);
         param.setExportType(exportType);
+        param.setEnableHiveSupport(false);
 
         final String s = JacksonUtil.MAPPER.writeValueAsString(param);
         assertEquals(
-            "{\"userName\":\"jimo\",\"dbName\":\"db\",\"sql\":\"select 1+1\",\"exportType\":\"PRINT\",\"hbaseZookeepers\":\"localhost:2181\",\"async\":true,\"remotePort\":0,\"local\":true}",
+            "{\"userName\":\"jimo\",\"dbName\":\"db\",\"sql\":\"select 1+1\",\"exportType\":\"PRINT\",\"enableHiveSupport\":false,\"hbaseZookeepers\":\"localhost:2181\",\"async\":true,\"remotePort\":0,\"local\":true}",
             s
         );
 
