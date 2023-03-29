@@ -10,7 +10,7 @@ services:
     ports:
       - '3306:3306'
   geomesa-hbase:
-    image: spatiotemporallab/geomesa-hbase:latest
+    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
     hostname: geomesa-hbase-local
     ports:
       - '2181:2181'
