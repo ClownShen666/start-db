@@ -55,7 +55,7 @@ object SparkQueryExecutor {
         loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
       }
       val df = spark.sql(sql)
-      SparkResultExporterFactory.getInstance(param.getExportType).exportData(param.getSqlId, df)
+      SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
     } finally {
       spark.stop()
       SparkSession.clearActiveSession()
