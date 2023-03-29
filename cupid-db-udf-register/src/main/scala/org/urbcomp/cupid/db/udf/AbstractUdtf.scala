@@ -57,10 +57,10 @@ trait AbstractUdtf extends GenericUDTF {
           override def enumerator(): Enumerator[Array[AnyRef]] = new Enumerator[Array[AnyRef]]() {
 
             /**
-             * current result
-             *
-             * @return current
-             */
+              * current result
+              *
+              * @return current
+              */
             override def current(): Array[AnyRef] = {
               curval
             }
@@ -98,11 +98,11 @@ trait AbstractUdtf extends GenericUDTF {
       }
 
       override def rolledUpColumnValidInsideAgg(
-                                                 s: String,
-                                                 sqlCall: SqlCall,
-                                                 sqlNode: SqlNode,
-                                                 calciteConnectionConfig: CalciteConnectionConfig
-                                               ): Boolean = {
+          s: String,
+          sqlCall: SqlCall,
+          sqlNode: SqlNode,
+          calciteConnectionConfig: CalciteConnectionConfig
+      ): Boolean = {
         true
       }
     }
@@ -110,47 +110,570 @@ trait AbstractUdtf extends GenericUDTF {
 
   def udtfCalciteEntry1(input1: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1))
 
-  def udtfCalciteEntry2(input1: AnyRef, input2: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2))
+  def udtfCalciteEntry2(input1: AnyRef, input2: AnyRef): ScannableTable =
+    udtfCalciteEntryTemplate(Array(input1, input2))
 
-  def udtfCalciteEntry3(input1: AnyRef, input2: AnyRef, input3: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3))
+  def udtfCalciteEntry3(input1: AnyRef, input2: AnyRef, input3: AnyRef): ScannableTable =
+    udtfCalciteEntryTemplate(Array(input1, input2, input3))
 
-  def udtfCalciteEntry4(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4))
+  def udtfCalciteEntry4(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef
+  ): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4))
 
-  def udtfCalciteEntry5(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5))
+  def udtfCalciteEntry5(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef
+  ): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5))
 
-  def udtfCalciteEntry6(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6))
+  def udtfCalciteEntry6(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6))
 
-  def udtfCalciteEntry7(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7))
+  def udtfCalciteEntry7(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7))
 
-  def udtfCalciteEntry8(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8))
+  def udtfCalciteEntry8(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8))
 
-  def udtfCalciteEntry9(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9))
+  def udtfCalciteEntry9(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(input1, input2, input3, input4, input5, input6, input7, input8, input9)
+    )
 
-  def udtfCalciteEntry10(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10))
+  def udtfCalciteEntry10(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10)
+    )
 
-  def udtfCalciteEntry11(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11))
+  def udtfCalciteEntry11(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11
+      )
+    )
 
-  def udtfCalciteEntry12(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12))
+  def udtfCalciteEntry12(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12
+      )
+    )
 
-  def udtfCalciteEntry13(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13))
+  def udtfCalciteEntry13(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13
+      )
+    )
 
-  def udtfCalciteEntry14(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14))
+  def udtfCalciteEntry14(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14
+      )
+    )
 
-  def udtfCalciteEntry15(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15))
+  def udtfCalciteEntry15(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15
+      )
+    )
 
-  def udtfCalciteEntry16(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16))
+  def udtfCalciteEntry16(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16
+      )
+    )
 
-  def udtfCalciteEntry17(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17))
+  def udtfCalciteEntry17(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17
+      )
+    )
 
-  def udtfCalciteEntry18(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef, input18: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18))
+  def udtfCalciteEntry18(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef,
+      input18: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17,
+        input18
+      )
+    )
 
-  def udtfCalciteEntry19(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef, input18: AnyRef, input19: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19))
+  def udtfCalciteEntry19(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef,
+      input18: AnyRef,
+      input19: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17,
+        input18,
+        input19
+      )
+    )
 
-  def udtfCalciteEntry20(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef, input18: AnyRef, input19: AnyRef, input20: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20))
+  def udtfCalciteEntry20(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef,
+      input18: AnyRef,
+      input19: AnyRef,
+      input20: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17,
+        input18,
+        input19,
+        input20
+      )
+    )
 
-  def udtfCalciteEntry21(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef, input18: AnyRef, input19: AnyRef, input20: AnyRef, input21: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21))
+  def udtfCalciteEntry21(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef,
+      input18: AnyRef,
+      input19: AnyRef,
+      input20: AnyRef,
+      input21: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17,
+        input18,
+        input19,
+        input20,
+        input21
+      )
+    )
 
-  def udtfCalciteEntry22(input1: AnyRef, input2: AnyRef, input3: AnyRef, input4: AnyRef, input5: AnyRef, input6: AnyRef, input7: AnyRef, input8: AnyRef, input9: AnyRef, input10: AnyRef, input11: AnyRef, input12: AnyRef, input13: AnyRef, input14: AnyRef, input15: AnyRef, input16: AnyRef, input17: AnyRef, input18: AnyRef, input19: AnyRef, input20: AnyRef, input21: AnyRef, input22: AnyRef): ScannableTable = udtfCalciteEntryTemplate(Array(input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12, input13, input14, input15, input16, input17, input18, input19, input20, input21, input22))
+  def udtfCalciteEntry22(
+      input1: AnyRef,
+      input2: AnyRef,
+      input3: AnyRef,
+      input4: AnyRef,
+      input5: AnyRef,
+      input6: AnyRef,
+      input7: AnyRef,
+      input8: AnyRef,
+      input9: AnyRef,
+      input10: AnyRef,
+      input11: AnyRef,
+      input12: AnyRef,
+      input13: AnyRef,
+      input14: AnyRef,
+      input15: AnyRef,
+      input16: AnyRef,
+      input17: AnyRef,
+      input18: AnyRef,
+      input19: AnyRef,
+      input20: AnyRef,
+      input21: AnyRef,
+      input22: AnyRef
+  ): ScannableTable =
+    udtfCalciteEntryTemplate(
+      Array(
+        input1,
+        input2,
+        input3,
+        input4,
+        input5,
+        input6,
+        input7,
+        input8,
+        input9,
+        input10,
+        input11,
+        input12,
+        input13,
+        input14,
+        input15,
+        input16,
+        input17,
+        input18,
+        input19,
+        input20,
+        input21,
+        input22
+      )
+    )
 
   override protected def process(objects: Array[AnyRef]): Unit = {
     val ret = udtfImpl(objects)
