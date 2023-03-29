@@ -19,7 +19,9 @@ package org.urbcomp.cupid.db.server;
 import org.apache.calcite.avatica.server.AvaticaJsonHandler;
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.jdbc.DbMetaFactory;
+import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.server.daemon.DaemonManager;
+import org.urbcomp.cupid.db.spark.data.RemoteServer;
 
 /**
  * @author jimo
@@ -27,6 +29,12 @@ import org.urbcomp.cupid.db.server.daemon.DaemonManager;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+
+        final RemoteServer remoteServer = new RemoteServer(DynamicConfig.getRemoteServerPort());
+        remoteServer.start();
+        // open for test grpc
+        // remoteServer.blockUntilShutdown();
+
         String[] params = { DbMetaFactory.class.getCanonicalName() };
         final HttpServer server = org.apache.calcite.avatica.server.Main.start(
             params,

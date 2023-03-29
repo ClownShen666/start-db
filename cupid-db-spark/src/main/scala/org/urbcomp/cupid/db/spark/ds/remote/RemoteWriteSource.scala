@@ -1,0 +1,121 @@
+/* 
+ * Copyright (C) 2022  ST-Lab
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.urbcomp.cupid.db.spark.ds.remote
+
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.connector.catalog.{SupportsWrite, Table, TableCapability, TableProvider}
+import org.apache.spark.sql.connector.expressions.Transform
+import org.apache.spark.sql.connector.write._
+import org.apache.spark.sql.sources.Filter
+import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.util.CaseInsensitiveStringMap
+
+import java.util
+import scala.collection.JavaConverters._
+
+class RemoteWriteSource extends TableProvider {
+
+  override def inferSchema(caseInsensitiveStringMap: CaseInsensitiveStringMap): StructType =
+    getTable(null, Array.empty[Transform], caseInsensitiveStringMap.asCaseSensitiveMap()).schema()
+
+  override def getTable(
+      structType: StructType,
+      transforms: Array[Transform],
+      map: util.Map[String, String]
+  ): Table =
+    new RemoteTable(map)
+}
+
+object RemoteWriteSource {
+  val SCHEMA_KEY = "schema"
+}
+
+class RemoteTable(map: util.Map[String, String]) extends SupportsWrite {
+  override def newWriteBuilder(logicalWriteInfo: LogicalWriteInfo): WriteBuilder = {
+    new RemoteWriteBuilder(map)
+  }
+
+  override def name(): String = "RemoteWrite"
+
+  override def schema(): StructType = {
+    DataType.fromJson(map.get(RemoteWriteSource.SCHEMA_KEY)).asInstanceOf[StructType]
+  }
+
+  override def capabilities(): util.Set[TableCapability] =
+    Set(TableCapability.BATCH_WRITE, TableCapability.TRUNCATE, TableCapability.OVERWRITE_BY_FILTER).asJava
+}
+
+class RemoteWriteBuilder(options: util.Map[String, String])
+    extends WriteBuilder
+    with SupportsOverwrite {
+
+  override def buildForBatch(): BatchWrite = new RemoteBatchWrite(options)
+
+  override def overwrite(filters: Array[Filter]): WriteBuilder = this
+}
+
+class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
+
+  IRemoteWriter.options = options
+
+  override def createBatchWriterFactory(info: PhysicalWriteInfo): DataWriterFactory =
+    new RemoteDataWriterFactory()
+
+  override def commit(messages: Array[WriterCommitMessage]): Unit = {
+    RemoteWriter.remoteWriter.commit()
+  }
+
+  override def abort(messages: Array[WriterCommitMessage]): Unit = {
+    RemoteWriter.remoteWriter.abort()
+  }
+}
+
+class RemoteDataWriterFactory extends DataWriterFactory {
+  override def createWriter(partitionId: Int, taskId: Long): DataWriter[InternalRow] = {
+    new RemoteWriter()
+  }
+}
+
+class RemoteWriter extends DataWriter[InternalRow] {
+
+  override def write(record: InternalRow): Unit = {
+    RemoteWriter.remoteWriter.writeOne(record)
+  }
+
+  override def commit(): WriterCommitMessage = {
+    RemoteWriter.remoteWriter.writeOneCommit()
+    WriteSucceed
+  }
+
+  override def abort(): Unit = {
+    RemoteWriter.remoteWriter.writeOneAbort()
+  }
+
+  override def close(): Unit = {
+    RemoteWriter.remoteWriter.writeOneClose()
+  }
+}
+
+object RemoteWriter {
+
+  /**
+    * 这里用静态方式的原因是：RemoteWriter 里的grpc连接无法序列化
+    */
+  val remoteWriter: IRemoteWriter = IRemoteWriter.getInstance()
+}
+
+object WriteSucceed extends WriterCommitMessage {}

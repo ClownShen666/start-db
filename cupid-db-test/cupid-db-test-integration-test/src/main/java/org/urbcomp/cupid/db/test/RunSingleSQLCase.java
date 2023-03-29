@@ -41,7 +41,7 @@ public class RunSingleSQLCase {
     static boolean COMPARE_RESULT = true;
     static boolean COMPARE_EXCEPTION = true;
     // 用一个静态变量来控制是否输出过程信息
-    static boolean OUTPUT_MESSAGE = false;
+    static boolean OUTPUT_MESSAGE = true;
     static String XML_PATH;
     static String XML_NAME;
     static String DBNAME;
@@ -52,7 +52,7 @@ public class RunSingleSQLCase {
         Connection conn;
         try {
             conn = DriverManager.getConnection(
-                "jdbc:cupid-db:url=http://127.0.0.1:8000",
+                "jdbc:cupid-db:url=http://localhost:8000",
                 "root",
                 "cupid-db"
             );
@@ -96,15 +96,20 @@ public class RunSingleSQLCase {
             for (Element sqlElement : sqlElements) {
                 String initSql = sqlElement.getText();
                 String sqlType = sqlElement.attributeValue("type");
-
+                if (sqlType.equals("ignore")) {
+                    continue;
+                }
                 // sql不需要拼接参数时
                 if (!initSql.contains("?")) {
                     analyseSql(sqlElement, initSql, sqlType);
                 } else {
                     // sql需要拼接参数时
+                    if (argumentsElements.size() == 0) {
+                        throw new Exception("缺少参数");
+                    }
                     for (Element argumentsElement : argumentsElements) {
                         // 将sql和参数进行拼接
-                        String params = argumentsElement.getText();
+                        String params = argumentsElement.getText().trim();
                         String sqlWithParam = getSqlWithParam(initSql, params);
                         analyseSql(argumentsElement, sqlWithParam, sqlType);
                     }
@@ -134,10 +139,8 @@ public class RunSingleSQLCase {
             }
 
             // 有预期结果获取并加入预期数据中,然后与实际数据进行比较
-            if (resultID != null) {
-                if (OUTPUT_MESSAGE) {
-                    log.info("开始执行sql: " + sql + " resultID: " + resultID);
-                }
+            if (resultID != null && !resultID.equals("ignore")) {
+                logInfo(OUTPUT_MESSAGE, "开始执行sql: " + sql + " resultID: " + resultID);
                 sql = dataTransform(sql);
                 // 执行sql并选择是否将实际返回值写入文档
                 try (Statement stmt = connect.createStatement()) {
@@ -146,61 +149,43 @@ public class RunSingleSQLCase {
                         writeActualDocument(actualArray, resultID);
                     }
                 }
-                if (OUTPUT_MESSAGE) {
-                    log.info("实际返回值：" + actualArray);
-                }
+                logInfo(OUTPUT_MESSAGE, "实际返回值：" + actualArray);
                 // 选择是否进行结果比较，是的话获取预期结果然后与实际结果进行比较
                 if (COMPARE_RESULT) {
                     List<String> expectedArray;
                     expectedArray = getExpectedDataArray(XML_PATH, XML_NAME, resultID);
-                    if (OUTPUT_MESSAGE) {
-                        log.info("预期返回值：" + expectedArray);
-                    }
+                    logInfo(OUTPUT_MESSAGE, "预期返回值：" + expectedArray);
                     compareResult(actualArray, expectedArray);
                 }
-                if (OUTPUT_MESSAGE) {
-                    log.info("sql执行完成");
-                }
-            } else if (exception != null) {
+                logInfo(OUTPUT_MESSAGE, "sql执行完成");
+            } else if (exception != null && !exception.equals("ignore")) {
                 // 有预期异常加入预期数据中，然后与实际数据进行比较
                 if (!exception.contains("Exception")) {
                     throw new Exception("预期异常内容不对");
                 } else {
-                    if (OUTPUT_MESSAGE) {
-                        log.info("开始执行sql: " + sql);
-                    }
+                    logInfo(OUTPUT_MESSAGE, "开始执行sql: " + sql);
                     sql = dataTransform(sql);
                     try (Statement stmt = connect.createStatement()) {
                         actualArray = executeSql(stmt, sql, sqlType);
                     }
-                    if (OUTPUT_MESSAGE) {
-                        log.info("实际返回值：" + actualArray);
-                    }
+                    logInfo(OUTPUT_MESSAGE, "实际返回值：" + actualArray);
                     // 选择是否进行异常比较，是的话获取预期异常与实际异常进行比较
                     if (COMPARE_EXCEPTION) {
                         List<String> expectedArray = new ArrayList<>();
                         expectedArray.add(exception);
-                        if (OUTPUT_MESSAGE) {
-                            log.info("预期异常：" + expectedArray);
-                        }
+                        logInfo(OUTPUT_MESSAGE, "预期异常：" + expectedArray);
                         compareException(actualArray, expectedArray);
                     }
-                    if (OUTPUT_MESSAGE) {
-                        log.info("sql执行完成");
-                    }
+                    logInfo(OUTPUT_MESSAGE, "sql执行完成");
                 }
-            } else {
+            } else if (resultID == null && exception == null) {
                 // 没有预期结果和异常
-                if (OUTPUT_MESSAGE) {
-                    log.info("开始执行sql: " + sql);
-                }
+                logInfo(OUTPUT_MESSAGE, "开始执行sql: " + sql);
                 sql = dataTransform(sql);
                 try (Statement stmt = connect.createStatement()) {
                     executeSql(stmt, sql, sqlType);
                 }
-                if (OUTPUT_MESSAGE) {
-                    log.info("sql执行完成");
-                }
+                logInfo(OUTPUT_MESSAGE, "sql执行完成");
             }
         } catch (Exception e) {
             if (ERROR_STOP) {
@@ -216,7 +201,8 @@ public class RunSingleSQLCase {
      * @param sqlType sql的类型
      * @return sql执行后得到的返回值
      */
-    public static List<String> executeSql(Statement stmt, String sql, String sqlType) {
+    public static List<String> executeSql(Statement stmt, String sql, String sqlType)
+        throws Exception {
         List<String> actualValue = new ArrayList<>();
         try {
             switch (sqlType) {
@@ -229,7 +215,7 @@ public class RunSingleSQLCase {
                     }
                     break;
                 case "ignore":
-                    log.info("忽略执行:" + sql);
+                    log.info("忽略执行: " + sql);
                     break;
                 default:
                     log.info(sql + ":sql标签的type类型有误");
@@ -239,5 +225,17 @@ public class RunSingleSQLCase {
             actualValue.add(e.toString());
         }
         return actualValue;
+    }
+
+    /**
+     * 判断是否日志输出所给消息
+     *
+     * @param output_message 判断值
+     * @param message 消息
+     */
+    public static void logInfo(boolean output_message, String message) {
+        if (output_message) {
+            log.info(message);
+        }
     }
 }

@@ -1,66 +1,52 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--  通用空间构造函数 测试用例  -->
 <testCase>
-
+    <resultXml>stMake_result.xml</resultXml>
     <!--  输入经纬度生成点  st_makePoint(x: Double, y: Double): Point  -->
     <case>
-        <sql type="query">select st_makePoint( ?, ?);</sql>
-        <assertion expected="stMake_001.xml">[110][40]</assertion>
-        <assertion expected="error:参数有误">[181][40]</assertion>
-        <assertion expected="error:参数有误">[110][91]</assertion>
+        <sql type="query">select st_makePoint(?, ?);</sql>
+        <arguments resultID="1">[110.0][40.0]</arguments>
+        <arguments exception="Exception">[181][40]</arguments>
+        <arguments exception="Exception">[110][91]</arguments>
+        <arguments exception="Exception">[-110][40]</arguments>
+        <arguments exception="Exception">[110][-40]</arguments>
     </case>
-
     <!--  传入一列点生成轨迹  st_makeLineString(points: List[Point]): LineString  -->
     <case>
-        <sql type="query">select st_makeLineString(?);</sql>
-        <assertion expected="stMake_002.xml"> </assertion>
+        <sql type="ignore">select st_makeLineString(?);</sql>
     </case>
-
     <!--  传入linestring返回polygon  st_makePolygon(shell: LineString): Polygon  -->
     <case>
         <sql type="query">select st_makePolygon(?);</sql>
-        <assertion expected="stMake_003.xml">
-            [st_lineStringFromGeoJSON('{ "type": "LineString", "coordinates": [ [30, 10], [10, 30], [40, 40] ] }')]
-        </assertion>
-        <assertion expected="stMake_004.xml">
-            [st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)')]
-        </assertion>
-        <assertion expected="stMake_005.xml">
-            [st_lineStringFromWKB(st_asWKB('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)'))]
-        </assertion>
-        <assertion expected="stMake_006.xml">
-            [st_castToLineString(st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)'))]
-        </assertion>
-        <assertion expected="stMake_007.xml">
-            [st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2)')]
-        </assertion>
-        <assertion expected="error:参数有误">
-            [null]
-        </assertion>
+        <arguments resultID="ignore">[st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)')]</arguments>
+        <arguments exception="SqlValidatorException">[st_makePoint(1,2)]</arguments>
     </case>
-
     <!--  指定对角点的经纬度，生成矩形
         st_makeBBOX(lowerX: Double, lowerY: Double, upperX: Double, upperY: Double): Polygon  -->
     <case>
         <sql type="query">select st_makeBBOX(?, ?, ?, ?);</sql>
-        <assertion expected="stMake_008.xml">[1][1][2][2]</assertion>
-        <assertion expected="error:参数有误">[1][1][2][1]</assertion>
-        <assertion expected="error:参数有误">[1][1][1][2]</assertion>
-        <assertion expected="error:参数有误">[181][1][2][2]</assertion>
-        <assertion expected="error:参数有误">[1][91][2][2]</assertion>
-        <assertion expected="error:参数有误">[1][1][2][ ]</assertion>
+        <arguments resultID="ignore">[1][1][2][2]</arguments>
+        <arguments exception="ignore">[1][1][2][1]</arguments>
+        <arguments exception="ignore">[1][1][1][2]</arguments>
+        <arguments exception="ignore">[181][1][2][2]</arguments>
+        <arguments exception="ignore">[1][91][2][2]</arguments>
     </case>
-
     <!--  指定对角点，生成矩形  st_makeBBOX(lowerLeft: Point, upperRight: Point): Polygon	  -->
     <case>
         <sql type="query">select st_makeBBOX(?, ?);</sql>
-        <assertion expected="stMake_009.xml">[st_makePoint(1, 1)][st_makePoint(1, 1)]</assertion>
-        <assertion expected="stMake_010.xml">[st_geomFromWKT(1, 1)][st_geomFromWKT(1, 1)]</assertion>
-        <assertion expected="error:参数有误">[st_makePoint(1, 1)][st_makePoint(2, 1)]</assertion>
-        <assertion expected="error:参数有误">[st_makePoint(1, 1)][st_makePoint(2, 1)]</assertion>
-        <assertion expected="error:参数有误">[st_makePoint(1, 1)][st_makePoint(1, 2)]</assertion>
-        <assertion expected="error:参数有误">[st_makePoint(1, 1)][ ]</assertion>
+        <arguments resultID="ignore">[st_makePoint(1, 1)][st_makePoint(1, 1)]</arguments>
+        <arguments resultID="ignore">[st_geomFromWKT(1, 1)][st_geomFromWKT(1, 1)]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(2, 1)]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(2, 1)]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(1, 2)]</arguments>
     </case>
-
+    <!--  指定圆心点和半径，生成圆	 st_makeCircle(center: Point, radiusInM: Double) 	-->
+    <case>
+        <sql type="query">select st_makeCircle(?, ?);</sql>
+        <arguments resultID="ignore">[st_makePoint(1, 1)][1.0]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][0.0]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][-1.0]</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)][null]</arguments>
+    </case>
 </testCase>

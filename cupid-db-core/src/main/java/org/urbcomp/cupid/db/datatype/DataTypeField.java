@@ -20,6 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 /**
  * 抽象的数据类型
  *
@@ -36,4 +38,6 @@ public class DataTypeField {
      */
     private String type;
     private boolean nullable;
+
+    private Map<String, Object> metadata;
 }

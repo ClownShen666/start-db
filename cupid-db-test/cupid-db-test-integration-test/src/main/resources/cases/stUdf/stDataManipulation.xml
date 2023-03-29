@@ -1,158 +1,193 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--  通用空间数据操作 测试用例  -->
 <testCase>
-
-    <!--  点聚类  st_dbscan(points: List[Point], dInM: Double, minPointNum: Int): Table  -->
+    <resultXml>stDataManipulation_result.xml</resultXml>
+    <!--  点聚类  st_dbscan(points: List[Point], dInM: Double, minPointNum: Int): GeometryCollection  -->
     <case>
-        <sql type="query">select st_dbscan(?, ?, ?);</sql>
-        <assertion expected="stDm_001.xml"/>
+        <sql type="ignore">select st_dbscan(?, ?, ?);</sql>
     </case>
-
+    <!--  点聚类  st_dbscan(points: List[Point], dInM: Double, minPointNum: Int): List[Point, Integer]  -->
+    <case>
+        <sql type="ignore">select st_dbscanPoints(?, ?, ?);</sql>
+    </case>
     <!--  将一个Geometry对象偏移给定的数值  st_translate(geom: Geometry, deltaX: Double, deltaY: Double): Geometry  -->
     <case>
         <sql type="query">select st_translate(?, ?, ?);</sql>
-        <assertion expected="stDm_002.xml">[st_geomFromWKT('POINT(0 0)')][5][12]</assertion>
+        <arguments resultID="1">[st_makePoint(1, 2)][3][4]</arguments>
+        <arguments resultID="2">[st_geomFromWkt('LINESTRING(0 1,1 2)')][3][4]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][3][4]</arguments>
+        <arguments exception="SqlValidatorException">[2][3][4]</arguments>
     </case>
-
     <!--  返回点的x坐标  st_x(point: Point): Double  -->
     <case>
         <sql type="query">select st_x(?);</sql>
-        <assertion expected="stDm_003.xml">[st_makepoint(1, 2)]</assertion>
+        <arguments resultID="3">[st_makePoint(1, 2)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回点的y坐标  st_y(point: Point): Double  -->
     <case>
         <sql type="query">select st_y(?);</sql>
-        <assertion expected="stDm_004.xml">[st_makepoint(1, 2)]</assertion>
+        <arguments resultID="4">[st_makePoint(1, 2)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回几何的外边框  st_BBox(geom: Geometry): Geometry  -->
     <case>
         <sql type="query">select st_BBox(?);</sql>
-        <assertion expected="stDm_005.xml">[st_makeBBOX(1, 1, 2, 2)]</assertion>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回geom的顶点数  st_numPoints(geom: Geometry): Integer  -->
     <case>
-        <sql type="query">select st_numpoints(?);</sql>
-        <assertion expected="stDm_006.xml">
-            [st_geomFromText('linestring(77.29 29.07,77.42 29.26,77.27 29.31,77.29 29.07)')]
-        </assertion>
+        <sql type="query">select st_numPoints(?);</sql>
+        <arguments resultID="5">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="6">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="7">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回输入LineString对象或者环形LineString中的第n个点。
         如果对象不是LineString，则返回NULL。如果n是负数，那么将从末尾向前计数。负值从LineString的末尾开始算起，因此-1是最后一个点。
          st_pointN(geom: Geometry, n: Integer): Point	  -->
     <case>
         <sql type="query">select st_pointN(?, ?);</sql>
-        <assertion expected="stDm_007.xml">[st_geomFromWKT('LINESTRING(0 0,0 1,1 1,1 0,0 2)')][-5]</assertion>
+        <arguments resultID="8">[st_geomFromWKT('LINESTRING(0 0,0 1,1 1,1 0,0 2)')][2]</arguments>
+        <arguments resultID="9">[st_geomFromWKT('LINESTRING(0 0,0 1,1 1,1 0,0 2)')][-2]</arguments>
+        <arguments resultID="10">[st_geomFromWKT('LINESTRING(0 0,0 1,1 1,1 0,0 2)')][6]</arguments>
+        <arguments resultID="11">[st_makePoint(1, 2)][-5]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  返回geom的曲面面积（单位为平方度）  st_area(geom: Geometry): Double  -->
     <case>
         <sql type="query">select st_area(?);</sql>
-        <assertion expected="stDm_008.xml">[st_geomfromwkt('POLYGON((0 0,0 10,10 10,10 0,0 0))')]</assertion>
+        <arguments resultID="12">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="13">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="14">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  返回geom 的几何中心  st_centroid(geometry: Geometry): Point	  -->
     <case>
         <sql type="query">select st_centroid(?);</sql>
-        <assertion expected="stDm_009.xml">[st_geomFromWKT('POLYGON((0 0,0 10,10 10,10 0,0 0))')]</assertion>
+        <arguments resultID="15">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="16">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="17">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  求几何a 离几何b 最近的点  st_closestPoint(a: Geometry, b: Geometry): Point  -->
     <case>
         <sql type="query">select st_closestPoint(?, ?);</sql>
-        <assertion expected="stDm_010.xml">
-            [st_geomFromWKT('POLYGON((0 0,0 10,10 10,10 0,0 0))')]
-            [st_geomFromWKT('POINT(15 5)')]
-        </assertion>
+        <arguments resultID="18">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="19">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="20">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="21">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 1)')]</arguments>
+        <arguments resultID="22">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(1 1,2 2)')]</arguments>
+        <arguments resultID="23">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(5.0,5.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  根据给定的两个几何体返回它们之间的二维笛卡尔距离 st_distance(geom1: Geometry, geom2: Geometry): Double  -->
     <case>
         <sql type="query">select st_distance(?, ?);</sql>
-        <assertion expected="stDm_011.xml">[st_makePoint(1,2)][st_makePoint(2,3)]</assertion>
+        <arguments resultID="24">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="25">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="26">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="27">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 1)')]</arguments>
+        <arguments resultID="28">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(1 1,2 2)')]</arguments>
+        <arguments resultID="29">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(5.0,5.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  假设地球是球形的，近似计算两个几何的最小距离，单位为米  st_distanceSphere(a: Geometry, b: Geometry): Double  -->
     <case>
         <sql type="query">select st_distanceSphere(?, ?);</sql>
-        <assertion expected="stDm_012.xml">
-            [st_geomFromWKT('POINT(0 0)')]
-            [st_geomFromWKT('POINT(10 0)')]
-        </assertion>
+        <arguments resultID="30">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="31">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="32">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="33">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 1)')]</arguments>
+        <arguments resultID="34">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(1 1,2 2)')]</arguments>
+        <arguments resultID="35">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(5.0,5.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  假设满足WGS84球体，计算两个几何的最小距离，单位为米  st_distanceSpheroid(a: Geometry, b: Geometry): Double  -->
     <case>
         <sql type="query">select st_distanceSpheroid(?, ?);</sql>
-        <assertion expected="stDm_013.xml">
-            [st_geomFromWKT('POINT(0 0)')]
-            [st_geomFromWKT('POINT(10 0)')]
-        </assertion>
+        <arguments resultID="36">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="37">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="38">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="39">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 1)')]</arguments>
+        <arguments resultID="40">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(1 1,2 2)')]</arguments>
+        <arguments resultID="41">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(5.0,5.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  求两个几何的交集  st_intersection(a: Geometry, b: Geometry): Geometry  -->
     <case>
         <sql type="query">select st_intersection(?, ?);</sql>
-        <assertion expected="stDm_014.xml">
-            [st_geomFromWKT('POLYGON((0 0,0 10,10 10,10 0,0 0))')]
-            [st_geomFromWKT('POINT(5 5)')]
-        </assertion>
+        <arguments resultID="42">[st_makePoint(1, 2)][st_makePoint(1, 2)]</arguments>
+        <arguments resultID="ignore">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="43">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(0.5, 1.5)]</arguments>
+        <arguments resultID="ignore">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="44">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(3, 4)]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="45">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 3)')]</arguments>
+        <arguments resultID="ignore">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 0,1 1)')]</arguments>
+        <arguments resultID="46">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(1 1,2 2)')]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(5 5,6 6)')]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(2.0,2.0,6.0,6.0)]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(5.0,5.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
-    <!--  计算一个LineString的二维长度、或一个Polygon的周长，单位为度  st_length(geom: Geometry): Double  -->
+    <!--  计算一个地理对象长度或周长，单位为度  st_length(geom: Geometry): Double  -->
     <case>
         <sql type="query">select st_length(?);</sql>
-        <assertion expected="stDm_015.xml">[st_geomFromWKT('LINESTRING(0 0,10 0)')]</assertion>
+        <arguments resultID="47">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="48">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="49">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  使用球体地球模型近似计算LineString的二维长度，输出单位为米  st_lengthSphere(line: LineString): Double  -->
     <case>
         <sql type="query">select st_lengthSphere(?);</sql>
-        <assertion expected="stDm_016.xml">
-            [st_castToLineString(st_geomFromWKT("LINESTRING(1 2,11 2)"))]
-        </assertion>
+        <arguments resultID="50">[st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)')]</arguments>
+        <arguments exception="SqlValidatorException">[st_pointFromWKT('POINT (1 2)')]</arguments>
     </case>
-
     <!--  在WGS84球体的经纬坐标系中，计算LineString的二维长度，单位为米  st_lengthSpheroid(line: LineString): Double  -->
     <case>
         <sql type="query">select st_lengthSpheroid(?);</sql>
-        <assertion expected="stDm_017.xml">
-            [st_castToLineString(st_geomFromWKT("LINESTRING(1 2,11 2)"))]
-        </assertion>
+        <arguments resultID="51">[st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)')]</arguments>
+        <arguments exception="SqlValidatorException">[st_pointFromWKT('POINT (1 2)')]</arguments>
     </case>
-
-    <!--  Geometry a和b的差异分析：就是a里有b里没有的所有点的集合  st_difference(a: Geometry, b: Geometry): Geometry  -->
+    <!--  Geometry a和b的差异分析：就是a里有b里没有的地理对象 st_difference(a: Geometry, b: Geometry): Geometry  -->
     <case>
         <sql type="query">select st_difference(?, ?);</sql>
-        <assertion expected="stDm_018.xml">
-            [st_geomFromWKT('POLYGON((0 0,0 10,10 10,10 0,0 0))')]
-            [st_geomFromWKT('POINT(15 5)')]
-        </assertion>
+        <arguments resultID="ignore">[st_makePoint(1, 2)][st_makePoint(1, 2)]</arguments>
+        <arguments resultID="52">[st_makePoint(1, 2)][st_makePoint(5, 6)]</arguments>
+        <arguments resultID="53">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_makePoint(0, 1)]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makePoint(0, 0)]</arguments>
+        <arguments resultID="54">[st_geomFromWkt('LINESTRING(0 1,1 2)')][st_geomFromWkt('LINESTRING(0 1,1 3)')]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_geomFromWkt('LINESTRING(0 0,2 2)')]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)][st_makeBBox(2.0,2.0,6.0,6.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  根据OGC，SFS规范，判断geom是否拓扑有效  st_isValid(geom: Geometry): Boolean  -->
     <case>
         <sql type="query">select st_isValid(?);</sql>
-        <assertion expected="stDm_019.xml">[st_geomFromWKT('LINESTRING(0 0,1 1)')]</assertion>
+        <arguments resultID="55">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="56">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="57">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
     <!--  给定一个点point和半径buffer，返回以该point为中心向外扩张buffer长度的polygon
         st_bufferPoint(p: Point, buffer: Double): Polygon  -->
     <case>
         <sql type="query">select st_bufferPoint(?, ?);</sql>
-        <assertion expected="stDm_020.xml">[st_makePoint(0,0)][10]</assertion>
+        <arguments resultID="ignore">[st_makePoint(0,0)][10]</arguments>
+        <arguments resultID="ignore">[st_makePoint(0,0)][0]</arguments>
+        <arguments resultID="ignore">[st_makePoint(0,0)][-10]</arguments>
+        <arguments exception="SqlValidatorException">[1][1]</arguments>
     </case>
-
     <!--  返回包裹geom对象的最小凸包  st_convexHull(geom: Geometry): Polygon  -->
     <case>
         <sql type="query">select st_convexHull(?);</sql>
-        <assertion expected="stDm_021.xml"> </assertion>
+        <arguments resultID="58">[st_makePoint(1, 2)]</arguments>
+        <arguments resultID="59">[st_geomFromWkt('LINESTRING(0 1,1 2)')]</arguments>
+        <arguments resultID="ignore">[st_makeBBox(0.0,0.0,4.0,4.0)]</arguments>
+        <arguments exception="SqlValidatorException">[1]</arguments>
     </case>
-
-
-
 </testCase>

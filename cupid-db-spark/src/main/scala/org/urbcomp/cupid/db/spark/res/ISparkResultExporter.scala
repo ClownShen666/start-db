@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.res
 
 import org.apache.spark.sql.DataFrame
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
 /**
   * the interface to export spark dataframe data
@@ -25,5 +26,5 @@ import org.apache.spark.sql.DataFrame
   * */
 trait ISparkResultExporter {
 
-  def exportData(sqlId: String, data: DataFrame): Unit
+  def exportData(param: SparkSqlParam, data: DataFrame): Unit
 }
