@@ -28,7 +28,7 @@ class LengthUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(str: String): Any =
+  def udfImpl(str: String): Integer =
     if (str == null) null
     else {
       val n = str.length
@@ -42,6 +42,6 @@ class LengthUdf extends Serializable with AbstractUdf {
       length
     }
 
-  def udfWrapper: String => Any = udfImpl
+  def udfWrapper: String => Integer = udfImpl
 
 }

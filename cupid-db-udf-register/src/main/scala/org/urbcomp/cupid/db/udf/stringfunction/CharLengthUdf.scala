@@ -28,8 +28,8 @@ class CharLengthUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(str: String): Any =
+  def udfImpl(str: String): Integer =
     if (str == null) null else str.length
 
-  def udfWrapper: String => Any = udfImpl
+  def udfWrapper: String => Integer = udfImpl
 }

@@ -28,10 +28,10 @@ class locateUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(substr: String, str: String): Any =
+  def udfImpl(substr: String, str: String): Integer =
     if (substr == null || str == null) null
     else str.indexOf(substr) + 1
 
-  def udfWrapper: (String, String) => Any = udfImpl
+  def udfWrapper: (String, String) => Integer = udfImpl
 
 }
