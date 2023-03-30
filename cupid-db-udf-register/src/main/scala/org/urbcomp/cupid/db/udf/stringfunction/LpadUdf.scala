@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udf.stringfunction
 
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class AddOneUdf extends Serializable with AbstractUdf {
+import scala.collection.mutable
 
-  override def name(): String = "AddOne"
+class LpadUdf extends Serializable with AbstractUdf with Pad {
+  override def name(): String = "lpad"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -28,9 +30,26 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(x: Int): Int = {
-    x + 1
+  def udfImpl(str: String, len: Int): String = {
+    if (str == null) null
+    else {
+      val sb = new mutable.StringBuilder()
+      var i = 0
+      while (i < len) {
+        sb.append(' ')
+        i += 1
+      }
+      sb + str
+    }
   }
+//  def udfImpl(str: String, len: Int, pa: String): String = {
+//    val res = pad(str, len, pa)
+//    if(res == null) null
+//    else if(res.length == len) res
+//    else res + str
+//  }
+  def udfWrapper: (String, Int) => String = udfImpl
 
-  def udfWrapper: Int => Int = udfImpl
+//  def udfWrapper: (String, Int, String) => String = udfImpl
+
 }
