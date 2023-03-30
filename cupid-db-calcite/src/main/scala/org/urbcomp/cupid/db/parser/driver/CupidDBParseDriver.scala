@@ -16,7 +16,14 @@
  */
 package org.urbcomp.cupid.db.parser.driver
 
-import org.antlr.v4.runtime.{CharStream, CharStreams, CommonTokenStream}
+import org.antlr.v4.runtime.{
+  BaseErrorListener,
+  CharStream,
+  CharStreams,
+  CommonTokenStream,
+  RecognitionException,
+  Recognizer
+}
 import org.apache.calcite.sql.SqlNode
 import org.urbcomp.cupid.db.parser.parser.{CupidDBSqlLexer, CupidDBSqlParser}
 import org.urbcomp.cupid.db.parser.visitor.CupidDBVisitor
@@ -33,7 +40,23 @@ object CupidDBParseDriver {
     val lexer = new CupidDBSqlLexer(charStream)
     lexer.removeErrorListeners()
     val parser = new CupidDBSqlParser(new CommonTokenStream(lexer))
+
     parser.removeErrorListeners()
+    parser.addErrorListener(new BaseErrorListener() {
+      override def syntaxError(
+          recognizer: Recognizer[_, _],
+          offendingSymbol: Any,
+          line: Int,
+          charPositionInLine: Int,
+          msg: String,
+          e: RecognitionException
+      ): Unit = {
+        throw new IllegalArgumentException(
+          "[Invalid SQL] line " + line + ":" + charPositionInLine + " " + msg
+        );
+      }
+    })
+
     val tree = parser.program()
     val param = SqlParam.CACHE.get()
     val visitor = new CupidDBVisitor(param.getUserName, param.getDbName)
