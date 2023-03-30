@@ -22,59 +22,11 @@
 
 package org.urbcomp.cupid.db.function;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * @author zaiyuan, XiangHe
  * @date 2022-05-26 23:12:07
  */
 public class StringFunction {
-    @CupidDBFunction("concat")
-    public String concat(String str1, String str2) {
-        if (str1 == null || str2 == null) return null;
-        return str1.concat(str2);
-    }
-
-    public String reverse(String str) {
-        if (str == null) return null;
-        return new StringBuffer(str).reverse().toString();
-    }
-
-    @CupidDBFunction("trim")
-    public String trim(String str) {
-        if (str == null) return null;
-        return str.trim();
-    }
-
-    @CupidDBFunction("ltrim")
-    public String ltrim(String str) {
-        if (str == null) return null;
-        int i = 0;
-        int n = str.length();
-        while (i < n && str.charAt(i) == ' ')
-            ++i;
-        return str.substring(i);
-    }
-
-    @CupidDBFunction("rtrim")
-    public String rtrim(String str) {
-        if (str == null) return null;
-        int i = str.length() - 1;
-        while (i >= 0 && str.charAt(i) == ' ')
-            --i;
-        return str.substring(0, i + 1);
-    }
-
-    @CupidDBFunction("lpad")
-    public String lpad(String str, int len) {
-        if (str == null) return null;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(' ');
-        }
-        return sb + str;
-    }
 
     @CupidDBFunction("lpad")
     public String lpad(String str, int len, String pad) {
@@ -85,16 +37,6 @@ public class StringFunction {
     }
 
     @CupidDBFunction("rpad")
-    public String rpad(String str, int len) {
-        if (str == null) return null;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < len; ++i) {
-            sb.append(' ');
-        }
-        return str + sb;
-    }
-
-    @CupidDBFunction("rpad")
     public String rpad(String str, int len, String pad) {
         String res = pad(str, len, pad);
         if (res == null) return null;
@@ -102,67 +44,10 @@ public class StringFunction {
         return str + pad(str, len, pad);
     }
 
-    @CupidDBFunction("length")
-    public Object length(String str) {
-        if (str == null) return null;
-        int n = str.length();
-        int length = n;
-        for (int i = 0; i < n; ++i) {
-            int ascii = Character.codePointAt(str, i);
-            if (ascii > 256) ++length;
-        }
-        return length;
-    }
-
-    @CupidDBFunction("charLength")
-    public Object charLength(String str) {
-        if (str == null) return null;
-        return str.length();
-    }
-
-    @CupidDBFunction("locate")
-    public Object locate(String substr, String str) {
-        if (substr == null || str == null) return null;
-        return str.indexOf(substr) + 1;
-    }
-
     @CupidDBFunction("locate")
     public Object locate(String substr, String str, int pos) {
         if (substr == null || str == null) return null;
         return str.indexOf(substr, pos) + 1;
-    }
-
-    @CupidDBFunction("md5")
-    public String md5(String str) throws NoSuchAlgorithmException {
-        final char[] hexDigits = {
-            '0',
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-            'A',
-            'B',
-            'C',
-            'D',
-            'E',
-            'F' };
-        byte[] btInput = str.getBytes();
-        MessageDigest mdInst = MessageDigest.getInstance("MD5");
-        mdInst.update(btInput);
-        byte[] md = mdInst.digest();
-        int j = md.length;
-        char[] code = new char[j * 2];
-        int k = 0;
-        for (byte byte0 : md) {
-            code[k++] = hexDigits[byte0 >>> 4 & 0xf];
-            code[k++] = hexDigits[byte0 & 0xf];
-        }
-        return new String(code);
     }
 
     private String pad(String str, int len, String pad) {
