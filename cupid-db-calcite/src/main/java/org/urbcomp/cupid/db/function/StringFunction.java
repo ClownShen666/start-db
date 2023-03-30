@@ -36,7 +36,6 @@ public class StringFunction {
         return str1.concat(str2);
     }
 
-    @CupidDBFunction("reverse")
     public String reverse(String str) {
         if (str == null) return null;
         return new StringBuffer(str).reverse().toString();
