@@ -78,13 +78,13 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
                             |    name String,
                             |    st Point,
                             |    dtg Datetime,
-                            |    SPATIAL INDEX spatial_index2(st, dtg) type z3
+                            |    SPATIAL INDEX spatial_index2(st, dtg) type z2t
                             |)""".stripMargin.format(uniqueId).stripMargin
     val stmt = connect.createStatement()
     stmt.executeUpdate(createTableSQL)
     val rs = stmt.executeQuery("""show index from gemo_%s""".format(uniqueId))
     rs.next()
-    assertEquals(rs.getString(3), "z3")
+    assertEquals(rs.getString(3), "z2t")
   }
 
   test("test create table with invalid index type will throw error") {
@@ -162,7 +162,7 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
     rs.next()
     assertEquals(rs.getString(1), "gemo_%s".format(uniqueId))
     assertEquals(rs.getString(2), "et,dtg")
-    assertEquals(rs.getString(3), "z3")
+    assertEquals(rs.getString(3), "z2t")
   }
 
   test("test drop table") {

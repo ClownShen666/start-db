@@ -649,7 +649,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
           var indexImplType: SqlIdentifier = null
           if (i.index_type_decl() != null) {
-            indexImplType = new SqlIdentifier(i.index_type_decl().ident().getText, pos)
+            indexImplType = new SqlIdentifier(i.index_type_decl().ident().getText.toLowerCase, pos)
           }
 
           val columns = i

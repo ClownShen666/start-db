@@ -157,8 +157,8 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
             else "xz2"
           case 2 =>
             if (DataTypeUtils.isPoint(geoType))
-              "z3"
-            else "xz3"
+              "z2t"
+            else "xz2t"
           case _ => throw new IllegalArgumentException("index type mismatch columns")
         }
       case _ =>
