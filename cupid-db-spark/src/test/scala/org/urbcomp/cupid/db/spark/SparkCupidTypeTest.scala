@@ -25,7 +25,7 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.model._
 
-class SparkTypeTest extends FunSuite {
+class SparkCupidTypeTest extends FunSuite {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
