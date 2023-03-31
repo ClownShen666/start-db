@@ -24,16 +24,17 @@ import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
 class RoadNetworkUDT extends UserDefinedType[RoadNetwork] {
   override def typeName: String = "RoadNetworkUDT"
 
+  // Note that this serialization will not be triggered if using Kryo
   override def serialize(roadNetwork: RoadNetwork): InternalRow = {
     InternalRow(UTF8String.fromString(roadNetwork.toString))
   }
-
-  override def sqlType: DataType = StructType(Seq(StructField("roadNetwork", DataTypes.StringType)))
-
-  override def userClass: Class[RoadNetwork] = classOf[RoadNetwork]
 
   override def deserialize(datum: Any): RoadNetwork = {
     val ir = datum.asInstanceOf[InternalRow]
     RoadNetwork.fromGeoJSON(ir.getString(0))
   }
+
+  override def sqlType: DataType = StructType(Seq(StructField("roadNetwork", DataTypes.StringType)))
+
+  override def userClass: Class[RoadNetwork] = classOf[RoadNetwork]
 }

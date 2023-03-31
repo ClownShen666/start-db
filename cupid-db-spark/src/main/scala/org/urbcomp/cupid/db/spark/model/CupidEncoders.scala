@@ -17,7 +17,6 @@
 package org.urbcomp.cupid.db.spark.model
 
 import org.apache.spark.sql.Encoder
-import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
@@ -26,7 +25,10 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   * of the types supported below has a corresponding UDT, we are able to use a standard Spark Encoder
   * to construct these implicits. */
 trait CupidEncoders {
-  implicit def trajectoryEncoder: Encoder[Trajectory] = ExpressionEncoder()
-  implicit def roadNetworkEncoder: Encoder[RoadNetwork] = ExpressionEncoder()
-  implicit def roadSegmentEncoder: Encoder[RoadSegment] = ExpressionEncoder()
+  implicit def trajectoryEncoder: Encoder[Trajectory] =
+    org.apache.spark.sql.Encoders.kryo[Trajectory]
+  implicit def roadNetworkEncoder: Encoder[RoadNetwork] =
+    org.apache.spark.sql.Encoders.kryo[RoadNetwork]
+  implicit def roadSegmentEncoder: Encoder[RoadSegment] =
+    org.apache.spark.sql.Encoders.kryo[RoadSegment]
 }

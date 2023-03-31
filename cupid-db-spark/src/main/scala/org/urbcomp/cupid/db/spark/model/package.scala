@@ -27,7 +27,6 @@ package object model extends CupidEncoders {
     */
   def initCupid(sqlContext: SQLContext): Unit = {
     org.apache.spark.sql.model.registerTypes()
-    //udf.registerFunctions(sqlContext)
   }
 
   /** Enrichment over [[SQLContext]] to add `withCupid` "literate" method. */
