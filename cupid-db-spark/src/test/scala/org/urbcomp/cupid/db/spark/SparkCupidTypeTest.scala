@@ -40,7 +40,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid trajectory type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true).withCupid
+      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(trajectory))
     val df = rdd.toDF("traj")
@@ -50,7 +50,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid road network type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true).withCupid
+      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(rn))
     val df = rdd.toDF("roadNetwork")
@@ -60,7 +60,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid road segment type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true).withCupid
+      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(rs))
     val df = rdd.toDF("roadSegment")
