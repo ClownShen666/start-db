@@ -21,18 +21,12 @@ import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 
-class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
+abstract class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
   override def typeName: String = "RoadSegmentUDT"
 
-  // Note that this serialization will not be triggered if using Kryo
-  override def serialize(roadSegment: RoadSegment): InternalRow = {
-    InternalRow(UTF8String.fromString(roadSegment.toString))
-  }
+  override def serialize(roadSegment: RoadSegment): InternalRow
 
-  override def deserialize(datum: Any): RoadSegment = {
-    val ir = datum.asInstanceOf[InternalRow]
-    RoadSegment.fromGeoJSON(ir.getString(0))
-  }
+  override def deserialize(datum: Any): RoadSegment
 
   override def sqlType: DataType = StructType(Seq(StructField("roadSegment", DataTypes.StringType)))
 
