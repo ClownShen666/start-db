@@ -26,21 +26,25 @@ public class DataTypeConversionFunction {
 
     @CupidDBFunction("castToInteger")
     public Integer castToInteger(String str) {
+        if (str == null) return null;
         return Integer.valueOf(str);
     }
 
     @CupidDBFunction("castToLong")
     public Long castToLong(String str) {
+        if (str == null) return null;
         return Long.valueOf(str);
     }
 
     @CupidDBFunction("castToFloat")
     public Float castToFloat(String str) {
+        if (str == null) return null;
         return Float.valueOf(str);
     }
 
     @CupidDBFunction("castToDouble")
     public Double castToDouble(String str) {
+        if (str == null) return null;
         return Double.valueOf(str);
     }
 
@@ -51,21 +55,25 @@ public class DataTypeConversionFunction {
 
     @CupidDBFunction("castToString")
     public String castToString(Object any) {
+        if (any == null) return null;
         return any.toString();
     }
 
     @CupidDBFunction("parseInteger")
     public Integer parseInteger(Object num) {
+        if (num == null) return null;
         return Integer.valueOf(num.toString());
     }
 
     @CupidDBFunction("parseLong")
     public Long parseLong(Object num) {
+        if (num == null) return null;
         return Long.valueOf(num.toString());
     }
 
     @CupidDBFunction("parseDouble")
     public Double parseDouble(Object num) {
+        if (num == null) return null;
         return Double.valueOf(num.toString());
     }
 
