@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db.util;
 
-import org.urbcomp.cupid.db.model.data.DataExportType;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,21 +42,30 @@ public class SqlParam {
      */
     private String dbName;
 
-    private boolean isLocal;
-
     private String sql;
-
-    private DataExportType exportType;
 
     private String sqlId;
 
-    private boolean enableHiveSupport;
+    private ExecuteEngine executeEngine;
+
+    private Map<String, String> options;
 
     public SqlParam() {}
 
     public SqlParam(String userName, String dbName) {
+        this(userName, dbName, ExecuteEngine.CALCITE, null);
+    }
+
+    public SqlParam(
+        String userName,
+        String dbName,
+        ExecuteEngine executeEngine,
+        Map<String, String> options
+    ) {
         this.userName = userName;
         this.dbName = dbName;
+        this.executeEngine = executeEngine;
+        this.options = options;
     }
 
     public String getUserName() {
@@ -87,28 +96,12 @@ public class SqlParam {
         connectionParams.remove(connectionId);
     }
 
-    public boolean isLocal() {
-        return isLocal;
-    }
-
-    public void setLocal(boolean local) {
-        isLocal = local;
-    }
-
     public String getSql() {
         return sql;
     }
 
     public void setSql(String sql) {
         this.sql = sql;
-    }
-
-    public DataExportType getExportType() {
-        return exportType;
-    }
-
-    public void setExportType(DataExportType exportType) {
-        this.exportType = exportType;
     }
 
     public String getSqlId() {
@@ -119,11 +112,19 @@ public class SqlParam {
         this.sqlId = sqlId;
     }
 
-    public boolean isEnableHiveSupport() {
-        return enableHiveSupport;
+    public ExecuteEngine getExecuteEngine() {
+        return executeEngine;
     }
 
-    public void setEnableHiveSupport(boolean enableHiveSupport) {
-        this.enableHiveSupport = enableHiveSupport;
+    public void setExecuteEngine(ExecuteEngine executeEngine) {
+        this.executeEngine = executeEngine;
+    }
+
+    public Map<String, String> getOptions() {
+        return options == null ? new HashMap<>(4) : options;
+    }
+
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
     }
 }

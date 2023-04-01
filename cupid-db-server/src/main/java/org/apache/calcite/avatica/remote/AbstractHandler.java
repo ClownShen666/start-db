@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.remote.Service.ErrorResponse;
 import org.apache.calcite.avatica.remote.Service.Request;
 import org.apache.calcite.avatica.remote.Service.Response;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.server.AuthenticationHelper;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -105,7 +106,9 @@ public abstract class AbstractHandler<T> implements Handler<T> {
                 }
                 final SqlParam param = new SqlParam(
                     info.get("user"),
-                    info.getOrDefault("db", "default")
+                    info.getOrDefault("db", "default"),
+                    ExecuteEngine.valueOf(info.getOrDefault("engine", "calcite")),
+                    info
                 );
                 SqlParam.CACHE.set(param);
                 SqlParam.setParam(openConnection.connectionId, param);

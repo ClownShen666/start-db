@@ -16,6 +16,11 @@
  */
 package org.urbcomp.cupid.db.util;
 
+import org.urbcomp.cupid.db.config.DynamicConfig;
+import org.urbcomp.cupid.db.model.data.DataExportType;
+
+import java.util.Map;
+
 /**
  * @author jimo
  **/
@@ -27,6 +32,29 @@ public class SparkSqlParam extends SqlParam {
     public static final String REMOTE_PORT_KEY = "port";
     public static final String REMOTE_HOST_KEY = "hostname";
 
+    public SparkSqlParam() {
+        this.hbaseZookeepers = DynamicConfig.getHBaseZookeepers();
+    }
+
+    public SparkSqlParam(SqlParam sqlParam) {
+        this();
+        this.setUserName(sqlParam.getUserName());
+        this.setDbName(sqlParam.getDbName());
+        this.setExecuteEngine(sqlParam.getExecuteEngine());
+        this.setSql(sqlParam.getSql());
+        final Map<String, String> options = sqlParam.getOptions();
+        this.isLocal = Boolean.parseBoolean(options.getOrDefault("spark.local", "true"));
+        this.async = Boolean.parseBoolean(options.getOrDefault("spark.async", "false"));
+        this.enableHiveSupport = Boolean.parseBoolean(
+            options.getOrDefault("spark.hiveEnable", "false")
+        );
+        this.exportType = DataExportType.valueOf(
+            options.getOrDefault("spark.exportType", "print").toUpperCase()
+        );
+    }
+
+    private boolean isLocal;
+
     private String hbaseZookeepers;
     /**
      * 是否异步执行
@@ -35,6 +63,18 @@ public class SparkSqlParam extends SqlParam {
 
     private String remoteHost;
     private int remotePort;
+
+    private DataExportType exportType;
+
+    private boolean enableHiveSupport;
+
+    public boolean isLocal() {
+        return isLocal;
+    }
+
+    public void setLocal(boolean local) {
+        isLocal = local;
+    }
 
     public String getHbaseZookeepers() {
         return hbaseZookeepers;
@@ -66,5 +106,21 @@ public class SparkSqlParam extends SqlParam {
 
     public void setRemotePort(int remotePort) {
         this.remotePort = remotePort;
+    }
+
+    public DataExportType getExportType() {
+        return exportType;
+    }
+
+    public void setExportType(DataExportType exportType) {
+        this.exportType = exportType;
+    }
+
+    public boolean isEnableHiveSupport() {
+        return enableHiveSupport;
+    }
+
+    public void setEnableHiveSupport(boolean enableHiveSupport) {
+        this.enableHiveSupport = enableHiveSupport;
     }
 }
