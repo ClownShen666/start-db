@@ -16,19 +16,22 @@
  */
 package org.urbcomp.cupid.db.spark.res
 
+import org.apache.spark.sql.DataFrame
+import org.urbcomp.cupid.db.datatype.StructTypeJson
 import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.cache.ResultCacheFactory
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
 /**
   * @author jimo
   * */
-object SparkResultExporterFactory {
+class SparkLocalResultExporter extends ISparkResultExporter {
+  override def getType: DataExportType = DataExportType.LOCAL
 
-  def getInstance(exportType: DataExportType): ISparkResultExporter = {
-    exportType match {
-      case DataExportType.PRINT => new ShowSparkResultExporter
-      case DataExportType.HDFS  => new SparkResult2HdfsExporter
-      case DataExportType.CACHE => new SparkResult2RemoteExporter
-      case _                    => throw new IllegalArgumentException("not support type now:" + exportType)
-    }
+  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
+    val sqlId = param.getSqlId
+    ResultCacheFactory.getGlobalInstance
+      .addSchema(sqlId, StructTypeJson.deserializeJson(data.schema.json))
+    ResultCacheFactory.getGlobalInstance.addRow(sqlId, null)
   }
 }

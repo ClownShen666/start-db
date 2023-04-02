@@ -18,6 +18,7 @@ package org.urbcomp.cupid.db.spark;
 
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -27,11 +28,12 @@ public class LocalSparkSubmitter implements ISparkSubmitter {
 
     @Override
     public SubmitResult submit(SparkSqlParam param) {
-        return null;
+        final String sqlId = UUID.randomUUID().toString();
+        param.setSqlId(sqlId);
+        SparkQueryExecutor.execute(param, null);
+        return SubmitResult.builder().sqlId(sqlId).build();
     }
 
     @Override
-    public void waitToFinish(SubmitResult res) throws TimeoutException {
-
-    }
+    public void waitToFinish(SubmitResult res) throws TimeoutException {}
 }
