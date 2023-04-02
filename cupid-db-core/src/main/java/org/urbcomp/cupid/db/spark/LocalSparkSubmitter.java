@@ -16,8 +16,6 @@
  */
 package org.urbcomp.cupid.db.spark;
 
-import org.urbcomp.cupid.db.config.ExecuteEngine;
-import org.urbcomp.cupid.db.spark.livy.LivySubmitter;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
 import java.util.concurrent.TimeoutException;
@@ -25,24 +23,15 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author jimo
  **/
-public interface ISparkSubmitter {
+public class LocalSparkSubmitter implements ISparkSubmitter {
 
-    static ISparkSubmitter getInstance(ExecuteEngine engine) {
-        if (engine == ExecuteEngine.SPARK_LOCAL) {
-            return new LocalSparkSubmitter();
-        }
-        return new LivySubmitter();
+    @Override
+    public SubmitResult submit(SparkSqlParam param) {
+        return null;
     }
 
-    /**
-     * 提交到spark
-     *
-     * @return sqlId
-     */
-    SubmitResult submit(SparkSqlParam param);
+    @Override
+    public void waitToFinish(SubmitResult res) throws TimeoutException {
 
-    /**
-     * 同步等待执行完成
-     */
-    void waitToFinish(SubmitResult res) throws TimeoutException;
+    }
 }

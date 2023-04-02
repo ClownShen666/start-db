@@ -71,11 +71,6 @@
             <version>${geomesa.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.locationtech.geomesa</groupId>
-            <artifactId>geomesa-hbase-spark_${scala.binary.version}</artifactId>
-            <version>${geomesa.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-mapreduce</artifactId>
             <version>${hbase.version}</version>
