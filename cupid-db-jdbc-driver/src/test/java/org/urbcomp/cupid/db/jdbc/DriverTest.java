@@ -153,4 +153,27 @@ public class DriverTest {
             assertTrue(rs.getInt(1) >= 0);
         }
     }
+
+    @Test
+    public void testUseSpark() throws SQLException {
+        final Properties conf = new Properties();
+        conf.put("user", "cupid_db");
+        conf.put("password", "cupid-db");
+        conf.put("engine", "spark_local");
+        conf.put("spark.local", "true");
+        conf.put("spark.async", "false");
+        conf.put("spark.exportType", "local");
+        try (
+            Connection conn = DriverManager.getConnection(
+                "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",
+                conf
+            )
+        ) {
+            final Statement stmt = conn.createStatement();
+
+            final ResultSet rs = stmt.executeQuery("select 1 as s");
+            rs.next();
+            assertEquals("1", rs.getString(1));
+        }
+    }
 }

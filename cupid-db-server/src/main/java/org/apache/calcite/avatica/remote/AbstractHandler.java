@@ -107,7 +107,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
                 final SqlParam param = new SqlParam(
                     info.get("user"),
                     info.getOrDefault("db", "default"),
-                    ExecuteEngine.valueOf(info.getOrDefault("engine", "calcite")),
+                    ExecuteEngine.valueOf(info.getOrDefault("engine", "calcite").toUpperCase()),
                     info
                 );
                 SqlParam.CACHE.set(param);
