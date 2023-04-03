@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -174,6 +175,7 @@ public class TimeFunction {
      */
     @CupidDBFunction("toDatetime")
     public LocalDateTime toDateTime(String dateString) throws DateTimeParseException {
+        if (dateString == null) return null;
         LocalDateTime localDateTime = LocalDateTime.MIN;
         boolean isCorrect = false;
         DateTimeParseException pe = null;
@@ -187,9 +189,18 @@ public class TimeFunction {
                 pe = exception;
             }
         }
-        if (!isCorrect && pe != null) {
+        if (!isCorrect) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                localDateTime = LocalDate.parse(dateString, formatter).atStartOfDay();
+                isCorrect = true;
+            } catch (DateTimeParseException exception) {
+                pe = exception;
+            }
+        }
+        if (!isCorrect) {
             throw new DateTimeParseException(
-                "Date format is error. Only receive ",
+                "Date format is error. Only receive. ",
                 String.join(",", DEFAULT_FORMATS),
                 pe.getErrorIndex()
             );
