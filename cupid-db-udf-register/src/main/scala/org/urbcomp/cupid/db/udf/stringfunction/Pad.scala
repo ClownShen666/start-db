@@ -14,15 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf;
+package org.urbcomp.cupid.db.udf.stringfunction
 
-import org.junit.Test;
+import scala.collection.mutable
 
-public class UdfFactoryTest {
-    @Test
-    public void testUdfFactory() {
-        UdfFactory factory = new UdfFactory();
-        assert (factory.getEngineUdfMap().size() == 2);
+trait Pad {
+  def pad(str: String, len: Int, pad: String): String = {
+    if (str == null || pad == null) null
+    else if (len < str.length) str.substring(0, len)
+    else {
+      val sb = new mutable.StringBuilder()
+      var i = 0
+      while (i < len - str.length) {
+        sb.append(pad)
+        i += 1
+      }
+      sb.toString()
     }
-
+  }
 }

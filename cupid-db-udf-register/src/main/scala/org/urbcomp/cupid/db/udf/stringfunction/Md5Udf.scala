@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udf.stringfunction
 
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class AddOneUdf extends Serializable with AbstractUdf {
+import java.security.MessageDigest
 
-  override def name(): String = "AddOne"
+class Md5Udf extends Serializable with AbstractUdf {
+  override def name(): String = "md5"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -28,9 +30,25 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(x: Int): Int = {
-    x + 1
+  def udfImpl(str: String): String = {
+    val hexDigits =
+      Array[Char]('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
+    val btInput = str.getBytes()
+    val mdInst = MessageDigest.getInstance("MD5")
+    mdInst.update(btInput)
+    val md = mdInst.digest()
+    val j = md.length
+    val code = new Array[Char](j * 2)
+    var k = 0
+    for (e <- md) {
+      code(k) = hexDigits(e >>> 4 & 0xf)
+      k += 1
+      code(k) = hexDigits(e & 0xf)
+      k += 1
+    }
+    new String(code)
   }
 
-  def udfWrapper: Int => Int = udfImpl
+  def udfWrapper: String => String = udfImpl
+
 }

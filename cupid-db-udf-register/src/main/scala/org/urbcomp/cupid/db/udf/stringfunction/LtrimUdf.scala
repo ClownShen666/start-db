@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udf.stringfunction
 
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class AddOneUdf extends Serializable with AbstractUdf {
-
-  override def name(): String = "AddOne"
+class LtrimUdf extends Serializable with AbstractUdf {
+  override def name(): String = "ltrim"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -28,9 +28,17 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(x: Int): Int = {
-    x + 1
+  def udfImpl(str: String): String = {
+    if (str == null) null
+    else {
+      var i = 0
+      val n = str.length()
+      while (i < n && str.charAt(i) == ' ') {
+        i += 1
+      }
+      str.substring(i)
+    }
   }
 
-  def udfWrapper: Int => Int = udfImpl
+  def udfWrapper: String => String = udfImpl
 }

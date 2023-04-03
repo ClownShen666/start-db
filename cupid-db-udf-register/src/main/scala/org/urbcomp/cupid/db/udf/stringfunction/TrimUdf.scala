@@ -14,15 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf;
+package org.urbcomp.cupid.db.udf.stringfunction
 
-import org.junit.Test;
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-public class UdfFactoryTest {
-    @Test
-    public void testUdfFactory() {
-        UdfFactory factory = new UdfFactory();
-        assert (factory.getEngineUdfMap().size() == 2);
-    }
+class TrimUdf extends Serializable with AbstractUdf {
+  override def name(): String = "trim"
 
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+
+  override def udfCalciteEntryName(): String = "udfImpl"
+
+  override def udfSparkEntryName(): String = "udfWrapper"
+
+  def udfImpl(str: String): String =
+    if (str == null) null else str.trim
+
+  def udfWrapper: String => String = udfImpl
 }
