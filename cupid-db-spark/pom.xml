@@ -112,6 +112,12 @@
             <artifactId>scalatest_${scala.binary.version}</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-spark-jts_${scala.binary.version}</artifactId>
+            <version>${geomesa.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
