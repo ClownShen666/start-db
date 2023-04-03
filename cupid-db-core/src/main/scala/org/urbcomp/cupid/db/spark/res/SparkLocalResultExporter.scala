@@ -23,15 +23,24 @@ import org.urbcomp.cupid.db.spark.cache.ResultCacheFactory
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
 /**
-  * @author jimo
-  * */
+ * @author jimo
+ * */
 class SparkLocalResultExporter extends ISparkResultExporter {
   override def getType: DataExportType = DataExportType.LOCAL
 
   override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
     val sqlId = param.getSqlId
+    val schema = data.schema
     ResultCacheFactory.getGlobalInstance
-      .addSchema(sqlId, StructTypeJson.deserializeJson(data.schema.json))
-    ResultCacheFactory.getGlobalInstance.addRow(sqlId, null)
+      .addSchema(sqlId, StructTypeJson.deserializeJson(schema.json))
+    val numFields = schema.fields.length
+    data.coalesce(1).foreach(row => {
+      var rowArr: Array[AnyRef] = Array()
+      for (i <- 0 until numFields) {
+        val value = row.get(i)
+        rowArr +:= value.asInstanceOf[AnyRef]
+      }
+      ResultCacheFactory.getGlobalInstance.addRow(sqlId, rowArr)
+    })
   }
 }

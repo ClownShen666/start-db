@@ -211,6 +211,12 @@
             <artifactId>geomesa-spark-jts_${scala.binary.version}</artifactId>
             <version>${geomesa.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>${kryo.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.grpc</groupId>
