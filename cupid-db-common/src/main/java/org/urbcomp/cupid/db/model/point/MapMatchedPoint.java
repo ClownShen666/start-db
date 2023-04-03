@@ -18,7 +18,7 @@ package org.urbcomp.cupid.db.model.point;
 
 import java.sql.Timestamp;
 
-public class MapMatchedPoint {
+public class MapMatchedPoint implements java.io.Serializable {
     /**
      * 原始点
      */
