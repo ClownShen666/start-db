@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.spark.mapmatch
 
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.{SparkConf, SparkContext}
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
@@ -26,14 +27,18 @@ import java.util
 import scala.collection.JavaConverters._
 
 class MapMatch {
-
+  val conf = new SparkConf()
+  val session: SparkSession = SparkSession
+    .builder()
+    .master("local[*]")
+    .appName("MapMatchApp")
+    .config(conf)
+    .getOrCreate()
+  private val context = session.sparkContext
   def mapMatch(
       roadNetwork: RoadNetwork,
       trajectory: Array[Trajectory]
   ): util.List[MapMatchedTrajectory] = {
-    val sparkConf = new SparkConf().setAppName("MapMatchApp")
-    sparkConf.setMaster("local")
-    val context = new SparkContext(sparkConf)
     val trajRdd = context.parallelize(trajectory)
     val bcRoadNetwork = context.broadcast[RoadNetwork](roadNetwork)
     val mapMatchRdd = trajRdd.mapPartitions(trajIter => {
