@@ -729,8 +729,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             }
 
             final SqlParam sqlParam = SqlParam.CACHE.get();
-            sqlParam.setSql(query.sql);
             if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
+                sqlParam.setSql(query.sql);
                 return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
             }
 
