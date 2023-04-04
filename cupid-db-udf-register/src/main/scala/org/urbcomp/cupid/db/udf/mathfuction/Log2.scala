@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,15 +32,16 @@ class Log2 extends Serializable with AbstractUdf {
   override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
-   * Returns the base 2 logarithm of a double value (num).
-   *
-   * @param num double
-   * @return double
-   */
+    * Returns the base 2 logarithm of a double value (num).
+    *
+    * @param num double
+    * @return double
+    */
   def udfImpl(num: BigDecimal): BigDecimal = {
     if (num == null || num.doubleValue <= 0) return null
-    val res = Math.log(num.doubleValue) / Math.log(2.0D)
-     BigDecimal.valueOf(res)  }
+    val res = Math.log(num.doubleValue) / Math.log(2.0d)
+    BigDecimal.valueOf(res)
+  }
 
   def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }

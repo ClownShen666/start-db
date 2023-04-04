@@ -32,10 +32,10 @@ class Pi extends Serializable with AbstractUdf {
   override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
-   * The double value that is closer than any other to pi
-   *
-   * @return PI double.
-   */
+    * The double value that is closer than any other to pi
+    *
+    * @return PI double.
+    */
   def udfImpl(): BigDecimal = {
     new BigDecimal(Math.PI)
   }
