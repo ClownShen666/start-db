@@ -174,9 +174,13 @@ public class TimeFunction {
      */
     @CupidDBFunction("toDatetime")
     public LocalDateTime toDateTime(String dateString) throws DateTimeParseException {
+        if (dateString == null) return null;
         LocalDateTime localDateTime = LocalDateTime.MIN;
         boolean isCorrect = false;
         DateTimeParseException pe = null;
+        if (dateString.length() == 10) {
+            dateString += " 00:00:00";
+        }
         for (String format : DEFAULT_FORMATS) {
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -189,8 +193,8 @@ public class TimeFunction {
         }
         if (!isCorrect && pe != null) {
             throw new DateTimeParseException(
-                "Date format is error. Only receive ",
-                String.join(",", DEFAULT_FORMATS),
+                "Date format is error. Only receive. " + String.join(",", DEFAULT_FORMATS),
+                dateString,
                 pe.getErrorIndex()
             );
         }
