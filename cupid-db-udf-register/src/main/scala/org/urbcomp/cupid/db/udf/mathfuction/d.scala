@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,9 +21,9 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Pi extends Serializable with AbstractUdf {
+class Log extends Serializable with AbstractUdf {
 
-  override def name(): String = "pi"
+  override def name(): String = "log"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -32,13 +32,18 @@ class Pi extends Serializable with AbstractUdf {
   override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
-   * The double value that is closer than any other to pi
+   * Returns the (base) logarithm of a double value (num).
    *
-   * @return PI double.
+   * @param base double
+   * @param num  double
+   * @return log result
    */
-  def udfImpl(): BigDecimal = {
-    new BigDecimal(Math.PI)
+  def udfImpl(base: BigDecimal, num: BigDecimal): BigDecimal = {
+    if (base == null || num == null || base.doubleValue <= 0 || base.doubleValue == 1 || num.doubleValue == 0)
+      return null
+    val res = Math.log(num.doubleValue) / Math.log(base.doubleValue)
+    BigDecimal.valueOf(res)
   }
 
-  def udfWrapper: () => BigDecimal = udfImpl
+  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = udfImpl
 }

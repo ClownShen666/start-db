@@ -75,7 +75,6 @@ public class MathFunction {
     public Object log2(BigDecimal num) {
         if (num == null || num.doubleValue() <= 0) return null;
         double res = Math.log(num.doubleValue()) / Math.log(2.0D);
-        if (res % 1 == 0) return res;
         return BigDecimal.valueOf(res);
     }
 
