@@ -26,7 +26,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -179,6 +178,9 @@ public class TimeFunction {
         LocalDateTime localDateTime = LocalDateTime.MIN;
         boolean isCorrect = false;
         DateTimeParseException pe = null;
+        if (dateString.length() == 10) {
+            dateString += " 00:00:00";
+        }
         for (String format : DEFAULT_FORMATS) {
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
@@ -189,19 +191,10 @@ public class TimeFunction {
                 pe = exception;
             }
         }
-        if (!isCorrect) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                localDateTime = LocalDate.parse(dateString, formatter).atStartOfDay();
-                isCorrect = true;
-            } catch (DateTimeParseException exception) {
-                pe = exception;
-            }
-        }
-        if (!isCorrect) {
+        if (!isCorrect && pe != null) {
             throw new DateTimeParseException(
-                "Date format is error. Only receive. ",
-                String.join(",", DEFAULT_FORMATS),
+                "Date format is error. Only receive. " + String.join(",", DEFAULT_FORMATS),
+                dateString,
                 pe.getErrorIndex()
             );
         }
