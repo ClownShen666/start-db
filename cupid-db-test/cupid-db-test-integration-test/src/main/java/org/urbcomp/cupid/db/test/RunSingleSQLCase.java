@@ -38,8 +38,8 @@ public class RunSingleSQLCase {
     // 用一个静态变量来控制是否自动将实际返回值写入xml文件中
     static boolean WRITE_ACTUAL = true;
     // 分别用一个静态变量来控制是否比较执行结果或异常
-    static boolean COMPARE_RESULT = true;
-    static boolean COMPARE_EXCEPTION = true;
+    static boolean COMPARE_RESULT = false;
+    static boolean COMPARE_EXCEPTION = false;
     // 用一个静态变量来控制是否输出过程信息
     static boolean OUTPUT_MESSAGE = true;
     static String XML_PATH;

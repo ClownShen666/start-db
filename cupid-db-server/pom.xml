@@ -73,7 +73,7 @@
                     <transformers>
                         <transformer
                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>org.urbcomp.cupid.db.server.Main</mainClass>
+                            <mainClass>org.urbcomp.cupid.db.server.CupidDbServerStart</mainClass>
                         </transformer>
                     </transformers>
                     <filters>

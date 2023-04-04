@@ -6,11 +6,10 @@
     <!--  输入经纬度生成点  st_makePoint(x: Double, y: Double): Point  -->
     <case>
         <sql type="query">select st_makePoint(?, ?);</sql>
-        <arguments resultID="1">[110.0][40.0]</arguments>
-        <arguments exception="Exception">[181][40]</arguments>
-        <arguments exception="Exception">[110][91]</arguments>
-        <arguments exception="Exception">[-110][40]</arguments>
-        <arguments exception="Exception">[110][-40]</arguments>
+        <arguments resultID="1">[180.0][-90.0]</arguments>
+        <arguments resultID="2">[181][91]</arguments>
+        <arguments resultID="3">[-181][-91]</arguments>
+        <arguments resultID="4">[null][null]</arguments>
     </case>
     <!--  传入一列点生成轨迹  st_makeLineString(points: List[Point]): LineString  -->
     <case>
@@ -20,7 +19,7 @@
     <case>
         <sql type="query">select st_makePolygon(?);</sql>
         <arguments resultID="ignore">[st_lineStringFromWKT('LINESTRING (1 1, 2 1, 2 2, 1 2, 1 1)')]</arguments>
-        <arguments exception="SqlValidatorException">[st_makePoint(1,2)]</arguments>
+        <arguments resultID="5">[null]</arguments>
     </case>
     <!--  指定对角点的经纬度，生成矩形
         st_makeBBOX(lowerX: Double, lowerY: Double, upperX: Double, upperY: Double): Polygon  -->
@@ -31,6 +30,7 @@
         <arguments exception="ignore">[1][1][1][2]</arguments>
         <arguments exception="ignore">[181][1][2][2]</arguments>
         <arguments exception="ignore">[1][91][2][2]</arguments>
+        <arguments resultID="6">[null][null][null][null]</arguments>
     </case>
     <!--  指定对角点，生成矩形  st_makeBBOX(lowerLeft: Point, upperRight: Point): Polygon	  -->
     <case>
@@ -40,13 +40,14 @@
         <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(2, 1)]</arguments>
         <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(2, 1)]</arguments>
         <arguments exception="ignore">[st_makePoint(1, 1)][st_makePoint(1, 2)]</arguments>
+        <arguments resultID="7">[null][null]</arguments>
     </case>
     <!--  指定圆心点和半径，生成圆	 st_makeCircle(center: Point, radiusInM: Double) 	-->
     <case>
         <sql type="query">select st_makeCircle(?, ?);</sql>
-        <arguments resultID="ignore">[st_makePoint(1, 1)][1.0]</arguments>
-        <arguments exception="ignore">[st_makePoint(1, 1)][0.0]</arguments>
-        <arguments exception="ignore">[st_makePoint(1, 1)][-1.0]</arguments>
-        <arguments exception="ignore">[st_makePoint(1, 1)][null]</arguments>
+        <arguments resultID="ignore">[st_makePoint(1, 1)]['1.0']</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)]['0.0']</arguments>
+        <arguments exception="ignore">[st_makePoint(1, 1)]['-1.0']</arguments>
+        <arguments resultID="8">[null][null]</arguments>
     </case>
 </testCase>

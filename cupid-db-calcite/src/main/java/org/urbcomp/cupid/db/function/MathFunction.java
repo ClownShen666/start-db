@@ -38,6 +38,16 @@ public class MathFunction {
     public static final double PI = 3.14159265358979323846;
 
     /**
+     * The double value that is closer than any other to pi
+     *
+     * @return PI double.
+     */
+    @CupidDBFunction("pi")
+    public double pi() {
+        return Math.PI;
+    }
+
+    /**
      * Returns the (base) logarithm of a double value (num).
      *
      * @param base double
@@ -50,20 +60,10 @@ public class MathFunction {
             || num == null
             || base.doubleValue() <= 0
             || base.doubleValue() == 1
-            || num.doubleValue() == 0) return null;
+            || num.doubleValue() <= 0) return null;
         double res = Math.log(num.doubleValue()) / Math.log(base.doubleValue());
         if (res % 1 == 0) return res;
         return BigDecimal.valueOf(res);
-    }
-
-    /**
-     * The double value that is closer than any other to pi
-     *
-     * @return PI double.
-     */
-    @CupidDBFunction("pi")
-    public double pi() {
-        return Math.PI;
     }
 
     /**
@@ -81,6 +81,34 @@ public class MathFunction {
     }
 
     /**
+     * Returns the base 10 logarithm of a double value (num).
+     *
+     * @param num double
+     * @return double
+     */
+    @CupidDBFunction("log10")
+    public Object log10(BigDecimal num) {
+        if (num == null || num.doubleValue() <= 0) return null;
+        double res = Math.log(num.doubleValue()) / Math.log(10.0D);
+        if (res % 1 == 0) return res;
+        return BigDecimal.valueOf(res);
+    }
+
+    /**
+     * Returns the natural logarithm of a double value (num).
+     *
+     * @param num double
+     * @return double
+     */
+    @CupidDBFunction("ln")
+    public Object ln(BigDecimal num) {
+        if (num == null || num.doubleValue() <= 0) return null;
+        double res = Math.log(num.doubleValue());
+        if (res % 1 == 0) return res;
+        return BigDecimal.valueOf(res);
+    }
+
+    /**
      * Returns the natural logarithm of a double value (num) + 1.
      *
      * @param num double
@@ -88,7 +116,7 @@ public class MathFunction {
      */
     @CupidDBFunction("log1p")
     public Object log1p(BigDecimal num) {
-        if (num == null || num.doubleValue() <= 0) return null;
+        if (num == null || num.doubleValue() <= -1) return null;
         double res = Math.log1p(num.doubleValue());
         if (res % 1 == 0) return res;
         return BigDecimal.valueOf(res);

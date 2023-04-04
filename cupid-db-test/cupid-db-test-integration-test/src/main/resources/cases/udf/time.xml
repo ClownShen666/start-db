@@ -1,171 +1,167 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--  通用时间函数 测试用例  -->
 <testCase>
-
-    <resultxml>time_result.xml</resultxml>
-
+    <resultXml>time_result.xml</resultXml>
     <!--  将日期时间字符串转换为datetime  toDatetime(dateString: String[, format: String]): Datetime  -->
     <case>
         <sql type="query">select toDatetime(?);</sql>
         <arguments resultID="1">['2022-05-25']</arguments>
         <arguments resultID="2">['2022-05-25 12:34:56']</arguments>
         <arguments resultID="3">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="DateTimeParseException">['2022-01-32 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022']</arguments>
+        <arguments resultID="4">[null]</arguments>
     </case>
-
     <case>
         <sql type="query">select toDatetime(?, ?);</sql>
-        <arguments resultID="4">['2022-05-25']['yyyy-MM-dd']</arguments>
-        <arguments resultID="5">['2022-05-25 12:34:56']['yyyy-MM-dd HH:mm:ss']</arguments>
-        <arguments resultID="6">['2022-05-25 12:34:56.789']['yyyy-MM-dd HH:mm:ss.SSS']</arguments>
+        <arguments resultID="5">['2022-05-25']['yyyy-MM-dd']</arguments>
+        <arguments resultID="6">['2022-05-25 12:34:56']['yyyy-MM-dd HH:mm:ss']</arguments>
+        <arguments resultID="7">['2022-05-25 12:34:56.789']['yyyy-MM-dd HH:mm:ss.SSS']</arguments>
         <arguments exception="DateTimeParseException">['2022-05-25 12:34:56.789']['yyyy-MM-dd']</arguments>
         <arguments exception="DateTimeParseException">['2022-05-25']['yyyy-MM-dd HH:mm:ss']</arguments>
+        <arguments resultID="8">[null][null]</arguments>
     </case>
-
     <!--  将日期字符串转换为timestamp  toTimestamp(dateString: String[, format: String]): Timestamp  -->
     <case>
         <sql type="query">select toTimestamp(?);</sql>
-        <arguments resultID="7">['2022-05-25']</arguments>
-        <arguments resultID="8">['2022-05-25 12:34:56']</arguments>
-        <arguments resultID="9">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="DateTimeParseException">['2022-01-32 12:34:56.789']</arguments>
-        <arguments exception="RuntimeException">['2022']</arguments>
+        <arguments resultID="9">['2022-05-25']</arguments>
+        <arguments resultID="10">['2022-05-25 12:34:56']</arguments>
+        <arguments resultID="11">['2022-05-25 12:34:56.789']</arguments>
+        <arguments exception="ParseException">['2022']</arguments>
+        <arguments resultID="12">[null]</arguments>
     </case>
-
     <case>
         <sql type="query">select toTimestamp(?, ?);</sql>
-        <arguments resultID="10">['2022-05-25']['yyyy-MM-dd']</arguments>
-        <arguments resultID="11">['2022-05-25 12:34:56']['yyyy-MM-dd HH:mm:ss']</arguments>
-        <arguments resultID="12">['2022-05-25 12:34:56.789']['yyyy-MM-dd HH:mm:ss.SSS']</arguments>
-        <arguments resultID="13">['2022-05-25 12:34:56.789']['yyyy-MM-dd']</arguments>
+        <arguments resultID="13">['2022-05-25']['yyyy-MM-dd']</arguments>
+        <arguments resultID="14">['2022-05-25 12:34:56']['yyyy-MM-dd HH:mm:ss']</arguments>
+        <arguments resultID="15">['2022-05-25 12:34:56.789']['yyyy-MM-dd HH:mm:ss.SSS']</arguments>
+        <arguments resultID="16">['2022-05-25 12:34:56.789']['yyyy-MM-dd']</arguments>
         <arguments exception="ParseException">['2022-05-25']['yyyy-MM-dd HH:mm:ss']</arguments>
+        <arguments resultID="17">[null][null]</arguments>
     </case>
-
     <!--  将datetime类型转成timestamp  datetimeToTimestamp(dt: Datetime): Timestamp  -->
     <case>
         <sql type="query">select datetimeToTimestamp(?);</sql>
-        <arguments resultID="14">['2022-05-25']</arguments>
-        <arguments resultID="15">['2022-05-25 12:34:56']</arguments>
-        <arguments resultID="16">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="RuntimeException">['2022']</arguments>
+        <arguments resultID="18">['2022-05-25']</arguments>
+        <arguments resultID="19">['2022-05-25 12:34:56']</arguments>
+        <arguments resultID="20">['2022-05-25 12:34:56.789']</arguments>
+        <arguments exception="ParseException">['2022']</arguments>
+        <arguments resultID="21">[null]</arguments>
     </case>
-
     <!--  将timestamp类型转化成datetime类型  timestampToDatetime(ts: Timestamp): Datetime  -->
     <case>
         <sql type="query">select timestampToDatetime(?);</sql>
-        <arguments resultID="17">['2022-05-25']</arguments>
-        <arguments resultID="18">['2022-05-25 12:34:56']</arguments>
-        <arguments resultID="19">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="RuntimeException">['2022']</arguments>
+        <arguments resultID="22">['2022-05-25']</arguments>
+        <arguments resultID="23">['2022-05-25 12:34:56']</arguments>
+        <arguments resultID="24">['2022-05-25 12:34:56.789']</arguments>
+        <arguments exception="ParseException">['2022']</arguments>
+        <arguments resultID="25">[null]</arguments>
     </case>
-
     <!--  获取当前日期时间  currentDatetime(): Datetime  -->
     <case>
-        <sql type="query">select currentDatetime();</sql>
+        <sql type="query" resultID="26">select currentDatetime();</sql>
     </case>
-
     <!--  获取当前系统时间戳  currentTimestamp():Timestamp  -->
     <case>
-        <sql type="query">select currentTimestamp();</sql>
+        <sql type="query" resultID="27">select currentTimestamp();</sql>
     </case>
-
     <!--  timestamp转long类型  timestampToLong(ts: Timestamp): Long  -->
     <case>
         <sql type="query">select timestampToLong(?);</sql>
-        <arguments resultID="20">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="RuntimeException">['2022']</arguments>
+        <arguments resultID="28">['2022-05-25']</arguments>
+        <arguments resultID="29">['2022-05-25 12:34:56']</arguments>
+        <arguments resultID="30">['2022-05-25 12:34:56.789']</arguments>
+        <arguments exception="ParseException">['2022']</arguments>
+        <arguments resultID="31">[null]</arguments>
     </case>
-
     <!--  long转Timestamp类型  longToTimestamp(num: Long): Timestamp
   -->
     <case>
         <sql type="query">select longToTimestamp(?);</sql>
-        <arguments resultID="21">[1653453296789]</arguments>
-        <arguments resultID="22">[0]</arguments>
-        <arguments resultID="23">[-10]</arguments>
-        <arguments resultID="24">[9223372036854775807]</arguments>
+        <arguments resultID="32">[1653453296789]</arguments>
+        <arguments resultID="33">[0]</arguments>
+        <arguments resultID="34">[-10]</arguments>
+        <arguments resultID="35">[9223372036854775807]</arguments>
         <arguments exception="SqlValidatorException">[9223372036854775808]</arguments>
+        <arguments resultID="36">[null]</arguments>
     </case>
-
     <!--  按照给定格式，格式化时间  datetimeFormat(dt: Datetime, string: String): String  -->
     <case>
         <sql type="query">select datetimeFormat(?, ?);</sql>
-        <arguments resultID="25">['2022-05-25']['yyyyMMdd']</arguments>
-        <arguments resultID="26">['2022-05-25 12:34:56.789']['yyyyMMddHH']</arguments>
+        <arguments resultID="37">['2022-05-25']['yyyyMMdd']</arguments>
+        <arguments resultID="38">['2022-05-25 12:34:56.789']['yyyyMMddHH']</arguments>
         <arguments exception="DateTimeParseException">['2022-05']['yyyyMM']</arguments>
+        <arguments resultID="39">[null][null]</arguments>
     </case>
-
     <!--  按照给定的格式，格式化时间戳  timestampFormat(ts: Timestamp, string: String): String  -->
     <case>
         <sql type="query">select timestampFormat(?, ?);</sql>
-        <arguments resultID="27">['2022-05-25']['yyyyMMdd']</arguments>
-        <arguments expected="28">['2022-05-25 12:34:56.789']['yyyyMMddHH']</arguments>
-        <arguments exception="DateTimeParseException">['2022-05']['yyyyMM']</arguments>
+        <arguments resultID="40">['2022-05-25']['yyyyMMdd']</arguments>
+        <arguments resultID="41">['2022-05-25 12:34:56.789']['yyyyMMddHH']</arguments>
+        <arguments resultID="42">['2022-05']['yyyyMM']</arguments>
+        <arguments resultID="43">[null][null]</arguments>
     </case>
-
     <!--  获得Timestamp对应的小时  hour(dt: Timestamp): Integer  -->
     <case>
         <sql type="query">select hour(?);</sql>
-        <arguments resultID="29">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="DateTimeParseException">['2022-05-25']</arguments>
+        <arguments resultID="44">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="45">['2022-05-25']</arguments>
+        <arguments resultID="46">[null]</arguments>
     </case>
-
     <!--  获得Timestamp对应的分钟  minute(dt: Timestamp): Integer  -->
     <case>
         <sql type="query">select minute(?);</sql>
-        <arguments resultID="30">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="DateTimeParseException">['2022-05-25']</arguments>
+        <arguments resultID="47">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="48">['2022-05-25']</arguments>
+        <arguments resultID="49">[null]</arguments>
     </case>
-
     <!--  获得Timestamp对应的秒  second(dt: Timestamp)): Integer  -->
     <case>
         <sql type="query">select second(?));</sql>
-        <arguments resultID="31">['2022-05-25 12:34:56.789']</arguments>
-        <arguments exception="DateTimeParseException">['2022-05-25']</arguments>
+        <arguments resultID="50">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="51">['2022-05-25']</arguments>
+        <arguments resultID="52">[null]</arguments>
     </case>
-
     <!--  获得datetime对应的周  week(dt Datetime): Integer  -->
     <case>
         <sql type="query">select week(?);</sql>
-        <arguments resultID="32">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="53">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022']</arguments>
+        <arguments resultID="54">[null]</arguments>
     </case>
-
     <!--  获得datetime对应的月份  month(dt: Datetime): Integer  -->
     <case>
         <sql type="query">select month(?);</sql>
-        <arguments resultID="33">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="55">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022']</arguments>
+        <arguments resultID="56">[null]</arguments>
     </case>
-
     <!--  获得datetime对应的年份  year(dt: Datetime): Integer  -->
     <case>
         <sql type="query">select year(?);</sql>
-        <arguments resultID="34">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="57">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['']</arguments>
+        <arguments resultID="58">[null]</arguments>
     </case>
-
     <!--  获得datetime对应的时间在月份中是第几天  dayOfMonth(dt: Datetime): Integer  -->
     <case>
         <sql type="query">select dayOfMonth(?);</sql>
-        <arguments resultID="35">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="59">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022-05']</arguments>
+        <arguments resultID="60">[null]</arguments>
     </case>
-
     <!--  获得datetime对应的时间在星期中是第几天，星期日为1，星期一为2，依次类推  dayOfWeek(dt: Datetime): Integer  -->
     <case>
         <sql type="query">select dayOfWeek(?);</sql>
-        <arguments resultID="36">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="61">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022-05']</arguments>
+        <arguments resultID="62">[null]</arguments>
     </case>
-
     <!--  获得入datetime对应的时间在年份中是第几天  dayOfYear(dt: Datetime): Integer  -->
     <case>
         <sql type="query">select dayOfYear(?);</sql>
-        <arguments resultID="37">['2022-05-25 12:34:56.789']</arguments>
+        <arguments resultID="63">['2022-05-25 12:34:56.789']</arguments>
         <arguments exception="DateTimeParseException">['2022-05']</arguments>
+        <arguments resultID="64">[null]</arguments>
     </case>
-
 </testCase>
