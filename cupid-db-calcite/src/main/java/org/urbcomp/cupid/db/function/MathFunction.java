@@ -52,7 +52,6 @@ public class MathFunction {
             || base.doubleValue() == 1
             || num.doubleValue() == 0) return null;
         double res = Math.log(num.doubleValue()) / Math.log(base.doubleValue());
-        if (res % 1 == 0) return res;
         return BigDecimal.valueOf(res);
     }
 
