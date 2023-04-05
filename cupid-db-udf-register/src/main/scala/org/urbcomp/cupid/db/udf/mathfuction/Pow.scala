@@ -39,9 +39,8 @@ class Pow extends Serializable with AbstractUdf {
     * @return double
     */
   def udfImpl(a: BigDecimal, b: BigDecimal): BigDecimal = {
-    if (base == null || num == null || base.doubleValue <= 0 || base.doubleValue == 1 || num.doubleValue == 0)
-      return null
-    val res = Math.log(num.doubleValue) / Math.log(base.doubleValue)
+    if (a == null || b == null) return null
+    val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)
   }
 

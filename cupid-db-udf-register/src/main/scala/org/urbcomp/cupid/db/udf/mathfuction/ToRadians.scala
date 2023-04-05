@@ -18,12 +18,11 @@ package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-
 import java.math.BigDecimal
 
-class Pi extends Serializable with AbstractUdf {
+class ToRadians extends Serializable with AbstractUdf {
 
-  override def name(): String = "pi"
+  override def name(): String = "toRadians"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -32,13 +31,17 @@ class Pi extends Serializable with AbstractUdf {
   override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
-    * The double value that is closer than any other to pi
+    * Converts an angle measured in degrees to an approximately equivalent angle measured in radians.
+    * The conversion from degrees to radians is generally inexact.
     *
-    * @return PI double.
+    * @param angDeg double
+    * @return double
     */
-  def udfImpl(): BigDecimal = {
-    BigDecimal.valueOf(Math.PI)
+  def udfImpl(angDeg: BigDecimal): BigDecimal = {
+    if (angDeg == null) return null
+    val res = Math.toRadians(angDeg.doubleValue)
+    BigDecimal.valueOf(res)
   }
 
-  def udfWrapper: () => BigDecimal = udfImpl
+  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }

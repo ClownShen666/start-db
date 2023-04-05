@@ -21,9 +21,9 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Pi extends Serializable with AbstractUdf {
+class Floor extends Serializable with AbstractUdf {
 
-  override def name(): String = "pi"
+  override def name(): String = "floor"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
@@ -31,14 +31,11 @@ class Pi extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  /**
-    * The double value that is closer than any other to pi
-    *
-    * @return PI double.
-    */
-  def udfImpl(): BigDecimal = {
-    BigDecimal.valueOf(Math.PI)
+  def udfImpl(a: BigDecimal): BigDecimal = {
+    if (a == null) return null
+    BigDecimal.valueOf(Math.floor(a.doubleValue))
+
   }
 
-  def udfWrapper: () => BigDecimal = udfImpl
+  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }
