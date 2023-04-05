@@ -25,10 +25,21 @@ package org.urbcomp.cupid.db.function;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 public class OtherFunction {
+    private static final String version = "1.0.0-SNAPSHOT";
 
     @CupidDBFunction("database")
     public String database() {
         return SqlParam.CACHE.get().getDbName();
+    }
+
+    /*
+     * the value of version is stored in this file
+     * if you want to change the version value
+     * just change the value in this file
+     */
+    @CupidDBFunction("version")
+    public String version() {
+        return version;
     }
 
 }
