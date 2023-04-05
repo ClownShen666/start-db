@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.{assertNotNull, assertTrue}
+import org.junit.Assert.assertNotNull
 
 class OtherFunctionTest extends AbstractCalciteFunctionTest {
 
