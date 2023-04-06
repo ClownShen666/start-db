@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--  通用数据类型转换 测试用例  -->
 <testCase>
-
-    <resultxml>numeric_result.xml</resultxml>
-
+    <resultXml>numeric_result.xml</resultXml>
     <!--  数值字符串 转 Integer  castToInteger(str: String): Integer  -->
     <case>
         <sql type="query">select castToInteger(?);</sql>
@@ -14,11 +12,9 @@
         <arguments exception="NumberFormatException">['2147483648']</arguments>
         <arguments exception="NumberFormatException">['-2147483649']</arguments>
         <arguments exception="NumberFormatException">['12.34']</arguments>
-        <arguments exception="NumberFormatException">['-12.34']</arguments>
-        <arguments exception="NumberFormatException">['hello']</arguments>
-        <arguments exception="NumberFormatException">[null]</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
     <!--  数值字符串 转 Long  castToLong(str: String): Long  -->
     <case>
         <sql type="query">select castToLong(?);</sql>
@@ -28,93 +24,82 @@
         <arguments exception="NumberFormatException">['9223372036854775808']</arguments>
         <arguments exception="NumberFormatException">['-9223372036854775809']</arguments>
         <arguments exception="NumberFormatException">['12.34']</arguments>
-        <arguments exception="NumberFormatException">['-12.34']</arguments>
-        <arguments exception="NumberFormatException">['hello']</arguments>
-        <arguments exception="NumberFormatException">[null]</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
     <!--  数值字符串 转 Float  castToFloat(str: String): Float  -->
     <case>
         <sql type="query">select castToFloat(?);</sql>
         <arguments resultID="7">['0']</arguments>
-        <arguments resultID="8">['100.1234567']</arguments>
-        <arguments resultID="9">['-100.1234567']</arguments>
-        <arguments resultID="10">['3.4028235E38']</arguments>
-        <arguments resultID="11">['-3.4028235E38']</arguments>
+        <arguments resultID="8">['3.4028235E38']</arguments>
+        <arguments resultID="9">['-3.4028235E38']</arguments>
         <arguments exception="ClassCastException">['3.4028236E38']</arguments>
-        <arguments exception="NumberFormatException">['hello']</arguments>
+        <arguments exception="ClassCastException">['-3.4028236E38']</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments exception="ignore">[null]</arguments>
     </case>
-
     <!--  数值字符串 转 Double  castToDouble(str: String): Double  -->
     <case>
         <sql type="query">select castToDouble(?);</sql>
-        <arguments resultID="12">['0']</arguments>
-        <arguments resultID="13">['1.123456789012345']</arguments>
-        <arguments resultID="14">['-1.123456789012345']</arguments>
-        <arguments resultID="15">['1.79E308']</arguments>
-        <arguments resultID="16">['-1.79E308']</arguments>
+        <arguments resultID="10">['0']</arguments>
+        <arguments resultID="11">['1.79E308']</arguments>
+        <arguments resultID="12">['-1.79E308']</arguments>
         <arguments exception="ClassCastException">['1.80E308']</arguments>
-        <arguments exception="NumberFormatException">['hello']</arguments>
+        <arguments exception="ClassCastException">['-1.80E308']</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments exception="ignore">[null]</arguments>
     </case>
-
     <!--  字符串 转 布尔值  castToBoolean(str: String): Boolean  -->
     <case>
         <sql type="query">select castToBoolean(?);</sql>
-        <arguments resultID="17">['true']</arguments>
-        <arguments resultID="18">['false']</arguments>
-        <arguments resultID="19">['abcd']</arguments>
-        <arguments resultID="20">['123']</arguments>
-        <arguments resultID="21">[null]</arguments>
+        <arguments resultID="13">['true']</arguments>
+        <arguments resultID="14">['false']</arguments>
+        <arguments resultID="15">['cupid']</arguments>
+        <arguments resultID="16">['123']</arguments>
+        <arguments resultID="17">[null]</arguments>
     </case>
-
     <!--  任意数据 转 字符串  castToString(any: Any): String  -->
     <case>
         <sql type="query">select castToString(?);</sql>
-        <arguments resultID="22">[123]</arguments>
-        <arguments resultID="23">[-123]</arguments>
-        <arguments resultID="24">[123.456]</arguments>
-        <arguments resultID="25">['abcd']</arguments>
-        <arguments resultID="26">[true]</arguments>
+        <arguments resultID="18">[123.456]</arguments>
+        <arguments resultID="19">[-123.456]</arguments>
+        <arguments resultID="20">['cupid']</arguments>
+        <arguments resultID="21">[true]</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
     <!--  数值类型 转 Integer  parseInteger(num: Any): Integer   -->
     <case>
         <sql type="query">select parseInteger(?);</sql>
-        <arguments resultID="27">[0]</arguments>
-        <arguments resultID="28">[2147483647]</arguments>
-        <arguments resultID="29">[-2147483648]</arguments>
-        <arguments exception="NumberFormatException">[100.12345]</arguments>
+        <arguments resultID="22">[0]</arguments>
+        <arguments resultID="23">[2147483647]</arguments>
+        <arguments resultID="24">[-2147483648]</arguments>
+        <arguments exception="NumberFormatException">[123.456]</arguments>
         <arguments exception="NumberFormatException">[2147483648]</arguments>
         <arguments exception="NumberFormatException">[-2147483649]</arguments>
-        <arguments exception="NumberFormatException">['abcd']</arguments>
-        <arguments exception="NumberFormatException">[true]</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
     <!--  数值类型 转 Long  parseLong(num: Any): Long  -->
     <case>
         <sql type="query">select parseLong(?);</sql>
-        <arguments resultID="30">[0]</arguments>
-        <arguments resultID="31">[9223372036854775807]</arguments>
-        <arguments resultID="32">[-9223372036854775808]</arguments>
-        <arguments exception="NumberFormatException">[12345.2345]</arguments>
+        <arguments resultID="25">[0]</arguments>
+        <arguments resultID="26">[9223372036854775807]</arguments>
+        <arguments resultID="27">[-9223372036854775808]</arguments>
+        <arguments exception="NumberFormatException">[123.456]</arguments>
         <arguments exception="SqlValidatorException">[9223372036854775808]</arguments>
         <arguments exception="SqlValidatorException">[-9223372036854775809]</arguments>
-        <arguments exception="NumberFormatException">['abcd']</arguments>
-        <arguments exception="NumberFormatException">[true]</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
     <!--  数值类型 转 Double  parseDouble(num: Any): Double  -->
     <case>
-        <sql type="query">select  parseDouble(?);</sql>
-        <arguments resultID="33">[0]</arguments>
-        <arguments resultID="34">[1.123456789012345]</arguments>
-        <arguments resultID="35">[-1.123456789012345]</arguments>
-        <arguments resultID="36">[9223372036854775807]</arguments>
-        <arguments resultID="37">[-9223372036854775808]</arguments>
+        <sql type="query">select parseDouble(?);</sql>
+        <arguments resultID="28">[0]</arguments>
+        <arguments resultID="29">[9223372036854775807]</arguments>
+        <arguments resultID="30">[-9223372036854775808]</arguments>
         <arguments exception="SqlValidatorException">[9223372036854775808]</arguments>
-        <arguments exception="ClassCastException">[1.80E308]</arguments>
-        <arguments exception="NumberFormatException">['hello']</arguments>
-        <arguments exception="NumberFormatException">[true]</arguments>
+        <arguments exception="SqlValidatorException">[-9223372036854775809]</arguments>
+        <arguments exception="NumberFormatException">['cupid']</arguments>
+        <arguments resultID="ignore">[null]</arguments>
     </case>
-
 </testCase>

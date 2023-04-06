@@ -162,6 +162,10 @@ public class TimeFunction {
      */
     @CupidDBFunction("toDatetime")
     public LocalDateTime toDatetime(String dateString, String format) throws DateTimeException {
+        if (dateString.length() == 10) {
+            dateString += " 00:00:00";
+            format += " HH:mm:ss";
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format.trim());
         return LocalDateTime.parse(dateString, formatter);
     }
@@ -193,7 +197,7 @@ public class TimeFunction {
         }
         if (!isCorrect && pe != null) {
             throw new DateTimeParseException(
-                "Date format is error. Only receive. " + String.join(",", DEFAULT_FORMATS),
+                "Date format is error. Only receive " + String.join(",", DEFAULT_FORMATS),
                 dateString,
                 pe.getErrorIndex()
             );
@@ -230,7 +234,11 @@ public class TimeFunction {
      */
     @CupidDBFunction("timestampToDatetime")
     public LocalDateTime timestampToDatetime(Timestamp timestamp) {
-        return toDateTime(timestamp.toString());
+        String tsString = timestamp.toString();
+        if (tsString.length() != 23) {
+            tsString = tsString.substring(0, tsString.length() - 2);
+        }
+        return toDateTime(tsString);
     }
 
     /**

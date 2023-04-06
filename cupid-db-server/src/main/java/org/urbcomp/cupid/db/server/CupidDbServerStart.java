@@ -26,10 +26,13 @@ import org.urbcomp.cupid.db.spark.data.RemoteServer;
 /**
  * @author jimo
  **/
-public class Main {
+public class CupidDbServerStart {
 
     public static void main(String[] args) throws Exception {
+        start();
+    }
 
+    public static void start() throws Exception {
         final RemoteServer remoteServer = new RemoteServer(DynamicConfig.getRemoteServerPort());
         remoteServer.start();
         // open for test grpc
