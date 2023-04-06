@@ -26,6 +26,7 @@ import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam}
 import org.urbcomp.cupid.db.udf.UdfFactory
 import org.slf4j.Logger
+
 import scala.reflect.runtime.universe._
 import scala.reflect.api
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
@@ -97,7 +98,6 @@ object SparkQueryExecutor {
             def apply[U <: api.Universe with Singleton](m: api.Mirror[U]): U#Type =
               tpe.asInstanceOf[U#Type]
           })
-
         method match {
           case method: Function0[rt] =>
             spark.udf.register(name, method)(typeToTypeTag[rt](functionType.typeArgs(0)))

@@ -18,17 +18,23 @@ package org.urbcomp.cupid.db.spark.data;
 
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import org.urbcomp.cupid.db.datatype.StructTypeJson;
 import org.urbcomp.cupid.db.spark.cache.ResultCacheFactory;
+import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer;
 
 @Slf4j
 public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
 
     @Override
     public void sendSchema(
-        GrpcRemote.SchemaRequest request,
+        GrpcRemote.SchemaRequest schemaRequest,
         StreamObserver<GrpcRemote.SchemaResponse> responseObserver
     ) {
-        ResultCacheFactory.getGlobalInstance().addSchema(request);
+        ResultCacheFactory.getGlobalInstance()
+            .addSchema(
+                schemaRequest.getSqlId(),
+                StructTypeJson.deserializeJson(schemaRequest.getSchemaJson())
+            );
 
         final GrpcRemote.SchemaResponse response = GrpcRemote.SchemaResponse.newBuilder()
             .setRes("ok")
@@ -43,8 +49,12 @@ public class RemoteServiceImpl extends RemoteServiceGrpc.RemoteServiceImplBase {
     ) {
         return new StreamObserver<GrpcRemote.RowRequest>() {
             @Override
-            public void onNext(GrpcRemote.RowRequest rowRequest) {
-                ResultCacheFactory.getGlobalInstance().addRow(rowRequest);
+            public void onNext(GrpcRemote.RowRequest request) {
+                ResultCacheFactory.getGlobalInstance()
+                    .addRow(
+                        request.getSqlId(),
+                        SparkDataSerializer.deserialize(request.getData().toByteArray())
+                    );
             }
 
             @Override

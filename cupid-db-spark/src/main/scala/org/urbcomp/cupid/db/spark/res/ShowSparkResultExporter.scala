@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.res
 
 import org.apache.spark.sql.DataFrame
+import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
 class ShowSparkResultExporter extends ISparkResultExporter {
@@ -24,4 +25,6 @@ class ShowSparkResultExporter extends ISparkResultExporter {
   override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
     data.show()
   }
+
+  override def getType: DataExportType = DataExportType.PRINT
 }

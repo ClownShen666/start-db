@@ -31,7 +31,7 @@ public class SparkExecutor {
      * 如果是异步，那么只返回一个提交成功
      */
     public <T> MetadataResult<T> execute(SparkSqlParam param) {
-        final ISparkSubmitter submitter = ISparkSubmitter.getInstance();
+        final ISparkSubmitter submitter = ISparkSubmitter.getInstance(param.getExecuteEngine());
         final SubmitResult res = submitter.submit(param);
         if (param.isAsync()) {
             // TODO 记录执行任务到缓存队列

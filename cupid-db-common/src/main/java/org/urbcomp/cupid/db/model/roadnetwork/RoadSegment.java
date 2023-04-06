@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @JsonSerialize(using = RoadSegmentSerializer.class)
 @JsonDeserialize(using = RoadSegmentDeserializer.class)
-public class RoadSegment {
+public class RoadSegment implements java.io.Serializable {
     // road segment id
     private final int roadSegmentId;
     // the road geometry

@@ -112,4 +112,8 @@ public class DynamicConfig {
     public static String getResultDataName(String sqlId) {
         return sqlId + "_data";
     }
+
+    public static String getHBaseZookeepers() {
+        return properties.getProperty("hbase.zookeepers", "127.0.0.1:2181");
+    }
 }

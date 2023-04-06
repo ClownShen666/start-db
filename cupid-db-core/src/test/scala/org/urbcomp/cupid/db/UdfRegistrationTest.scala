@@ -43,4 +43,14 @@ class UdfRegistrationTest extends AbstractCalciteFunctionTest {
       assertEquals(0, u + 1 - v)
     }
   }
+
+  test("reverse") {
+    val statement = connect.createStatement
+    val resultSet = statement.executeQuery("select reverse('abcde')")
+    resultSet.next()
+    assertEquals("edcba", resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select reverse(null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
+  }
 }
