@@ -18,19 +18,18 @@ package org.urbcomp.cupid.db.udf
 
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class AddOneUdf extends Serializable with AbstractUdf {
+class AddUdf extends AbstractUdf {
 
-  override def name(): String = "AddOne"
+  override def name(): String = "AddOverload"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(x: Int): Int = {
+  def evaluate(x: Int): Int = {
     x + 1
   }
 
-  def udfWrapper: Int => Int = udfImpl
+  def evaluate(x: Int, y: Int): Int = {
+    x + y
+  }
+
 }

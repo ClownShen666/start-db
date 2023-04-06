@@ -38,6 +38,8 @@ import org.urbcomp.cupid.db.udf.DataEngine.Calcite
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.util.LogUtil
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * Schema Factory of Geomesa
   *
@@ -58,25 +60,22 @@ class GeomesaSchemaFactory extends SchemaFactory {
     new GeomesaSchema
   }
 
-  def findMethod[T](clazz: Class[T], name: String): Boolean = {
-    clazz.getMethods.foreach { method: Method =>
-      if (method.getName == name && !method.isBridge) return true
-    }
-    false
+  def getAllMethods[T](clazz: Class[T], name: String): Array[Method] = {
+    clazz.getMethods.filter(method => method.getName == name && !method.isBridge)
   }
 
   private def initUdf(schemaPlus: SchemaPlus): Unit = {
     new UdfFactory().getUdfMap(Calcite).foreach {
       case (name, clazz) =>
-        val instance = clazz.newInstance()
-        val udfCalciteEntryName: String =
-          clazz.getDeclaredMethod("udfCalciteEntryName").invoke(instance).asInstanceOf[String]
-        val function: Function = ScalarFunctionImpl.create(clazz, udfCalciteEntryName)
-        if (function != null) {
-          log.warn("Calcite registers udf " + name)
-          schemaPlus.add(name, function)
-        } else {
-          log.warn("Calcite cannot register udf " + name)
+        getAllMethods(clazz, "evaluate").foreach {
+          case method: Method =>
+            val function: Function = ScalarFunctionImpl.create(method)
+            if (function != null) {
+              log.warn("Calcite registers udf " + name + " using " + method.toString)
+              schemaPlus.add(name, function)
+            } else {
+              log.warn("Calcite cannot register udf " + name)
+            }
         }
     }
     new UdfFactory().getUdtfMap(Calcite).foreach {

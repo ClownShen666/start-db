@@ -19,17 +19,11 @@ package org.urbcomp.cupid.db.udf.stringfunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class CharLengthUdf extends Serializable with AbstractUdf {
+class CharLengthUdf extends AbstractUdf {
   override def name(): String = "charLength"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(str: String): Integer =
+  def evaluate(str: String): Integer =
     if (str == null) null else str.length
-
-  def udfWrapper: String => Integer = udfImpl
 }
