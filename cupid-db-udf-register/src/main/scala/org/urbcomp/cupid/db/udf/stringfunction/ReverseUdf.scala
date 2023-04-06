@@ -19,21 +19,15 @@ package org.urbcomp.cupid.db.udf.stringfunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class ReverseUdf extends Serializable with AbstractUdf {
+class ReverseUdf extends AbstractUdf {
   override def name(): String = "reverse"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(str: String): String =
+  def evaluate(str: String): String =
     if (str == null) null
     else {
       new StringBuffer(str).reverse().toString
     }
-
-  def udfWrapper: String => String = udfImpl
 
 }

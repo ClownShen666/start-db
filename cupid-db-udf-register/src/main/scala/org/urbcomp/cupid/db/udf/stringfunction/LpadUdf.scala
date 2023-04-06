@@ -21,16 +21,12 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import scala.collection.mutable
 
-class LpadUdf extends Serializable with AbstractUdf with Pad {
+class LpadUdf extends AbstractUdf with Pad {
   override def name(): String = "lpad"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(str: String, len: Int): String = {
+  def evaluate(str: String, len: Int): String = {
     if (str == null) null
     else {
       val sb = new mutable.StringBuilder()
@@ -42,6 +38,5 @@ class LpadUdf extends Serializable with AbstractUdf with Pad {
       sb + str
     }
   }
-  def udfWrapper: (String, Int) => String = udfImpl
 
 }

@@ -21,15 +21,11 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Pow extends Serializable with AbstractUdf {
+class Pow extends AbstractUdf {
 
   override def name(): String = "pow"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
     * Returns the value of the first argument raised to the power of the second argument.
@@ -38,11 +34,9 @@ class Pow extends Serializable with AbstractUdf {
     * @param b double
     * @return double
     */
-  def udfImpl(a: BigDecimal, b: BigDecimal): BigDecimal = {
+  def evaluate(a: BigDecimal, b: BigDecimal): BigDecimal = {
     if (a == null || b == null) return null
     val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = udfImpl
 }

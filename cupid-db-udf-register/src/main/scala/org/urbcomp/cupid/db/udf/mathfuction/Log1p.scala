@@ -21,15 +21,11 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Log1p extends Serializable with AbstractUdf {
+class Log1p extends AbstractUdf {
 
   override def name(): String = "log1p"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
     * Returns the natural logarithm of a double value (num) + 1.
@@ -37,11 +33,10 @@ class Log1p extends Serializable with AbstractUdf {
     * @param num double
     * @return double
     */
-  def udfImpl(num: BigDecimal): BigDecimal = {
+  def evaluate(num: BigDecimal): BigDecimal = {
     if (num == null || num.doubleValue <= -1) return null
     val res = Math.log1p(num.doubleValue)
     BigDecimal.valueOf(res)
   }
 
-  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }

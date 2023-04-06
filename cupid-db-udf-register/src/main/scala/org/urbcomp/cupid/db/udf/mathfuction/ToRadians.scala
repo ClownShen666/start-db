@@ -20,15 +20,11 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import java.math.BigDecimal
 
-class ToRadians extends Serializable with AbstractUdf {
+class ToRadians extends AbstractUdf {
 
   override def name(): String = "toRadians"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
 
   /**
     * Converts an angle measured in degrees to an approximately equivalent angle measured in radians.
@@ -37,11 +33,9 @@ class ToRadians extends Serializable with AbstractUdf {
     * @param angDeg double
     * @return double
     */
-  def udfImpl(angDeg: BigDecimal): BigDecimal = {
+  def evaluate(angDeg: BigDecimal): BigDecimal = {
     if (angDeg == null) return null
     val res = Math.toRadians(angDeg.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }

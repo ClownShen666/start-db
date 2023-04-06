@@ -16,12 +16,10 @@
  */
 package org.urbcomp.cupid.db.udf
 
+import org.apache.hadoop.hive.ql.exec.UDF
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-trait AbstractUdf {
-
+trait AbstractUdf extends UDF {
   def name(): String
   def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  def udfCalciteEntryName(): String
-  def udfSparkEntryName(): String
 }

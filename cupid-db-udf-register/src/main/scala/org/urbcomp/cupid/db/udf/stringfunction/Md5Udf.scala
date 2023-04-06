@@ -21,16 +21,12 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.security.MessageDigest
 
-class Md5Udf extends Serializable with AbstractUdf {
+class Md5Udf extends AbstractUdf {
   override def name(): String = "md5"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(str: String): String = {
+  def evaluate(str: String): String = {
     val hexDigits =
       Array[Char]('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
     val btInput = str.getBytes()
@@ -48,7 +44,5 @@ class Md5Udf extends Serializable with AbstractUdf {
     }
     new String(code)
   }
-
-  def udfWrapper: String => String = udfImpl
 
 }

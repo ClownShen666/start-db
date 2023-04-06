@@ -19,17 +19,11 @@ package org.urbcomp.cupid.db.udf.stringfunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class ConcatUdf extends Serializable with AbstractUdf {
+class ConcatUdf extends AbstractUdf {
   override def name(): String = "concat"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(str1: String, str2: String): String =
+  def evaluate(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)
-
-  def udfWrapper: (String, String) => String = udfImpl
 }

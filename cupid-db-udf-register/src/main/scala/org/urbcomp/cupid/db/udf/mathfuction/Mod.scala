@@ -21,23 +21,17 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Mod extends Serializable with AbstractUdf {
+class Mod extends AbstractUdf {
 
   override def name(): String = "mod"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def udfCalciteEntryName(): String = "udfImpl"
-
-  override def udfSparkEntryName(): String = "udfWrapper"
-
-  def udfImpl(a: BigDecimal, b: BigDecimal): BigDecimal = {
+  def evaluate(a: BigDecimal, b: BigDecimal): BigDecimal = {
     if (a == null || b == null) null
     else {
       val res = a.doubleValue % b.doubleValue
       BigDecimal.valueOf(res)
     }
   }
-
-  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = udfImpl
 }

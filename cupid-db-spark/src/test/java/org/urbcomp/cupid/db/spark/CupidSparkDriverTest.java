@@ -22,17 +22,6 @@ import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
 public class CupidSparkDriverTest {
-
-    private void execute(String sql) {
-        final SparkSqlParam param = new SparkSqlParam();
-        param.setUserName("root");
-        param.setDbName("default");
-        param.setSql(sql);
-        param.setExportType(DataExportType.PRINT);
-        param.setLocal(true);
-        SparkQueryExecutor.execute(param, null);
-    }
-
     @Test
     public void testExecute() {
         final SparkSqlParam param = new SparkSqlParam();
@@ -58,11 +47,24 @@ public class CupidSparkDriverTest {
     }
 
     @Test
-    public void testUdf() {
+    public void testUdf1() {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
         param.setDbName("default");
-        param.setSql("select AddOne(10) as addOne");
+        param.setEnableHiveSupport(true);
+        param.setSql("select AddOverload(10) as addOverload");
+        param.setExportType(DataExportType.PRINT);
+        param.setLocal(true);
+        SparkQueryExecutor.execute(param, null);
+    }
+
+    @Test
+    public void testUdf2() {
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setEnableHiveSupport(true);
+        param.setSql("select AddOverload(10, 20) as addOverload");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         SparkQueryExecutor.execute(param, null);
@@ -92,15 +94,20 @@ public class CupidSparkDriverTest {
         SparkQueryExecutor.execute(param, null);
     }
 
-    @Test
-    public void reverseTest() {
+    private void execute(String sql) {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
         param.setDbName("default");
-        param.setSql("select reverse('abc')");
+        param.setEnableHiveSupport(true);
+        param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         SparkQueryExecutor.execute(param, null);
+    }
+
+    @Test
+    public void reverseTest() {
+        execute("select reverse('abc')");
     }
 
     @Test
