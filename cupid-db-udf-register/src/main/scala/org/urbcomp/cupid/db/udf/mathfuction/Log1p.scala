@@ -38,7 +38,7 @@ class Log1p extends Serializable with AbstractUdf {
     * @return double
     */
   def udfImpl(num: BigDecimal): BigDecimal = {
-    if (num == null || num.doubleValue <= 0) return null
+    if (num == null || num.doubleValue <= -1) return null
     val res = Math.log1p(num.doubleValue)
     BigDecimal.valueOf(res)
   }
