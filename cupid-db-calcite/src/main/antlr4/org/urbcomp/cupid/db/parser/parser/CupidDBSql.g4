@@ -21,6 +21,7 @@ stmt :
      | dropDatabaseStmt
      | dropTableStmt
      | dropTableIndexStmt
+     | dropIndexStmt
      | truncateStmt
      | useStmt
      | showDatabasesStmt
@@ -168,6 +169,10 @@ createIndexCol :
 
 dropTableIndexStmt :
         T_DROP T_INDEX indexName=L_ID T_ON tableName
+     ;
+
+dropIndexStmt:
+        T_DROP (T_SPATIAL | T_ATTRIBUTE) T_INDEX indexName=L_ID T_ON tableName
      ;
 
 dtype_default :
