@@ -22,5 +22,6 @@ package org.urbcomp.cupid.db.model.data;
 public enum DataExportType {
     PRINT,
     HDFS,
-    CACHE
+    CACHE,
+    LOCAL
 }

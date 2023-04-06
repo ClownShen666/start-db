@@ -24,4 +24,5 @@ public class UdfFactoryTest {
         UdfFactory factory = new UdfFactory();
         assert (factory.getEngineUdfMap().size() == 2);
     }
+
 }

@@ -17,8 +17,6 @@
 package org.urbcomp.cupid.db.spark.cache;
 
 import org.urbcomp.cupid.db.datatype.DataTypeField;
-import org.urbcomp.cupid.db.datatype.StructTypeJson;
-import org.urbcomp.cupid.db.spark.data.GrpcRemote;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,18 +34,13 @@ public class ResultCacheByMap implements IResultCache {
     private final static Map<String, List<Object[]>> ROW_CACHE = new ConcurrentHashMap<>();
 
     @Override
-    public void addRow(GrpcRemote.RowRequest request) {
-        final String sqlId = request.getSqlId();
-        ROW_CACHE.computeIfAbsent(sqlId, s -> new ArrayList<>(8))
-            .add(SparkDataSerializer.deserialize(request.getData().toByteArray()));
+    public void addRow(String sqlId, Object[] row) {
+        ROW_CACHE.computeIfAbsent(sqlId, s -> new ArrayList<>(8)).add(row);
     }
 
     @Override
-    public void addSchema(GrpcRemote.SchemaRequest schemaRequest) {
-        SCHEMA_CACHE.put(
-            schemaRequest.getSqlId(),
-            StructTypeJson.deserializeJson(schemaRequest.getSchemaJson())
-        );
+    public void addSchema(String sqlId, List<DataTypeField> schema) {
+        SCHEMA_CACHE.put(sqlId, schema);
     }
 
     @Override

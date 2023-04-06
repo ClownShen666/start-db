@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 @JsonSerialize(using = TrajSerializer.class)
 @JsonDeserialize(using = TrajDeserializer.class)
-public class Trajectory {
+public class Trajectory implements java.io.Serializable {
     private String tid;
     private String oid;
     private List<GPSPoint> gpsPointList;

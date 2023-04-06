@@ -23,6 +23,16 @@ import org.urbcomp.cupid.db.util.SparkSqlParam;
 
 public class CupidSparkDriverTest {
 
+    private void execute(String sql) {
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setSql(sql);
+        param.setExportType(DataExportType.PRINT);
+        param.setLocal(true);
+        SparkQueryExecutor.execute(param, null);
+    }
+
     @Test
     public void testExecute() {
         final SparkSqlParam param = new SparkSqlParam();
@@ -81,4 +91,66 @@ public class CupidSparkDriverTest {
         param.setLocal(true);
         SparkQueryExecutor.execute(param, null);
     }
+
+    @Test
+    public void reverseTest() {
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setSql("select reverse('abc')");
+        param.setExportType(DataExportType.PRINT);
+        param.setLocal(true);
+        SparkQueryExecutor.execute(param, null);
+    }
+
+    @Test
+    public void charLengthTest() {
+        execute("select charLength('abc')");
+    }
+
+    @Test
+    public void concatTest() {
+        execute("select concat('abc','bcd')");
+    }
+
+    @Test
+    public void lengthTest() {
+        execute("select length('abc')");
+    }
+
+    @Test
+    public void locate() {
+        execute("select locate('bc', 'abcabc')");
+    }
+
+    @Test
+    public void lpad() {
+        execute("select lpad('abcde', 2)");
+    }
+
+    @Test
+    public void ltrim() {
+        execute("select ltrim('  abcde ')");
+    }
+
+    @Test
+    public void rpad() {
+        execute("select rpad('abcde',2)");
+    }
+
+    @Test
+    public void md5() {
+        execute("select md5('abcde')");
+    }
+
+    @Test
+    public void rtrim() {
+        execute("select rtrim('  abcde ')");
+    }
+
+    @Test
+    public void trim() {
+        execute("select trim('  abcde ')");
+    }
+
 }

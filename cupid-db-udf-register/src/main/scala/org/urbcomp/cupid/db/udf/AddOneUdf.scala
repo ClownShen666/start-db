@@ -28,7 +28,9 @@ class AddOneUdf extends Serializable with AbstractUdf {
 
   override def udfSparkEntryName(): String = "udfWrapper"
 
-  def udfImpl(x: Int): Int = { x + 1 }
+  def udfImpl(x: Int): Int = {
+    x + 1
+  }
 
   def udfWrapper: Int => Int = udfImpl
 }

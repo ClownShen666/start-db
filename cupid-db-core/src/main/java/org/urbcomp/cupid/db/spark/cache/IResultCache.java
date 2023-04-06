@@ -17,7 +17,6 @@
 package org.urbcomp.cupid.db.spark.cache;
 
 import org.urbcomp.cupid.db.datatype.DataTypeField;
-import org.urbcomp.cupid.db.spark.data.GrpcRemote;
 
 import java.util.List;
 
@@ -31,9 +30,9 @@ import java.util.List;
  **/
 public interface IResultCache {
 
-    void addRow(GrpcRemote.RowRequest request);
+    void addRow(String sqlId, Object[] row);
 
-    void addSchema(GrpcRemote.SchemaRequest schemaRequest);
+    void addSchema(String sqlId, List<DataTypeField> schema);
 
     List<DataTypeField> schema(String sqlId);
 

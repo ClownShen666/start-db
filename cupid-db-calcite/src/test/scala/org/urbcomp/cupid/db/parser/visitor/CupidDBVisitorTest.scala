@@ -18,7 +18,7 @@ package org.urbcomp.cupid.db.parser.visitor
 import org.apache.calcite.sql._
 import org.apache.calcite.sql.ddl.{SqlDropSchema, SqlDropTable}
 import org.apache.calcite.sql.parser.SqlParser
-import org.junit.Assert.{assertEquals, assertFalse, assertTrue}
+import org.junit.Assert.{assertEquals, assertFalse, assertNotNull, assertTrue}
 import org.scalatest.{BeforeAndAfterEach, FunSuite, nodurations}
 import org.urbcomp.cupid.db.parser.CupidDBSQLSamples
 import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
@@ -170,4 +170,26 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals(4, node.columnList.size())
   }
 
+  test("invalid create table sql will fail with exception") {
+    val sql = s"""CREATE TABLE gemo_%s (
+                            |    name String,
+                            |    st Point,
+                            |    dtg Datetime
+                            |    SPATIAL INDEX spatial_index2(st, dtg) type nonsense
+                            |)"""
+    val thrown = intercept[Exception] {
+      driver.parseSql(sql)
+    }
+    assertTrue(thrown.getMessage.contains("[Invalid SQL]"))
+
+    val sql2 = "CREATE TABLE IF EXISTS test_table (name String)"
+    val thrown2 = intercept[Exception] {
+      driver.parseSql(sql2)
+    }
+    assertTrue(thrown2.getMessage.contains("[Invalid SQL]"))
+
+    val sql3 = "CREATE TABLE IF NOT EXISTS test_table (name String)"
+    val node = driver.parseSql(sql3)
+    assertNotNull(node)
+  }
 }

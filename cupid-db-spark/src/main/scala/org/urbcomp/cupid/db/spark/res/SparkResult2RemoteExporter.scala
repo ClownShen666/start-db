@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.res
 
 import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.ds.remote.RemoteWriteSource
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
@@ -36,4 +37,6 @@ class SparkResult2RemoteExporter extends ISparkResultExporter {
       .option(SparkSqlParam.REMOTE_PORT_KEY, param.getRemotePort)
       .save()
   }
+
+  override def getType: DataExportType = DataExportType.CACHE
 }

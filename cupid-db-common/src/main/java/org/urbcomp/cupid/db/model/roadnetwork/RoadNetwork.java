@@ -35,17 +35,17 @@ import java.util.stream.Collectors;
 
 @JsonSerialize(using = RoadNetworkSerializer.class)
 @JsonDeserialize(using = RoadNetworkDeserializer.class)
-public class RoadNetwork {
+public class RoadNetwork implements java.io.Serializable {
     private final HashMap<Integer, RoadSegment> idToExpandedRoadSegment = new HashMap<>();
     private final List<RoadSegment> roadSegments;
 
-    private final Object directedRoadGraphLock = new Object();
+    private final LockObject directedRoadGraphLock = new LockObject();
     private volatile RoadGraph directedRoadGraph;
 
-    private final Object undirectedRoadGraphLock = new Object();
+    private final LockObject undirectedRoadGraphLock = new LockObject();
     private volatile RoadGraph undirectedRoadGraph;
 
-    private final Object roadRTreeLock = new Object();
+    private final LockObject roadRTreeLock = new LockObject();
     private volatile RTree<RoadSegment, Rectangle> roadRTree;
 
     public RoadNetwork(List<RoadSegment> roadSegments) {

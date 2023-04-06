@@ -21,6 +21,7 @@ import org.apache.spark.sql.types.Metadata
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.datatype.DataTypeField
+import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.util.{JacksonUtil, SparkSqlParam}
 
 /**
@@ -59,4 +60,6 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
     val json = md.json
     JSON.parseObject(json)
   }
+
+  override def getType: DataExportType = DataExportType.HDFS
 }
