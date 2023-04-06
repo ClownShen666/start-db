@@ -25,6 +25,7 @@ import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlDropIndex,
   SqlIndexDeclaration,
   SqlTruncateTable,
   SqlUseDatabase
@@ -36,6 +37,7 @@ import org.urbcomp.cupid.db.parser.dql.{
   SqlShowTables
 }
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
+import org.urbcomp.cupid.db.schema.IndexType
 import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 
 class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
@@ -116,6 +118,15 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val node = parsed.asInstanceOf[SqlDropTable]
     assertEquals(SqlKind.DROP_TABLE, node.getKind)
     assertEquals(tableName, node.name.names.get(0))
+  }
+
+  test("convert drop st-index statement to SqlNode") {
+    val parsed = driver.parseSql(CupidDBSQLSamples.DROP_INDEX_SAMPLE)
+    val node = parsed.asInstanceOf[SqlDropIndex]
+    assertEquals(SqlKind.DROP_INDEX, node.getKind)
+    assertEquals(IndexType.SPATIAL, node.indexType)
+    assertEquals("indexName", node.indexName)
+    assertEquals("tableName", node.tableName.names.get(0))
   }
 
   test("convert delete statement to SqlNode") {
