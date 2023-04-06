@@ -164,7 +164,7 @@ public class TimeFunction {
     public LocalDateTime toDatetime(String dateString, String format) throws DateTimeException {
         if (dateString.length() == 10) {
             dateString += " 00:00:00";
-            format = "yyyy-MM-dd HH:mm:ss";
+            format += " HH:mm:ss";
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format.trim());
         return LocalDateTime.parse(dateString, formatter);
