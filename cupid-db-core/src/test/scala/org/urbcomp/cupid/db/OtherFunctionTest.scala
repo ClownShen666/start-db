@@ -14,14 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.model.data;
+package org.urbcomp.cupid.db
 
-/**
- * @author jimo
- **/
-public enum DataExportType {
-    PRINT,
-    HDFS,
-    CACHE,
-    LOCAL
+import org.junit.Assert.assertNotNull
+
+class OtherFunctionTest extends AbstractCalciteFunctionTest {
+
+  test("version") {
+    val stmt = connect.createStatement()
+    val rs = stmt.executeQuery("select version()")
+    rs.next()
+    assertNotNull(rs.getObject(1))
+  }
 }

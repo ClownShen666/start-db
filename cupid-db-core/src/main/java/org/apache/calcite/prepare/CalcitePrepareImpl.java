@@ -80,12 +80,16 @@ import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.util.ImmutableIntList;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
 import org.urbcomp.cupid.db.parser.ddl.SqlCreateDatabase;
 import org.urbcomp.cupid.db.parser.ddl.SqlCupidCreateTable;
 import org.urbcomp.cupid.db.parser.ddl.SqlTruncateTable;
 import org.urbcomp.cupid.db.parser.ddl.SqlUseDatabase;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
+import org.urbcomp.cupid.db.spark.SparkExecutor;
+import org.urbcomp.cupid.db.util.SparkSqlParam;
+import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -722,6 +726,12 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     null,
                     Meta.StatementType.OTHER_DDL
                 );
+            }
+
+            final SqlParam sqlParam = SqlParam.CACHE.get();
+            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
+                sqlParam.setSql(query.sql);
+                return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
             }
 
             // modify start

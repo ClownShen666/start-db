@@ -19,6 +19,7 @@ package org.urbcomp.cupid.db.spark;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.config.DynamicConfig;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
@@ -26,10 +27,9 @@ import org.urbcomp.cupid.db.util.SparkSqlParam;
 import static org.junit.Assert.assertNotNull;
 import static org.urbcomp.cupid.db.config.DynamicConfig.DB_SPARK_JARS;
 
-@Ignore
 public class SparkExecutorTest {
 
-    @Test
+    @Ignore
     public void testExecute() {
         DynamicConfig.updateProperties(
             DB_SPARK_JARS,
@@ -41,6 +41,19 @@ public class SparkExecutorTest {
         final SparkSqlParam param = new SparkSqlParam();
         param.setExportType(DataExportType.PRINT);
         param.setSql("1+1");
+        final MetadataResult<Object> res = executor.execute(param);
+        assertNotNull(res);
+    }
+
+    @Test
+    public void testExecuteLocal() {
+        final SparkExecutor executor = new SparkExecutor();
+
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setLocal(true);
+        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExportType(DataExportType.LOCAL);
+        param.setSql("select 1+1");
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
     }

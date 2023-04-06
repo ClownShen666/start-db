@@ -14,35 +14,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark;
-
-import org.urbcomp.cupid.db.config.ExecuteEngine;
-import org.urbcomp.cupid.db.spark.livy.LivySubmitter;
-import org.urbcomp.cupid.db.util.SparkSqlParam;
-
-import java.util.concurrent.TimeoutException;
+package org.urbcomp.cupid.db.config;
 
 /**
  * @author jimo
  **/
-public interface ISparkSubmitter {
+public enum ExecuteEngine {
+    CALCITE("calcite"),
+    /**
+     * 表示在本地起一个local模式的spark执行，用于测试
+     */
+    SPARK_LOCAL("spark_local"),
+    /**
+     * 提交到远程spark执行
+     */
+    SPARK_CLUSTER("spark_cluster");
 
-    static ISparkSubmitter getInstance(ExecuteEngine engine) {
-        if (engine == ExecuteEngine.SPARK_LOCAL) {
-            return new LocalSparkSubmitter();
-        }
-        return new LivySubmitter();
+    private String value;
+
+    ExecuteEngine(String value) {
+        this.value = value;
     }
 
-    /**
-     * 提交到spark
-     *
-     * @return sqlId
-     */
-    SubmitResult submit(SparkSqlParam param);
+    public void setValue(String value) {
+        this.value = value;
+    }
 
-    /**
-     * 同步等待执行完成
-     */
-    void waitToFinish(SubmitResult res) throws TimeoutException;
+    public String getValue() {
+        return value;
+    }
+
+    public static boolean isSpark(ExecuteEngine engine) {
+        return (engine == SPARK_LOCAL || engine == SPARK_CLUSTER);
+    }
 }

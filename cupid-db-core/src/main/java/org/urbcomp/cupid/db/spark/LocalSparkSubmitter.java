@@ -14,17 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark.res
+package org.urbcomp.cupid.db.spark;
 
-import org.apache.spark.sql.DataFrame
-import org.urbcomp.cupid.db.util.SparkSqlParam
+import org.urbcomp.cupid.db.util.SparkSqlParam;
+
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 /**
-  * the interface to export spark dataframe data
-  *
-  * @author jimo
-  * */
-trait ISparkResultExporter {
+ * @author jimo
+ **/
+public class LocalSparkSubmitter implements ISparkSubmitter {
 
-  def exportData(param: SparkSqlParam, data: DataFrame): Unit
+    @Override
+    public SubmitResult submit(SparkSqlParam param) {
+        final String sqlId = UUID.randomUUID().toString();
+        param.setSqlId(sqlId);
+        SparkQueryExecutor.execute(param, null);
+        return SubmitResult.builder().sqlId(sqlId).build();
+    }
+
+    @Override
+    public void waitToFinish(SubmitResult res) throws TimeoutException {}
 }

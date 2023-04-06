@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.model.data;
+package org.urbcomp.cupid.db.spark.mapmatch
 
-/**
- * @author jimo
- **/
-public enum DataExportType {
-    PRINT,
-    HDFS,
-    CACHE,
-    LOCAL
+import org.scalatest.FunSuite
+import org.urbcomp.cupid.db.model.sample.ModelGenerator.{generateRoadNetwork, generateTrajectory}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
+
+class MapMatchTest extends FunSuite {
+
+  test("test map matching") {
+    val mapMatch: MapMatch = new MapMatch
+    val rn = generateRoadNetwork()
+    val traj = generateTrajectory()
+    val trajArray = Array[Trajectory](traj)
+    val result = mapMatch.mapMatch(rn, trajArray)
+
+    assertResult(result.get(0).getMmPtList.size())(117)
+  }
+
 }

@@ -63,5 +63,5 @@ CREATE TABLE IF NOT EXISTS `sys_field`
 
 
 -- 插入测试用户、库、表，DDL好了后就没必要手动插入了, 密码是 cupid-db
-INSERT INTO sys_user(id, name, password) VALUE (1, 'root', '8c63375da3a78421a04ed427367d8e89');
+INSERT INTO sys_user(id, name, password) VALUE (1, 'cupid_db', '8c63375da3a78421a04ed427367d8e89');
 INSERT INTO sys_database(id, user_id, name) VALUE (1, 1, 'default');

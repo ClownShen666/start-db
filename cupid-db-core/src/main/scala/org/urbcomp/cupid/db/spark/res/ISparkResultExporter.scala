@@ -14,14 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.model.data;
+package org.urbcomp.cupid.db.spark.res
+
+import org.apache.spark.sql.DataFrame
+import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
 /**
- * @author jimo
- **/
-public enum DataExportType {
-    PRINT,
-    HDFS,
-    CACHE,
-    LOCAL
+  * the interface to export spark dataframe data
+  *
+  * @author jimo
+  * */
+trait ISparkResultExporter {
+
+  def getType: DataExportType
+
+  def exportData(param: SparkSqlParam, data: DataFrame): Unit
 }

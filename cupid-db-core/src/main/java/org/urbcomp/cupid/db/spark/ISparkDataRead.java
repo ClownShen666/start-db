@@ -18,6 +18,7 @@ package org.urbcomp.cupid.db.spark;
 
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.model.data.DataExportType;
+import org.urbcomp.cupid.db.spark.reader.SparkDataReadCache;
 import org.urbcomp.cupid.db.spark.reader.SparkDataReadDummy;
 import org.urbcomp.cupid.db.spark.reader.SparkDataReadHdfs;
 
@@ -34,7 +35,9 @@ public interface ISparkDataRead {
                 return new SparkDataReadDummy();
             case HDFS:
                 return new SparkDataReadHdfs();
+            case LOCAL:
             case CACHE:
+                return new SparkDataReadCache();
             default:
                 throw new IllegalArgumentException("Not Support Type Yet:" + type);
         }

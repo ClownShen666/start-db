@@ -14,21 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark.res
+package org.urbcomp.cupid.db.model.roadnetwork;
 
-import org.urbcomp.cupid.db.model.data.DataExportType
-
-/**
-  * @author jimo
-  * */
-object SparkResultExporterFactory {
-
-  def getInstance(exportType: DataExportType): ISparkResultExporter = {
-    exportType match {
-      case DataExportType.PRINT => new ShowSparkResultExporter
-      case DataExportType.HDFS  => new SparkResult2HdfsExporter
-      case DataExportType.CACHE => new SparkResult2RemoteExporter
-      case _                    => throw new IllegalArgumentException("not support type now:" + exportType)
-    }
-  }
-}
+public class LockObject extends Object implements java.io.Serializable {}

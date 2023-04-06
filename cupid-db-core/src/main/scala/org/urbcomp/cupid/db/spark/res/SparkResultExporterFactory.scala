@@ -16,15 +16,36 @@
  */
 package org.urbcomp.cupid.db.spark.res
 
-import org.apache.spark.sql.DataFrame
 import org.urbcomp.cupid.db.model.data.DataExportType
-import org.urbcomp.cupid.db.util.SparkSqlParam
 
-class ShowSparkResultExporter extends ISparkResultExporter {
+import java.util.ServiceLoader
+import scala.collection.mutable
 
-  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
-    data.show()
+/**
+  * @author jimo
+  * */
+object SparkResultExporterFactory {
+
+  def getInstances: mutable.Map[DataExportType, ISparkResultExporter] = {
+    val exporters: ServiceLoader[ISparkResultExporter] =
+      ServiceLoader.load(classOf[ISparkResultExporter])
+    val it = exporters.iterator()
+    val map = new mutable.HashMap[DataExportType, ISparkResultExporter]()
+    while (it.hasNext) {
+      val exporter = it.next()
+      map.put(exporter.getType, exporter)
+    }
+    map
   }
 
-  override def getType: DataExportType = DataExportType.PRINT
+  private val INSTANCES = getInstances
+
+  def getInstance(exportType: DataExportType): ISparkResultExporter = {
+
+    val e = INSTANCES.get(exportType)
+    if (e == null) {
+      throw new IllegalArgumentException("not support type now:" + exportType)
+    }
+    e.get
+  }
 }

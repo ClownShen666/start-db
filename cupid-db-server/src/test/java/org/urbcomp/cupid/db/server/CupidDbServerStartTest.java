@@ -24,7 +24,7 @@ import java.sql.*;
 import static org.junit.Assert.assertTrue;
 
 @Ignore
-public class MainTest {
+public class CupidDbServerStartTest {
 
     @Test
     public void testJDBC() throws SQLException {
