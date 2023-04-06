@@ -1,0 +1,37 @@
+/* 
+ * Copyright (C) 2022  ST-Lab
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.urbcomp.cupid.db.udf.stringfunction
+
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+
+class LocateUdf extends Serializable with AbstractUdf {
+  override def name(): String = "locate"
+
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+
+  override def udfCalciteEntryName(): String = "udfImpl"
+
+  override def udfSparkEntryName(): String = "udfWrapper"
+
+  def udfImpl(substr: String, str: String): Integer =
+    if (substr == null || str == null) null
+    else str.indexOf(substr) + 1
+
+  def udfWrapper: (String, String) => Integer = udfImpl
+
+}

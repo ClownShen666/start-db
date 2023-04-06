@@ -81,7 +81,7 @@ public class MainTest {
     public void singleSQLCaseTest() throws Exception {
         // 执行单个xml测试用例文件
         String xmlResource = Objects.requireNonNull(
-            RunSingleSQLCase.class.getClassLoader().getResource("cases/stUdf/stDataTransform.xml")
+            RunSingleSQLCase.class.getClassLoader().getResource("cases/udf/math.xml")
         ).getPath();
         setResultIDbyOrder(xmlResource);
         runSingleCase(xmlResource);
