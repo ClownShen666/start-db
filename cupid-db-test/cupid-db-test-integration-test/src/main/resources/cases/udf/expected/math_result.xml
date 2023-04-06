@@ -16,7 +16,7 @@
 
     <result id="3">
         <column name="EXPR$0" type="double">
-            <row>0.0</row>
+            <row>null</row>
         </column>
     </result>
 
@@ -40,7 +40,7 @@
 
     <result id="7">
         <column name="EXPR$0" type="double">
-            <row>0.0</row>
+            <row>null</row>
         </column>
     </result>
 
@@ -69,91 +69,91 @@
     </result>
 
     <result id="12">
-        <column name="EXPR$0" type="int">
-            <row>100</row>
+        <column name="EXPR$0" type="double">
+            <row>100.0</row>
         </column>
     </result>
 
     <result id="13">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>0.0</row>
         </column>
     </result>
 
     <result id="14">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>100.123</row>
         </column>
     </result>
 
     <result id="15">
-        <column name="EXPR$0" type="decimal">
-            <row>2</row>
+        <column name="EXPR$0" type="double">
+            <row>2.0</row>
         </column>
     </result>
 
     <result id="16">
-        <column name="EXPR$0" type="decimal">
-            <row>0</row>
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
         </column>
     </result>
 
     <result id="17">
-        <column name="EXPR$0" type="decimal">
-            <row>-1</row>
+        <column name="EXPR$0" type="double">
+            <row>-1.0</row>
         </column>
     </result>
 
     <result id="18">
-        <column name="EXPR$0" type="decimal">
-            <row>12</row>
+        <column name="EXPR$0" type="double">
+            <row>12.0</row>
         </column>
     </result>
 
     <result id="19">
-        <column name="EXPR$0" type="int">
-            <row>0</row>
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
         </column>
     </result>
 
     <result id="20">
-        <column name="EXPR$0" type="decimal">
-            <row>-13</row>
+        <column name="EXPR$0" type="double">
+            <row>-13.0</row>
         </column>
     </result>
 
     <result id="21">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>123.500</row>
         </column>
     </result>
 
     <result id="22">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>123.000</row>
         </column>
     </result>
 
     <result id="23">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>123.456</row>
         </column>
     </result>
 
     <result id="24">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>120.000</row>
         </column>
     </result>
 
     <result id="25">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>0.000</row>
         </column>
     </result>
 
     <result id="26">
-        <column name="EXPR$0" type="decimal">
+        <column name="EXPR$0" type="double">
             <row>0.000</row>
         </column>
     </result>
@@ -177,49 +177,49 @@
     </result>
 
     <result id="30">
-        <column name="EXPR$0" type="int">
-            <row>1</row>
+        <column name="EXPR$0" type="double">
+            <row>1.0</row>
         </column>
     </result>
 
     <result id="31">
-        <column name="EXPR$0" type="int">
-            <row>0</row>
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
         </column>
     </result>
 
     <result id="32">
-        <column name="EXPR$0" type="int">
-            <row>4</row>
+        <column name="EXPR$0" type="double">
+            <row>4.0</row>
         </column>
     </result>
 
     <result id="33">
-        <column name="EXPR$0" type="int">
-            <row>-1</row>
+        <column name="EXPR$0" type="double">
+            <row>-1.0</row>
         </column>
     </result>
 
     <result id="34">
-        <column name="EXPR$0" type="int">
-            <row>0</row>
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
         </column>
     </result>
 
     <result id="35">
-        <column name="EXPR$0" type="int">
-            <row>-4</row>
+        <column name="EXPR$0" type="double">
+            <row>-4.0</row>
         </column>
     </result>
 
     <result id="36">
-        <column name="EXPR$0" type="int">
-            <row>0</row>
+        <column name="EXPR$0" type="double">
+            <row>0.0</row>
         </column>
     </result>
 
     <result id="37">
-        <column name="EXPR$0" type="int">
+        <column name="EXPR$0" type="double">
             <row>null</row>
         </column>
     </result>

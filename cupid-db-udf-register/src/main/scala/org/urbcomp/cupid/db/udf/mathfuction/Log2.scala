@@ -14,18 +14,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.stringfunction
+package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class locateUdf extends AbstractUdf {
-  override def name(): String = "locate"
+import java.math.BigDecimal
+
+class Log2 extends Serializable with AbstractUdf {
+
+  override def name(): String = "log2"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(substr: String, str: String): Integer =
-    if (substr == null || str == null) null
-    else str.indexOf(substr) + 1
+  override def udfCalciteEntryName(): String = "udfImpl"
 
+  override def udfSparkEntryName(): String = "udfWrapper"
+
+  /**
+    * Returns the base 2 logarithm of a double value (num).
+    *
+    * @param num double
+    * @return double
+    */
+  def udfImpl(num: BigDecimal): BigDecimal = {
+    if (num == null || num.doubleValue <= 0) return null
+    val res = Math.log(num.doubleValue) / Math.log(2.0d)
+    BigDecimal.valueOf(res)
+  }
+
+  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }

@@ -227,6 +227,9 @@ public class GetData {
             case "bool":
                 type = "boolean";
                 break;
+            case "decimal":
+                type = "double";
+                break;
             default:
                 type = colType.toLowerCase();
         }

@@ -14,31 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.server;
+package org.urbcomp.cupid.db.udf.mathfuction
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-import java.sql.*;
+import java.math.BigDecimal
 
-import static org.junit.Assert.assertTrue;
+class Ceil extends Serializable with AbstractUdf {
 
-@Ignore
-public class MainTest {
+  override def name(): String = "ceil"
 
-    @Test
-    public void testJDBC() throws SQLException {
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-        try (
-            Connection conn = DriverManager.getConnection(
-                "jdbc:avatica:remote:url=http://127.0.0.1:8000"
-            )
-        ) {
-            final Statement stmt = conn.createStatement();
+  override def udfCalciteEntryName(): String = "udfImpl"
 
-            final ResultSet rs = stmt.executeQuery("select count(1) from test_table01");
-            rs.next();
-            assertTrue(rs.getInt(1) >= 2);
-        }
-    }
+  override def udfSparkEntryName(): String = "udfWrapper"
+
+  def udfImpl(a: BigDecimal): BigDecimal = {
+    if (a == null) return null
+    BigDecimal.valueOf(Math.ceil(a.doubleValue))
+
+  }
+
+  def udfWrapper: BigDecimal => BigDecimal = udfImpl
 }
