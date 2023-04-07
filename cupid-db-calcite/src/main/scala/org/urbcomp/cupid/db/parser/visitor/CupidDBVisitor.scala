@@ -542,7 +542,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
   override def visitDropIndexStmt(ctx: DropIndexStmtContext): SqlNode = {
     val indexType = {
-      if (ctx.T_SPATIAL() != null && ctx.T_SPATIAL() == null) IndexType.SPATIAL
+      if (ctx.T_SPATIAL() != null && ctx.T_ATTRIBUTE() == null) IndexType.SPATIAL
       else if (ctx.T_ATTRIBUTE() != null && ctx.T_SPATIAL() == null) IndexType.ATTRIBUTE
       else throw new AssertionError("unexpected index type.")
     }
