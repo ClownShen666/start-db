@@ -30,6 +30,7 @@ public class CupidSparkDriverTest {
         param.setSql("select * from t_test");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
+        param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -55,6 +56,7 @@ public class CupidSparkDriverTest {
         param.setSql("select AddOverload(10) as addOverload");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
+        // param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -102,6 +104,7 @@ public class CupidSparkDriverTest {
         param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
+        param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -158,6 +161,11 @@ public class CupidSparkDriverTest {
     @Test
     public void trim() {
         execute("select trim('  abcde ')");
+    }
+
+    @Test
+    public void testCoord() {
+        execute("select st_makePoint(1,2)");
     }
 
 }
