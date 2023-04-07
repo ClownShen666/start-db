@@ -45,7 +45,7 @@ abstract class AbstractCalciteFunctionTest extends FunSuite with BeforeAndAfterA
     connect.close()
   }
 
-  protected def executeSpark(sql:String): Unit = {
+  protected def executeSpark(sql: String): Unit = {
     val param = new SparkSqlParam
     param.setUserName("root")
     param.setDbName("default")
