@@ -84,7 +84,7 @@ public class DynamicConfig {
      * 这个jar包要放在Livy Server能够访问的地方，如果是本地，就要放在Livy Server机器上
      */
     public static List<String> getDbSparkJars() {
-        final String jar = properties.getProperty(DB_SPARK_JARS, "/opt/cupid-db-spark-shaded.jar");
+        final String jar = properties.getProperty(DB_SPARK_JARS, "/opt/spark-apps/cupid-db-spark-1.0.0-SNAPSHOT.jar");
         final String[] jars = jar.split(",");
         return Arrays.asList(jars);
     }
