@@ -34,10 +34,11 @@ class Log extends AbstractUdf {
     * @param num  double
     * @return log result
     */
-  def evaluate(base: BigDecimal, num: BigDecimal): BigDecimal = {
-    if (base == null || num == null || base.doubleValue <= 0 || base.doubleValue == 1 || num.doubleValue == 0)
-      return null
+  def evaluate(base: Long, num: Long): BigDecimal = {
+//    if (base == null || num == null || base.doubleValue <= 0 || base.doubleValue == 1 || num.doubleValue == 0)
+//      return null
     val res = Math.log(num.doubleValue) / Math.log(base.doubleValue)
     BigDecimal.valueOf(res)
+
   }
 }

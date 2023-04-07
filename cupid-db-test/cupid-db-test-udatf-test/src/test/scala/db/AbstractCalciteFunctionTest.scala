@@ -18,7 +18,9 @@ package db
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
-import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
+import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
+import org.urbcomp.cupid.db.util.{LogUtil, SparkSqlParam, SqlParam}
 
 import java.sql.Connection
 import java.util.TimeZone
@@ -41,5 +43,16 @@ abstract class AbstractCalciteFunctionTest extends FunSuite with BeforeAndAfterA
 
   override protected def afterAll(): Unit = {
     connect.close()
+  }
+
+  protected def executeSpark(sql:String): Unit = {
+    val param = new SparkSqlParam
+    param.setUserName("root")
+    param.setDbName("default")
+    param.setEnableHiveSupport(true)
+    param.setSql(sql)
+    param.setExportType(DataExportType.PRINT)
+    param.setLocal(true)
+    SparkQueryExecutor.execute(param, null)
   }
 }
