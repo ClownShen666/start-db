@@ -78,8 +78,14 @@ public class LivySubmitter implements ISparkSubmitter {
         if (checkSession) {
             createNewSession();
             ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
-            pool.scheduleAtFixedRate(new CheckSessionTask(), 0, 3, TimeUnit.SECONDS);
+            pool.scheduleAtFixedRate(new CheckSessionTask(), 0, 10, TimeUnit.SECONDS);
         }
+    }
+
+    private final static LivySubmitter INSTANCE = new LivySubmitter();
+
+    public static LivySubmitter getSingleton() {
+        return INSTANCE;
     }
 
     private class CheckSessionTask implements Runnable {
@@ -174,6 +180,7 @@ public class LivySubmitter implements ISparkSubmitter {
             final String sqlId = buildSqlId();
             param.setSqlId(sqlId);
             String code = buildCode(param);
+            log.info("Submitting:{}", param);
             final LivyStatementResult res = restApi.executeStatement(
                 sessionId,
                 LivyStatementParam.builder().kind(DEFAULT_KIND).code(code).build()
@@ -193,7 +200,7 @@ public class LivySubmitter implements ISparkSubmitter {
                 JacksonUtil.MAPPER.writeValueAsString(param)
             );
             return String.format(
-                "org.urbcomp.cupid.db.spark.CupidSparkDriver.main(Array(\"%s\"))",
+                "org.urbcomp.cupid.db.spark.CupidSparkDriver.main(Array(s\"\"\"%s\"\"\"))",
                 encodeParam
             );
         } catch (JsonProcessingException e) {
