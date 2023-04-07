@@ -29,7 +29,7 @@ class St_makePoint extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(x: BigDecimal, y: BigDecimal): Point = {
+  def evaluate(x: Long, y: Long): Point = {
     println("*************")
     val X = x.doubleValue
     val Y = y.doubleValue

@@ -45,7 +45,6 @@ object SparkQueryExecutor {
         enableHiveSupport = param.isEnableHiveSupport,
         withJTS = param.isWithJTS
       )
-    //spark = getSparkSession(param.isLocal, enableHiveSupport = param.isEnableHiveSupport)
 
     val sql = param.getSql
     try {

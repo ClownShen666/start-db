@@ -29,6 +29,10 @@ trait CupidEncoders {
     org.apache.spark.sql.Encoders.kryo[Trajectory]
   implicit def roadNetworkEncoder: Encoder[RoadNetwork] =
     org.apache.spark.sql.Encoders.kryo[RoadNetwork]
-  implicit def roadSegmentEncoder: Encoder[RoadSegment] =
+  implicit def roadSegmentEncoder: Encoder[RoadSegment] = {
     org.apache.spark.sql.Encoders.kryo[RoadSegment]
+  }
+  implicit def bigDecimalEncoder: Encoder[BigDecimal] = {
+    org.apache.spark.sql.Encoders.kryo[BigDecimal]
+  }
 }
