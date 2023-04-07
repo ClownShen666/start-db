@@ -104,7 +104,7 @@ public class CupidSparkDriverTest {
         param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
-       // param.setWithJTS(true);
+        // param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
