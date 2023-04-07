@@ -46,6 +46,6 @@ abstract class AbstractCalciteFunctionTest extends FunSuite with BeforeAndAfterA
   }
 
   protected def executeSpark(sql: String): Unit = {
-    SparkExecute.getSparkExecute.executeSpark(sql)
+    SparkExecuteWrapper.getSparkExecute.executeSql(sql)
   }
 }

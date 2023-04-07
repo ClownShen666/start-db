@@ -20,23 +20,26 @@ import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
-object SparkExecute {
-  private var sparkExecute: SparkExecute = _
-  def getSparkExecute: SparkExecute = {
-    if (sparkExecute == null) sparkExecute = new SparkExecute
+object SparkExecuteWrapper {
+  private var sparkExecute: SparkExecuteWrapper = _
+  def getSparkExecute: SparkExecuteWrapper = {
+    if (sparkExecute == null) {
+      sparkExecute = new SparkExecuteWrapper(new SparkSqlParam())
+    }
     sparkExecute
   }
 }
 
-class SparkExecute private () {
-  def executeSpark(sql: String): Unit = {
-    val param = new SparkSqlParam
-    param.setUserName("root")
-    param.setDbName("default")
-    param.setEnableHiveSupport(true)
+class SparkExecuteWrapper private (param: SparkSqlParam) {
+  param.setUserName("root")
+  param.setDbName("default")
+  param.setEnableHiveSupport(true)
+  param.setExportType(DataExportType.PRINT)
+  param.setLocal(true)
+  def executeSql(sql: String): Unit = {
     param.setSql(sql)
-    param.setExportType(DataExportType.PRINT)
-    param.setLocal(true)
     SparkQueryExecutor.execute(param, null)
+
   }
+
 }
