@@ -14,21 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.apache.spark.sql.cupid.model.roadnetwork
+package org.urbcomp.cupid.db.udf.stringfunction
 
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.types._
-import org.apache.spark.unsafe.types.UTF8String
-import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
+import scala.collection.mutable
 
-abstract class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
-  override def typeName: String = "RoadSegmentUDT"
-
-  override def serialize(roadSegment: RoadSegment): InternalRow
-
-  override def deserialize(datum: Any): RoadSegment
-
-  override def sqlType: DataType = StructType(Seq(StructField("roadSegment", DataTypes.StringType)))
-
-  override def userClass: Class[RoadSegment] = classOf[RoadSegment]
+object Util {
+  def pad(str: String, len: Int, pad: String): String = {
+    if (str == null || pad == null) null
+    else if (len < str.length) str.substring(0, len)
+    else {
+      val sb = new mutable.StringBuilder()
+      var i = 0
+      while (i < len - str.length) {
+        sb.append(pad)
+        i += 1
+      }
+      sb.toString()
+    }
+  }
 }

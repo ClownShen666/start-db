@@ -46,13 +46,6 @@ abstract class AbstractCalciteFunctionTest extends FunSuite with BeforeAndAfterA
   }
 
   protected def executeSpark(sql: String): Unit = {
-    val param = new SparkSqlParam
-    param.setUserName("root")
-    param.setDbName("default")
-    param.setEnableHiveSupport(true)
-    param.setSql(sql)
-    param.setExportType(DataExportType.PRINT)
-    param.setLocal(true)
-    SparkQueryExecutor.execute(param, null)
+    SparkExecute.getSparkExecute.executeSpark(sql)
   }
 }

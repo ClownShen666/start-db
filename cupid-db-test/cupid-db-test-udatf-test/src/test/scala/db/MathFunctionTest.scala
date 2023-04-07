@@ -28,13 +28,10 @@ class MathFunctionTest extends AbstractCalciteFunctionTest {
     val statement = connect.createStatement()
     val resultSet = statement.executeQuery("select log(3.4,9.6)")
     resultSet.next()
-    // assertEquals(BigDecimal.valueOf(1.8943969631190591), resultSet.getObject(1))
-//    val resultSet2 = statement.executeQuery("select log(null,null)")
-//    resultSet2.next()
-//    assertEquals(null, resultSet2.getObject(1))
-//    executeSpark("select reverse('abcd')")
-    executeSpark("select log(2,2)")
-
+    assertEquals(BigDecimal.valueOf(1.8481847568028238), resultSet.getObject(1))
+    val resultSet2 = statement.executeQuery("select log(null,null)")
+    resultSet2.next()
+    assertEquals(null, resultSet2.getObject(1))
   }
 
   /**

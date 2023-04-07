@@ -14,17 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark.res
+package db
 
-import org.apache.spark.sql.DataFrame
 import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
-class ShowSparkResultExporter extends ISparkResultExporter {
-
-  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
-    data.show()
+object SparkExecute {
+  private var sparkExecute: SparkExecute = _
+  def getSparkExecute: SparkExecute = {
+    if (sparkExecute == null) sparkExecute = new SparkExecute
+    sparkExecute
   }
+}
 
-  override def getType: DataExportType = DataExportType.PRINT
+class SparkExecute private () {
+  def executeSpark(sql: String): Unit = {
+    val param = new SparkSqlParam
+    param.setUserName("root")
+    param.setDbName("default")
+    param.setEnableHiveSupport(true)
+    param.setSql(sql)
+    param.setExportType(DataExportType.PRINT)
+    param.setLocal(true)
+    SparkQueryExecutor.execute(param, null)
+  }
 }

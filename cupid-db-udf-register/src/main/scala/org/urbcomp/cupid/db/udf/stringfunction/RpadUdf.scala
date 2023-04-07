@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import scala.collection.mutable
 
-class RpadUdf extends AbstractUdf with Pad {
+class RpadUdf extends AbstractUdf {
   override def name(): String = "rpad"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
@@ -37,6 +37,13 @@ class RpadUdf extends AbstractUdf with Pad {
       }
       str + sb
     }
+  }
+
+  def evaluate(str: String, len: Int, pad: String): String = {
+    val res = Util.pad(str, len, pad)
+    if (res == null) return null
+    if (res.length == len) return res
+    str + res
   }
 
 }

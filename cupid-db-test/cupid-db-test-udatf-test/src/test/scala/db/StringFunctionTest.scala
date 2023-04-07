@@ -34,6 +34,7 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select upper('abcde')")
     resultSet.next()
     assertEquals("ABCDE", resultSet.getObject(1))
+    executeSpark("select upper('abcde')")
   }
 
   /**
@@ -45,6 +46,7 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select lower('ABCDE')")
     resultSet.next()
     assertEquals("abcde", resultSet.getObject(1))
+    executeSpark("select lower('ABCDE')")
   }
 
   /**
@@ -57,6 +59,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select substring('abcde', 2, 3)")
     resultSet.next()
     assertEquals("bcd", resultSet.getObject(1))
+    executeSpark("select substring('abcde', 2, 3)")
+
   }
 
   /**
@@ -69,6 +73,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select substring('abcde', 2)")
     resultSet.next()
     assertEquals("bcde", resultSet.getObject(1))
+    executeSpark("select substring('abcde', 2)")
+
   }
 
   test("trim") {
@@ -76,6 +82,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select trim('  abcde ')")
     resultSet.next()
     assertEquals("abcde", resultSet.getObject(1))
+    executeSpark("select trim('  abcde ')")
+
   }
 
   test("concat") {
@@ -86,6 +94,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet2 = statement.executeQuery("select concat(null, '2')")
     resultSet2.next()
     assertEquals(null, resultSet2.getObject(1))
+    executeSpark("select concat('1', '2')")
+
   }
 
   test("reverse") {
@@ -96,6 +106,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet2 = statement.executeQuery("select reverse(null)")
     resultSet2.next()
     assertEquals(null, resultSet2.getObject(1))
+    executeSpark("select reverse('abcde')")
+
   }
 
   test("ltrim") {
@@ -106,6 +118,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet2 = statement.executeQuery("select ltrim(null)")
     resultSet2.next()
     assertEquals(null, resultSet2.getObject(1))
+    executeSpark("select ltrim('  abcde ')")
+
   }
 
   test("rtrim") {
@@ -113,6 +127,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select rtrim('  abcde ')")
     resultSet.next()
     assertEquals("  abcde", resultSet.getObject(1))
+    executeSpark("select rtrim('  abcde ')")
+
   }
 
   test("lpad1") {
@@ -120,6 +136,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select lpad('abcde', 2)")
     resultSet.next()
     assertEquals("  abcde", resultSet.getObject(1))
+    executeSpark("select lpad('abcde', 2)")
+
   }
 
   test("lpad2") {
@@ -133,6 +151,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet3 = statement.executeQuery("select lpad('abcde', 6, 'a')")
     resultSet3.next()
     assertEquals("aabcde", resultSet3.getObject(1))
+    executeSpark("select lpad('abcde', 2, 'a')")
+
   }
 
   test("rpad1") {
@@ -140,6 +160,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select rpad('abcde', 1)")
     resultSet.next()
     assertEquals("abcde ", resultSet.getObject(1))
+    executeSpark("select rpad('abcde', 1)")
+
   }
 
   test("rpad2") {
@@ -153,6 +175,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet3 = statement.executeQuery("select rpad('abcde', 6, null)")
     resultSet3.next()
     assertEquals(null, resultSet3.getObject(1))
+    executeSpark("select rpad('abcde', 1, 'e')")
+
   }
 
   //TODO 多字节字符测试
@@ -161,6 +185,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select length('abc')")
     resultSet.next()
     assertEquals(3, resultSet.getObject(1))
+    executeSpark("select length('abc')")
+
   }
 
   //TODO 多字节字符测试
@@ -169,6 +195,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select charLength('abc')")
     resultSet.next()
     assertEquals(3, resultSet.getObject(1))
+    executeSpark("select charLength('abc')")
+
   }
 
   test("locate1") {
@@ -176,6 +204,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select locate('bc', 'abcabc')")
     resultSet.next()
     assertEquals(2, resultSet.getObject(1))
+    executeSpark("select locate('bc', 'abcabc')")
+
   }
 
   test("locate2") {
@@ -183,6 +213,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select locate('bc', 'abcabc', 2)")
     resultSet.next()
     assertEquals(5, resultSet.getObject(1))
+    executeSpark("select locate('bc', 'abcabc', 2)")
+
   }
 
   test("md5") {
@@ -190,6 +222,8 @@ class StringFunctionTest extends AbstractCalciteFunctionTest {
     val resultSet = statement.executeQuery("select md5('abcde')")
     resultSet.next()
     assertEquals("AB56B4D92B40713ACC5AF89985D4B786", resultSet.getObject(1))
+    executeSpark("select md5('abcde')")
+
   }
 
 }
