@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.spark;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
@@ -35,7 +34,7 @@ import static org.urbcomp.cupid.db.config.DynamicConfig.DB_SPARK_JARS;
 
 public class SparkExecutorTest {
 
-//    @Ignore
+    // @Ignore
     @Test
     public void testExecute() {
         DynamicConfig.updateProperties(
