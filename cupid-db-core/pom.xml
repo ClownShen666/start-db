@@ -154,6 +154,10 @@
             <artifactId>geomesa-spark-sql_${scala.binary.version}</artifactId>
             <version>${geomesa.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+        </dependency>
         <!-- Mybatis Core -->
         <dependency>
             <groupId>org.mybatis</groupId>
