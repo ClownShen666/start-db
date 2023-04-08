@@ -28,6 +28,7 @@ import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlDropIndex,
   SqlIndexDeclaration,
   SqlTruncateTable,
   SqlUseDatabase
@@ -74,6 +75,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     case c: ShowIndexStmtContext       => visitShowIndexStmt(c)
     case c: ShowStatusStmtContext      => visitShowStatusStmt(c)
     case c: DropTableStmtContext       => visitDropTableStmt(c)
+    case c: DropIndexStmtContext       => visitDropIndexStmt(c)
     case c: UseStmtContext             => visitUseStmt(c)
     case c: DescribeStmtContext        => visitDescribeStmt(c)
     case c: InsertStmtContext          => visitInsertStmt(c)
@@ -536,6 +538,15 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       ctx.T_EXISTS() != null,
       new SqlIdentifier(ctx.dbName.getText, pos)
     )
+  }
+
+  override def visitDropIndexStmt(ctx: DropIndexStmtContext): SqlNode = {
+    val indexType = {
+      if (ctx.T_SPATIAL() != null && ctx.T_ATTRIBUTE() == null) IndexType.SPATIAL
+      else if (ctx.T_ATTRIBUTE() != null && ctx.T_SPATIAL() == null) IndexType.ATTRIBUTE
+      else throw new AssertionError("unexpected index type.")
+    }
+    new SqlDropIndex(pos, indexType, ctx.L_ID().getText, visitIdent(ctx.tableName().ident()))
   }
 
   /**

@@ -23,6 +23,7 @@ import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlDropIndex,
   SqlTruncateTable,
   SqlUseDatabase
 }
@@ -49,6 +50,7 @@ class CupidDBExecutorFactory extends BaseExecutorFactory {
     case n: SqlShowTables       => ShowTablesExecutor(n)
     case n: SqlShowIndex        => ShowIndexExecutor(n)
     case n: SqlDropTable        => DropTableExecutor(n)
+    case n: SqlDropIndex        => DropIndexExecutor(n)
     case n: SqlDescribeTable    => DescribeTableExecutor(n)
     case n: SqlDropSchema       => DropDatabaseExecutor(n)
     case n: SqlTruncateTable    => TruncateTableExecutor(n)
