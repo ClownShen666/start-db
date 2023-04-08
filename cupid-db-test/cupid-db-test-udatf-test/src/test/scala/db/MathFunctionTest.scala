@@ -19,7 +19,7 @@ package db
 import org.junit.Assert.assertEquals
 
 import java.math.BigDecimal
-class MathFunctionTest extends AbstractCalciteFunctionTest {
+class MathFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * test for log

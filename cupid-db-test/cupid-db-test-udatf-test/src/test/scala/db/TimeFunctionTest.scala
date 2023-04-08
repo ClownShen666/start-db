@@ -26,7 +26,7 @@ import java.time.LocalDateTime
   *
   * @author Wang Bohong
   */
-class TimeFunctionTest extends AbstractCalciteFunctionTest {
+class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   val DEFAULT_TIME_STR = "2021-05-20 11:21:01.234"
   val DEFAULT_DATETIME: LocalDateTime = LocalDateTime.of(2021, 5, 20, 11, 21, 1, 234000000)
   val DEFAULT_TIMESTAMP: Timestamp = Timestamp.valueOf(DEFAULT_TIME_STR)

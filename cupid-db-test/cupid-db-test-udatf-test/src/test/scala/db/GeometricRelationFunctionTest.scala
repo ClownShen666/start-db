@@ -28,7 +28,7 @@ import scala.collection.JavaConverters.seqAsJavaList
   * @author XiangHe
   */
 // TODO test the relation between linestring and polygon
-class GeometricRelationFunctionTest extends AbstractCalciteFunctionTest {
+class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
   val typeArray: Array[String] = Array[String]("Integer", "String", "Double", "Point")
   val trajectory: Trajectory =

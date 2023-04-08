@@ -22,7 +22,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
 import scala.collection.JavaConverters.seqAsJavaList
 
-class TrajectoryFunctionTest extends AbstractCalciteFunctionTest {
+class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
   val typeArray: Array[String] = Array[String]("Integer", "String", "Double", "Point")
   val trajectory: Trajectory =

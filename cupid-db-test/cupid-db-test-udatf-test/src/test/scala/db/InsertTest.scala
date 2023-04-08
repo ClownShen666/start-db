@@ -25,7 +25,7 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
   * @author  WangBohong
   * @date    2022-06-08
   */
-class InsertTest extends AbstractCalciteFunctionTest {
+class InsertTest extends AbstractCalciteSparkFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON

@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.assertEquals
 
-class DataTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
+class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
     val statement = connect.createStatement

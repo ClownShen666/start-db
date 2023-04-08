@@ -26,7 +26,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   * @author Wang Bohong
   * @date 2022-06-16
   */
-class TrajectoryQueryTest extends AbstractCalciteFunctionTest {
+class TrajectoryQueryTest extends AbstractCalciteSparkFunctionTest {
 
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val tGeo: String = trajectory.toGeoJSON

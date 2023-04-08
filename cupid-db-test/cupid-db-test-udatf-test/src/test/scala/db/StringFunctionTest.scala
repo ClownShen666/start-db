@@ -23,7 +23,7 @@ import org.junit.Assert.assertEquals
   *
   * @author zaiyuan, XiangHe
   */
-class StringFunctionTest extends AbstractCalciteFunctionTest {
+class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * Calcite's function

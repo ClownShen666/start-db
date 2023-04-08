@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.assertNotNull
 
-class OtherFunctionTest extends AbstractCalciteFunctionTest {
+class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
     val stmt = connect.createStatement()

@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.assertEquals
 
-class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteFunctionTest {
+class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("st_pointFromGeoJSON(String)") {
     val statement = connect.createStatement
     val resultSet =

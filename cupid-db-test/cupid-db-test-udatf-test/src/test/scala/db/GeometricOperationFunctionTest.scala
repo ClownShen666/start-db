@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.{assertEquals, assertTrue}
 
-class GeometricOperationFunctionTest extends AbstractCalciteFunctionTest {
+class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("st_translate(geom, deltaX, deltaY)") {
     val statement = connect.createStatement
     val resultSet = statement.executeQuery(

@@ -16,7 +16,7 @@
  */
 package db.executor
 
-import db.AbstractCalciteFunctionTest
+import db.AbstractCalciteSparkFunctionTest
 import org.junit.Assert.assertEquals
 
 /**
@@ -24,7 +24,7 @@ import org.junit.Assert.assertEquals
   * @author Wang Bohong
   * @date 2022-06-21
   */
-class DeleteTest extends AbstractCalciteFunctionTest {
+class DeleteTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * test for delete

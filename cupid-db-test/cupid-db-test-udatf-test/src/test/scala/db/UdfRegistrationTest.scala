@@ -26,7 +26,7 @@ import scala.collection.mutable.ListBuffer
   * @author Hang Wu
   * @date 2023-03-08
   */
-class UdfRegistrationTest extends AbstractCalciteFunctionTest {
+class UdfRegistrationTest extends AbstractCalciteSparkFunctionTest {
 
   test("udf registration test 1") {
     val statement = connect.createStatement()

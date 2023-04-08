@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.assertEquals
 
-class UpdateTest extends AbstractCalciteFunctionTest {
+class UpdateTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * test for update

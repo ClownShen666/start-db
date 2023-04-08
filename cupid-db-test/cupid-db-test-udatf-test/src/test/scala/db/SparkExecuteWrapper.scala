@@ -16,9 +16,11 @@
  */
 package db
 
+import org.apache.spark.sql.{Dataset, Row}
 import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 import org.urbcomp.cupid.db.util.SparkSqlParam
+
 
 object SparkExecuteWrapper {
   private var sparkExecute: SparkExecuteWrapper = _
@@ -36,6 +38,7 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setEnableHiveSupport(true)
   param.setExportType(DataExportType.PRINT)
   param.setLocal(true)
+
   def executeSql(sql: String): Unit = {
     param.setSql(sql)
     SparkQueryExecutor.execute(param, null)

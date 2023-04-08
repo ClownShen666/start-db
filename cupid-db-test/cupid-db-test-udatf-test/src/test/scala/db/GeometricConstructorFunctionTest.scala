@@ -18,7 +18,7 @@ package db
 
 import org.junit.Assert.{assertEquals, assertNotNull}
 
-class GeometricConstructorFunctionTest extends AbstractCalciteFunctionTest {
+class GeometricConstructorFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("st_makePoint(x, y)") {
     val statement = connect.createStatement
     val resultSet = statement.executeQuery("select st_makePoint(1.1, 2)")

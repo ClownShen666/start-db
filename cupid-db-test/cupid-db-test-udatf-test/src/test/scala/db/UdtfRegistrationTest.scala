@@ -24,7 +24,7 @@ import org.junit.Assert.assertEquals
   * @author Hang Wu
   * @date 2023-03-08
   */
-class UdtfRegistrationTest extends AbstractCalciteFunctionTest {
+class UdtfRegistrationTest extends AbstractCalciteSparkFunctionTest {
 
   test("udtf registration test1") {
     val statement = connect.createStatement()

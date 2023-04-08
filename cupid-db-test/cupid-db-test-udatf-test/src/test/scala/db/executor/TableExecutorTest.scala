@@ -16,7 +16,7 @@
  */
 package db.executor
 
-import db.AbstractCalciteFunctionTest
+import db.AbstractCalciteSparkFunctionTest
 import org.junit.Assert.{assertEquals, assertFalse, assertNotNull, assertTrue}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -24,7 +24,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import java.util.UUID
 import scala.collection.mutable.ArrayBuffer
 
-class TableExecutorTest extends AbstractCalciteFunctionTest {
+class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
 
   private def generateUniqueId(): String = {
     UUID.randomUUID().toString.replace("-", "_")

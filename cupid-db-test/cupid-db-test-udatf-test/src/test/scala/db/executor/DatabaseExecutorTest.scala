@@ -16,12 +16,12 @@
  */
 package db.executor
 
-import db.AbstractCalciteFunctionTest
+import db.AbstractCalciteSparkFunctionTest
 import org.junit.Assert.{assertEquals, assertFalse, assertTrue}
 
 import java.util.UUID
 
-class DatabaseExecutorTest extends AbstractCalciteFunctionTest {
+class DatabaseExecutorTest extends AbstractCalciteSparkFunctionTest {
 
   private def generateUniqueId(): String = {
     UUID.randomUUID().toString.replace("-", "_")

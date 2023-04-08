@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
-class CoordTransformFunctionTest extends AbstractCalciteFunctionTest {
+class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val tGeo: String = trajectory.toGeoJSON

@@ -18,9 +18,8 @@ package db
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
-import org.urbcomp.cupid.db.model.data.DataExportType
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor
-import org.urbcomp.cupid.db.util.{LogUtil, SparkSqlParam, SqlParam}
+
+import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.Connection
 import java.util.TimeZone
@@ -31,7 +30,7 @@ import java.util.TimeZone
   * @author zaiyuan
   * @since 0.1.0
   */
-abstract class AbstractCalciteFunctionTest extends FunSuite with BeforeAndAfterAll {
+abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndAfterAll {
   var connect: Connection = _
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger

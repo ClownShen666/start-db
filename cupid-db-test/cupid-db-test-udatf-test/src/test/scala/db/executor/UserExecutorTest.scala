@@ -16,9 +16,9 @@
  */
 package db.executor
 
-import db.AbstractCalciteFunctionTest
+import db.AbstractCalciteSparkFunctionTest
 
-class UserExecutorTest extends AbstractCalciteFunctionTest {
+class UserExecutorTest extends AbstractCalciteSparkFunctionTest {
 
   private val randomNum = scala.util.Random.nextInt(100000)
   private val CREATE_USER_EXAMPLE =

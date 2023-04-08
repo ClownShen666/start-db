@@ -26,7 +26,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   *
   * @author XiangHe
   */
-class RoadFunctionTest extends AbstractCalciteFunctionTest {
+class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()

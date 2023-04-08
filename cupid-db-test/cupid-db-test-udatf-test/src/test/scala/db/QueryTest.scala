@@ -20,7 +20,7 @@ import org.junit.Assert.{assertEquals, assertTrue}
 
 import java.sql.Timestamp
 
-class QueryTest extends AbstractCalciteFunctionTest {
+class QueryTest extends AbstractCalciteSparkFunctionTest {
 
   test("test query") {
     val stmt = connect.createStatement()
