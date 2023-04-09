@@ -41,7 +41,8 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   def executeSql(sql: String): Dataset[Row] = {
     param.setSql(sql)
     SparkQueryExecutor.execute(param, null)
-    SparkQueryExecutor.getSparkSession(param.isLocal,param.isEnableHiveSupport)
+    SparkQueryExecutor
+      .getSparkSession(param.isLocal, param.isEnableHiveSupport)
       .sql(sql)
   }
 

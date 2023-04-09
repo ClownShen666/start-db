@@ -19,7 +19,6 @@ package db
 import org.apache.spark.sql.{Dataset, Row}
 import org.junit.Assert.assertEquals
 
-
 /**
   * String Function test
   *
