@@ -33,8 +33,9 @@ case class ShowIndexExecutor(n: SqlShowIndex) extends BaseExecutor {
         indexEntity =>
           Array(
             tableName.asInstanceOf[AnyRef],
-            indexEntity.getFieldsIdList.asInstanceOf[AnyRef],
+            indexEntity.getName.asInstanceOf[AnyRef],
             indexEntity.getIndexType.asInstanceOf[AnyRef],
+            indexEntity.getFieldsIdList.asInstanceOf[AnyRef],
             indexEntity.getIndexProperties.asInstanceOf[AnyRef]
           )
       )
@@ -42,7 +43,7 @@ case class ShowIndexExecutor(n: SqlShowIndex) extends BaseExecutor {
 
     MetadataResult
       .buildResult(
-        Array("Table", "Fields", "IndexType", "IndexProperties"),
+        Array("Table", "IndexName", "IndexType", "Fields", "IndexProperties"),
         java.util.Arrays.asList(indexPropArray: _*)
       )
       .asInstanceOf[MetadataResult[Array]]

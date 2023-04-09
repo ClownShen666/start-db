@@ -161,8 +161,9 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
     val rs = stmt.executeQuery("""show index from gemo_%s""".format(uniqueId))
     rs.next()
     assertEquals(rs.getString(1), "gemo_%s".format(uniqueId))
-    assertEquals(rs.getString(2), "et,dtg")
+    assertEquals(rs.getString(2), "spatial_index")
     assertEquals(rs.getString(3), "z2t")
+    assertEquals(rs.getString(4), "et,dtg")
   }
 
   test("test drop index") {
