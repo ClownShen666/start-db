@@ -60,7 +60,7 @@ public class CupidDBSQLSamples {
     // Drop table
     public static final String DROP_TABLE_IF_EXISTS_SAMPLE = "DROP TABLE IF EXISTS table_name;";
 
-    public static final String DROP_INDEX_SAMPLE = "DROP SPATIAL INDEX indexName on tableName;";
+    public static final String DROP_INDEX_SAMPLE = "DROP INDEX indexName on tableName;";
 
     // Delete sample
     public static final String DELETE_SAMPLE =

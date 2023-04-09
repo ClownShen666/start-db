@@ -24,7 +24,6 @@ package org.urbcomp.cupid.db.parser.ddl;
 
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParserPos;
-import org.urbcomp.cupid.db.schema.IndexType;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -34,8 +33,6 @@ public class SqlDropIndex extends SqlCall {
 
     public final SqlIdentifier tableName;
 
-    public final IndexType indexType;
-
     public final String indexName;
 
     public static final SqlSpecialOperator OPERATOR = new SqlSpecialOperator(
@@ -43,16 +40,10 @@ public class SqlDropIndex extends SqlCall {
         SqlKind.DROP_INDEX
     );
 
-    public SqlDropIndex(
-        SqlParserPos pos,
-        IndexType indexType,
-        String indexName,
-        SqlIdentifier tableName
-    ) {
+    public SqlDropIndex(SqlParserPos pos, String indexName, SqlIdentifier tableName) {
         super(pos);
         this.tableName = tableName;
         this.indexName = indexName;
-        this.indexType = indexType;
     }
 
     @Nonnull
@@ -70,16 +61,6 @@ public class SqlDropIndex extends SqlCall {
     @Override
     public void unparse(SqlWriter writer, int leftPrec, int rightPrec) {
         writer.keyword("DROP");
-        switch (indexType) {
-            case SPATIAL:
-                writer.keyword("SPATIAL");
-                break;
-            case ATTRIBUTE:
-                writer.keyword("ATTRIBUTE");
-                break;
-            default:
-                throw new AssertionError("unexpected index type: " + indexType.name());
-        }
         writer.keyword("INDEX");
         writer.keyword(indexName);
         writer.keyword("ON");

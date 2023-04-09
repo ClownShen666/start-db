@@ -120,11 +120,10 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals(tableName, node.name.names.get(0))
   }
 
-  test("convert drop st-index statement to SqlNode") {
+  test("convert drop index statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.DROP_INDEX_SAMPLE)
     val node = parsed.asInstanceOf[SqlDropIndex]
     assertEquals(SqlKind.DROP_INDEX, node.getKind)
-    assertEquals(IndexType.SPATIAL, node.indexType)
     assertEquals("indexName", node.indexName)
     assertEquals("tableName", node.tableName.names.get(0))
   }
