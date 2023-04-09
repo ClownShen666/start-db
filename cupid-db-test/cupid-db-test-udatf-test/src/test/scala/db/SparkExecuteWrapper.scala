@@ -38,10 +38,11 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setExportType(DataExportType.PRINT)
   param.setLocal(true)
 
-  def executeSql(sql: String): Unit = {
+  def executeSql(sql: String): Dataset[Row] = {
     param.setSql(sql)
     SparkQueryExecutor.execute(param, null)
-
+    SparkQueryExecutor.getSparkSession(param.isLocal,param.isEnableHiveSupport)
+      .sql(sql)
   }
 
 }

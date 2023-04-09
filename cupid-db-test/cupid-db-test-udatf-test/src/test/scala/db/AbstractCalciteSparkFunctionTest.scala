@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package db
+import org.apache.spark.sql.{Dataset, Row}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
-
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.Connection
@@ -44,7 +44,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     connect.close()
   }
 
-  protected def executeSpark(sql: String): Unit = {
+  protected def executeSpark(sql: String): Dataset[Row] = {
     SparkExecuteWrapper.getSparkExecute.executeSql(sql)
   }
 }

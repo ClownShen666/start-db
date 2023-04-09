@@ -16,7 +16,9 @@
  */
 package db
 
+import org.apache.spark.sql.{Dataset, Row}
 import org.junit.Assert.assertEquals
+
 
 /**
   * String Function test
@@ -34,7 +36,8 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     val resultSet = statement.executeQuery("select upper('abcde')")
     resultSet.next()
     assertEquals("ABCDE", resultSet.getObject(1))
-    executeSpark("select upper('abcde')")
+    val rs = executeSpark("select upper('abcde')")
+    assertEquals("ABCDE", rs.head().get(0))
   }
 
   /**
