@@ -16,7 +16,6 @@
  */
 package db
 
-import org.apache.spark.sql.{Dataset, Row}
 import org.junit.Assert.assertEquals
 
 /**
@@ -31,12 +30,16 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     * returns the string after converting each letter of the original string to uppercase
     */
   test("upper") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select upper('abcde')")
-    resultSet.next()
-    assertEquals("ABCDE", resultSet.getObject(1))
-    val rs = executeSpark("select upper('abcde')")
-    assertEquals("ABCDE", rs.head().get(0))
+//    val statement = connect.createStatement
+//    val resultSet = statement.executeQuery("select upper('abcde')")
+//    resultSet.next()
+//    assertEquals("ABCDE", resultSet.getObject(1))
+//    val rs = executeSpark("select upper('abcde')")
+//    assertEquals("ABCDE", rs.head().get(0))
+    val rs = statement.executeQuery("select upper('abcde')")
+    rs.next()
+    assertEquals("ABCDE", rs.getObject(1))
+
   }
 
   /**

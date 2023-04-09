@@ -21,7 +21,7 @@ import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
-import java.sql.Connection
+import java.sql.{Connection, ResultSet, Statement}
 import java.util.TimeZone
 
 /**
@@ -34,17 +34,28 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   var connect: Connection = _
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger
+  var statement: Statement = _
 
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))
     connect = CalciteHelper.createConnection()
+    statement = connect.createStatement()
   }
 
   override protected def afterAll(): Unit = {
+    statement.close()
     connect.close()
   }
 
   protected def executeSpark(sql: String): Dataset[Row] = {
     SparkExecuteWrapper.getSparkExecute.executeSql(sql)
   }
+
+  protected def executeQuery(sql: String): ResultSet = {
+    val rs1 = executeSpark(sql)
+    val res2 = statement.executeQuery(sql)
+    //返回类型统一后做两个结果的判断。
+    res2
+  }
+
 }

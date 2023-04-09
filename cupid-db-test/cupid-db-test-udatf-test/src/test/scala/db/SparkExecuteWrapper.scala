@@ -16,6 +16,7 @@
  */
 package db
 
+import db.SparkExecuteWrapper.sparkExecute
 import org.apache.spark.sql.{Dataset, Row}
 import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
