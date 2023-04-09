@@ -32,19 +32,8 @@ case class DropIndexExecutor(n: SqlDropIndex) extends BaseExecutor {
     val (userName, dbName, tableName) = ExecutorUtil.getUserNameDbNameAndTableName(n.tableName)
 
     val targetIndexName = n.indexName
-    val targetIndexType = n.indexType
-
     val existIndexes = MetadataAccessUtil.getIndexes(userName, dbName, tableName)
-    val indexToDrop = existIndexes.asScala
-      .filter(index => {
-        val indexName = index.getName
-        val indexType = index.getIndexType match {
-          case "attr" => IndexType.ATTRIBUTE
-          case _      => IndexType.SPATIAL
-        }
-
-        indexName.equals(targetIndexName) && indexType.equals(targetIndexType)
-      })
+    val indexToDrop = existIndexes.asScala.filter(index => index.getName.equals(targetIndexName))
 
     // Delete metadata
     val affectedRows =

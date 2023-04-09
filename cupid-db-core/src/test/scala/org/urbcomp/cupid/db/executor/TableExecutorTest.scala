@@ -177,7 +177,7 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
          |  ATTRIBUTE INDEX attribute_temporal_index(name, dtg)
          |  )
          |""".stripMargin.format(uniqueId).stripMargin
-    val dropIndexSQL = "DROP SPATIAL INDEX spatial_index on table_%s".format(uniqueId)
+    val dropIndexSQL = "DROP INDEX spatial_index on table_%s".format(uniqueId)
     val showIndexSQL = "SHOW INDEX FROM table_%s".format(uniqueId)
     val stmt = connect.createStatement()
     stmt.executeUpdate(createTableSQL)
