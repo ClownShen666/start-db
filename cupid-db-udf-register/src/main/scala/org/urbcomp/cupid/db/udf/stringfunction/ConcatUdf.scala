@@ -26,6 +26,4 @@ class ConcatUdf extends AbstractUdf with Serializable {
 
   def evaluate(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)
-
-  def sparkEntry: (String, String) => String = evaluate
 }

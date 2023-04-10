@@ -40,6 +40,4 @@ class Log extends AbstractUdf with Serializable {
     val res = Math.log(num.doubleValue) / Math.log(base.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: (BigDecimal, BigDecimal) => BigDecimal = evaluate
 }

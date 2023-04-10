@@ -29,6 +29,4 @@ class ReverseUdf extends AbstractUdf with Serializable {
     else {
       new StringBuffer(str).reverse().toString
     }
-
-  def sparkEntry: String => String = evaluate
 }

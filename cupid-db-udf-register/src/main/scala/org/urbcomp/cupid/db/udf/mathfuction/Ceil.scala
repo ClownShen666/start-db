@@ -31,6 +31,4 @@ class Ceil extends AbstractUdf with Serializable {
     if (a == null) return null
     BigDecimal.valueOf(Math.ceil(a.doubleValue))
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

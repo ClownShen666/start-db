@@ -27,6 +27,4 @@ class AddOneUdf extends AbstractUdf with Serializable {
   def evaluate(x: Int): Int = {
     x + 1
   }
-
-  def sparkEntry: Int => Int = evaluate
 }

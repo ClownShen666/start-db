@@ -35,6 +35,4 @@ class LtrimUdf extends AbstractUdf with Serializable {
       str.substring(i)
     }
   }
-
-  def sparkEntry: String => String = evaluate
 }

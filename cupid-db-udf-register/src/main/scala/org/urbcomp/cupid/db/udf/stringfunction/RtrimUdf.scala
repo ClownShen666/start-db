@@ -34,6 +34,4 @@ class RtrimUdf extends AbstractUdf with Serializable {
       str.substring(0, i + 1)
     }
   }
-
-  def sparkEntry: String => String = evaluate
 }

@@ -39,6 +39,4 @@ class Pow extends AbstractUdf with Serializable {
     val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: (BigDecimal, BigDecimal) => BigDecimal = evaluate
 }

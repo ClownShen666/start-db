@@ -38,6 +38,4 @@ class Log1p extends AbstractUdf with Serializable {
     val res = Math.log1p(num.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

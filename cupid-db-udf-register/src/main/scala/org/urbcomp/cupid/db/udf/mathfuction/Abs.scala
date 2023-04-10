@@ -32,6 +32,4 @@ class Abs extends AbstractUdf with Serializable {
     val res = Math.abs(a.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

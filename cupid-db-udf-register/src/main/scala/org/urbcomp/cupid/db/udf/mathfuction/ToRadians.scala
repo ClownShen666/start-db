@@ -38,6 +38,4 @@ class ToRadians extends AbstractUdf with Serializable {
     val res = Math.toRadians(angDeg.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

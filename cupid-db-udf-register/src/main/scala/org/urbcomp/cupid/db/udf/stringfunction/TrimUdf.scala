@@ -26,6 +26,4 @@ class TrimUdf extends AbstractUdf with Serializable {
 
   def evaluate(str: String): String =
     if (str == null) null else str.trim
-
-  def sparkEntry: String => String = evaluate
 }

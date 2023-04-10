@@ -38,6 +38,4 @@ class RpadUdf extends AbstractUdf with Pad with Serializable {
       str + sb
     }
   }
-
-  def sparkEntry: (String, Int) => String = evaluate
 }

@@ -31,6 +31,4 @@ class Floor extends AbstractUdf with Serializable {
     if (a == null) return null
     BigDecimal.valueOf(Math.floor(a.doubleValue))
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

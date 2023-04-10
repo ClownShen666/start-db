@@ -44,6 +44,4 @@ class Md5Udf extends AbstractUdf with Serializable {
     }
     new String(code)
   }
-
-  def sparkEntry: String => String = evaluate
 }

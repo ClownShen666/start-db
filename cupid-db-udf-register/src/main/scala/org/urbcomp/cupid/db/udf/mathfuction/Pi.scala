@@ -35,6 +35,4 @@ class Pi extends AbstractUdf with Serializable {
   def evaluate(): BigDecimal = {
     BigDecimal.valueOf(Math.PI)
   }
-
-  def sparkEntry: () => BigDecimal = evaluate
 }

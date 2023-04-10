@@ -26,6 +26,4 @@ class CharLengthUdf extends AbstractUdf with Serializable {
 
   def evaluate(str: String): Integer =
     if (str == null) null else str.length
-
-  def sparkEntry: String => Integer = evaluate
 }

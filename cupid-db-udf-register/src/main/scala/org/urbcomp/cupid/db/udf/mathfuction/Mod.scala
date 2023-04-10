@@ -34,6 +34,4 @@ class Mod extends AbstractUdf with Serializable {
       BigDecimal.valueOf(res)
     }
   }
-
-  def sparkEntry: (BigDecimal, BigDecimal) => BigDecimal = evaluate
 }

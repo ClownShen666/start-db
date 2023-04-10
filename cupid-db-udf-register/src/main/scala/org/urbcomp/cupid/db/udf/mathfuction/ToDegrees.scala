@@ -40,6 +40,4 @@ class ToDegrees extends AbstractUdf with Serializable {
     val res = Math.toDegrees(angRad.doubleValue)
     BigDecimal.valueOf(res)
   }
-
-  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

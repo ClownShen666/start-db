@@ -37,6 +37,4 @@ class LengthUdf extends AbstractUdf with Serializable {
       }
       length
     }
-
-  def sparkEntry: String => Integer = evaluate
 }
