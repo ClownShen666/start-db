@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.security.MessageDigest
 
-class Md5Udf extends AbstractUdf {
+class Md5Udf extends AbstractUdf with Serializable {
   override def name(): String = "md5"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
@@ -45,4 +45,5 @@ class Md5Udf extends AbstractUdf {
     new String(code)
   }
 
+  def sparkEntry: String => String = evaluate
 }

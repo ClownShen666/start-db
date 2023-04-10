@@ -35,29 +35,12 @@ class UdfRegistrationTest extends AbstractCalciteFunctionTest {
     statement.executeUpdate("insert into table test3 values (2)")
     statement.executeUpdate("insert into table test3 values (7)")
     val resultSet =
-      statement.executeQuery("select dat, AddOverload(dat) from test3")
+      statement.executeQuery("select dat, AddOne(dat) from test3")
     while (resultSet.next()) {
       val u = resultSet.getObject(1).toString.toInt
       val v = resultSet.getObject(2).toString.toInt
       assertEquals(0, u + 1 - v)
     }
-  }
-
-  test("udf registration test 2") {
-    val statement = connect.createStatement()
-    statement.executeUpdate("DROP TABLE IF EXISTS test4")
-    statement.executeUpdate("create table test4 (v1 Int, v2 Int)")
-    statement.executeUpdate("insert into table test4 values (1, 70)")
-    statement.executeUpdate("insert into table test4 values (2, 100)")
-    statement.executeUpdate("insert into table test4 values (7, 400)")
-    val resultSet =
-      statement.executeQuery("select AddOverload(v1, v2) from test4")
-    val outputs = ListBuffer[Int]()
-    while (resultSet.next()) {
-      val output = resultSet.getObject(1).toString.toInt
-      outputs += output
-    }
-    assertEquals(List(71, 102, 407), outputs.toList.sorted)
   }
 
   test("reverse") {

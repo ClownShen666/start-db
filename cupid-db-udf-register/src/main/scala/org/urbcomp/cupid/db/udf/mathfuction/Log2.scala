@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Log2 extends AbstractUdf {
+class Log2 extends AbstractUdf with Serializable {
 
   override def name(): String = "log2"
 
@@ -38,4 +38,6 @@ class Log2 extends AbstractUdf {
     val res = Math.log(num.doubleValue) / Math.log(2.0d)
     BigDecimal.valueOf(res)
   }
+
+  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

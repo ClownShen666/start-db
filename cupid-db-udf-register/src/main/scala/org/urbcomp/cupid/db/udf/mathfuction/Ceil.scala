@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class Ceil extends AbstractUdf {
+class Ceil extends AbstractUdf with Serializable {
 
   override def name(): String = "ceil"
 
@@ -30,6 +30,7 @@ class Ceil extends AbstractUdf {
   def evaluate(a: BigDecimal): BigDecimal = {
     if (a == null) return null
     BigDecimal.valueOf(Math.ceil(a.doubleValue))
-
   }
+
+  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }

@@ -20,7 +20,7 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import java.math.BigDecimal
 
-class ToRadians extends AbstractUdf {
+class ToRadians extends AbstractUdf with Serializable {
 
   override def name(): String = "toRadians"
 
@@ -38,4 +38,6 @@ class ToRadians extends AbstractUdf {
     val res = Math.toRadians(angDeg.doubleValue)
     BigDecimal.valueOf(res)
   }
+
+  def sparkEntry: BigDecimal => BigDecimal = evaluate
 }
