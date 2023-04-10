@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
@@ -31,15 +30,7 @@ import org.slf4j.Logger
 import scala.reflect.runtime.universe._
 import scala.reflect.api
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
-
 import java.lang.reflect.Method
-
-class MethodFunc[T <: AnyRef](o: Object, m: Method, tc: Class[T]) {
-  def apply(oa: Any*): T = {
-    val result = m.invoke(o, oa.map(_.asInstanceOf[AnyRef]): _*)
-    result.asInstanceOf[T]
-  }
-}
 
 @Slf4j
 object SparkQueryExecutor {
