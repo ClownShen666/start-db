@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import java.math.BigDecimal
 
-class ToDegrees extends AbstractUdf with Serializable {
+class ToDegrees extends AbstractUdf {
 
   override def name(): String = "toDegrees"
 

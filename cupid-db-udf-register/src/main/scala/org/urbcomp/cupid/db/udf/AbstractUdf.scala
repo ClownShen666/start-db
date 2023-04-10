@@ -18,7 +18,7 @@ package org.urbcomp.cupid.db.udf
 
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-trait AbstractUdf {
+trait AbstractUdf extends Serializable {
   def name(): String
   def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 }

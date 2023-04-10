@@ -19,7 +19,7 @@ package org.urbcomp.cupid.db.udf.stringfunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class TrimUdf extends AbstractUdf with Serializable {
+class TrimUdf extends AbstractUdf {
   override def name(): String = "trim"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)

@@ -21,7 +21,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 import scala.collection.mutable
 
-class RpadUdf extends AbstractUdf with Pad with Serializable {
+class RpadUdf extends AbstractUdf with Pad {
   override def name(): String = "rpad"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)

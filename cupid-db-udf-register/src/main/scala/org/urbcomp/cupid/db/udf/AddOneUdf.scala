@@ -18,7 +18,7 @@ package org.urbcomp.cupid.db.udf
 
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class AddOneUdf extends AbstractUdf with Serializable {
+class AddOneUdf extends AbstractUdf {
 
   override def name(): String = "AddOne"
 
