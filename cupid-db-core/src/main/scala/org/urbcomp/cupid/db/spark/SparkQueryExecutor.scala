@@ -32,8 +32,6 @@ import org.urbcomp.cupid.db.udf.DataEngine.Spark
 import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
 import java.lang.reflect.Method
-
-
 @Slf4j
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
@@ -84,8 +82,8 @@ object SparkQueryExecutor {
       .load()
       .createTempView(tableName)
   }
-  
-    def getAllMethods[T](clazz: Class[T], name: String): Array[Method] = {
+
+  def getAllMethods[T](clazz: Class[T], name: String): Array[Method] = {
     clazz.getMethods.filter(method => method.getName == name && !method.isBridge)
   }
 
