@@ -53,20 +53,8 @@ public class CupidSparkDriverTest {
         param.setUserName("root");
         param.setDbName("default");
         param.setEnableHiveSupport(true);
-        param.setSql("select AddOverload(10) as addOverload");
-        param.setExportType(DataExportType.PRINT);
-        param.setLocal(true);
-        // param.setWithJTS(true);
-        SparkQueryExecutor.execute(param, null);
-    }
-
-    @Test
-    public void testUdf2() {
-        final SparkSqlParam param = new SparkSqlParam();
-        param.setUserName("root");
-        param.setDbName("default");
-        param.setEnableHiveSupport(true);
-        param.setSql("select AddOverload(10, 20) as addOverload");
+        param.setWithJTS(true);
+        param.setSql("select AddOne(23) as addOne");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         SparkQueryExecutor.execute(param, null);
@@ -164,8 +152,38 @@ public class CupidSparkDriverTest {
     }
 
     @Test
-    public void testCoord() {
-        execute("select reverse('abcd')");
+    public void testAbs() {
+        execute("select abs(-1)");
+    }
+
+    @Test
+    public void testCeil() {
+        execute("select ceil(1.5)");
+    }
+
+    @Test
+    public void testFloor() {
+        execute("select floor(1.5)");
+    }
+
+    @Test
+    public void testLog() {
+        execute("select log(pi(), pi() * pi())");
+    }
+
+    @Test
+    public void testMod() {
+        execute("select mod(pow(2, 3), 5)");
+    }
+
+    @Test
+    public void testToDegrees() {
+        execute("select toDegrees(pi())");
+    }
+
+    @Test
+    public void testToRadians() {
+        execute("select toRadians(180)");
     }
 
 }

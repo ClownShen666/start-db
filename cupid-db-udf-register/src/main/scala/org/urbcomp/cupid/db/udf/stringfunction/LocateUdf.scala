@@ -27,5 +27,4 @@ class LocateUdf extends AbstractUdf {
   def evaluate(substr: String, str: String): Integer =
     if (substr == null || str == null) null
     else str.indexOf(substr) + 1
-
 }

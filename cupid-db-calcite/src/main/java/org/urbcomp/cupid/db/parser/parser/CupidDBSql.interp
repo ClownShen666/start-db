@@ -871,7 +871,7 @@ create_table_options_item
 create_table_options_mysql_item
 createIndexStmt
 createIndexCol
-dropTableIndexStmt
+dropIndexStmt
 dtype_default
 showTablesStmt
 dtype_attr

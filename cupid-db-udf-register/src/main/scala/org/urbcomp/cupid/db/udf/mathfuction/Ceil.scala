@@ -30,6 +30,5 @@ class Ceil extends AbstractUdf {
   def evaluate(a: BigDecimal): BigDecimal = {
     if (a == null) return null
     BigDecimal.valueOf(Math.ceil(a.doubleValue))
-
   }
 }

@@ -38,5 +38,4 @@ class RpadUdf extends AbstractUdf with Pad {
       str + sb
     }
   }
-
 }

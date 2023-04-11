@@ -44,5 +44,4 @@ class Md5Udf extends AbstractUdf {
     }
     new String(code)
   }
-
 }

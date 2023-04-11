@@ -128,7 +128,7 @@ public class CupidDBSqlParser extends Parser {
         RULE_create_table_preoptions = 22, RULE_create_table_preoptions_item = 23,
         RULE_create_table_preoptions_td_item = 24, RULE_create_table_options = 25,
         RULE_create_table_options_item = 26, RULE_create_table_options_mysql_item = 27,
-        RULE_createIndexStmt = 28, RULE_createIndexCol = 29, RULE_dropTableIndexStmt = 30,
+        RULE_createIndexStmt = 28, RULE_createIndexCol = 29, RULE_dropIndexStmt = 30,
         RULE_dtype_default = 31, RULE_showTablesStmt = 32, RULE_dtype_attr = 33, RULE_dtype = 34,
         RULE_dtypeLen = 35, RULE_createDatabaseStmt = 36, RULE_showDatabasesStmt = 37,
         RULE_dropDatabaseStmt = 38, RULE_createDatabaseOption = 39, RULE_dropTableStmt = 40,
@@ -193,7 +193,7 @@ public class CupidDBSqlParser extends Parser {
             "create_table_options_mysql_item",
             "createIndexStmt",
             "createIndexCol",
-            "dropTableIndexStmt",
+            "dropIndexStmt",
             "dtype_default",
             "showTablesStmt",
             "dtype_attr",
@@ -1280,8 +1280,8 @@ public class CupidDBSqlParser extends Parser {
             return getRuleContext(DropTableStmtContext.class, 0);
         }
 
-        public DropTableIndexStmtContext dropTableIndexStmt() {
-            return getRuleContext(DropTableIndexStmtContext.class, 0);
+        public DropIndexStmtContext dropIndexStmt() {
+            return getRuleContext(DropIndexStmtContext.class, 0);
         }
 
         public TruncateStmtContext truncateStmt() {
@@ -1395,7 +1395,7 @@ public class CupidDBSqlParser extends Parser {
                 case 7:
                     enterOuterAlt(_localctx, 7); {
                     setState(268);
-                    dropTableIndexStmt();
+                    dropIndexStmt();
                 }
                     break;
                 case 8:
@@ -5210,7 +5210,7 @@ public class CupidDBSqlParser extends Parser {
         return _localctx;
     }
 
-    public static class DropTableIndexStmtContext extends ParserRuleContext {
+    public static class DropIndexStmtContext extends ParserRuleContext {
         public Token indexName;
 
         public TerminalNode T_DROP() {
@@ -5233,26 +5233,26 @@ public class CupidDBSqlParser extends Parser {
             return getToken(CupidDBSqlParser.L_ID, 0);
         }
 
-        public DropTableIndexStmtContext(ParserRuleContext parent, int invokingState) {
+        public DropIndexStmtContext(ParserRuleContext parent, int invokingState) {
             super(parent, invokingState);
         }
 
         @Override
         public int getRuleIndex() {
-            return RULE_dropTableIndexStmt;
+            return RULE_dropIndexStmt;
         }
 
         @Override
         public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
             if (visitor instanceof CupidDBSqlVisitor) return ((CupidDBSqlVisitor<
-                ? extends T>) visitor).visitDropTableIndexStmt(this);
+                ? extends T>) visitor).visitDropIndexStmt(this);
             else return visitor.visitChildren(this);
         }
     }
 
-    public final DropTableIndexStmtContext dropTableIndexStmt() throws RecognitionException {
-        DropTableIndexStmtContext _localctx = new DropTableIndexStmtContext(_ctx, getState());
-        enterRule(_localctx, 60, RULE_dropTableIndexStmt);
+    public final DropIndexStmtContext dropIndexStmt() throws RecognitionException {
+        DropIndexStmtContext _localctx = new DropIndexStmtContext(_ctx, getState());
+        enterRule(_localctx, 60, RULE_dropIndexStmt);
         try {
             enterOuterAlt(_localctx, 1);
             {
@@ -5261,7 +5261,7 @@ public class CupidDBSqlParser extends Parser {
                 setState(659);
                 match(T_INDEX);
                 setState(660);
-                ((DropTableIndexStmtContext) _localctx).indexName = match(L_ID);
+                ((DropIndexStmtContext) _localctx).indexName = match(L_ID);
                 setState(661);
                 match(T_ON);
                 setState(662);

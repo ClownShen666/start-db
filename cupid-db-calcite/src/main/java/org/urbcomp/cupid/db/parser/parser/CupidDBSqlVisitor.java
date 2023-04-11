@@ -249,11 +249,11 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitCreateIndexCol(CupidDBSqlParser.CreateIndexColContext ctx);
 
     /**
-     * Visit a parse tree produced by {@link CupidDBSqlParser#dropTableIndexStmt}.
+     * Visit a parse tree produced by {@link CupidDBSqlParser#dropIndexStmt}.
      * @param ctx the parse tree
      * @return the visitor result
      */
-    T visitDropTableIndexStmt(CupidDBSqlParser.DropTableIndexStmtContext ctx);
+    T visitDropIndexStmt(CupidDBSqlParser.DropIndexStmtContext ctx);
 
     /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#dtype_default}.

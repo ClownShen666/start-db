@@ -29,5 +29,4 @@ class ReverseUdf extends AbstractUdf {
     else {
       new StringBuffer(str).reverse().toString
     }
-
 }
