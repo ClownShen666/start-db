@@ -29,53 +29,6 @@ import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment;
 import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
 public class CoordTransformFunction {
-    // @CupidDBFunction("st_BD09ToWGS84")
-    // public Point st_BD09ToWGS84(Point point) {
-    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-    // return transformer.pointTransform(point);
-    // }
-    //
-    // @CupidDBFunction("st_BD09ToWGS84")
-    // public LineString st_BD09ToWGS84(LineString lineString) {
-    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-    // return transformer.lineStringTransform(lineString);
-    // }
-    //
-    // @CupidDBFunction("st_BD09ToWGS84")
-    // public Polygon st_BD09ToWGS84(Polygon polygon) {
-    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-    // return transformer.polygonTransform(polygon);
-    // }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public MultiPoint st_BD09ToWGS84(MultiPoint multiPoint) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.multiPointTransform(multiPoint);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public MultiLineString st_BD09ToWGS84(MultiLineString multiLineString) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.multiLineStringTransform(multiLineString);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public MultiPolygon st_BD09ToWGS84(MultiPolygon mPolygon) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.multiPolygonTransform(mPolygon);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public Geometry st_BD09ToWGS84(Geometry geometry) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.geometryTransform(geometry);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public GeometryCollection st_BD09ToWGS84(GeometryCollection geometryCollection) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.geometryCollectionTransform(geometryCollection);
-    }
 
     @CupidDBFunction("st_BD09ToWGS84")
     public Trajectory st_BD09ToWGS84(Trajectory trajectory) {
