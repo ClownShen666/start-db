@@ -14,16 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.stringfunction
+package org.urbcomp.cupid.db.udf.coordtransformfunction
 
+import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
+  BD09ToWGS84Transformer,
+  MatchUtil
+}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class TrimUdf extends AbstractUdf {
-  override def name(): String = "trim"
+class st_BD09ToWGS84 extends AbstractUdf {
+  override def name(): String = "st_BD09ToWGS84"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(str: String): String =
-    if (str == null) null else str.trim
+  def evaluate(st: Geometry): Geometry = {
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st)
+  }
+
 }
