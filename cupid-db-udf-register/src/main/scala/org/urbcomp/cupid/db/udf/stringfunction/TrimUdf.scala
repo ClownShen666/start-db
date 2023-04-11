@@ -26,5 +26,4 @@ class TrimUdf extends AbstractUdf {
 
   def evaluate(str: String): String =
     if (str == null) null else str.trim
-
 }

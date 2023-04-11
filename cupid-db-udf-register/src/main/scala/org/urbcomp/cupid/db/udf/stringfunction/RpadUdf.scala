@@ -39,11 +39,4 @@ class RpadUdf extends AbstractUdf {
     }
   }
 
-  def evaluate(str: String, len: Int, pad: String): String = {
-    val res = Util.pad(str, len, pad)
-    if (res == null) return null
-    if (res.length == len) return res
-    str + res
-  }
-
 }

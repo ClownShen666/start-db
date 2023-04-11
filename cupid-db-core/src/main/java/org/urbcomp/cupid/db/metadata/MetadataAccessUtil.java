@@ -108,6 +108,10 @@ public class MetadataAccessUtil {
         return noRollback(v -> AccessorFactory.getIndexAccessor().insert(index));
     }
 
+    public static long dropIndex(long id) {
+        return noRollback(v -> AccessorFactory.getIndexAccessor().deleteById(id));
+    }
+
     /**
      * query with cache
      */

@@ -38,5 +38,4 @@ class Log1p extends AbstractUdf {
     val res = Math.log1p(num.doubleValue)
     BigDecimal.valueOf(res)
   }
-
 }

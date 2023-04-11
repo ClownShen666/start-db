@@ -37,5 +37,4 @@ class LengthUdf extends AbstractUdf {
       }
       length
     }
-
 }

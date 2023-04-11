@@ -31,5 +31,4 @@ class Floor extends AbstractUdf {
     if (a == null) return null
     BigDecimal.valueOf(Math.floor(a.doubleValue))
   }
-
 }

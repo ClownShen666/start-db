@@ -34,5 +34,4 @@ class RtrimUdf extends AbstractUdf {
       str.substring(0, i + 1)
     }
   }
-
 }
