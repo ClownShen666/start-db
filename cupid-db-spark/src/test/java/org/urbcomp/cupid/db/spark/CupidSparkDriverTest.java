@@ -54,6 +54,7 @@ public class CupidSparkDriverTest {
         param.setDbName("default");
         param.setEnableHiveSupport(true);
         param.setWithJTS(true);
+        param.setWithJTS(true);
         param.setSql("select AddOne(23) as addOne");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
@@ -92,7 +93,7 @@ public class CupidSparkDriverTest {
         param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
-        // param.setWithJTS(true);
+        param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -186,4 +187,8 @@ public class CupidSparkDriverTest {
         execute("select toRadians(180)");
     }
 
+    @Test
+    public void testCoord() {
+        execute("select st_BD09ToWGS84(st_makePoint(1, 2))");
+    }
 }
