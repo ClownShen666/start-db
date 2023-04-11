@@ -54,7 +54,6 @@ public class CupidSparkDriverTest {
         param.setDbName("default");
         param.setEnableHiveSupport(true);
         param.setWithJTS(true);
-        param.setWithJTS(true);
         param.setSql("select AddOne(23) as addOne");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
