@@ -17,8 +17,6 @@
 package org.urbcomp.cupid.db.udf.coordtransformfunction
 
 import org.locationtech.jts.geom.Geometry
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
   BD09ToWGS84Transformer,
@@ -32,20 +30,7 @@ class st_BD09ToWGS84 extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(st: Geometry): Geometry = {
-    println("**********************")
     MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st)
-  }
-
-  def evaluate(trajectory: Trajectory): Trajectory = {
-    MatchUtil.MathTRR(new BD09ToWGS84Transformer).trajectoryTransform(trajectory)
-  }
-
-  def evaluate(roadNetwork: RoadNetwork): RoadNetwork = {
-    MatchUtil.MathTRR(new BD09ToWGS84Transformer).roadNetworkTransform(roadNetwork)
-  }
-
-  def evaluate(roadSegment: RoadSegment): RoadSegment = {
-    MatchUtil.MathTRR(new BD09ToWGS84Transformer).roadSegmentTransform(roadSegment)
   }
 
 }

@@ -26,8 +26,6 @@ import org.locationtech.jts.geom.{
   Point,
   Polygon
 }
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
 object MatchUtil {
   def MatchCoordinate(transformer: AbstractCoordTransformer, st: Geometry): Geometry = {
@@ -45,14 +43,5 @@ object MatchUtil {
       case _ => throw new IllegalStateException("This parameter is not supported ")
     }
   }
-  def MathTRR(transformer: AbstractCoordTransformer): AbstractCoordTransformer = {
-    transformer match {
-      case res: BD09ToGCJ02Transformer  => res
-      case res: BD09ToWGS84Transformer  => res
-      case res: GCJ02ToBD09Transformer  => res
-      case res: GCJ02ToWGS84Transformer => res
-      case res: WGS84ToBD09Transformer  => res
-      case res: WGS84ToGCJ02Transformer => res
-    }
-  }
+
 }

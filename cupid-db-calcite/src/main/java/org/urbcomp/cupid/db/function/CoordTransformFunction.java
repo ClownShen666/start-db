@@ -29,23 +29,23 @@ import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment;
 import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
 public class CoordTransformFunction {
-    @CupidDBFunction("st_BD09ToWGS84")
-    public Point st_BD09ToWGS84(Point point) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.pointTransform(point);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public LineString st_BD09ToWGS84(LineString lineString) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.lineStringTransform(lineString);
-    }
-
-    @CupidDBFunction("st_BD09ToWGS84")
-    public Polygon st_BD09ToWGS84(Polygon polygon) {
-        AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
-        return transformer.polygonTransform(polygon);
-    }
+    // @CupidDBFunction("st_BD09ToWGS84")
+    // public Point st_BD09ToWGS84(Point point) {
+    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
+    // return transformer.pointTransform(point);
+    // }
+    //
+    // @CupidDBFunction("st_BD09ToWGS84")
+    // public LineString st_BD09ToWGS84(LineString lineString) {
+    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
+    // return transformer.lineStringTransform(lineString);
+    // }
+    //
+    // @CupidDBFunction("st_BD09ToWGS84")
+    // public Polygon st_BD09ToWGS84(Polygon polygon) {
+    // AbstractCoordTransformer transformer = new BD09ToWGS84Transformer();
+    // return transformer.polygonTransform(polygon);
+    // }
 
     @CupidDBFunction("st_BD09ToWGS84")
     public MultiPoint st_BD09ToWGS84(MultiPoint multiPoint) {
