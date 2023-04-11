@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--    test case for database sql    -->
+<testCase>
+    <resultXml>database_result.xml</resultXml>
+    <!--    展示所有数据库信息    -->
+    <case>
+        <sql type="query" resultID="1">show databases;</sql>
+    </case>
+    <!--    创建数据库  create database ?; -->
+    <case>
+        <sql type="update">create database ?;</sql>
+        <arguments>[test]</arguments>
+        <arguments>[ABC]</arguments>
+        <arguments>[a123]</arguments>
+        <arguments>[a_b]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789]</arguments>
+        <arguments exception="NullPointerException">[TEST]</arguments>
+        <arguments exception="NullPointerException">[a-b]</arguments>
+        <arguments exception="NullPointerException">[null]</arguments>
+        <arguments exception="NullPointerException">[123]</arguments>
+        <arguments exception="NullPointerException">[ ]</arguments>
+        <arguments exception="NullPointerException">[int]</arguments>
+        <sql type="query" resultID="2">show databases;</sql>
+    </case>
+    <!--    创建数据库  create database if not exists ?; -->
+    <case>
+        <sql type="update">create database if not exists ?;</sql>
+        <arguments>[exist]</arguments>
+        <arguments>[TEST]</arguments>
+        <sql type="query" resultID="3">show databases;</sql>
+    </case>
+    <!--    删除数据库  drop database ?;-->
+    <case>
+        <sql type="update">drop database ?;</sql>
+        <arguments>[test]</arguments>
+        <arguments>[ABC]</arguments>
+        <arguments>[a123]</arguments>
+        <arguments>[a_b]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789]</arguments>
+        <arguments>[a-b]</arguments>
+        <sql type="query" resultID="4">show databases;</sql>
+    </case>
+    <!--    删除数据库  drop database if exists ?;-->
+    <case>
+        <sql type="update">drop database if exists ?;</sql>
+        <arguments>[exist]</arguments>
+        <arguments>[TEST]</arguments>
+        <sql type="query" resultID="5">show databases;</sql>
+    </case>
+    <!--    使用数据库  use database ？;-->
+    <case>
+        <sql type="update">use database ?;</sql>
+        <arguments>[default]</arguments>
+        <arguments exception="Exception">[TEST]</arguments>
+        <sql type="query" resultID="6">show tables;</sql>
+    </case>
+</testCase>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--    test case for table sql    -->
+<testCase>
+    <resultXml>table_result.xml</resultXml>
+    <!--    test show tables    -->
+    <case>
+        <sql type="query" resultID="1">show tables;</sql>
+    </case>
+    <!--    test create table    -->
+    <case>
+        <sql type="update">create table if not exists test(int1 int, int2 integer, long_ long, float_ float, double_ double, string_ string, boolean1 bool, boolean2 boolean, binary_ binary, datetime_ datetime, timestamp_ timestamp, geometry_ geometry, point_ point, linestring_ linestring, polygon_ polygon, MultiPoint_ multipoint, MultiLineString_ MultiLineString, MultiPolygon_ MultiPolygon, GeometryCollection_ GeometryCollection, traj trajectory, road roadSegment);</sql>
+        <sql type="update">create table ?;</sql>
+        <arguments>[ABC(idx Integer)]</arguments>
+        <arguments>[a123(idx Integer)]</arguments>
+        <arguments>[a_b(idx Integer)]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789(idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[TEST(idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[a-b(idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[null(idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[123(idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[ (idx Integer)]</arguments>
+        <arguments exception="NullPointerException">[int(idx Integer)]</arguments>
+        <sql type="query" resultID="2">show tables;</sql>
+    </case>
+    <!--    test drop table    -->
+    <case>
+        <sql type="update">drop table test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+        <sql type="query" resultID="3">show databases;</sql>
+    </case>
+    <!--    test create table with index    -->
+    <case>
+        <sql type="update">create table if not exists test( name String, st Point, et Point, dtg Datetime, SPATIAL INDEX (st, dtg), SPATIAL INDEX spatial_index(et, dtg) );</sql>
+        <sql type="query" resultID="4">show tables;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test create table with specify concrete index type    -->
+    <case>
+        <sql type="update">create table if not exists test( name String, st Point, dtg Datetime, SPATIAL INDEX spatial_index2(st, dtg) type z2t);</sql>
+        <sql type="query" resultID="5">show tables;</sql>
+        <sql type="update">drop table if exists test;</sql>
+        <sql type="update" exception="IllegalArgumentException">create table if not exists test( name String, st Point, dtg Datetime, SPATIAL INDEX spatial_index2(st, dtg) type nonsense);</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test create table with attribute secondary temporal/Z2/Z3 index    -->
+    <case>
+        <sql type="update">create table if not exists test( name String, st Point, et Point, dtg Datetime, ATTRIBUTE INDEX attribute_temporal_index(name, dtg), ATTRIBUTE INDEX attribute_z2_index(name, st), ATTRIBUTE INDEX attribute_z3_index(name, st, dtg) );</sql>
+        <sql type="query" resultID="6">show tables;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test create then insert    -->
+    <case>
+        <sql type="update">create table if not exists test(tid integer, name string);</sql>
+        <sql type="update">insert into test values (1, 'tmp');</sql>
+    </case>
+    <!--    test show index    -->
+    <case>
+        <sql type="update">create table if not exists test( name String, st Point, et Point, dtg Datetime, SPATIAL INDEX spatial_index(et, dtg));</sql>
+        <sql type="query" resultID="7">show index from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test drop index    -->
+    <case>
+        <sql type="update">create table if not exists test( name String, st Point, et Point, dtg Datetime, SPATIAL INDEX spatial_index(et, dtg), ATTRIBUTE INDEX attribute_temporal_index(name, dtg));</sql>
+        <sql type="query" resultID="8">show index from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test describe table    -->
+    <case>
+        <sql type="update">create table if not exists test( tr Trajectory, rs RoadSegment, gm Geometry);</sql>
+        <sql type="query" resultID="9">describe test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test show create table    -->
+    <case>
+        <sql type="update">create table if not exists test( tr Trajectory, rs RoadSegment, gm Geometry);</sql>
+        <sql type="query" resultID="10">show create table test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test truncate table    -->
+    <case>
+        <sql type="update">create table if not exists test( idx Integer);</sql>
+        <sql type="query" resultID="11">insert into test values (1);</sql>
+        <sql type="query" resultID="12">select * from test;</sql>
+        <sql type="update">truncate table test;</sql>
+        <sql type="query" resultID="13">insert into test values (2);</sql>
+        <sql type="query" resultID="14">select * from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test for update    -->
+    <case>
+        <sql type="update">create table if not exists test(idx Integer);</sql>
+        <sql type="update">insert into test values (1);</sql>
+        <sql type="query" resultID="15">select * from test;</sql>
+        <sql type="update">update test set idx = 2 where idx = 1;</sql>
+        <sql type="query" resultID="16">select * from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test for delete    -->
+    <case>
+        <sql type="update">create table if not exists test(idx Integer);</sql>
+        <sql type="update">insert into test values (1);</sql>
+        <sql type="update">insert into test values (2);</sql>
+        <sql type="query" resultID="17">select * from test;</sql>
+        <sql type="update">delete from test where idx = 1;</sql>
+        <sql type="query" resultID="18">select * from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+    <!--    test for filter (1 = 1 and no where condition)    -->
+    <case>
+        <sql type="update">create table if not exists test(idx Integer);</sql>
+        <sql type="update">insert into test values (1);</sql>
+        <sql type="query" resultID="19">select * from test;</sql>
+        <sql type="update">delete from test;</sql>
+        <sql type="query" resultID="20">select * from test;</sql>
+        <sql type="update">insert into test values (1);</sql>
+        <sql type="update">delete from test where 1 = 1;</sql>
+        <sql type="query" resultID="21">select * from test;</sql>
+        <sql type="update">drop table if exists test;</sql>
+    </case>
+</testCase>
