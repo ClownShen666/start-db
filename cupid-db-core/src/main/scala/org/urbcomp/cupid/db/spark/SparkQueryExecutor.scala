@@ -18,7 +18,6 @@ package org.urbcomp.cupid.db.spark
 
 import lombok.extern.slf4j.Slf4j
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.SparkSession
 import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
@@ -90,7 +89,7 @@ object SparkQueryExecutor {
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) =>
         val instance = clazz.newInstance()
-        val rm = ScalaReflection.mirror
+        val rm = runtimeMirror(clazz.getClassLoader)
 
         def typeToTypeTag[T](tpe: Type): TypeTag[T] =
           TypeTag(rm, new api.TypeCreator {

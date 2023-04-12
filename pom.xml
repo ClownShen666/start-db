@@ -21,6 +21,7 @@
         <module>cupid-db-store</module>
         <module>cupid-db-flink</module>
         <module>cupid-db-udf-register</module>
+        <module>cupid-db-spark-sql-catalyst-fix</module>
     </modules>
 
     <properties>
