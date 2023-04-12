@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<expectedResult>
+    <result id="1">
+        <column name="Tables" type="tables"/>
+    </result>
+    <result id="2">
+        <column name="Tables" type="tables">
+            <row>test</row>
+            <row>abc</row>
+            <row>a123</row>
+            <row>a_b</row>
+            <row>a123456789b123456789c123456789d123456789e123456789</row>
+            <row>integer</row>
+        </column>
+    </result>
+    <result id="3">
+        <column name="Tables" type="tables"/>
+    </result>
+    <result id="4">
+        <column name="Tables" type="tables">
+            <row>test0</row>
+        </column>
+    </result>
+    <result id="5">
+        <column name="Tables" type="tables">
+            <row>test1</row>
+        </column>
+    </result>
+    <result id="6">
+        <column name="Tables" type="tables">
+            <row>test3</row>
+        </column>
+    </result>
+    <result id="7">
+        <column name="tid	name" type="int	string">
+            <row>1 tmp</row>
+        </column>
+    </result>
+    <result id="8">
+        <column name="Table	IndexName	IndexType	Fields	IndexProperties" type="table	indexname	indextype	fields	indexproperties">
+            <row>test5 spatial_index z2t et,dtg</row>
+        </column>
+    </result>
+    <result id="9">
+        <column name="Table	IndexName	IndexType	Fields	IndexProperties" type="table	indexname	indextype	fields	indexproperties">
+            <row>test6 spatial_index z2t et,dtg</row>
+            <row>test6 attribute_temporal_index attr name,dtg</row>
+        </column>
+    </result>
+    <result id="10">
+        <column name="Table	IndexName	IndexType	Fields	IndexProperties" type="table	indexname	indextype	fields	indexproperties"/>
+    </result>
+    <result id="11">
+        <column name="Field	Type	Key" type="field	type	key">
+            <row>tr Trajectory</row>
+            <row>rs RoadSegment</row>
+            <row>gm Geometry</row>
+        </column>
+    </result>
+    <result id="12">
+        <column name="Table	Create Table" type="table	create table">
+            <row>test8 CREATE TABLE test8 (tr Trajectory, rs RoadSegment, gm Geometry)</row>
+        </column>
+    </result>
+    <result id="13">
+        <column name="idx" type="int"/>
+    </result>
+    <result id="14">
+        <column name="idx" type="int">
+            <row>2</row>
+        </column>
+    </result>
+    <result id="15">
+        <column name="idx" type="int">
+            <row>2</row>
+        </column>
+    </result>
+    <result id="16">
+        <column name="idx" type="int"/>
+    </result>
+    <result id="17">
+        <column name="idx" type="int"/>
+    </result>
+</expectedResult>
