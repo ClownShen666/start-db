@@ -268,21 +268,40 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
 
   test("test show create table") {
     val tableName = "test_show_create_table"
+    val tableName2 = "test_show_create_table_with_index"
     val createTableSQL = s"""CREATE TABLE IF NOT EXISTS $tableName (
                             |    tr Trajectory,
                             |    rs RoadSegment,
                             |    gm Geometry
                             |);""".stripMargin
+    val createTableSql2 = s"""CREATE TABLE IF NOT EXISTS $tableName2  (
+         |  name String,
+         |  st Point,
+         |  et Point,
+         |  dtg Datetime,
+         |  SPATIAL INDEX spatial_index(et, dtg)
+         |  );
+         |""".stripMargin
     val stmt = connect.createStatement()
     stmt.executeUpdate(createTableSQL)
+    stmt.executeUpdate(createTableSql2)
     val rss = stmt.executeQuery("show create table %s".format(tableName))
     if (!rss.next()) {
       throw new AssertionError("unexpected show create table no result")
     }
     val sql = rss.getString(2)
+    val rss2 = stmt.executeQuery("show create table %s".format(tableName2))
+    if (!rss2.next()) {
+      throw new AssertionError("unexpected show create table no result")
+    }
+    val sql2 = rss2.getString(2)
     assertEquals(
-      "CREATE TABLE test_show_create_table (tr Trajectory, rs RoadSegment, gm Geometry)",
+      "CREATE TABLE test_show_create_table (tr Trajectory, rs RoadSegment, gm Geometry, SPATIAL INDEX gm (gm))",
       sql
+    )
+    assertEquals(
+      "CREATE TABLE test_show_create_table_with_index (name String, st Point, et Point, dtg Datetime, SPATIAL INDEX spatial_index (et, dtg))",
+      sql2
     )
   }
 
