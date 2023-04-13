@@ -21,11 +21,8 @@ import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
 object SparkExecuteWrapper {
-  private var sparkExecute: SparkExecuteWrapper = _
+  private val sparkExecute: SparkExecuteWrapper = new SparkExecuteWrapper(new SparkSqlParam())
   def getSparkExecute: SparkExecuteWrapper = {
-    if (sparkExecute == null) {
-      sparkExecute = new SparkExecuteWrapper(new SparkSqlParam())
-    }
     sparkExecute
   }
 }

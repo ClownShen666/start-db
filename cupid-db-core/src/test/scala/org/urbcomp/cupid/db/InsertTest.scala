@@ -17,14 +17,13 @@
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertEquals
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 
 /**
   * test for Insert
   * @author  WangBohong
-  * @date    2022-06-08
-  */
+  * */
 class InsertTest extends AbstractCalciteFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
@@ -56,7 +55,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test (a, b) values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -91,7 +90,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -109,7 +108,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\')), (3, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")

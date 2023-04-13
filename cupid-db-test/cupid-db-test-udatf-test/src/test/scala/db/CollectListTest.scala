@@ -24,8 +24,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
   * Collect List Test
   *
   * @author Hang Wu
-  * @date 2023-02-11
-  */
+  * */
 class CollectListTest extends AbstractCalciteSparkFunctionTest {
 
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()

@@ -22,8 +22,7 @@ import org.urbcomp.cupid.db.AbstractCalciteFunctionTest
 /**
   * test for delete executor
   * @author Wang Bohong
-  * @date 2022-06-21
-  */
+  * */
 class DeleteTest extends AbstractCalciteFunctionTest {
 
   /**
