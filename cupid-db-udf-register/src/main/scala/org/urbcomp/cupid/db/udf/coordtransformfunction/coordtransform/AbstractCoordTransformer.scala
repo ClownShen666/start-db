@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.{
   Geometry,
   GeometryCollection,
   LineString,
-  LinearRing,
   MultiLineString,
   MultiPoint,
   MultiPolygon,
@@ -34,64 +33,56 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
 abstract class AbstractCoordTransformer {
+
+  private val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory()
   def pointTransform(point: Point): Point = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
     val lngLat = transform(point.getX, point.getY)
     geometryFactory.createPoint(new Coordinate(lngLat(0), lngLat(1)))
   }
 
   def lineStringTransform(lineString: LineString): LineString = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
     val coordinates = lineString.getCoordinates
-    val res = new Array[Coordinate](coordinates.length)
-    for (i <- 0 until coordinates.length) {
-      val lngLat = transform(coordinates(i).getX, coordinates(i).getY)
-      res(i) = new Coordinate(lngLat(0), lngLat(1))
-    }
+    val res = coordinates
+      .map(coordinate => transform(coordinate.getX, coordinate.getY))
+      .map(lngLat => new Coordinate(lngLat(0), lngLat(1)))
     geometryFactory.createLineString(res)
+
   }
 
   def polygonTransform(polygon: Polygon): Polygon = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
     val shell = geometryFactory.createLinearRing(
       lineStringTransform(polygon.getExteriorRing).getCoordinateSequence
     )
-    val holes = new Array[LinearRing](polygon.getNumInteriorRing)
-    for (i <- 0 until polygon.getNumInteriorRing) {
-      val linearRing = polygon.getInteriorRingN(i)
-      val lineString = lineStringTransform(linearRing)
-      holes(i) = geometryFactory.createLinearRing(lineString.getCoordinateSequence)
-    }
+    val holes = (0 until polygon.getNumInteriorRing)
+      .map(polygon.getInteriorRingN)
+      .map(linearRing => lineStringTransform(linearRing))
+      .map(lineString => geometryFactory.createLinearRing(lineString.getCoordinateSequence))
+      .toArray
     geometryFactory.createPolygon(shell, holes)
   }
 
   def multiPointTransform(multiPoint: MultiPoint): MultiPoint = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    val points = new Array[Point](multiPoint.getNumGeometries)
-    for (i <- 0 until multiPoint.getNumGeometries) {
-      val point = multiPoint.getGeometryN(i).asInstanceOf[Point]
-      points(i) = pointTransform(point)
-    }
+    val points = (0 until multiPoint.getNumGeometries)
+      .map(GeometryN => GeometryN.asInstanceOf[Point])
+      .map(point => pointTransform(point))
+      .toArray
     geometryFactory.createMultiPoint(points)
   }
 
   def multiLineStringTransform(multiLineString: MultiLineString): MultiLineString = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    val lineStrings = new Array[LineString](multiLineString.getNumGeometries)
-    for (i <- 0 until multiLineString.getNumGeometries) {
-      val lineString = multiLineString.getGeometryN(i).asInstanceOf[LineString]
-      lineStrings(i) = lineStringTransform(lineString)
-    }
+    val lineStrings = (0 until multiLineString.getNumGeometries)
+      .map(GeometryN => GeometryN.asInstanceOf[LineString])
+      .map(lineString => lineStringTransform(lineString))
+      .toArray
     geometryFactory.createMultiLineString(lineStrings)
   }
 
   def multiPolygonTransform(mPolygon: MultiPolygon): MultiPolygon = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    val polygons = new Array[Polygon](mPolygon.getNumGeometries)
-    for (i <- 0 until mPolygon.getNumGeometries) {
-      val polygon = mPolygon.getGeometryN(i).asInstanceOf[Polygon]
-      polygons(i) = polygonTransform(polygon)
-    }
+
+    val polygons = (0 until mPolygon.getNumGeometries)
+      .map(GeometryN => GeometryN.asInstanceOf[Polygon])
+      .map(polygon => polygonTransform(polygon))
+      .toArray
     geometryFactory.createMultiPolygon(polygons)
   }
 
@@ -110,38 +101,29 @@ abstract class AbstractCoordTransformer {
   }
 
   def geometryCollectionTransform(geometryCollection: GeometryCollection): GeometryCollection = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    val geometries = new Array[Geometry](geometryCollection.getNumGeometries)
-    for (i <- 0 until geometryCollection.getNumGeometries) {
-      val geometry = geometryCollection.getGeometryN(i)
-      geometries(i) = geometryTransform(geometry)
-    }
+    val geometries = (0 until geometryCollection.getNumGeometries)
+      .map(GeometryN => GeometryN.asInstanceOf[GeometryCollection])
+      .map(geometry => geometryTransform(geometry))
+      .toArray
     geometryFactory.createGeometryCollection(geometries)
   }
 
   def trajectoryTransform(trajectory: Trajectory): Trajectory = {
-    val points = trajectory.getGPSPointList.stream
-      .map((o: GPSPoint) => {
-        def foo(o: GPSPoint) = {
-          val coords = transform(o.getLng, o.getLat)
-          new GPSPoint(o.getTime, coords(0), coords(1))
-        }
-
-        foo(o)
+    val points = trajectory.getGPSPointList
+      .stream()
+      .map(point => {
+        val coords = transform(point.getLng, point.getLat)
+        new GPSPoint(point.getTime, coords(0), coords(1))
       })
-      .collect(List.asInstanceOf) //collect(Collectors.toList)
+      .collect(List.asInstanceOf)
     new Trajectory(trajectory.getTid, trajectory.getOid, points)
   }
 
   def roadSegmentTransform(rs: RoadSegment): RoadSegment = {
     val points = rs.getPoints.stream
-      .map((o: SpatialPoint) => {
-        def foo(o: SpatialPoint) = {
-          val coords = transform(o.getLng, o.getLat)
-          new SpatialPoint(coords(0), coords(1))
-        }
-
-        foo(o)
+      .map(o => {
+        val coords = transform(o.getLng, o.getLat)
+        new SpatialPoint(coords(0), coords(1))
       })
       .collect(List.asInstanceOf)
     new RoadSegment(rs.getRoadSegmentId, rs.getStartNode.getNodeId, rs.getEndNode.getNodeId, points)
