@@ -33,7 +33,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   var connect: Connection = _
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger
-  private var statement: Statement = _
+  var statement: Statement = _
 
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))
