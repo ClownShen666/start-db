@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package db
-import org.apache.spark.sql.{Dataset, Row}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
@@ -47,12 +46,13 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     connect.close()
   }
 
-  protected def executeSpark(sql: String): Dataset[Row] = {
+  protected def executeSpark(sql: String): Unit = {
     SparkExecuteWrapper.getSparkExecute.executeSql(sql)
   }
 
   protected def executeQuery(sql: String): ResultSet = {
-    val rs1 = executeSpark(sql)
+    //测试spark
+    executeSpark(sql)
     val res2 = statement.executeQuery(sql)
     //返回类型统一后做两个结果的判断。
     res2
