@@ -62,27 +62,29 @@ abstract class AbstractCoordTransformer {
   }
 
   def multiPointTransform(multiPoint: MultiPoint): MultiPoint = {
-    val points = (0 until multiPoint.getNumGeometries)
-      .map(GeometryN => GeometryN.asInstanceOf[Point])
-      .map(point => pointTransform(point))
-      .toArray
+    val points = new Array[Point](multiPoint.getNumGeometries)
+    for (i <- 0 until multiPoint.getNumGeometries) {
+      val point = multiPoint.getGeometryN(i).asInstanceOf[Point]
+      points(i) = pointTransform(point)
+    }
     geometryFactory.createMultiPoint(points)
   }
 
   def multiLineStringTransform(multiLineString: MultiLineString): MultiLineString = {
-    val lineStrings = (0 until multiLineString.getNumGeometries)
-      .map(GeometryN => GeometryN.asInstanceOf[LineString])
-      .map(lineString => lineStringTransform(lineString))
-      .toArray
+    val lineStrings = new Array[LineString](multiLineString.getNumGeometries)
+    for (i <- 0 until multiLineString.getNumGeometries) {
+      val lineString = multiLineString.getGeometryN(i).asInstanceOf[LineString]
+      lineStrings(i) = lineStringTransform(lineString)
+    }
     geometryFactory.createMultiLineString(lineStrings)
   }
 
   def multiPolygonTransform(mPolygon: MultiPolygon): MultiPolygon = {
-
-    val polygons = (0 until mPolygon.getNumGeometries)
-      .map(GeometryN => GeometryN.asInstanceOf[Polygon])
-      .map(polygon => polygonTransform(polygon))
-      .toArray
+    val polygons = new Array[Polygon](mPolygon.getNumGeometries)
+    for (i <- 0 until mPolygon.getNumGeometries) {
+      val polygon = mPolygon.getGeometryN(i).asInstanceOf[Polygon]
+      polygons(i) = polygonTransform(polygon)
+    }
     geometryFactory.createMultiPolygon(polygons)
   }
 
@@ -101,10 +103,11 @@ abstract class AbstractCoordTransformer {
   }
 
   def geometryCollectionTransform(geometryCollection: GeometryCollection): GeometryCollection = {
-    val geometries = (0 until geometryCollection.getNumGeometries)
-      .map(GeometryN => GeometryN.asInstanceOf[GeometryCollection])
-      .map(geometry => geometryTransform(geometry))
-      .toArray
+    val geometries = new Array[Geometry](geometryCollection.getNumGeometries)
+    for (i <- 0 until geometryCollection.getNumGeometries) {
+      val geometry = geometryCollection.getGeometryN(i)
+      geometries(i) = geometryTransform(geometry)
+    }
     geometryFactory.createGeometryCollection(geometries)
   }
 
