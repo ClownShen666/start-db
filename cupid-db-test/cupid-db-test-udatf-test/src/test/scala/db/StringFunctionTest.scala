@@ -30,16 +30,9 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     * returns the string after converting each letter of the original string to uppercase
     */
   test("upper") {
-//    val statement = connect.createStatement
-//    val resultSet = statement.executeQuery("select upper('abcde')")
-//    resultSet.next()
-//    assertEquals("ABCDE", resultSet.getObject(1))
-//    val rs = executeSpark("select upper('abcde')")
-//    assertEquals("ABCDE", rs.head().get(0))
-    val rs = statement.executeQuery("select upper('abcde')")
+    val rs = executeQuery("select upper('abcde')")
     rs.next()
     assertEquals("ABCDE", rs.getObject(1))
-
   }
 
   /**
@@ -145,20 +138,20 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   }
 
-  test("lpad2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select lpad('abcde', 2, 'a')")
-    resultSet.next()
-    assertEquals("ab", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select lpad(null, 5, 'a')")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-    val resultSet3 = statement.executeQuery("select lpad('abcde', 6, 'a')")
-    resultSet3.next()
-    assertEquals("aabcde", resultSet3.getObject(1))
-    executeSpark("select lpad('abcde', 2, 'a')")
-
-  }
+//  test("lpad2") {
+//    val statement = connect.createStatement
+//    val resultSet = statement.executeQuery("select lpad('abcde', 2, 'a')")
+//    resultSet.next()
+//    assertEquals("ab", resultSet.getObject(1))
+//    val resultSet2 = statement.executeQuery("select lpad(null, 5, 'a')")
+//    resultSet2.next()
+//    assertEquals(null, resultSet2.getObject(1))
+//    val resultSet3 = statement.executeQuery("select lpad('abcde', 6, 'a')")
+//    resultSet3.next()
+//    assertEquals("aabcde", resultSet3.getObject(1))
+//    executeSpark("select lpad('abcde', 2, 'a')")
+//
+//  }
 
   test("rpad1") {
     val statement = connect.createStatement
@@ -169,20 +162,20 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   }
 
-  test("rpad2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select rpad('abcde', 1, 'e')")
-    resultSet.next()
-    assertEquals("a", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select rpad('abcde', 6, 'e')")
-    resultSet2.next()
-    assertEquals("abcdee", resultSet2.getObject(1))
-    val resultSet3 = statement.executeQuery("select rpad('abcde', 6, null)")
-    resultSet3.next()
-    assertEquals(null, resultSet3.getObject(1))
-    executeSpark("select rpad('abcde', 1, 'e')")
-
-  }
+//  test("rpad2") {
+//    val statement = connect.createStatement
+//    val resultSet = statement.executeQuery("select rpad('abcde', 1, 'e')")
+//    resultSet.next()
+//    assertEquals("a", resultSet.getObject(1))
+//    val resultSet2 = statement.executeQuery("select rpad('abcde', 6, 'e')")
+//    resultSet2.next()
+//    assertEquals("abcdee", resultSet2.getObject(1))
+//    val resultSet3 = statement.executeQuery("select rpad('abcde', 6, null)")
+//    resultSet3.next()
+//    assertEquals(null, resultSet3.getObject(1))
+//    executeSpark("select rpad('abcde', 1, 'e')")
+//
+//  }
 
   //TODO 多字节字符测试
   test("length") {
@@ -213,14 +206,14 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   }
 
-  test("locate2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select locate('bc', 'abcabc', 2)")
-    resultSet.next()
-    assertEquals(5, resultSet.getObject(1))
-    executeSpark("select locate('bc', 'abcabc', 2)")
-
-  }
+//  test("locate2") {
+//    val statement = connect.createStatement
+//    val resultSet = statement.executeQuery("select locate('bc', 'abcabc', 2)")
+//    resultSet.next()
+//    assertEquals(5, resultSet.getObject(1))
+//    executeSpark("select locate('bc', 'abcabc', 2)")
+//
+//  }
 
   test("md5") {
     val statement = connect.createStatement

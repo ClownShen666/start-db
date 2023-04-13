@@ -53,9 +53,9 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   protected def executeQuery(sql: String): ResultSet = {
     //测试spark
     executeSpark(sql)
-    val res2 = statement.executeQuery(sql)
+    statement.executeQuery(sql)
     //返回类型统一后做两个结果的判断。
-    res2
+
   }
 
 }
