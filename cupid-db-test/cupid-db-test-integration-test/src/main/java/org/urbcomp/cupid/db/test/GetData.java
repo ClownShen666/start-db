@@ -230,6 +230,12 @@ public class GetData {
             case "decimal":
                 type = "double";
                 break;
+            case "bigint":
+                type = "long";
+                break;
+            case "real":
+                type = "float";
+                break;
             default:
                 type = colType.toLowerCase();
         }
