@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db
+package db
 
 import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
@@ -23,8 +23,9 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
 /**
   * test for Insert
   * @author  WangBohong
-  * */
-class InsertTest extends AbstractCalciteFunctionTest {
+  * @date    2022-06-08
+  */
+class InsertTest extends AbstractCalciteSparkFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON
@@ -55,7 +56,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    statement.execute(
+    val set = statement.execute(
       "insert into t_road_segment_test (a, b) values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -90,7 +91,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    statement.execute(
+    val set = statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -108,7 +109,7 @@ class InsertTest extends AbstractCalciteFunctionTest {
     val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
     rsBefore.next()
     val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    statement.execute(
+    val set = statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\')), (3, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")

@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db
+package db
 
 import org.junit.Assert.assertEquals
+
 import java.math.BigDecimal
-class MathFunctionTest extends AbstractCalciteFunctionTest {
+class MathFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * test for log
     */
   test("log") {
     val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log(3.4,7.4)")
+    val resultSet = statement.executeQuery("select log(3.4,9.6)")
     resultSet.next()
-    assertEquals(BigDecimal.valueOf(1.6354961445476646), resultSet.getObject(1))
+    assertEquals(BigDecimal.valueOf(1.8481847568028238), resultSet.getObject(1))
     val resultSet2 = statement.executeQuery("select log(null,null)")
     resultSet2.next()
     assertEquals(null, resultSet2.getObject(1))

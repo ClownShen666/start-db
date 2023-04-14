@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db
+package db
 
 import org.junit.Assert.{assertEquals, assertTrue}
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
@@ -23,9 +23,10 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
 /**
   * test for RoadSegmentQuery
   *
-  * @author WangBohong
-  * */
-class RoadSegmentQueryTest extends AbstractCalciteFunctionTest {
+  * @author WangBohongd
+  * @date 2022-06-16
+  */
+class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON
@@ -55,4 +56,6 @@ class RoadSegmentQueryTest extends AbstractCalciteFunctionTest {
       assertEquals(classOf[RoadSegment], rs.getObject(2).getClass)
     }
   }
+
+  test("0626Test") {}
 }

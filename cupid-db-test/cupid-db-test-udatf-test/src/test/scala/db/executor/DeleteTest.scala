@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.executor
+package db.executor
 
+import db.AbstractCalciteSparkFunctionTest
 import org.junit.Assert.assertEquals
-import org.urbcomp.cupid.db.AbstractCalciteFunctionTest
 
 /**
   * test for delete executor
   * @author Wang Bohong
-  * */
-class DeleteTest extends AbstractCalciteFunctionTest {
+  * @date 2022-06-21
+  */
+class DeleteTest extends AbstractCalciteSparkFunctionTest {
 
   /**
     * test for delete

@@ -14,22 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.stringfunction
+package db
 
-import scala.collection.mutable
+import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
+import org.urbcomp.cupid.db.util.SparkSqlParam
 
-trait Pad {
-  def pad(str: String, len: Int, pad: String): String = {
-    if (str == null || pad == null) null
-    else if (len < str.length) str.substring(0, len)
-    else {
-      val sb = new mutable.StringBuilder()
-      var i = 0
-      while (i < len - str.length) {
-        sb.append(pad)
-        i += 1
-      }
-      sb.toString()
-    }
+object SparkExecuteWrapper {
+  private val sparkExecute: SparkExecuteWrapper = new SparkExecuteWrapper(new SparkSqlParam())
+  def getSparkExecute: SparkExecuteWrapper = {
+    sparkExecute
   }
+}
+
+class SparkExecuteWrapper private (param: SparkSqlParam) {
+  param.setUserName("root")
+  param.setDbName("default")
+  param.setEnableHiveSupport(true)
+  param.setExportType(DataExportType.PRINT)
+  param.setLocal(true)
+
+  def executeSql(sql: String): Unit = {
+    param.setSql(sql)
+    SparkQueryExecutor.execute(param, null)
+  }
+
 }

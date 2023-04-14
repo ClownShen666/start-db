@@ -16,27 +16,20 @@
  */
 package org.urbcomp.cupid.db.udf.stringfunction
 
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-
 import scala.collection.mutable
 
-class LpadUdf extends AbstractUdf {
-  override def name(): String = "lpad"
-
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  def evaluate(str: String, len: Int): String = {
-    if (str == null) null
+object Util {
+  def pad(str: String, len: Int, pad: String): String = {
+    if (str == null || pad == null) null
+    else if (len < str.length) str.substring(0, len)
     else {
       val sb = new mutable.StringBuilder()
       var i = 0
-      while (i < len) {
-        sb.append(' ')
+      while (i < len - str.length) {
+        sb.append(pad)
         i += 1
       }
-      sb + str
+      sb.toString()
     }
   }
-
 }
