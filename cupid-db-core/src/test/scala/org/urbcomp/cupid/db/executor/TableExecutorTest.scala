@@ -269,6 +269,7 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
   test("test show create table") {
     val tableName = "test_show_create_table"
     val tableName2 = "test_show_create_table_with_index"
+    val tableName3 = "test_show_create_table_with_double_index"
     val createTableSQL = s"""CREATE TABLE IF NOT EXISTS $tableName (
                             |    tr Trajectory,
                             |    rs RoadSegment,
@@ -282,9 +283,20 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
          |  SPATIAL INDEX spatial_index(et, dtg)
          |  );
          |""".stripMargin
+    val createTableSql3 =
+      s"""CREATE TABLE IF NOT EXISTS $tableName3 (
+         |  name String,
+         |  st Point,
+         |  et Point,
+         |  dtg Datetime,
+         |  SPATIAL INDEX spatial_index(et, dtg),
+         |  ATTRIBUTE INDEX attribute_temporal_index(name, dtg)
+         |  );
+         |""".stripMargin
     val stmt = connect.createStatement()
     stmt.executeUpdate(createTableSQL)
     stmt.executeUpdate(createTableSql2)
+    stmt.executeUpdate(createTableSql3)
     val rss = stmt.executeQuery("show create table %s".format(tableName))
     if (!rss.next()) {
       throw new AssertionError("unexpected show create table no result")
@@ -295,6 +307,11 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
       throw new AssertionError("unexpected show create table no result")
     }
     val sql2 = rss2.getString(2)
+    val rss3 = stmt.executeQuery("show create table %s".format(tableName3))
+    if (!rss3.next()) {
+      throw new AssertionError("unexpected show create table no result")
+    }
+    val sql3 = rss3.getString(2)
     assertEquals(
       "CREATE TABLE test_show_create_table (tr Trajectory, rs RoadSegment, gm Geometry, SPATIAL INDEX gm (gm))",
       sql
@@ -302,6 +319,10 @@ class TableExecutorTest extends AbstractCalciteFunctionTest {
     assertEquals(
       "CREATE TABLE test_show_create_table_with_index (name String, st Point, et Point, dtg Datetime, SPATIAL INDEX spatial_index (et, dtg))",
       sql2
+    )
+    assertEquals(
+      "CREATE TABLE test_show_create_table_with_double_index (name String, st Point, et Point, dtg Datetime, SPATIAL INDEX spatial_index (et, dtg), ATTRIBUTE INDEX attribute_temporal_index (name, dtg))",
+      sql3
     )
   }
 
