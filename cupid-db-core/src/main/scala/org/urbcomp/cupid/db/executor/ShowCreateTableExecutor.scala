@@ -27,7 +27,6 @@ import org.apache.calcite.sql.{
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
-import org.urbcomp.cupid.db.metadata.entity.Index
 import org.urbcomp.cupid.db.parser.SqlHelper
 import org.urbcomp.cupid.db.parser.ddl.{SqlCupidCreateTable, SqlIndexDeclaration}
 import org.urbcomp.cupid.db.parser.dql.SqlShowCreateTable
@@ -65,9 +64,7 @@ case class ShowCreateTableExecutor(n: SqlShowCreateTable) extends BaseExecutor {
     val indexes = MetadataAccessUtil.getIndexes(userName, dbName, tableName)
     var sqlIndexList: SqlNodeList = null
     if (indexes != null) {
-      val indexList = MetadataAccessUtil
-        .getIndexes(userName, dbName, tableName)
-        .asScala
+      val indexList = indexes.asScala
         .map(index => {
           val columnList = index.getFieldsIdList
             .split(",")
