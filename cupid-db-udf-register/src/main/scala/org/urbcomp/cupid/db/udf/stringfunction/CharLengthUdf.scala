@@ -26,4 +26,8 @@ class CharLengthUdf extends AbstractUdf {
 
   def evaluate(str: String): Integer =
     if (str == null) null else str.length
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => Integer = evaluate
 }

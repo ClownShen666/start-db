@@ -40,4 +40,8 @@ class ToDegrees extends AbstractUdf {
     val res = Math.toDegrees(angRad.doubleValue)
     BigDecimal.valueOf(res)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: BigDecimal => BigDecimal = evaluate
 }

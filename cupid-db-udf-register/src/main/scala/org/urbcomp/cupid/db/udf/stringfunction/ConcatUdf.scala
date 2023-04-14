@@ -26,4 +26,8 @@ class ConcatUdf extends AbstractUdf {
 
   def evaluate(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (String, String) => String = evaluate
 }

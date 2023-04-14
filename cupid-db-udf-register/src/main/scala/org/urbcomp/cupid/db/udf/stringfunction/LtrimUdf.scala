@@ -35,4 +35,8 @@ class LtrimUdf extends AbstractUdf {
       str.substring(i)
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => String = evaluate
 }

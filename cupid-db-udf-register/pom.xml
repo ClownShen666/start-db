@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.binary.version}</artifactId>
+            <artifactId>spark-sql-fix_${scala.binary.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
             <exclusions>
@@ -57,6 +57,10 @@
                     <artifactId>spark-catalyst_${scala.binary.version}</artifactId>
                     <groupId>org.apache.spark</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                    <groupId>org.apache.spark</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -66,6 +70,10 @@
             <exclusions>
                 <exclusion>
                     <artifactId>spark-catalyst_${scala.binary.version}</artifactId>
+                    <groupId>org.apache.spark</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spark-sql_${scala.binary.version}</artifactId>
                     <groupId>org.apache.spark</groupId>
                 </exclusion>
             </exclusions>

@@ -21,7 +21,8 @@
         <module>cupid-db-store</module>
         <module>cupid-db-flink</module>
         <module>cupid-db-udf-register</module>
-        <module>cupid-db-spark-sql-catalyst-fix</module>
+        <module>cupid-db-spark-catalyst-fix</module>
+        <module>cupid-db-spark-sql-fix</module>
     </modules>
 
     <properties>
@@ -72,6 +73,7 @@
         <hive.version>2.3.0</hive.version>
         <grpc.version>1.19.0</grpc.version>
         <kryo.version>5.3.0</kryo.version>
+        <hive-serde.version>2.3.7</hive-serde.version>
     </properties>
 
     <dependencyManagement>

@@ -39,4 +39,8 @@ class Pow extends AbstractUdf {
     val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = evaluate
 }

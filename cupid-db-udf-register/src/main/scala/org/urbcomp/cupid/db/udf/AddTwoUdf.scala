@@ -14,38 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.stringfunction
+package org.urbcomp.cupid.db.udf
 
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-import java.security.MessageDigest
+class AddTwoUdf extends AbstractUdf {
 
-class Md5Udf extends AbstractUdf {
-  override def name(): String = "md5"
+  override def name(): String = "AddTwo"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(str: String): String = {
-    val hexDigits =
-      Array[Char]('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
-    val btInput = str.getBytes()
-    val mdInst = MessageDigest.getInstance("MD5")
-    mdInst.update(btInput)
-    val md = mdInst.digest()
-    val j = md.length
-    val code = new Array[Char](j * 2)
-    var k = 0
-    for (e <- md) {
-      code(k) = hexDigits(e >>> 4 & 0xf)
-      k += 1
-      code(k) = hexDigits(e & 0xf)
-      k += 1
-    }
-    new String(code)
+  def evaluate(x: Int, y: Int): Int = {
+    x + y
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => String = evaluate
+  def udfWrapper: (Int, Int) => Int = evaluate
 }

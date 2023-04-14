@@ -14,20 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.stringfunction
+package org.apache.spark.sql
 
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.apache.spark.annotation.Stable
+import org.apache.spark.sql.catalyst.expressions.Expression
 
-class TrimUdf extends AbstractUdf {
-  override def name(): String = "trim"
-
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  def evaluate(str: String): String =
-    if (str == null) null else str.trim
-
-  def udfSparkEntries: List[String] = List("udfWrapper")
-
-  def udfWrapper: String => String = evaluate
-}
+@Stable
+class ScoreException protected[sql] (val expr: Expression, val score: Int)
+    extends Throwable
+    with Serializable {}

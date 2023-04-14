@@ -38,4 +38,8 @@ class LpadUdf extends AbstractUdf with Pad {
       sb + str
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (String, Int) => String = evaluate
 }

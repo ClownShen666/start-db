@@ -18,12 +18,10 @@ package org.apache.spark.sql.catalyst.analysis
 
 import java.util.Locale
 import javax.annotation.concurrent.GuardedBy
-
 import scala.collection.mutable
 import scala.reflect.ClassTag
-
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.AnalysisException
+import org.apache.spark.sql.{AnalysisException, ScoreException}
 import org.apache.spark.sql.catalyst.FunctionIdentifier
 import org.apache.spark.sql.catalyst.analysis.FunctionRegistry.FunctionBuilder
 import org.apache.spark.sql.catalyst.expressions._
@@ -102,7 +100,7 @@ class SimpleFunctionRegistry extends FunctionRegistry with Logging {
       builder: FunctionBuilder
   ): Unit = synchronized {
     val normalizedName = normalizeFuncName(name)
-    System.out.println("enter my function")
+    System.out.println("enterentersimple")
     val newFunction = (info, builder)
     functionBuilders.put(normalizedName, newFunction) match {
       case Some(previousFunction) if previousFunction != newFunction =>
@@ -146,6 +144,107 @@ class SimpleFunctionRegistry extends FunctionRegistry with Logging {
     functionBuilders.iterator.foreach {
       case (name, (info, builder)) =>
         registry.registerFunction(name, info, builder)
+    }
+    registry
+  }
+}
+
+class FullFunctionRegistry extends FunctionRegistry with Logging {
+
+  @GuardedBy("this")
+  private val functionBuilders =
+    new mutable.HashMap[FunctionIdentifier, mutable.Set[(ExpressionInfo, FunctionBuilder)]]
+
+  // Resolution of the function name is always case insensitive, but the database name
+  // depends on the caller
+  private def normalizeFuncName(name: FunctionIdentifier): FunctionIdentifier = {
+    FunctionIdentifier(name.funcName.toLowerCase(Locale.ROOT), name.database)
+  }
+
+  override def registerFunction(
+      name: FunctionIdentifier,
+      info: ExpressionInfo,
+      builder: FunctionBuilder
+  ): Unit = synchronized {
+    val normalizedName = normalizeFuncName(name)
+    val newFunction = (info, builder)
+    if (!functionBuilders.contains(normalizedName))
+      functionBuilders += (normalizedName -> mutable.Set[(ExpressionInfo, FunctionBuilder)]())
+    if (functionBuilders(normalizedName).contains(newFunction)) {
+      logWarning(s"The function $normalizedName is registered multiple times.")
+    } else {
+      functionBuilders(normalizedName) = functionBuilders(normalizedName).filter(
+        x => !x._1.getClassName.startsWith("org.apache.spark.sql.catalyst.expressions")
+      )
+      functionBuilders(normalizedName) += newFunction
+    }
+  }
+
+  override def lookupFunction(name: FunctionIdentifier, children: Seq[Expression]): Expression = {
+    val normalizedName = normalizeFuncName(name)
+    synchronized {
+      if (!functionBuilders.contains(normalizedName)) {
+        throw new AnalysisException(s"Undefined function $name")
+      }
+      val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
+      // Get the most matched method for the UDF given the parameter types
+      var ret: Expression = null
+      var minScore: Int = Int.MaxValue
+      functions.foreach { func: FunctionBuilder =>
+        try {
+          func(children)
+        } catch {
+          case e: ScoreException =>
+            System.out.println(func.toString(), e.score)
+            if (e.score == 0) {
+              // Exact match
+              return e.expr
+            }
+            if (minScore > e.score) {
+              // Use closer function
+              minScore = e.score
+              ret = e.expr
+            }
+          case e: AnalysisException =>
+        }
+      }
+      if (ret == null) throw new AnalysisException(s"No matched function $name")
+      else ret
+    }
+  }
+
+  override def listFunction(): Seq[FunctionIdentifier] = synchronized {
+    functionBuilders.iterator.map(_._1).toList
+  }
+
+  override def lookupFunction(name: FunctionIdentifier): Option[ExpressionInfo] = synchronized {
+    functionBuilders.get(normalizeFuncName(name)).map(_.head).map(_._1)
+  }
+
+  override def lookupFunctionBuilder(name: FunctionIdentifier): Option[FunctionBuilder] =
+    synchronized {
+      functionBuilders.get(normalizeFuncName(name)).map(_.head).map(_._2)
+    }
+
+  override def dropFunction(name: FunctionIdentifier): Boolean = synchronized {
+    val normalizedName = normalizeFuncName(name)
+    logWarning(s"Drop all $normalizedName functions.")
+    functionBuilders.remove(normalizedName).isDefined
+  }
+
+  override def clear(): Unit = synchronized {
+    functionBuilders.clear()
+  }
+
+  override def clone(): FullFunctionRegistry = synchronized {
+    val registry = new FullFunctionRegistry
+    functionBuilders.iterator.foreach {
+      case (name, functions) =>
+        functions.iterator.foreach {
+          case (info, builder) => {
+            registry.registerFunction(name, info, builder)
+          }
+        }
     }
     registry
   }
@@ -548,8 +647,8 @@ object FunctionRegistry {
     expression[StructsToCsv]("to_csv")
   )
 
-  val builtin: SimpleFunctionRegistry = {
-    val fr = new SimpleFunctionRegistry
+  val builtin: FullFunctionRegistry = {
+    val fr = new FullFunctionRegistry
     expressions.foreach {
       case (name, (info, builder)) => fr.registerFunction(FunctionIdentifier(name), info, builder)
     }
