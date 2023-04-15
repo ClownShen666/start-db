@@ -25,11 +25,10 @@ class CastToBooleanUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(str: String): java.lang.Boolean = {
-    str match {
+    val s = Some(str).map(_.toLowerCase()).orNull
+    s match {
       case "true"  => true
-      case "TRUE"  => true
       case "false" => false
-      case "FALSE" => false
       case _       => null
     }
   }
