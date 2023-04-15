@@ -190,4 +190,19 @@ public class CupidSparkDriverTest {
     public void testCoord() {
         execute("select st_BD09ToWGS84(st_makePoint(1, 2))");
     }
+
+    @Test
+    public void testCastToBoolean() {
+        execute("select castToBoolean(585)");
+    }
+
+    @Test
+    public void testCastToDouble() {
+        execute("select castToDouble('1e6')," + "castToDouble(null)");
+    }
+
+    @Test
+    public void testParseDouble() {
+        execute("select parseDouble('1e6')," + "parseDouble(null)");
+    }
 }
