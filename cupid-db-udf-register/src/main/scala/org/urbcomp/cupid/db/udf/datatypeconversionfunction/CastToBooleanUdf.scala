@@ -27,7 +27,9 @@ class CastToBooleanUdf extends AbstractUdf {
   def evaluate(str: String): java.lang.Boolean = {
     str match {
       case "true"  => true
+      case "TRUE"  => true
       case "false" => false
+      case "FALSE" => false
       case _       => null
     }
   }
