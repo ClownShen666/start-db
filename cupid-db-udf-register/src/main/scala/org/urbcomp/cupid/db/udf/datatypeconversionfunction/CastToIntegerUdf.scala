@@ -36,4 +36,7 @@ class CastToIntegerUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => java.lang.Integer = evaluate
 }

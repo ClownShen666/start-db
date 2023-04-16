@@ -36,4 +36,7 @@ class CastToLongUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => java.lang.Long = evaluate
 }

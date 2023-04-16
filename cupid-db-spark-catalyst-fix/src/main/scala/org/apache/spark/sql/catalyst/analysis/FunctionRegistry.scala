@@ -185,7 +185,13 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
       }
       val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
       if (functions.isEmpty) throw new AnalysisException(s"No matched function name $name !")
-      else if (functions.size == 1) return functions.head(children)
+      else if (functions.size == 1) {
+        try {
+          return functions.head(children)
+        } catch {
+          case e: ScoreException => return e.expr
+        }
+      }
       // Get the most matched method for the UDF given the parameter types
       var ret: Expression = null
       var minScore: Int = Int.MaxValue

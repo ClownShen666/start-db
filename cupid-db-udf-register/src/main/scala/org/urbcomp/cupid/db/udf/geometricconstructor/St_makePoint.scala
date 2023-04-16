@@ -37,4 +37,7 @@ class St_makePoint extends AbstractUdf {
     geometryFactory.createPoint(new Coordinate(X, Y))
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Long, Long) => Point = evaluate
 }
