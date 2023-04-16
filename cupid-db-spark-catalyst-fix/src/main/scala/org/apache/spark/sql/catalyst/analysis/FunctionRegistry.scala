@@ -187,12 +187,15 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
         throw new AnalysisException(s"Undefined function $name")
       }
       val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
+      /*if (functions.isEmpty) throw new AnalysisException(s"No matched function name $name !")
+      else if (functions.size == 1) return functions.head(children)*/
       // Get the most matched method for the UDF given the parameter types
       var ret: Expression = null
       var minScore: Int = Int.MaxValue
       functions.foreach { func: FunctionBuilder =>
         try {
-          func(children)
+          val result: Expression = func(children)
+          ret = result
         } catch {
           case e: ScoreException =>
             System.out.println(func.toString(), e.score)
@@ -205,7 +208,7 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
               minScore = e.score
               ret = e.expr
             }
-          case e: AnalysisException =>
+          case _: AnalysisException =>
         }
       }
       if (ret == null) throw new AnalysisException(s"No matched function $name")
