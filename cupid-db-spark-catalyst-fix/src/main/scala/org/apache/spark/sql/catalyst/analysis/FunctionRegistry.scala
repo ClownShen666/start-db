@@ -173,9 +173,6 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
     if (functionBuilders(normalizedName).contains(newFunction)) {
       logWarning(s"The function $normalizedName is registered multiple times.")
     } else {
-      functionBuilders(normalizedName) = functionBuilders(normalizedName).filter(
-        x => !x._1.getClassName.startsWith("org.apache.spark.sql.catalyst.expressions")
-      )
       functionBuilders(normalizedName) += newFunction
     }
   }
@@ -187,8 +184,8 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
         throw new AnalysisException(s"Undefined function $name")
       }
       val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
-      /*if (functions.isEmpty) throw new AnalysisException(s"No matched function name $name !")
-      else if (functions.size == 1) return functions.head(children)*/
+      if (functions.isEmpty) throw new AnalysisException(s"No matched function name $name !")
+      else if (functions.size == 1) return functions.head(children)
       // Get the most matched method for the UDF given the parameter types
       var ret: Expression = null
       var minScore: Int = Int.MaxValue
