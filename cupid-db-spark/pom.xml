@@ -138,6 +138,7 @@
             <version>${geomesa.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--    test case for database sql    -->
+<testCase>
+    <resultXml>database_result.xml</resultXml>
+    <!--    drop database if exists    -->
+    <case>
+        <sql type="update">drop database if exists ?;</sql>
+        <arguments>[test]</arguments>
+        <arguments>[ABC]</arguments>
+        <arguments>[a123]</arguments>
+        <arguments>[a_b]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789]</arguments>
+        <arguments>[exist]</arguments>
+        <arguments>[TEST]</arguments>
+    </case>
+    <!--    test show databases    -->
+    <case>
+        <sql type="query" resultID="1">show databases;</sql>
+    </case>
+    <!--    test create database    -->
+    <case>
+        <sql type="update">create database ?;</sql>
+        <arguments>[test]</arguments>
+        <arguments>[ABC]</arguments>
+        <arguments>[a123]</arguments>
+        <arguments>[a_b]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789]</arguments>
+        <arguments exception="IllegalArgumentException">[TEST]</arguments>
+        <arguments exception="IllegalArgumentException">[a-b]</arguments>
+        <arguments exception="IllegalArgumentException">[null]</arguments>
+        <arguments exception="IllegalArgumentException">[123]</arguments>
+        <arguments exception="IllegalArgumentException">[ ]</arguments>
+        <arguments exception="IllegalArgumentException">[int]</arguments>
+        <sql type="query" resultID="2">show databases;</sql>
+    </case>
+    <!--    test create database if not exists    -->
+    <case>
+        <sql type="update">create database if not exists ?;</sql>
+        <arguments>[exist]</arguments>
+        <arguments>[TEST]</arguments>
+        <sql type="query" resultID="3">show databases;</sql>
+    </case>
+    <!--    test drop database    -->
+    <case>
+        <sql type="update">drop database ?;</sql>
+        <arguments>[test]</arguments>
+        <arguments>[ABC]</arguments>
+        <arguments>[a123]</arguments>
+        <arguments>[a_b]</arguments>
+        <arguments>[a123456789b123456789c123456789d123456789e123456789]</arguments>
+        <arguments>[a-b]</arguments>
+        <sql type="query" resultID="4">show databases;</sql>
+    </case>
+    <!--    test drop database if exists    -->
+    <case>
+        <sql type="update">drop database if exists ?;</sql>
+        <arguments>[exist]</arguments>
+        <arguments>[TEST]</arguments>
+        <sql type="query" resultID="5">show databases;</sql>
+    </case>
+    <!--    test use database    -->
+    <case>
+        <sql type="update">use  ?;</sql>
+        <arguments>[default]</arguments>
+        <arguments exception="IllegalArgumentException">[TEST]</arguments>
+    </case>
+</testCase>

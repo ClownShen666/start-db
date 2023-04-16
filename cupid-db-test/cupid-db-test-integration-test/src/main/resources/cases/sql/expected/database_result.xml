@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<expectedResult>
+    <result id="1">
+        <column name="Database" type="database">
+            <row>default</row>
+        </column>
+    </result>
+    <result id="2">
+        <column name="Database" type="database">
+            <row>default</row>
+            <row>test</row>
+            <row>ABC</row>
+            <row>a123</row>
+            <row>a_b</row>
+            <row>a123456789b123456789c123456789d123456789e123456789</row>
+        </column>
+    </result>
+    <result id="3">
+        <column name="Database" type="database">
+            <row>default</row>
+            <row>test</row>
+            <row>ABC</row>
+            <row>a123</row>
+            <row>a_b</row>
+            <row>a123456789b123456789c123456789d123456789e123456789</row>
+            <row>exist</row>
+        </column>
+    </result>
+    <result id="4">
+        <column name="Database" type="database">
+            <row>default</row>
+            <row>exist</row>
+        </column>
+    </result>
+    <result id="5">
+        <column name="Database" type="database">
+            <row>default</row>
+        </column>
+    </result>
+</expectedResult>

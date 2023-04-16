@@ -23,9 +23,8 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
 /**
   * test for RoadSegmentQuery
   *
-  * @author WangBohongd
-  * @date 2022-06-16
-  */
+  * @author WangBohong
+  * */
 class RoadSegmentQueryTest extends AbstractCalciteFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
@@ -56,6 +55,4 @@ class RoadSegmentQueryTest extends AbstractCalciteFunctionTest {
       assertEquals(classOf[RoadSegment], rs.getObject(2).getClass)
     }
   }
-
-  test("0626Test") {}
 }

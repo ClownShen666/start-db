@@ -111,5 +111,17 @@
            <artifactId>scala-compiler</artifactId>
            <version>${scala.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-spark-jts_${scala.binary.version}</artifactId>
+            <version>${geomesa.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

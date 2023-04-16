@@ -54,6 +54,7 @@ public class SparkExecutorTest {
         param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
         param.setExportType(DataExportType.LOCAL);
         param.setSql("select 1+1");
+        param.setWithJTS(true);
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
     }

@@ -30,6 +30,7 @@ public class CupidSparkDriverTest {
         param.setSql("select * from t_test");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
+        param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -52,6 +53,7 @@ public class CupidSparkDriverTest {
         param.setUserName("root");
         param.setDbName("default");
         param.setEnableHiveSupport(true);
+        param.setWithJTS(true);
         param.setSql("select AddTwo(AddTwo(23, 1), AddOne(\"1a\")) as addOne");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
@@ -90,6 +92,7 @@ public class CupidSparkDriverTest {
         param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
+        param.setWithJTS(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -183,4 +186,23 @@ public class CupidSparkDriverTest {
         execute("select toRadians(180)");
     }
 
+    @Test
+    public void testCoord() {
+        execute("select st_BD09ToWGS84(st_makePoint(1, 2))");
+    }
+
+    @Test
+    public void testCastToBoolean() {
+        execute("select castToBoolean(585)");
+    }
+
+    @Test
+    public void testCastToDouble() {
+        execute("select castToDouble('1e6')," + "castToDouble(null)");
+    }
+
+    @Test
+    public void testParseDouble() {
+        execute("select parseDouble('1e6')," + "parseDouble(null)");
+    }
 }

@@ -17,7 +17,7 @@
 package org.urbcomp.cupid.db.spark.mapmatch
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
@@ -47,7 +47,6 @@ class MapMatch {
       trajIter.flatMap(traj => Option(mapMatcher.mapMatch(traj)))
     })
     mapMatchRdd.collect().toList.asJava
-
   }
 
 }

@@ -29,9 +29,9 @@ import org.slf4j.Logger
 import scala.reflect.runtime.universe._
 import scala.reflect.api
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
-
+import org.locationtech.jts.geom._
+import org.locationtech.geomesa.spark.jts._
 import java.lang.reflect.Method
-
 @Slf4j
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
@@ -41,7 +41,11 @@ object SparkQueryExecutor {
     var spark = sparkSession
 
     if (spark == null)
-      spark = getSparkSession(param.isLocal, enableHiveSupport = param.isEnableHiveSupport)
+      spark = getSparkSession(
+        param.isLocal,
+        enableHiveSupport = param.isEnableHiveSupport,
+        withJTS = param.isWithJTS
+      )
 
     val sql = param.getSql
     try {
@@ -83,11 +87,17 @@ object SparkQueryExecutor {
     clazz.getMethods.filter(method => method.getName == name && !method.isBridge)
   }
 
-  def getSparkSession(isLocal: Boolean, enableHiveSupport: Boolean): SparkSession = {
+  def getSparkSession(
+      isLocal: Boolean,
+      enableHiveSupport: Boolean,
+      withJTS: Boolean
+  ): SparkSession = {
+
     val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
     if (enableHiveSupport) builder.enableHiveSupport()
-    val spark = builder.getOrCreate()
+    var spark = builder.getOrCreate()
+    if (withJTS) spark = spark.withJTS
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) =>
         val instance = clazz.newInstance()

@@ -13,7 +13,7 @@
         <arguments exception="NumberFormatException">['-2147483649']</arguments>
         <arguments exception="NumberFormatException">['12.34']</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值字符串 转 Long  castToLong(str: String): Long  -->
     <case>
@@ -25,7 +25,7 @@
         <arguments exception="NumberFormatException">['-9223372036854775809']</arguments>
         <arguments exception="NumberFormatException">['12.34']</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值字符串 转 Float  castToFloat(str: String): Float  -->
     <case>
@@ -36,7 +36,7 @@
         <arguments exception="ClassCastException">['3.4028236E38']</arguments>
         <arguments exception="ClassCastException">['-3.4028236E38']</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments exception="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值字符串 转 Double  castToDouble(str: String): Double  -->
     <case>
@@ -47,7 +47,7 @@
         <arguments exception="ClassCastException">['1.80E308']</arguments>
         <arguments exception="ClassCastException">['-1.80E308']</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments exception="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  字符串 转 布尔值  castToBoolean(str: String): Boolean  -->
     <case>
@@ -65,7 +65,7 @@
         <arguments resultID="19">[-123.456]</arguments>
         <arguments resultID="20">['cupid']</arguments>
         <arguments resultID="21">[true]</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值类型 转 Integer  parseInteger(num: Any): Integer   -->
     <case>
@@ -77,7 +77,7 @@
         <arguments exception="NumberFormatException">[2147483648]</arguments>
         <arguments exception="NumberFormatException">[-2147483649]</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值类型 转 Long  parseLong(num: Any): Long  -->
     <case>
@@ -89,7 +89,7 @@
         <arguments exception="SqlValidatorException">[9223372036854775808]</arguments>
         <arguments exception="SqlValidatorException">[-9223372036854775809]</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
     <!--  数值类型 转 Double  parseDouble(num: Any): Double  -->
     <case>
@@ -100,6 +100,6 @@
         <arguments exception="SqlValidatorException">[9223372036854775808]</arguments>
         <arguments exception="SqlValidatorException">[-9223372036854775809]</arguments>
         <arguments exception="NumberFormatException">['cupid']</arguments>
-        <arguments resultID="ignore">[null]</arguments>
+        <arguments resultID="1">[null]</arguments>
     </case>
 </testCase>
