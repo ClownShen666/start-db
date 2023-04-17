@@ -28,7 +28,7 @@ class St_distanceUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Double = {
-    if(geom1 == null || geom2 == null) null
+    if (geom1 == null || geom2 == null) null
     else {
       val op = new DistanceOp(geom1, geom2)
       op.distance

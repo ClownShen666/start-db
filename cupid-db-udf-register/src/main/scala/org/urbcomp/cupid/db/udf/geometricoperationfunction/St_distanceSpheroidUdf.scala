@@ -28,7 +28,7 @@ class St_distanceSpheroidUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Double = {
-    if(geom1 == null || geom2 == null) null
+    if (geom1 == null || geom2 == null) null
     else {
       val c1: Coordinate = geom1.getCoordinate()
       val c2: Coordinate = geom2.getCoordinate()

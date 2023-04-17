@@ -38,7 +38,7 @@ class St_bufferPointUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(point: Point, distanceInM: Double): Geometry = {
-    if(point == null || distanceInM == null) null
+    if (point == null || distanceInM == null) null
     else {
       val degrees = GeoFunctions.getDegreeFromM(distanceInM)
       val jstPoint = new JtsPoint(point, JtsSpatialContext.GEO)
@@ -66,10 +66,10 @@ class St_bufferPointUdf extends AbstractUdf {
     }
   }
 
-  private def degreesToTranslate(x: Double) :java.lang.Integer = {
-    Some(x) match{
-      case Some(x0)  =>  (Math.floor((x0 + 180) / 360.0) * -360).toInt
-      case _    => null
+  private def degreesToTranslate(x: Double): java.lang.Integer = {
+    Some(x) match {
+      case Some(x0) => (Math.floor((x0 + 180) / 360.0) * -360).toInt
+      case _        => null
     }
   }
 }

@@ -28,7 +28,7 @@ class St_translateUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(geom: Geometry, deltaX: Double, deltaY: Double): Geometry = {
-    if(geom == null || deltaY == null || deltaY == null) null
+    if (geom == null || deltaY == null || deltaY == null) null
     else {
       val at = new AffineTransformation
       at.setToTranslation(deltaX, deltaY)
