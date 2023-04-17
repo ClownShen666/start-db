@@ -25,5 +25,10 @@ class DegreesToTranslateUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  private def evaluate(x: Double) = (Math.floor((x + 180) / 360.0) * -360).toInt
+  private def evaluate(x: Double): java.lang.Integer = {
+    Some(x) match {
+      case Some(x0) => (Math.floor((x0 + 180) / 360.0) * -360).toInt
+      case _        => null
+    }
+  }
 }
