@@ -1,0 +1,67 @@
+/* 
+ * Copyright (C) 2022  ST-Lab
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.urbcomp.cupid.db.udf.geometricoperationfunction
+
+import org.locationtech.jts.geom.{
+  Coordinate,
+  CoordinateSequence,
+  CoordinateSequenceFilter,
+  Geometry,
+  Point
+}
+import org.locationtech.jts.util.GeometricShapeFactory
+import org.locationtech.spatial4j.context.jts.JtsSpatialContext
+import org.locationtech.spatial4j.shape.{Circle, Shape}
+import org.locationtech.spatial4j.shape.jts.JtsPoint
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.util.{GeoFunctions, GeometryFactoryUtils}
+
+class St_bufferPointUdf extends AbstractUdf {
+
+  override def name(): String = "st_bufferPoint"
+
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+
+  def evaluate(point: Point, distanceInM: Double): Geometry = {
+    val degrees = GeoFunctions.getDegreeFromM(distanceInM)
+    val jstPoint = new JtsPoint(point, JtsSpatialContext.GEO)
+    val circle = jstPoint.getBuffered(degrees, JtsSpatialContext.GEO)
+    val gsf = ThreadLocal
+      .withInitial(() => new GeometricShapeFactory(GeometryFactoryUtils.defaultGeometryFactory))
+      .get
+    gsf.setSize(circle.getBoundingBox.getWidth)
+    gsf.setNumPoints(4 * 25)
+    gsf.setCentre(new Coordinate(circle.getCenter.getX, circle.getCenter.getY))
+    val geomTemp = gsf.createCircle
+    val geomCopy = GeometryFactoryUtils.defaultGeometryFactory.createGeometry(geomTemp)
+    if (geomCopy.getEnvelopeInternal.getMinX < -180 || geomCopy.getEnvelopeInternal.getMaxX > 180)
+      geomCopy.apply(new CoordinateSequenceFilter() {
+        override def filter(seq: CoordinateSequence, i: Int): Unit = {
+          seq.setOrdinate(i, CoordinateSequence.X, seq.getX(i) + degreesToTranslate(seq.getX(i)))
+        }
+
+        override def isDone = false
+
+        override def isGeometryChanged = true
+      })
+    val datelineSafeShape = JtsSpatialContext.GEO.getShapeFactory.makeShapeFromGeometry(geomCopy)
+    JtsSpatialContext.GEO.getShapeFactory.getGeometryFrom(datelineSafeShape)
+  }
+
+  private def degreesToTranslate(x: Double) = (Math.floor((x + 180) / 360.0) * -360).toInt
+}
