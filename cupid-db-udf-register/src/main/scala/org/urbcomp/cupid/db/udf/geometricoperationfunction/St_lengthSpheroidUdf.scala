@@ -28,16 +28,19 @@ class St_lengthSpheroidUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: LineString): Double = {
-    var sum = 0.0
-    val gc = ThreadLocal.withInitial(() => new GeodeticCalculator).get()
-    val cs = geom.getCoordinates()
-    for (i <- 1 until cs.length) {
-      gc.setStartingGeographicPoint(cs(i - 1).x, cs(i - 1).y)
-      gc.setDestinationGeographicPoint(cs(i).x, cs(i).y)
-      sum += gc.getOrthodromicDistance()
+  def evaluate(geom: LineString): java.lang.Double = {
+    if(geom == null) null
+    else {
+      var sum = 0.0
+      val gc = ThreadLocal.withInitial(() => new GeodeticCalculator).get()
+      val cs = geom.getCoordinates()
+      for (i <- 1 until cs.length) {
+        gc.setStartingGeographicPoint(cs(i - 1).x, cs(i - 1).y)
+        gc.setDestinationGeographicPoint(cs(i).x, cs(i).y)
+        sum += gc.getOrthodromicDistance()
+      }
+      sum * DistanceUtils.DEG_TO_KM * 1000
     }
-    sum * DistanceUtils.DEG_TO_KM * 1000
   }
 
 }

@@ -26,6 +26,11 @@ class St_centroidUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: Geometry): Point = geom.getCentroid
+  def evaluate(geom: Geometry): Point = {
+    Some(geom) match{
+      case Some(value) => value.getCentroid
+      case _           => null
+    }
+  }
 
 }

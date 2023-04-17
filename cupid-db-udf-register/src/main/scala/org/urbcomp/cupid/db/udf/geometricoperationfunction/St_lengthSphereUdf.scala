@@ -28,15 +28,18 @@ class St_lengthSphereUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: LineString): Double = {
-    var sum = 0.0
-    val ca = ThreadLocal.withInitial(() => JtsSpatialContext.GEO.getDistCalc()).get()
-    val cs = geom.getCoordinates()
-    for (i <- 1 until cs.length) {
-      val startPoint = JtsSpatialContext.GEO.getShapeFactory.pointXY(cs(i - 1).x, cs(i - 1).y)
-      sum += ca.distance(startPoint, cs(i).x, cs(i).y)
+  def evaluate(geom: LineString): java.lang.Double = {
+    if(geom == null) null
+    else {
+      var sum = 0.0
+      val ca = ThreadLocal.withInitial(() => JtsSpatialContext.GEO.getDistCalc()).get()
+      val cs = geom.getCoordinates()
+      for (i <- 1 until cs.length) {
+        val startPoint = JtsSpatialContext.GEO.getShapeFactory.pointXY(cs(i - 1).x, cs(i - 1).y)
+        sum += ca.distance(startPoint, cs(i).x, cs(i).y)
+      }
+      sum * DistanceUtils.DEG_TO_KM * 1000
     }
-    sum * DistanceUtils.DEG_TO_KM * 1000
   }
 
 }

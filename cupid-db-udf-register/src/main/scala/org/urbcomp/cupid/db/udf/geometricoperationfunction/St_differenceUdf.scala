@@ -26,6 +26,11 @@ class St_differenceUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom1: Geometry, geom2: Geometry): Geometry = geom1.difference(geom2)
+  def evaluate(geom1: Geometry, geom2: Geometry): Geometry = {
+    if(geom1 == null || geom2 == null) null
+    else{
+      geom1.difference(geom2)
+    }
+  }
 
 }

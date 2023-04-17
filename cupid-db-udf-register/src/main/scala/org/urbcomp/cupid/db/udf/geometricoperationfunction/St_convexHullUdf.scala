@@ -26,5 +26,10 @@ class St_convexHullUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: Geometry): Geometry = geom.convexHull
+  def evaluate(geom: Geometry): Geometry = {
+      Some(geom) match{
+      case Some(s) => s.convexHull
+      case _         => null
+    }
+  }
 }

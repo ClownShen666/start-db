@@ -26,6 +26,12 @@ class St_BBoxUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: Geometry): Geometry = geom.getEnvelope
+  def evaluate(geom: Geometry): Geometry =
+  {
+      Some(geom) match {
+        case Some(geo) => geo.getEnvelope
+        case _ => null
+      }
+  }
 
 }

@@ -31,18 +31,21 @@ class St_distanceSphereUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom1: Geometry, geom2: Geometry): Double = {
-    val c1: Coordinate = geom1.getCoordinate()
-    val c2: Coordinate = geom2.getCoordinate()
-    val ca: DistanceCalculator =
-      ThreadLocal.withInitial(() => JtsSpatialContext.GEO.getDistCalc).get()
-    val jtsGeom1: JtsGeometry = new JtsGeometry(geom1, JtsSpatialContext.GEO, false, false)
-    val jtsGeom2: JtsGeometry = new JtsGeometry(geom2, JtsSpatialContext.GEO, false, false)
-    val startPoint1: org.locationtech.spatial4j.shape.Point =
-      JtsSpatialContext.GEO.getShapeFactory.pointXY(c1.x, c1.y)
-    val startPoint2: org.locationtech.spatial4j.shape.Point =
-      JtsSpatialContext.GEO.getShapeFactory.pointXY(c2.x, c2.y)
-    DistanceUtils.DEG_TO_KM * ca.distance(startPoint1, startPoint2) * 1000
+  def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Double = {
+    if(geom1 == null || geom2 == null) null
+    else {
+      val c1: Coordinate = geom1.getCoordinate()
+      val c2: Coordinate = geom2.getCoordinate()
+      val ca: DistanceCalculator =
+        ThreadLocal.withInitial(() => JtsSpatialContext.GEO.getDistCalc).get()
+      val jtsGeom1: JtsGeometry = new JtsGeometry(geom1, JtsSpatialContext.GEO, false, false)
+      val jtsGeom2: JtsGeometry = new JtsGeometry(geom2, JtsSpatialContext.GEO, false, false)
+      val startPoint1: org.locationtech.spatial4j.shape.Point =
+        JtsSpatialContext.GEO.getShapeFactory.pointXY(c1.x, c1.y)
+      val startPoint2: org.locationtech.spatial4j.shape.Point =
+        JtsSpatialContext.GEO.getShapeFactory.pointXY(c2.x, c2.y)
+      DistanceUtils.DEG_TO_KM * ca.distance(startPoint1, startPoint2) * 1000
+    }
   }
 
 }

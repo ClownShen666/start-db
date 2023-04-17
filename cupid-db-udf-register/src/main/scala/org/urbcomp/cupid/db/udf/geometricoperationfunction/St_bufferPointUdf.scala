@@ -38,30 +38,38 @@ class St_bufferPointUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(point: Point, distanceInM: Double): Geometry = {
-    val degrees = GeoFunctions.getDegreeFromM(distanceInM)
-    val jstPoint = new JtsPoint(point, JtsSpatialContext.GEO)
-    val circle = jstPoint.getBuffered(degrees, JtsSpatialContext.GEO)
-    val gsf = ThreadLocal
-      .withInitial(() => new GeometricShapeFactory(GeometryFactoryUtils.defaultGeometryFactory))
-      .get
-    gsf.setSize(circle.getBoundingBox.getWidth)
-    gsf.setNumPoints(4 * 25)
-    gsf.setCentre(new Coordinate(circle.getCenter.getX, circle.getCenter.getY))
-    val geomTemp = gsf.createCircle
-    val geomCopy = GeometryFactoryUtils.defaultGeometryFactory.createGeometry(geomTemp)
-    if (geomCopy.getEnvelopeInternal.getMinX < -180 || geomCopy.getEnvelopeInternal.getMaxX > 180)
-      geomCopy.apply(new CoordinateSequenceFilter() {
-        override def filter(seq: CoordinateSequence, i: Int): Unit = {
-          seq.setOrdinate(i, CoordinateSequence.X, seq.getX(i) + degreesToTranslate(seq.getX(i)))
-        }
+    if(point == null || distanceInM == null) null
+    else {
+      val degrees = GeoFunctions.getDegreeFromM(distanceInM)
+      val jstPoint = new JtsPoint(point, JtsSpatialContext.GEO)
+      val circle = jstPoint.getBuffered(degrees, JtsSpatialContext.GEO)
+      val gsf = ThreadLocal
+        .withInitial(() => new GeometricShapeFactory(GeometryFactoryUtils.defaultGeometryFactory))
+        .get
+      gsf.setSize(circle.getBoundingBox.getWidth)
+      gsf.setNumPoints(4 * 25)
+      gsf.setCentre(new Coordinate(circle.getCenter.getX, circle.getCenter.getY))
+      val geomTemp = gsf.createCircle
+      val geomCopy = GeometryFactoryUtils.defaultGeometryFactory.createGeometry(geomTemp)
+      if (geomCopy.getEnvelopeInternal.getMinX < -180 || geomCopy.getEnvelopeInternal.getMaxX > 180)
+        geomCopy.apply(new CoordinateSequenceFilter() {
+          override def filter(seq: CoordinateSequence, i: Int): Unit = {
+            seq.setOrdinate(i, CoordinateSequence.X, seq.getX(i) + degreesToTranslate(seq.getX(i)))
+          }
 
-        override def isDone = false
+          override def isDone = false
 
-        override def isGeometryChanged = true
-      })
-    val datelineSafeShape = JtsSpatialContext.GEO.getShapeFactory.makeShapeFromGeometry(geomCopy)
-    JtsSpatialContext.GEO.getShapeFactory.getGeometryFrom(datelineSafeShape)
+          override def isGeometryChanged = true
+        })
+      val datelineSafeShape = JtsSpatialContext.GEO.getShapeFactory.makeShapeFromGeometry(geomCopy)
+      JtsSpatialContext.GEO.getShapeFactory.getGeometryFrom(datelineSafeShape)
+    }
   }
 
-  private def degreesToTranslate(x: Double) = (Math.floor((x + 180) / 360.0) * -360).toInt
+  private def degreesToTranslate(x: Double) :java.lang.Integer = {
+    Some(x) match{
+      case Some(x0)  =>  (Math.floor((x0 + 180) / 360.0) * -360).toInt
+      case _    => null
+    }
+  }
 }
