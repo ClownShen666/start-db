@@ -26,11 +26,13 @@ class St_pointNUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(geom: Geometry, n: Int): Point =
-    if (geom.isInstanceOf[LineString])
+  def evaluate(geom: Geometry, n: Int): Point = {
+    if (geom == null || n == null) null
+    else if (geom.isInstanceOf[LineString])
       if (n > 0 && n <= geom.getNumPoints) geom.asInstanceOf[LineString].getPointN(n - 1)
       else if (n < 0 && n + geom.getNumPoints >= 0)
         geom.asInstanceOf[LineString].getPointN(n + geom.getNumPoints)
       else null
     else null
+  }
 }
