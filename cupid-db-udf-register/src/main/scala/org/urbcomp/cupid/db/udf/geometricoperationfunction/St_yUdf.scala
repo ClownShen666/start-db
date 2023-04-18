@@ -33,4 +33,7 @@ class St_yUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => java.lang.Double = evaluate
 }

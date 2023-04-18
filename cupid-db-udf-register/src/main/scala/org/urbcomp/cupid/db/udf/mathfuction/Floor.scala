@@ -31,4 +31,8 @@ class Floor extends AbstractUdf {
     if (a == null) return null
     BigDecimal.valueOf(Math.floor(a.doubleValue))
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: BigDecimal => BigDecimal = evaluate
 }

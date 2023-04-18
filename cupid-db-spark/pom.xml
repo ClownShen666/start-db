@@ -19,6 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-catalyst-fix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-sql-fix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-core</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -52,12 +60,6 @@
                     <groupId>org.apache.curator</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>

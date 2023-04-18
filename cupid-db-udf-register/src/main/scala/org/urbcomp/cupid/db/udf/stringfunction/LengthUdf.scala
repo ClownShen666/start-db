@@ -37,4 +37,8 @@ class LengthUdf extends AbstractUdf {
       }
       length
     }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => Integer = evaluate
 }

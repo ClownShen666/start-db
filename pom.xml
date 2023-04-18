@@ -21,6 +21,8 @@
         <module>cupid-db-store</module>
         <module>cupid-db-flink</module>
         <module>cupid-db-udf-register</module>
+        <module>cupid-db-spark-catalyst-fix</module>
+        <module>cupid-db-spark-sql-fix</module>
     </modules>
 
     <properties>
@@ -72,6 +74,7 @@
         <hive.version>2.3.0</hive.version>
         <grpc.version>1.19.0</grpc.version>
         <kryo.version>5.3.0</kryo.version>
+        <chill.version>0.10.0</chill.version>
     </properties>
 
     <dependencyManagement>
@@ -190,6 +193,28 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            
+            <!-- Spark -->
+            <dependency>
+                <groupId>org.urbcomp</groupId>
+                <artifactId>cupid-db-spark-catalyst-fix</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.urbcomp</groupId>
+                <artifactId>cupid-db-spark-sql-fix</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-catalyst_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                <version>${spark.version}</version>
             </dependency>
 
             <!-- Test  -->

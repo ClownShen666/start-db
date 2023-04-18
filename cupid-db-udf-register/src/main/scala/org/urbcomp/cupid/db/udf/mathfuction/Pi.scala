@@ -35,4 +35,8 @@ class Pi extends AbstractUdf {
   def evaluate(): BigDecimal = {
     BigDecimal.valueOf(Math.PI)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: () => BigDecimal = evaluate
 }

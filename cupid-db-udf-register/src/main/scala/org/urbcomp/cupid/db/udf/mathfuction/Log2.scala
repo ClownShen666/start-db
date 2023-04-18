@@ -38,4 +38,8 @@ class Log2 extends AbstractUdf {
     val res = Math.log(num.doubleValue) / Math.log(2.0d)
     BigDecimal.valueOf(res)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: BigDecimal => BigDecimal = evaluate
 }

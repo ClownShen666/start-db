@@ -42,4 +42,7 @@ class St_lengthSphereUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: LineString => java.lang.Double = evaluate
 }

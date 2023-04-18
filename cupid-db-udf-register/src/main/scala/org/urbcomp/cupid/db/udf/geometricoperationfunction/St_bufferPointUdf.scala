@@ -72,4 +72,8 @@ class St_bufferPointUdf extends AbstractUdf {
       case _        => null
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Point, Double) => Geometry = evaluate
 }

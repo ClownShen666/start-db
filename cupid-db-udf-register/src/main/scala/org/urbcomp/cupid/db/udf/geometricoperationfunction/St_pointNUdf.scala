@@ -35,4 +35,8 @@ class St_pointNUdf extends AbstractUdf {
       else null
     else null
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Geometry, Int) => Point = evaluate
 }

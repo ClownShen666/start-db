@@ -33,4 +33,7 @@ class St_centroidUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => Point = evaluate
 }

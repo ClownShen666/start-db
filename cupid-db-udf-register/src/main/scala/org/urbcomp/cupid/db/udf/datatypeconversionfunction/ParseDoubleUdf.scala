@@ -35,4 +35,8 @@ class ParseDoubleUdf extends AbstractUdf {
       }
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: AnyRef => java.lang.Double = evaluate
 }

@@ -18,6 +18,19 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>chill_${scala.binary.version}</artifactId>
+            <version>${chill.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-catalyst-fix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-sql-fix</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-spark</artifactId>
             <version>${project.version}</version>
@@ -37,6 +50,18 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>curator-recipes</artifactId>
+                    <groupId>org.apache.curator</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>

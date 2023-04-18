@@ -30,4 +30,8 @@ class St_isValidUdf extends AbstractUdf {
     case Some(s) => s
     case _       => null
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => java.lang.Boolean = evaluate
 }

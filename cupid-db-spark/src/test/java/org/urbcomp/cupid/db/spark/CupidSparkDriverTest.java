@@ -54,7 +54,20 @@ public class CupidSparkDriverTest {
         param.setDbName("default");
         param.setEnableHiveSupport(true);
         param.setWithJTS(true);
-        param.setSql("select AddOne(23) as addOne");
+        param.setSql("select AddTwo(AddTwo(23, AddOne(0)), AddOne(7, \"2\")) as addOne");
+        param.setExportType(DataExportType.PRINT);
+        param.setLocal(true);
+        SparkQueryExecutor.execute(param, null);
+    }
+
+    @Test
+    public void testUdf2() {
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setEnableHiveSupport(true);
+        param.setWithJTS(true);
+        param.setSql("select AddTwo(AddTwo(23, 1), AddOne(7)) as addOne");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         SparkQueryExecutor.execute(param, null);

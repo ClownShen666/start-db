@@ -34,4 +34,8 @@ class Mod extends AbstractUdf {
       BigDecimal.valueOf(res)
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = evaluate
 }

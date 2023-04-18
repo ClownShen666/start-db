@@ -27,4 +27,13 @@ class AddOneUdf extends AbstractUdf {
   def evaluate(x: Int): Int = {
     x + 1
   }
+
+  def evaluate(x: Int, y: String): Int = {
+    x + y.toInt
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper1", "udfWrapper2")
+
+  def udfWrapper1: Int => Int = evaluate
+  def udfWrapper2: (Int, String) => Int = evaluate
 }

@@ -36,4 +36,7 @@ class ParseIntegerUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: AnyRef => java.lang.Integer = evaluate
 }

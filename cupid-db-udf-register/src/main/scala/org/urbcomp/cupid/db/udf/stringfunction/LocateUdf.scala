@@ -28,4 +28,7 @@ class LocateUdf extends AbstractUdf {
     if (substr == null || str == null) null
     else str.indexOf(substr) + 1
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (String, String) => Integer = evaluate
 }

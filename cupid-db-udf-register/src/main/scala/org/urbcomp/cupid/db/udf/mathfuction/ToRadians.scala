@@ -38,4 +38,8 @@ class ToRadians extends AbstractUdf {
     val res = Math.toRadians(angDeg.doubleValue)
     BigDecimal.valueOf(res)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: BigDecimal => BigDecimal = evaluate
 }

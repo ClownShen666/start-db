@@ -43,4 +43,7 @@ class St_lengthSpheroidUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: LineString => java.lang.Double = evaluate
 }

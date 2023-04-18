@@ -34,4 +34,7 @@ class st_WGS84ToBD09 extends AbstractUdf {
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => Geometry = evaluate
 }

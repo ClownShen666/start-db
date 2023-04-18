@@ -45,4 +45,8 @@ class Md5Udf extends AbstractUdf {
     }
     new String(code)
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => String = evaluate
 }

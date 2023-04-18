@@ -36,4 +36,7 @@ class CastToStringUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: AnyRef => String = evaluate
 }

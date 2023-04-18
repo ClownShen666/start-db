@@ -36,4 +36,8 @@ class St_closestPointUdf extends AbstractUdf {
       geomFactory.createPoint(op.nearestPoints()(0))
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Geometry, Geometry) => Point = evaluate
 }

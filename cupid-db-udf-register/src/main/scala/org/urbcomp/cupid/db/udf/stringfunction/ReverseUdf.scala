@@ -29,4 +29,8 @@ class ReverseUdf extends AbstractUdf {
     else {
       new StringBuffer(str).reverse().toString
     }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => String = evaluate
 }

@@ -51,6 +51,7 @@ public class SparkSqlParam extends SqlParam {
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "print").toUpperCase()
         );
+        this.withJTS = Boolean.parseBoolean(options.getOrDefault("spark.JTSEnable", "false"));
     }
 
     private boolean isLocal;
@@ -67,6 +68,8 @@ public class SparkSqlParam extends SqlParam {
     private DataExportType exportType;
 
     private boolean enableHiveSupport;
+
+    private boolean withJTS;
 
     public boolean isLocal() {
         return isLocal;
@@ -122,5 +125,13 @@ public class SparkSqlParam extends SqlParam {
 
     public void setEnableHiveSupport(boolean enableHiveSupport) {
         this.enableHiveSupport = enableHiveSupport;
+    }
+
+    public boolean isWithJTS() {
+        return withJTS;
+    }
+
+    public void setWithJTS(boolean withJTS) {
+        this.withJTS = withJTS;
     }
 }

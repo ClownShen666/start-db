@@ -31,4 +31,7 @@ class St_numPointsUdf extends AbstractUdf {
     case None    => null
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => java.lang.Integer = evaluate
 }

@@ -34,4 +34,8 @@ class RtrimUdf extends AbstractUdf {
       str.substring(0, i + 1)
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => String = evaluate
 }

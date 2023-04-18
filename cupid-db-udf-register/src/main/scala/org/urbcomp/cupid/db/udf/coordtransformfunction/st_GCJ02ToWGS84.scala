@@ -33,4 +33,7 @@ class st_GCJ02ToWGS84 extends AbstractUdf {
     MatchUtil.MatchCoordinate(new GCJ02ToWGS84Transformer, st)
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => Geometry = evaluate
 }

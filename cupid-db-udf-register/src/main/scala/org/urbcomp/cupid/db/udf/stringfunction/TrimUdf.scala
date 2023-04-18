@@ -26,4 +26,8 @@ class TrimUdf extends AbstractUdf {
 
   def evaluate(str: String): String =
     if (str == null) null else str.trim
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: String => String = evaluate
 }
