@@ -200,7 +200,6 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
           ret = result
         } catch {
           case e: ScoreException =>
-            System.out.println(func.toString(), e.score)
             if (e.score == 0) {
               // Exact match
               return e.expr
