@@ -19,6 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-catalyst-fix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-sql-fix</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-spark</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -51,21 +59,16 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-catalyst-fix_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql-fix_${scala.binary.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spark-catalyst_${scala.binary.version}</artifactId>
-                    <groupId>org.apache.spark</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
