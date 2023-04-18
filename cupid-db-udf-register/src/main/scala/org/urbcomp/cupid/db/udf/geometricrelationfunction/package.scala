@@ -16,16 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf
 
-import org.apache.thrift.Option.some
+import org.locationtech.jts.geom.prep.{PreparedGeometry, PreparedLineString, PreparedPoint, PreparedPolygon}
 import org.locationtech.jts.geom.{Geometry, Lineal, Polygonal, Puntal}
-import org.locationtech.jts.geom.prep.{
-  PreparedGeometry,
-  PreparedLineString,
-  PreparedPoint,
-  PreparedPolygon
-}
-
-import java.util.Optional
 
 package object geometricrelationfunction {
 
