@@ -36,6 +36,6 @@ class St_polygonFromGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String) => jPolygon = evaluate
+  def udfWrapper: (String) => Polygon = evaluate
 
 }

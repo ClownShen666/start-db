@@ -28,7 +28,7 @@ class St_pointFromWKBUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
   @throws[ParseException]
   def evaluate(wkb: Array[Byte]): Point = {
-    if (wkt == null) null
+    if (wkb == null) null
     else st_castToPoint(st_geomFromWKB(wkb))
   }
 
