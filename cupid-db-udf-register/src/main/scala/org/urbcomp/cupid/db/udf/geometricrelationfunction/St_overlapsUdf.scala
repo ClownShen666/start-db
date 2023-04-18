@@ -30,9 +30,11 @@ class St_overlapsUdf extends AbstractUdf {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
-      preparedGeom1
-        .map(preparedGeometry => preparedGeometry.overlaps(geom2))
-        .getOrElse(geom1.overlaps(geom2))
+      preparedGeom1 match {
+        case Some(s) => s.overlaps(geom2)
+        case _       => geom1.overlaps(geom2)
+
+      }
     }
   }
 }

@@ -32,9 +32,11 @@ class St_touchesUdf extends AbstractUdf {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
-      preparedGeom1
-        .map(preparedGeometry => preparedGeometry.touches(geom2))
-        .getOrElse(geom1.touches(geom2))
+      preparedGeom1 match {
+        case Some(s) => s.touches(geom2)
+        case _       => geom1.touches(geom2)
+
+      }
     }
   }
 

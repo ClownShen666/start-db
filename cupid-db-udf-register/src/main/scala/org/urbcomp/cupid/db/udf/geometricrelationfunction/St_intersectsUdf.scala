@@ -32,9 +32,11 @@ class St_intersectsUdf extends AbstractUdf {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
-      preparedGeom1
-        .map(preparedGeometry => preparedGeometry.intersects(geom2))
-        .getOrElse(geom1.intersects(geom2))
+      preparedGeom1 match {
+        case Some(s) => s.intersects(geom2)
+        case _       => geom1.intersects(geom2)
+
+      }
     }
   }
 }

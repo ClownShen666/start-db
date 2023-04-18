@@ -28,17 +28,15 @@ class St_withinUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  /*
-   *
-   *
-   */
   def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
-      preparedGeom1
-        .map(preparedGeometry => preparedGeometry.within(geom2))
-        .getOrElse(geom1.within(geom2))
+      preparedGeom1 match {
+        case Some(s) => s.within(geom2)
+        case _       => geom1.within(geom2)
+
+      }
     }
   }
 }
