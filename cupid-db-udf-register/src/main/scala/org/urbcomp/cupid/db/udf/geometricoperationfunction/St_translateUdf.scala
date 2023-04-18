@@ -36,4 +36,7 @@ class St_translateUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Geometry, Double, Double) => Geometry = evaluate
 }

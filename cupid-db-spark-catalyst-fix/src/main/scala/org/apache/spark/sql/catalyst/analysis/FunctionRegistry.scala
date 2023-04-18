@@ -100,7 +100,6 @@ class SimpleFunctionRegistry extends FunctionRegistry with Logging {
       builder: FunctionBuilder
   ): Unit = synchronized {
     val normalizedName = normalizeFuncName(name)
-    System.out.println("enterentersimple")
     val newFunction = (info, builder)
     functionBuilders.put(normalizedName, newFunction) match {
       case Some(previousFunction) if previousFunction != newFunction =>

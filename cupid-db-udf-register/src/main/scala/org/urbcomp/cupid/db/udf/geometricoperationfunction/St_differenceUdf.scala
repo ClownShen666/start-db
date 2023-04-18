@@ -33,4 +33,7 @@ class St_differenceUdf extends AbstractUdf {
     }
   }
 
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (Geometry, Geometry) => Geometry = evaluate
 }

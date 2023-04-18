@@ -32,4 +32,8 @@ class St_convexHullUdf extends AbstractUdf {
       case _       => null
     }
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: Geometry => Geometry = evaluate
 }

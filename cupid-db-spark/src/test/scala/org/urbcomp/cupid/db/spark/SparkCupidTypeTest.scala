@@ -68,4 +68,12 @@ class SparkCupidTypeTest extends FunSuite {
     assertEquals(rs, df.select("roadSegment").as[RoadSegment].collect.toList.head)
     spark.stop()
   }
+
+  test("cupid functionRegistry test") {
+    val spark =
+      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+    val className = spark.sessionState.functionRegistry.getClass.getCanonicalName
+    assertEquals("FullFunctionRegistry", className.split("\\.").last)
+    spark.stop()
+  }
 }
