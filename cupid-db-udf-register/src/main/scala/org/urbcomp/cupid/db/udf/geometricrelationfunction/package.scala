@@ -16,7 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf
 
-import org.locationtech.jts.geom.prep.{PreparedGeometry, PreparedLineString, PreparedPoint, PreparedPolygon}
+import org.locationtech.jts.geom.prep.{
+  PreparedGeometry,
+  PreparedLineString,
+  PreparedPoint,
+  PreparedPolygon
+}
 import org.locationtech.jts.geom.{Geometry, Lineal, Polygonal, Puntal}
 
 package object geometricrelationfunction {
