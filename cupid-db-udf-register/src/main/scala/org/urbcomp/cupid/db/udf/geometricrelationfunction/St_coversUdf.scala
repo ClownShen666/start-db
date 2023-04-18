@@ -33,7 +33,7 @@ class St_coversUdf extends AbstractUdf {
     else {
       val preparedGeom1 = prepareGeometry(geom1)
       preparedGeom1
-        .map(preparedGeometry => preparedGeometry.contains(geom2))
+        .map(preparedGeometry => preparedGeometry.covers(geom2))
         .getOrElse(geom1.covers(geom2))
     }
   }

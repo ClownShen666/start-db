@@ -31,7 +31,7 @@ class St_overlapsUdf extends AbstractUdf {
     else {
       val preparedGeom1 = prepareGeometry(geom1)
       preparedGeom1
-        .map(preparedGeometry => preparedGeometry.contains(geom2))
+        .map(preparedGeometry => preparedGeometry.overlaps(geom2))
         .getOrElse(geom1.overlaps(geom2))
     }
   }

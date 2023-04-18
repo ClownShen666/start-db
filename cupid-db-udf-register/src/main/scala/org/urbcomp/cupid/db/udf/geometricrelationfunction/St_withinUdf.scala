@@ -37,7 +37,7 @@ class St_withinUdf extends AbstractUdf {
     else {
       val preparedGeom1 = prepareGeometry(geom1)
       preparedGeom1
-        .map(preparedGeometry => preparedGeometry.contains(geom2))
+        .map(preparedGeometry => preparedGeometry.within(geom2))
         .getOrElse(geom1.within(geom2))
     }
   }

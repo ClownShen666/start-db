@@ -33,7 +33,7 @@ class St_disjointUdf extends AbstractUdf {
     else {
       val preparedGeom1 = prepareGeometry(geom1)
       preparedGeom1
-        .map(preparedGeometry => preparedGeometry.contains(geom2))
+        .map(preparedGeometry => preparedGeometry.disjoint(geom2))
         .getOrElse(geom1.disjoint(geom2))
     }
   }

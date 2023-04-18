@@ -33,7 +33,7 @@ class St_crossesUdf extends AbstractUdf {
     else {
       val preparedGeom1 = prepareGeometry(geom1)
       preparedGeom1
-        .map(preparedGeometry => preparedGeometry.contains(geom2))
+        .map(preparedGeometry => preparedGeometry.crosses(geom2))
         .getOrElse(geom1.crosses(geom2))
     }
   }
