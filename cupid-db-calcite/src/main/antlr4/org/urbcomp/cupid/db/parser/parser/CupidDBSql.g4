@@ -33,6 +33,7 @@ stmt :
      | deleteStmt
      | selectStmt
      | createUserStmt
+     | loadStmt
      ;
 
 dbDotTable:
@@ -453,6 +454,26 @@ deleteAlias :
 describeStmt :
        (T_DESCRIBE | T_DESC) (T_TABLE | T_VIEW)? userDotDbDotTable
      ;
+
+loadStmt:
+    T_LOAD T_CSV? T_INPATH L_STRING T_TO T_TABLE? table_name load_mapping_columns? csv_file_format?
+;
+
+load_mapping_columns:
+   T_OPEN_P load_mapping_items T_CLOSE_P
+    ;
+
+load_mapping_items:
+    load_mapping_item (T_COMMA load_mapping_item)*
+    ;
+
+load_mapping_item:
+    ident expr
+;
+
+csv_file_format:
+    (T_WITH|T_WITHOUT)? T_HEADER
+;
 
 boolExpr :                               // Boolean condition
        T_NOT? T_OPEN_P boolExpr T_CLOSE_P
@@ -1087,6 +1108,7 @@ T_CREATE          : C R E A T E ;
 T_CREATION        : C R E A T I O N ;
 T_CREATOR         : C R E A T O R ;
 T_CS              : C S;
+T_CSV             : C S V;
 T_CURRENT         : C U R R E N T ;
 T_CURRENT_SCHEMA  : C U R R E N T '_' S C H E M A ;
 T_CURSOR          : C U R S O R ;
@@ -1157,6 +1179,7 @@ T_GROUP           : G R O U P ;
 T_HANDLER         : H A N D L E R ;
 T_HASH            : H A S H ;
 T_HAVING          : H A V I N G ;
+T_HEADER          : H E A D E R ;
 T_HOST            : H O S T ;
 T_IDENTITY        : I D E N T I T Y ;
 T_IDENTIFIED      : I D E N T I F I E D ;
@@ -1170,6 +1193,7 @@ T_INDEX           : I N D E X ;
 T_INITRANS        : I N I T R A N S ;
 T_INNER           : I N N E R ;
 T_INOUT           : I N O U T;
+T_INPATH          : I N P A T H ;
 T_INSERT          : I N S E R T ;
 T_INT             : I N T ;
 T_INT2            : I N T '2';
@@ -1438,6 +1462,13 @@ T_CLOSE_P      : ')' ;
 T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
 T_SUB          : '-' ;
+
+
+L_STRING    :
+             ( '\'' ( ~('\''|'\\') | ('\\' .) )* '\''
+             | '"' ( ~('"'|'\\') | ('\\' .) )* '"'
+             )+
+            ;
 
 L_ID        : L_ID_PART                                                // Identifier
             ;
