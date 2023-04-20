@@ -26,7 +26,7 @@ package object model extends CupidEncoders {
     * enrichment methods on [[SQLContext]] or [[SparkSession]] can be used instead.
     */
   def initCupid(sqlContext: SQLContext): Unit = {
-    // org.apache.spark.sql.model.registerTypes()
+    org.apache.spark.sql.model.registerTypes()
   }
 
   /** Enrichment over [[SQLContext]] to add `withCupid` "literate" method. */

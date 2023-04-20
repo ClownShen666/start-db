@@ -16,19 +16,27 @@
  */
 package org.apache.spark.sql.cupid.model.roadnetwork
 
+import org.apache.hadoop.hive.ql.exec.spark.KryoSerializer
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.types._
-import org.apache.spark.unsafe.types.UTF8String
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 
-abstract class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
+class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
   override def typeName: String = "RoadSegment"
 
-  override def serialize(roadSegment: RoadSegment): InternalRow
+  override def serialize(roadSegment: RoadSegment): InternalRow = {
+    new GenericInternalRow(Array[Any](KryoSerializer.serialize(roadSegment.toString)))
+  }
 
-  override def deserialize(datum: Any): RoadSegment
+  override def deserialize(datum: Any): RoadSegment = {
+    val ir = datum.asInstanceOf[InternalRow]
+    val roadSegmentString = KryoSerializer.deserialize(ir.getBinary(0), classOf[String])
+    RoadSegment.fromGeoJSON(roadSegmentString)
+  }
 
-  override def sqlType: DataType = StructType(Seq(StructField("roadSegment", DataTypes.StringType)))
+  override def sqlType: DataType =
+    StructType(Seq(StructField("RoadSegmentBinaryData", DataTypes.BinaryType)))
 
   override def userClass: Class[RoadSegment] = classOf[RoadSegment]
 }

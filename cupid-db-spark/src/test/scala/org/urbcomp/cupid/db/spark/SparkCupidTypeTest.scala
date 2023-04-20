@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.spark
 
-import org.apache.spark.sql.Encoder
 import org.junit.Assert.assertEquals
 import org.scalatest.FunSuite
 import org.locationtech.jts.geom._
@@ -25,9 +24,6 @@ import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.model._
-import org.apache.spark.sql.{Encoder, Encoders}
-
-import scala.reflect.ClassTag
 
 class SparkCupidTypeTest extends FunSuite {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
@@ -89,6 +85,7 @@ class SparkCupidTypeTest extends FunSuite {
     val li = df.select("a", "b").as[(Int, RoadSegment)].collect.toList
     assertEquals(1, li.size)
     assertEquals((1, rs), li.head)
+    df.printSchema()
     df.registerTempTable("ttt")
     spark.sql("desc ttt").show()
     spark.stop()
