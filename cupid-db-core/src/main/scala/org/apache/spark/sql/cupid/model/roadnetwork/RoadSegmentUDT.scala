@@ -22,7 +22,7 @@ import org.apache.spark.unsafe.types.UTF8String
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 
 abstract class RoadSegmentUDT extends UserDefinedType[RoadSegment] {
-  override def typeName: String = "RoadSegmentUDT"
+  override def typeName: String = "RoadSegment"
 
   override def serialize(roadSegment: RoadSegment): InternalRow
 

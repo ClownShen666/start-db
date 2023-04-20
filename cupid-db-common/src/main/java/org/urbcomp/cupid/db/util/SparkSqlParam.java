@@ -46,12 +46,13 @@ public class SparkSqlParam extends SqlParam {
         this.isLocal = Boolean.parseBoolean(options.getOrDefault("spark.local", "true"));
         this.async = Boolean.parseBoolean(options.getOrDefault("spark.async", "false"));
         this.enableHiveSupport = Boolean.parseBoolean(
-            options.getOrDefault("spark.hiveEnable", "false")
+            options.getOrDefault("spark.hiveEnable", "true")
         );
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "print").toUpperCase()
         );
-        this.withJTS = Boolean.parseBoolean(options.getOrDefault("spark.JTSEnable", "false"));
+        this.withJTS = Boolean.parseBoolean(options.getOrDefault("spark.JTSEnable", "true"));
+        this.withCupid = Boolean.parseBoolean(options.getOrDefault("spark.CupidEnable", "true"));
     }
 
     private boolean isLocal;
@@ -70,6 +71,8 @@ public class SparkSqlParam extends SqlParam {
     private boolean enableHiveSupport;
 
     private boolean withJTS;
+
+    private boolean withCupid;
 
     public boolean isLocal() {
         return isLocal;
@@ -133,5 +136,13 @@ public class SparkSqlParam extends SqlParam {
 
     public void setWithJTS(boolean withJTS) {
         this.withJTS = withJTS;
+    }
+
+    public boolean isWithCupid() {
+        return withCupid;
+    }
+
+    public void setWithCupid(boolean withCupid) {
+        this.withCupid = withCupid;
     }
 }

@@ -14,21 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.apache.spark.sql.cupid.model.trajectory
+package org.apache.spark.sql.cupid.model.roadnetwork
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
 
-abstract class TrajectoryUDT extends UserDefinedType[Trajectory] {
-  override def typeName: String = "TrajectoryUDT"
+abstract class RoadNetworkUDT extends UserDefinedType[RoadNetwork] {
+  override def typeName: String = "RoadNetwork"
 
-  override def serialize(traj: Trajectory): InternalRow
+  override def serialize(roadNetwork: RoadNetwork): InternalRow
 
-  override def deserialize(datum: Any): Trajectory
+  override def deserialize(datum: Any): RoadNetwork
 
-  override def sqlType: DataType = StructType(Seq(StructField("trajectory", DataTypes.StringType)))
+  override def sqlType: DataType = StructType(Seq(StructField("roadNetwork", DataTypes.StringType)))
 
-  override def userClass: Class[Trajectory] = classOf[Trajectory]
+  override def userClass: Class[RoadNetwork] = classOf[RoadNetwork]
 }

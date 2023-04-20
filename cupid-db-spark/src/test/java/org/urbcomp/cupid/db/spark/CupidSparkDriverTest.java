@@ -31,6 +31,7 @@ public class CupidSparkDriverTest {
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         param.setWithJTS(true);
+        param.setWithCupid(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -106,6 +107,7 @@ public class CupidSparkDriverTest {
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
         param.setWithJTS(true);
+        param.setWithCupid(true);
         SparkQueryExecutor.execute(param, null);
     }
 
