@@ -33,3 +33,5 @@ target
 # generated file
 **/dependency-reduced-pom.xml
 
+metastore_db/*
+

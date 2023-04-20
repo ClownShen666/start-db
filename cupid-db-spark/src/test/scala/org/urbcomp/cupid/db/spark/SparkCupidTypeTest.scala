@@ -90,4 +90,20 @@ class SparkCupidTypeTest extends FunSuite {
     spark.sql("desc ttt").show()
     spark.stop()
   }
+
+  test("cupid road segment type test 3") {
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq((1, rs)))
+    var df = rdd.toDF("a", "b")
+    df.createOrReplaceTempView("temp_table")
+    val li = spark
+      .sql("select a, RoadSegmentIdentity(b) from temp_table")
+      .as[(Int, RoadSegment)]
+      .collect
+      .toList
+    assertEquals(1, li.size)
+    assertEquals((1, rs), li.head)
+    spark.stop()
+  }
 }
