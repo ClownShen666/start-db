@@ -30,7 +30,7 @@ class St_lineStringFromWKBUdf extends AbstractUdf {
   def evaluate(wkb: Array[Byte]): LineString = {
     if (wkb == null) null
     else {
-      st_castToLineString(st_geomFromWKB(wkb))
+      castToLineString(geomFromWKB(wkb))
     }
   }
 

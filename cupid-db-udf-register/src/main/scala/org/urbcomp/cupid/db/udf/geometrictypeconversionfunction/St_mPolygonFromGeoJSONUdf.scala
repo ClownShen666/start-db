@@ -30,7 +30,7 @@ class St_mPolygonFromGeoJSONUdf extends AbstractUdf {
   def evaluate(geoJson: String): MultiPolygon = {
     if (geoJson == null) null
     else {
-      st_castToMPolygon(st_geomFromGeoJSON(geoJson))
+      castToMPolygon(geomFromGeoJSON(geoJson))
     }
   }
 

@@ -30,7 +30,7 @@ class St_mPointFromWKBUdf extends AbstractUdf {
   def evaluate(wkb: Array[Byte]): MultiPoint = {
     if (wkb == null) null
     else {
-      st_castToMPoint(st_geomFromWKB(wkb))
+      castToMPoint(geomFromWKB(wkb))
     }
   }
 

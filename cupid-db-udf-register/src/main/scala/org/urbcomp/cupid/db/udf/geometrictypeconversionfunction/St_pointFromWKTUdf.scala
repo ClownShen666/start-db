@@ -29,7 +29,7 @@ class St_pointFromWKTUdf extends AbstractUdf {
   @throws[ParseException]
   def evaluate(wktString: String): Point = {
     if (wktString == null) null
-    else st_castToPoint(st_geomFromWKT(wktString))
+    else castToPoint(geomFromWKT(wktString))
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")

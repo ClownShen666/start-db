@@ -30,7 +30,7 @@ class St_mPolygonFromWKTUdf extends AbstractUdf {
   def evaluate(wktString: String): Polygon = {
     if (wktString == null) null
     else {
-      st_castToPolygon(st_geomFromWKT(wktString))
+      castToPolygon(geomFromWKT(wktString))
     }
   }
 

@@ -30,7 +30,7 @@ class St_lineStringFromWKTUdf extends AbstractUdf {
   def evaluate(wktString: String): LineString = {
     if (wktString == null) null
     else {
-      st_castToLineString(st_geomFromWKT(wktString))
+      castToLineString(geomFromWKT(wktString))
     }
   }
 

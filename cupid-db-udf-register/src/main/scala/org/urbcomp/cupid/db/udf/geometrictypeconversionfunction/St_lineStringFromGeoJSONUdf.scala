@@ -30,7 +30,7 @@ class St_lineStringFromGeoJSONUdf extends AbstractUdf {
   def evaluate(geoJson: String): LineString = {
     if (geoJson == null) null
     else {
-      st_castToLineString(st_geomFromGeoJSON(geoJson))
+      castToLineString(geomFromGeoJSON(geoJson))
     }
   }
 

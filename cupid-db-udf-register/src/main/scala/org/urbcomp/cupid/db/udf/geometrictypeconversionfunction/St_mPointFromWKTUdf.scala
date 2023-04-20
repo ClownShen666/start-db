@@ -30,7 +30,7 @@ class St_mPointFromWKTUdf extends AbstractUdf {
   def evaluate(wktString: String): MultiPoint = {
     if (wktString == null) null
     else {
-      st_castToMPoint(st_geomFromWKT(wktString))
+      castToMPoint(geomFromWKT(wktString))
     }
   }
 

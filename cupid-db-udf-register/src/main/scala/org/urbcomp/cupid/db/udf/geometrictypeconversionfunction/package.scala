@@ -30,14 +30,14 @@ import org.locationtech.jts.io.geojson.GeoJsonReader
 
 package object geometrictypeconversionfunction {
 
-  def st_castToPoint(geom: Geometry): Point = {
+  def castToPoint(geom: Geometry): Point = {
     if (geom == null) null
     else if (geom.isInstanceOf[Point]) geom.asInstanceOf[Point]
     else null
   }
 
   @throws[ParseException]
-  def st_geomFromGeoJSON(geoJson: String): Geometry = {
+  def geomFromGeoJSON(geoJson: String): Geometry = {
     if (geoJson == null) null
     else {
       val geoJsonReader = new GeoJsonReader
@@ -45,36 +45,36 @@ package object geometrictypeconversionfunction {
     }
   }
 
-  def st_castToLineString(geom: Geometry): LineString = {
+  def castToLineString(geom: Geometry): LineString = {
     if (geom == null) null
     else if (geom.isInstanceOf[LineString]) geom.asInstanceOf[LineString]
     else null
   }
 
-  def st_castToPolygon(geom: Geometry): Polygon = {
+  def castToPolygon(geom: Geometry): Polygon = {
     if (geom == null) null
     else if (geom.isInstanceOf[Polygon]) geom.asInstanceOf[Polygon]
     else null
   }
 
-  def st_castToMPoint(geom: Geometry): MultiPoint = {
+  def castToMPoint(geom: Geometry): MultiPoint = {
     if (geom == null) null
     else if (geom.isInstanceOf[MultiPoint]) geom.asInstanceOf[MultiPoint]
     else null
   }
 
-  def st_castToMLineString(geom: Geometry): MultiLineString = {
+  def castToMLineString(geom: Geometry): MultiLineString = {
     if (geom == null) null
     else if (geom.isInstanceOf[MultiLineString]) geom.asInstanceOf[MultiLineString]
     else null
   }
 
-  def st_castToMPolygon(geom: Geometry): MultiPolygon =
+  def castToMPolygon(geom: Geometry): MultiPolygon =
     if (geom == null) null
     else if (geom.isInstanceOf[MultiPolygon]) geom.asInstanceOf[MultiPolygon]
     else null
   @throws[ParseException]
-  def st_geomFromWKT(wktString: String): Geometry = {
+  def geomFromWKT(wktString: String): Geometry = {
     if (wktString == null) null
     else {
       val wktReader = new WKTReader
@@ -82,7 +82,7 @@ package object geometrictypeconversionfunction {
     }
   }
   @throws[ParseException]
-  def st_geomFromWKB(wkb: Array[Byte]): Geometry = {
+  def geomFromWKB(wkb: Array[Byte]): Geometry = {
     if (wkb == null) null
     else {
       val wkbReader = new WKBReader

@@ -29,7 +29,7 @@ class St_pointFromGeoJSONUdf extends AbstractUdf {
   @throws[ParseException]
   def evaluate(geoJson: String): Point = {
     if (geoJson == null) null
-    else st_castToPoint(st_geomFromGeoJSON(geoJson))
+    else castToPoint(geomFromGeoJSON(geoJson))
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")

@@ -30,7 +30,7 @@ class St_polygonFromWKBUdf extends AbstractUdf {
   def evaluate(wkb: Array[Byte]): Polygon = {
     if (wkb == null) null
     else {
-      st_castToPolygon(st_geomFromWKB(wkb))
+      castToPolygon(geomFromWKB(wkb))
     }
   }
 

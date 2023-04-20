@@ -30,7 +30,7 @@ class St_mLineStringFromWKTUdf extends AbstractUdf {
   def evaluate(wktString: String): MultiLineString = {
     if (wktString == null) null
     else {
-      st_castToMLineString(st_geomFromWKT(wktString))
+      castToMLineString(geomFromWKT(wktString))
     }
   }
 

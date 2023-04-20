@@ -30,7 +30,7 @@ class St_mPointFromGeoJSONUdf extends AbstractUdf {
   def evaluate(geoJson: String): MultiPoint = {
     if (geoJson == null) null
     else {
-      st_castToMPoint(st_geomFromGeoJSON(geoJson))
+      castToMPoint(geomFromGeoJSON(geoJson))
     }
   }
 

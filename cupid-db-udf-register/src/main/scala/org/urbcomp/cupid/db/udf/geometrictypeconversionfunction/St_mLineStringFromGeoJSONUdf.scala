@@ -30,7 +30,7 @@ class St_mLineStringFromGeoJSONUdf extends AbstractUdf {
   def evaluate(geoJson: String): MultiLineString = {
     if (geoJson == null) null
     else {
-      st_castToMLineString(st_geomFromGeoJSON(geoJson))
+      castToMLineString(geomFromGeoJSON(geoJson))
     }
   }
 
