@@ -34,6 +34,9 @@ public class SparkSqlParam extends SqlParam {
 
     public SparkSqlParam() {
         this.hbaseZookeepers = DynamicConfig.getHBaseZookeepers();
+        this.enableHiveSupport = true;
+        this.withJTS = true;
+        this.withCupid = true;
     }
 
     public SparkSqlParam(SqlParam sqlParam) {
