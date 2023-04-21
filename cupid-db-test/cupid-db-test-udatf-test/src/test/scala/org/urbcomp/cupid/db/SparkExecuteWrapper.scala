@@ -30,9 +30,7 @@ object SparkExecuteWrapper {
 class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setUserName("root")
   param.setDbName("default")
-  param.setEnableHiveSupport(true)
   param.setExportType(DataExportType.PRINT)
-  param.setWithJTS(true)
   param.setLocal(true)
 
   def executeSql(sql: String): Unit = {
