@@ -30,8 +30,6 @@ public class CupidSparkDriverTest {
         param.setSql("select * from t_test");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
-        param.setWithJTS(true);
-        param.setWithCupid(true);
         SparkQueryExecutor.execute(param, null);
     }
 
@@ -53,7 +51,6 @@ public class CupidSparkDriverTest {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
         param.setDbName("default");
-        param.setEnableHiveSupport(true);
         param.setSql("select StringSplit('aaa bbb ccc') as StringName");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
@@ -65,7 +62,6 @@ public class CupidSparkDriverTest {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
         param.setDbName("default");
-        param.setEnableHiveSupport(true);
         param.setSql("select StringSplitTwice(';', 'abc:123;efd:567;utf:890')");
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
@@ -76,12 +72,9 @@ public class CupidSparkDriverTest {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
         param.setDbName("default");
-        param.setEnableHiveSupport(true);
         param.setSql(sql);
         param.setExportType(DataExportType.PRINT);
         param.setLocal(true);
-        param.setWithJTS(true);
-        param.setWithCupid(true);
         SparkQueryExecutor.execute(param, null);
     }
 

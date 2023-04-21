@@ -34,9 +34,6 @@ public class SparkSqlParam extends SqlParam {
 
     public SparkSqlParam() {
         this.hbaseZookeepers = DynamicConfig.getHBaseZookeepers();
-        this.enableHiveSupport = true;
-        this.withJTS = true;
-        this.withCupid = true;
     }
 
     public SparkSqlParam(SqlParam sqlParam) {
@@ -48,14 +45,9 @@ public class SparkSqlParam extends SqlParam {
         final Map<String, String> options = sqlParam.getOptions();
         this.isLocal = Boolean.parseBoolean(options.getOrDefault("spark.local", "true"));
         this.async = Boolean.parseBoolean(options.getOrDefault("spark.async", "false"));
-        this.enableHiveSupport = Boolean.parseBoolean(
-            options.getOrDefault("spark.hiveEnable", "true")
-        );
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "print").toUpperCase()
         );
-        this.withJTS = Boolean.parseBoolean(options.getOrDefault("spark.JTSEnable", "true"));
-        this.withCupid = Boolean.parseBoolean(options.getOrDefault("spark.CupidEnable", "true"));
     }
 
     private boolean isLocal;
@@ -70,12 +62,6 @@ public class SparkSqlParam extends SqlParam {
     private int remotePort;
 
     private DataExportType exportType;
-
-    private boolean enableHiveSupport;
-
-    private boolean withJTS;
-
-    private boolean withCupid;
 
     public boolean isLocal() {
         return isLocal;
@@ -123,29 +109,5 @@ public class SparkSqlParam extends SqlParam {
 
     public void setExportType(DataExportType exportType) {
         this.exportType = exportType;
-    }
-
-    public boolean isEnableHiveSupport() {
-        return enableHiveSupport;
-    }
-
-    public void setEnableHiveSupport(boolean enableHiveSupport) {
-        this.enableHiveSupport = enableHiveSupport;
-    }
-
-    public boolean isWithJTS() {
-        return withJTS;
-    }
-
-    public void setWithJTS(boolean withJTS) {
-        this.withJTS = withJTS;
-    }
-
-    public boolean isWithCupid() {
-        return withCupid;
-    }
-
-    public void setWithCupid(boolean withCupid) {
-        this.withCupid = withCupid;
     }
 }

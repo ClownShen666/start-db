@@ -43,15 +43,7 @@ object SparkQueryExecutor {
   def execute(param: SparkSqlParam, sparkSession: SparkSession = null): Unit = {
     if (param != null) SparkSqlParam.CACHE.set(param)
     var spark = sparkSession
-
-    if (spark == null)
-      spark = getSparkSession(
-        param.isLocal,
-        enableHiveSupport = param.isEnableHiveSupport,
-        withJTS = param.isWithJTS,
-        withCupid = param.isWithCupid
-      )
-
+    if (spark == null) spark = getSparkSession(param.isLocal)
     val sql = param.getSql
     try {
       CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
@@ -92,18 +84,10 @@ object SparkQueryExecutor {
     clazz.getMethods.filter(method => method.getName == name && !method.isBridge)
   }
 
-  def getSparkSession(
-      isLocal: Boolean,
-      enableHiveSupport: Boolean = true,
-      withJTS: Boolean = true,
-      withCupid: Boolean = true
-  ): SparkSession = {
+  def getSparkSession(isLocal: Boolean): SparkSession = {
     val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
-    if (enableHiveSupport) builder.enableHiveSupport()
-    var spark = builder.getOrCreate()
-    if (withJTS) spark = spark.withJTS
-    if (withCupid) spark = spark.withCupid
+    val spark = builder.enableHiveSupport().getOrCreate().withJTS.withCupid
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) =>
         val instance = clazz.newInstance()
