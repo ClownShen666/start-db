@@ -31,6 +31,10 @@ import scala.reflect.api
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
 import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
+import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.model._
+
 import java.lang.reflect.Method
 @Slf4j
 object SparkQueryExecutor {
@@ -44,7 +48,8 @@ object SparkQueryExecutor {
       spark = getSparkSession(
         param.isLocal,
         enableHiveSupport = param.isEnableHiveSupport,
-        withJTS = param.isWithJTS
+        withJTS = param.isWithJTS,
+        withCupid = param.isWithCupid
       )
 
     val sql = param.getSql
@@ -89,15 +94,16 @@ object SparkQueryExecutor {
 
   def getSparkSession(
       isLocal: Boolean,
-      enableHiveSupport: Boolean,
-      withJTS: Boolean
+      enableHiveSupport: Boolean = true,
+      withJTS: Boolean = true,
+      withCupid: Boolean = true
   ): SparkSession = {
-
     val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
     if (enableHiveSupport) builder.enableHiveSupport()
     var spark = builder.getOrCreate()
     if (withJTS) spark = spark.withJTS
+    if (withCupid) spark = spark.withCupid
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) =>
         val instance = clazz.newInstance()

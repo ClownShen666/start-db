@@ -16,8 +16,7 @@
  */
 package org.apache.spark.sql
 
-import org.apache.spark.sql.cupid.model.roadnetwork.{RoadNetworkUDT, RoadSegmentUDT}
-import org.apache.spark.sql.cupid.model.trajectory.TrajectoryUDT
+import org.apache.spark.sql.cupid.model.AbstractCupidUDT
 import org.apache.spark.sql.types.{UDTRegistration, UserDefinedType}
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -38,3 +37,14 @@ package object model {
     case (l, r) => UDTRegistration.register(l.getCanonicalName, r.getCanonicalName)
   }
 }
+
+private[spark] class TrajectoryUDT extends AbstractCupidUDT[Trajectory]("Trajectory", "fromGeoJSON")
+object LineStringUDT extends TrajectoryUDT
+
+private[spark] class RoadNetworkUDT
+    extends AbstractCupidUDT[RoadNetwork]("RoadNetwork", "fromGeoJSON")
+object RoadNetworkUDT extends RoadNetworkUDT
+
+private[spark] class RoadSegmentUDT
+    extends AbstractCupidUDT[RoadSegment]("RoadSegment", "fromGeoJSON")
+object RoadSegmentUDT extends RoadSegmentUDT

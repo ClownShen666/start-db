@@ -42,12 +42,13 @@ public class SparkSqlParamTest {
         param.setExportType(exportType);
         param.setEnableHiveSupport(false);
         param.setWithJTS(false);
+        param.setWithCupid(false);
 
         final String s = JacksonUtil.MAPPER.writeValueAsString(param);
         assertEquals(
             "{\"userName\":\"jimo\",\"dbName\":\"db\",\"sql\":\"select 1+1\",\"options\":{},\"withJTS\":false,"
                 + "\"hbaseZookeepers\":\"localhost:2181\",\"async\":true,\"remotePort\":0,\"exportType\":\"PRINT\","
-                + "\"enableHiveSupport\":false,\"local\":true}",
+                + "\"enableHiveSupport\":false,\"withCupid\":false,\"local\":true}",
             s
         );
         final String encodeStr = Base64Util.encode(s);

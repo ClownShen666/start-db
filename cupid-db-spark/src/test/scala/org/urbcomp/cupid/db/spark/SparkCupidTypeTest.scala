@@ -32,7 +32,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("geomesa point type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true)
     val point: Point = new GeometryFactory().createPoint(new Coordinate(3.4, 5.6))
     val df = spark.createDataset(Seq(point)).toDF("points")
     assertEquals(point, df.select("points").as[Point].collect.toList.head)
@@ -41,7 +41,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid trajectory type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(trajectory))
     val df = rdd.toDF("traj")
@@ -51,7 +51,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid road network type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(rn))
     val df = rdd.toDF("roadNetwork")
@@ -61,7 +61,7 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid road segment type test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq(rs))
     val df = rdd.toDF("roadSegment")
@@ -71,9 +71,23 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid functionRegistry test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true, enableHiveSupport = true, withJTS = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true)
     val className = spark.sessionState.functionRegistry.getClass.getCanonicalName
     assertEquals("FullFunctionRegistry", className.split("\\.").last)
+    spark.stop()
+  }
+
+  test("cupid road segment type test 2") {
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq((1, rs)))
+    val df = rdd.toDF("a", "b")
+    val li = df.select("a", "b").as[(Int, RoadSegment)].collect.toList
+    assertEquals(1, li.size)
+    assertEquals((1, rs), li.head)
+    df.printSchema()
+    df.registerTempTable("ttt")
+    spark.sql("desc ttt").show()
     spark.stop()
   }
 }
