@@ -20,8 +20,10 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+
 import java.util
 import java.util.List
+import scala.collection.immutable.List
 
 class St_rn_makeRoadNetworkUdf extends AbstractUdf {
 
@@ -35,8 +37,7 @@ class St_rn_makeRoadNetworkUdf extends AbstractUdf {
     else new RoadNetwork(rsList)
   }
 
-  def udfSparkEntries: util.List[String] = util.List("udfWrapper")
+  def udfSparkEntries: List[String] = List("udfWrapper")
 
   def udfWrapper: (util.List[RoadSegment]) => RoadNetwork = evaluate
-
 }
