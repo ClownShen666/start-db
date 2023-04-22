@@ -655,6 +655,41 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitDescribeStmt(CupidDBSqlParser.DescribeStmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#loadStmt}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLoadStmt(CupidDBSqlParser.LoadStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#load_mapping_columns}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLoad_mapping_columns(CupidDBSqlParser.Load_mapping_columnsContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#load_mapping_items}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLoad_mapping_items(CupidDBSqlParser.Load_mapping_itemsContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#load_mapping_item}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitLoad_mapping_item(CupidDBSqlParser.Load_mapping_itemContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#csv_file_format}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCsv_file_format(CupidDBSqlParser.Csv_file_formatContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#boolExpr}.
      * @param ctx the parse tree
      * @return the visitor result

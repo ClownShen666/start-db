@@ -20,8 +20,8 @@ import org.apache.calcite.sql.ddl.{SqlDropSchema, SqlDropTable}
 import org.apache.calcite.sql.parser.SqlParser
 import org.junit.Assert.{assertEquals, assertFalse, assertNotNull, assertTrue}
 import org.scalatest.{BeforeAndAfterEach, FunSuite, nodurations}
-import org.urbcomp.cupid.db.parser.CupidDBSQLSamples
-import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
+import org.urbcomp.cupid.db.parser.{CupidDBSQLSamples, SqlHelper}
+import org.urbcomp.cupid.db.parser.dcl.{SqlCreateUser, SqlLoadData}
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
@@ -201,5 +201,22 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val sql3 = "CREATE TABLE IF NOT EXISTS test_table (name String)"
     val node = driver.parseSql(sql3)
     assertNotNull(node)
+  }
+
+  test("convert load data sql to node and transform it to select") {
+    val sql = CupidDBSQLSamples.LOAD_DATA_SAMPLE;
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlLoadData]
+    assertEquals(
+      s"LOAD CSV INPATH 'HDFS://USER/DATA.CSV' INTO gemo_table " +
+        s"(road.oid oid, name 0, startp 1, endp 2, dtg to_timestamp(3)) " +
+        s"WITHOUT HEADER",
+      SqlHelper.toSqlString(node)
+    )
+    val selectNode = SqlHelper.convertToSelectNode(node)
+    assertEquals(
+      s"SELECT oid AS road.oid, 0 AS name, 1 AS startp, 2 AS endp, to_timestamp(3) AS dtg",
+      SqlHelper.toSqlString(selectNode)
+    )
   }
 }

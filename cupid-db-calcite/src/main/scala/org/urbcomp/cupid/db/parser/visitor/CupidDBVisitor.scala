@@ -24,7 +24,7 @@ import org.apache.calcite.sql.ddl.{SqlDdlNodes, SqlDropSchema, SqlDropTable}
 import org.apache.calcite.sql.fun.{SqlCase, SqlStdOperatorTable}
 import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.util.{DateString, TimestampString}
-import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
+import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlCreateUser, SqlLoadData}
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
@@ -86,7 +86,49 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     case c: TruncateStmtContext        => visitTruncateStmt(c)
     case c: UpdateStmtContext          => visitUpdateStmt(c)
     case c: CreateUserStmtContext      => visitCreateUserStmt(c)
-    case _                             => null // TODO 补全其他情况
+    case c: LoadStmtContext            => visitLoadStmt(c)
+    case _                             => throw new IllegalArgumentException("unexpected sql")
+  }
+
+  //////////////////////////////////////////////////////
+  //                     Load Clause                  //
+  //////////////////////////////////////////////////////
+
+  override def visitLoadStmt(ctx: LoadStmtContext): SqlNode = {
+    val tableName = visitTable_name(ctx.table_name()).asInstanceOf[SqlIdentifier]
+    val path = ctx.L_STRING().getText
+    val mappingItems = ctx
+      .load_mapping_columns()
+      .load_mapping_items()
+      .load_mapping_item()
+      .asScala
+      .map(i => {
+        val field = visitIdent(i.ident())
+        val expr = visitExpr(i.expr())
+        new SqlColumnMappingDeclaration(pos, field, expr)
+      })
+      .toList
+      .asJava
+    val mappings = new SqlNodeList(mappingItems, pos)
+
+    var hasHeader = false
+    if (ctx.csv_file_format().T_WITHOUT() != null) {
+      hasHeader = false
+    }
+    new SqlLoadData(pos, path, tableName, mappings, hasHeader)
+  }
+
+  override def visitTable_name(ctx: Table_nameContext): SqlNode = {
+    val names = ctx
+      .qident()
+      .ident()
+      .asScala
+      .map(ident => {
+        ident.getText
+      })
+      .toList
+      .asJava
+    new SqlIdentifier(names, pos)
   }
 
   //////////////////////////////////////////////////////

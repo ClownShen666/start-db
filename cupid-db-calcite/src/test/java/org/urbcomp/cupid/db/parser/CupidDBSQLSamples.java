@@ -82,6 +82,9 @@ public class CupidDBSQLSamples {
     public static final String CREATE_USER_SAMPLE =
         "CREATE USER test_user IDENTIFIED BY 'password'";
 
+    // Load data sample
+    public static final String LOAD_DATA_SAMPLE = loadSample("load-data");
+
     private static String loadSample(String resource) {
         String path = "/sql/samples/" + resource + ".sample.sql";
         try {
