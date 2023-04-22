@@ -35,7 +35,7 @@ class St_rn_makeRoadNetworkUdf extends AbstractUdf {
     else new RoadNetwork(rsList)
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def udfSparkEntries: util.List[String] = util.List("udfWrapper")
 
   def udfWrapper: (util.List[RoadSegment]) => RoadNetwork = evaluate
 
