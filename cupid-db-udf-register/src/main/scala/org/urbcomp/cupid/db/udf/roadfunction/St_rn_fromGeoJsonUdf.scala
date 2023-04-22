@@ -27,7 +27,10 @@ class St_rn_fromGeoJsonUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
   @throws[JsonProcessingException]
-  def evaluate(geoJson: String): RoadNetwork = RoadNetwork.fromGeoJSON(geoJson)
+  def evaluate(geoJson: String): RoadNetwork = {
+    if (geoJson == null) null
+    else RoadNetwork.fromGeoJSON(geoJson)
+  }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 

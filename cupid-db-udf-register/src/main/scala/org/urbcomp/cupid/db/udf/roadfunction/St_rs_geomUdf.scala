@@ -30,8 +30,11 @@ class St_rs_geomUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(rs: RoadSegment): LineString = {
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    geometryFactory.createLineString(rs.getPoints().toStream.map(x => x.getCoordinate).toArray)
+    if (rs == null) null
+    else {
+      val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
+      geometryFactory.createLineString(rs.getPoints().toStream.map(x => x.getCoordinate).toArray)
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")

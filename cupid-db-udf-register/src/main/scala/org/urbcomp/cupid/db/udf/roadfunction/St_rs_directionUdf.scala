@@ -26,10 +26,13 @@ class St_rs_directionUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(rs: RoadSegment): String = rs.getDirection.toString
+  def evaluate(rs: RoadSegment): java.lang.String = {
+    if (rs == null) null
+    else rs.getDirection.toString
+  }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadSegment) => String = evaluate
+  def udfWrapper: (RoadSegment) => java.lang.String = evaluate
 
 }

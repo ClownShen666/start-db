@@ -32,18 +32,21 @@ class St_rn_shortestPathUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
-  def evaluate(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): String = {
-    val biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork)
-    biDijkstraShortestPath
-      .findShortestPath(
-        new SpatialPoint(startPoint.getCoordinate),
-        new SpatialPoint(endPoint.getCoordinate)
-      )
-      .toGeoJSON
+  def evaluate(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
+    if (roadNetwork == null || startPoint == null || endPoint == null) null
+    else {
+      val biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork)
+      biDijkstraShortestPath
+        .findShortestPath(
+          new SpatialPoint(startPoint.getCoordinate),
+          new SpatialPoint(endPoint.getCoordinate)
+        )
+        .toGeoJSON
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadNetwork, Point, Point) => String = evaluate
+  def udfWrapper: (RoadNetwork, Point, Point) => java.lang.String = evaluate
 
 }

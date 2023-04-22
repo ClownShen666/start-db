@@ -26,10 +26,15 @@ class St_rs_levelUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(rs: RoadSegment): Integer = rs.getLevel.value
+  def evaluate(rs: RoadSegment): java.lang.Integer = {
+    if (rs == null) null
+    else {
+      rs.getLevel.value
+    }
+  }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadSegment) => Integer = evaluate
+  def udfWrapper: (RoadSegment) => java.lang.Integer = evaluate
 
 }

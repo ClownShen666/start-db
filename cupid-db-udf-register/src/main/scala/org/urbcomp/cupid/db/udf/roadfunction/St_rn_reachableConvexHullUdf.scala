@@ -37,10 +37,18 @@ class St_rn_reachableConvexHullUdf extends AbstractUdf {
       timeInSec: BigDecimal,
       travelMode: String
   ): Polygon = {
-    val startSpatialPoint = new SpatialPoint(startPt.getCoordinate)
-    val reachable =
-      new ReachableAreaConvexHull(roadNetwork, startSpatialPoint, timeInSec.doubleValue, travelMode)
-    reachable.getHull
+    if (roadNetwork == null || startPt == null || timeInSec == null || travelMode == null) null
+    else {
+      val startSpatialPoint = new SpatialPoint(startPt.getCoordinate)
+      val reachable =
+        new ReachableAreaConvexHull(
+          roadNetwork,
+          startSpatialPoint,
+          timeInSec.doubleValue,
+          travelMode
+        )
+      reachable.getHull
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
