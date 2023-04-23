@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,11 +10,10 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.cupid.db.geomesa.storage.index.xzstar
 
 import org.locationtech.geomesa.index.api.{GeoMesaFeatureIndex, IndexKeySpace}
@@ -25,31 +24,31 @@ import org.locationtech.geomesa.index.strategies.SpatioTemporalFilterStrategy
 import org.locationtech.geomesa.utils.index.IndexMode.IndexMode
 import org.opengis.feature.simple.SimpleFeatureType
 
-class XZStarTIndex protected(
-                              ds: GeoMesaDataStore[_],
-                              sft: SimpleFeatureType,
-                              version: Int,
-                              geom: String,
-                              dtg: String,
-                              mode: IndexMode
-                            ) extends GeoMesaFeatureIndex[XZStarTIndexValues, XZStarTIndexKey](
-  ds,
-  sft,
-  XZStarTIndex.name,
-  version,
-  Seq(geom, dtg),
-  mode
-)
-  with SpatioTemporalFilterStrategy[XZStarTIndexValues, XZStarTIndexKey]
-  with SpatioTemporalIndex[XZStarTIndexValues, XZStarTIndexKey] {
+class XZStarTIndex protected (
+    ds: GeoMesaDataStore[_],
+    sft: SimpleFeatureType,
+    version: Int,
+    geom: String,
+    dtg: String,
+    mode: IndexMode
+) extends GeoMesaFeatureIndex[XZStarTIndexValues, XZStarTIndexKey](
+      ds,
+      sft,
+      XZStarTIndex.name,
+      version,
+      Seq(geom, dtg),
+      mode
+    )
+    with SpatioTemporalFilterStrategy[XZStarTIndexValues, XZStarTIndexKey]
+    with SpatioTemporalIndex[XZStarTIndexValues, XZStarTIndexKey] {
 
   def this(
-            ds: GeoMesaDataStore[_],
-            sft: SimpleFeatureType,
-            geomField: String,
-            dtgField: String,
-            mode: IndexMode
-          ) =
+      ds: GeoMesaDataStore[_],
+      sft: SimpleFeatureType,
+      geomField: String,
+      dtgField: String,
+      mode: IndexMode
+  ) =
     this(ds, sft, XZStarTIndex.version, geomField, dtgField, mode)
 
   override val keySpace: XZStarTIndexKeySpace =

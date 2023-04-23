@@ -25,7 +25,7 @@ import java.time.ZonedDateTime
 
 package object xzstar {
 
-  case class XZStarTIndexKey (bin: Short, z: Long) extends Ordered[XZStarTIndexKey] {
+  case class XZStarTIndexKey(bin: Short, z: Long) extends Ordered[XZStarTIndexKey] {
     override def compare(that: XZStarTIndexKey): Int = {
       val b = Ordering.Short.compare(bin, that.bin)
       if (b != 0) {
@@ -46,13 +46,13 @@ package object xzstar {
   }
 
   case class XZStarTIndexValues(
-                                 sfc: XZStarSFC,
-                                 geometries: FilterValues[Geometry],
-                                 spatialBounds: Seq[(Double, Double, Double, Double)],
-                                 intervals: FilterValues[Bounds[ZonedDateTime]],
-                                 temporalBounds: Seq[Short],
-                                 temporalUnbounded: Seq[(Short, Short)]
-      ) extends TemporalIndexValues
-    with SpatialIndexValues
+      sfc: XZStarSFC,
+      geometries: FilterValues[Geometry],
+      spatialBounds: Seq[(Double, Double, Double, Double)],
+      intervals: FilterValues[Bounds[ZonedDateTime]],
+      temporalBounds: Seq[Short],
+      temporalUnbounded: Seq[(Short, Short)]
+  ) extends TemporalIndexValues
+      with SpatialIndexValues
 
 }

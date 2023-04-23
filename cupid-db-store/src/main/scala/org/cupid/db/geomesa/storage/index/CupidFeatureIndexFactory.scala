@@ -60,7 +60,7 @@ class CupidFeatureIndexFactory extends GeoMesaFeatureIndexFactory {
       case (Z2TIndex.name, 1)  => Some(new Z2TIndex(ds, sft, geom3, dtg, index.mode))
       case (XZ2TIndex.name, 1) => Some(new XZ2TIndex(ds, sft, geom3, dtg, index.mode))
 
-      case (XZStarIndex.name, 1) => Some(new XZStarIndex(ds, sft, geom2, index.mode))
+      case (XZStarIndex.name, 1)  => Some(new XZStarIndex(ds, sft, geom2, index.mode))
       case (XZStarTIndex.name, 1) => Some(new XZStarTIndex(ds, sft, geom3, dtg, index.mode))
 
       case (T1Index.name, 1) => Some(new T1Index(ds, sft, dtg1, index.mode))

@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,11 +10,10 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.cupid.db.geomesa.storage.index.xzstar
 
 import com.typesafe.scalalogging.LazyLogging
@@ -25,7 +24,20 @@ import org.locationtech.geomesa.curve.BinnedTime.{DateToBin, TimeToBin}
 import org.locationtech.geomesa.filter.FilterValues
 import org.locationtech.geomesa.index.api.IndexKeySpace.IndexKeySpaceFactory
 import org.locationtech.geomesa.index.api.ShardStrategy.{NoShardStrategy, ZShardStrategy}
-import org.locationtech.geomesa.index.api.{BoundedByteRange, BoundedRange, ByteRange, IndexKeySpace, LowerBoundedRange, RowKeyValue, ScanRange, ShardStrategy, SingleRowKeyValue, UnboundedRange, UpperBoundedRange, WritableFeature}
+import org.locationtech.geomesa.index.api.{
+  BoundedByteRange,
+  BoundedRange,
+  ByteRange,
+  IndexKeySpace,
+  LowerBoundedRange,
+  RowKeyValue,
+  ScanRange,
+  ShardStrategy,
+  SingleRowKeyValue,
+  UnboundedRange,
+  UpperBoundedRange,
+  WritableFeature
+}
 import org.locationtech.geomesa.index.conf.QueryProperties
 import org.locationtech.geomesa.index.geotools.GeoMesaDataStoreFactory.GeoMesaDataStoreConfig
 import org.locationtech.geomesa.index.utils.Explainer
@@ -38,13 +50,13 @@ import org.opengis.filter.Filter
 import java.util.Date
 import scala.util.control.NonFatal
 
-class XZStarTIndexKeySpace (
-                             val sft: SimpleFeatureType,
-                             val sharding: ShardStrategy,
-                             geomField: String,
-                             dtgField: String
-                           ) extends IndexKeySpace[XZStarTIndexValues, XZStarTIndexKey]
-  with LazyLogging {
+class XZStarTIndexKeySpace(
+    val sft: SimpleFeatureType,
+    val sharding: ShardStrategy,
+    geomField: String,
+    dtgField: String
+) extends IndexKeySpace[XZStarTIndexValues, XZStarTIndexKey]
+    with LazyLogging {
 
   import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 
@@ -82,11 +94,11 @@ class XZStarTIndexKeySpace (
   override val sharing: Array[Byte] = Array.empty
 
   override def toIndexKey(
-                           writable: WritableFeature,
-                           tier: Array[Byte],
-                           id: Array[Byte],
-                           lenient: Boolean
-                         ): RowKeyValue[XZStarTIndexKey] = {
+      writable: WritableFeature,
+      tier: Array[Byte],
+      id: Array[Byte],
+      lenient: Boolean
+  ): RowKeyValue[XZStarTIndexKey] = {
     val geom = writable.getAttribute[Geometry](geomIndex)
     if (geom == null) {
       throw new IllegalArgumentException(s"Null geometry in feature ${writable.feature.getID}")
@@ -194,9 +206,9 @@ class XZStarTIndexKeySpace (
   }
 
   override def getRanges(
-                          values: XZStarTIndexValues,
-                          multiplier: Int
-                        ): Iterator[ScanRange[XZStarTIndexKey]] = {
+      values: XZStarTIndexValues,
+      multiplier: Int
+  ): Iterator[ScanRange[XZStarTIndexKey]] = {
     val XZStarTIndexValues(xzstart, _, xy, _, timesByBin, unboundedBins) = values
 
     // note: `target` will always be Some, as ScanRangesTarget has a default value
@@ -212,7 +224,10 @@ class XZStarTIndexKeySpace (
     val bounded = timesByBin.iterator.flatMap {
       case bin =>
         val zs = toZRanges()
-        zs.map(range => BoundedRange(XZStarTIndexKey(bin, range.lower), XZStarTIndexKey(bin, range.upper)))
+        zs.map(
+          range =>
+            BoundedRange(XZStarTIndexKey(bin, range.lower), XZStarTIndexKey(bin, range.upper))
+        )
     }
 
     val unbounded = unboundedBins.iterator.map {
@@ -227,9 +242,9 @@ class XZStarTIndexKeySpace (
   }
 
   override def getRangeBytes(
-                              ranges: Iterator[ScanRange[XZStarTIndexKey]],
-                              tier: Boolean
-                            ): Iterator[ByteRange] = {
+      ranges: Iterator[ScanRange[XZStarTIndexKey]],
+      tier: Boolean
+  ): Iterator[ByteRange] = {
     if (sharding.length == 0) {
       ranges.map {
         case BoundedRange(lo, hi) =>
@@ -287,10 +302,10 @@ class XZStarTIndexKeySpace (
 
   // always apply the full filter to xzstart queries
   override def useFullFilter(
-                              values: Option[XZStarTIndexValues],
-                              config: Option[GeoMesaDataStoreConfig],
-                              hints: Hints
-                            ): Boolean = true
+      values: Option[XZStarTIndexValues],
+      config: Option[GeoMesaDataStoreConfig],
+      hints: Hints
+  ): Boolean = true
 
 }
 
@@ -302,10 +317,10 @@ object XZStarTIndexKeySpace extends IndexKeySpaceFactory[XZStarTIndexValues, XZS
       classOf[Date].isAssignableFrom(sft.getDescriptor(attributes.last).getType.getBinding)
 
   override def apply(
-                      sft: SimpleFeatureType,
-                      attributes: Seq[String],
-                      tier: Boolean
-                    ): XZStarTIndexKeySpace = {
+      sft: SimpleFeatureType,
+      attributes: Seq[String],
+      tier: Boolean
+  ): XZStarTIndexKeySpace = {
     val shards = if (tier) {
       NoShardStrategy
     } else {
