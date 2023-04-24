@@ -27,45 +27,17 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 import scala.collection.mutable.ListBuffer
 
-class st_traj_noiseFilterUdf extends AbstractUdf {
+class st_traj_lengthInKMUdf extends AbstractUdf {
 
-  override def name(): String = "st_traj_noiseFilter"
+  override def name(): String = "st_traj_lengthInKM"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(trajectory: Trajectory, speedLimitInMPerS: BigDecimal): Trajectory = {
-    val gpsPoints = trajectory.getGPSPointList
-    if (gpsPoints.length <= 1) {
-      trajectory.setTid(trajectory.getTid + "_filterNoise")
-      return trajectory
-    }
-
-    //Filter noise
-    val filterGPSPoints = new ListBuffer[GPSPoint]
-    //We assume the first point is always correct
-    var pre = gpsPoints(0)
-    filterGPSPoints += pre
-
-    var i = 1
-    while (i < gpsPoints.length) {
-      val cur = gpsPoints(i)
-      if (cur.getTime.after(pre.getTime)) {
-        val distanceInM = GeoFunctions.getDistanceInM(cur, pre)
-        val timeSpanInS = (cur.getTime.getTime - pre.getTime.getTime) / 1000.0
-        if (distanceInM / timeSpanInS <= speedLimitInMPerS.doubleValue) {
-          filterGPSPoints += cur
-          pre = cur
-        }
-      }
-      i += 1
-    }
-
-    trajectory.setTid(trajectory.getTid + "_filterNoise")
-    trajectory.setPointList(filterGPSPoints.toList.asJava)
-    trajectory
+  def evaluate(trajectory: Trajectory): Double = {
+    if (trajectory == null) null
+    else trajectory.getLengthInKm
   }
-
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: (Trajectory, BigDecimal) => Trajectory = evaluate
+  def udfWrapper1: (Trajectory) => Double = evaluate
 }
