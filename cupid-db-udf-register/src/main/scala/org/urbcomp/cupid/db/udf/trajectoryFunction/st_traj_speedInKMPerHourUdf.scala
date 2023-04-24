@@ -33,11 +33,11 @@ class st_traj_speedInKMPerHourUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(trajectory: Trajectory): Double = {
+  def evaluate(trajectory: Trajectory): java.lang.Double = {
     if (trajectory == null) null
     else trajectory.getSpeedInKMPerHour
   }
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: (Trajectory) => Double = evaluate
+  def udfWrapper1: (Trajectory) => java.lang.Double = evaluate
 }

@@ -34,12 +34,12 @@ class st_traj_asGeoJSONUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
   @throws[JsonProcessingException]
-  def evaluate(trajectory: Trajectory): String = {
+  def evaluate(trajectory: Trajectory): java.lang.String = {
     if (trajectory == null) null
     else trajectory.toGeoJSON
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: (Trajectory) => String = evaluate
+  def udfWrapper1: (Trajectory) => java.lang.String = evaluate
 }

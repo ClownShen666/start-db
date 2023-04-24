@@ -33,11 +33,11 @@ class st_traj_numOfPointsUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(trajectory: Trajectory): Int = {
+  def evaluate(trajectory: Trajectory): java.lang.Int = {
     if (trajectory == null) null
     else trajectory.getGPSPointList.size
   }
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: (Trajectory) => Int = evaluate
+  def udfWrapper1: (Trajectory) => java.lang.Int = evaluate
 }
