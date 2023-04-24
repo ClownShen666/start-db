@@ -35,6 +35,6 @@ class St_rs_lengthInKMUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadSegment) => java.lang.Double = evaluate
+  def udfWrapper: RoadSegment => java.lang.Double = evaluate
 
 }

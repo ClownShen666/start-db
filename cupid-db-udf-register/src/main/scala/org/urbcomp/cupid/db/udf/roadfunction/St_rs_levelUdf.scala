@@ -35,6 +35,6 @@ class St_rs_levelUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadSegment) => java.lang.Integer = evaluate
+  def udfWrapper: RoadSegment => java.lang.Integer = evaluate
 
 }

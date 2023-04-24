@@ -34,6 +34,6 @@ class St_rs_asGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadSegment) => java.lang.String = evaluate
+  def udfWrapper: RoadSegment => java.lang.String = evaluate
 
 }

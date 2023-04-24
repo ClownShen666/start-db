@@ -34,6 +34,6 @@ class St_rn_fromGeoJsonUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String) => RoadNetwork = evaluate
+  def udfWrapper: String => RoadNetwork = evaluate
 
 }
