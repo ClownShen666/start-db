@@ -1,0 +1,52 @@
+/* 
+ * Copyright (C) 2022  ST-Lab
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.urbcomp.cupid.db.udf.roadfunction
+
+import com.fasterxml.jackson.core.JsonProcessingException
+import org.locationtech.jts.geom.Point
+import org.urbcomp.cupid.db.algorithm.shortestpath.BiDijkstraShortestPath
+import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
+import org.urbcomp.cupid.db.model.point.SpatialPoint
+import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
+class St_rn_shortestPathUdf extends AbstractUdf {
+
+  override def name(): String = "st_rn_shortestPath"
+
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  @throws[AlgorithmExecuteException]
+  @throws[JsonProcessingException]
+  def evaluate(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
+    if (roadNetwork == null || startPoint == null || endPoint == null) null
+    else {
+      val biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork)
+      biDijkstraShortestPath
+        .findShortestPath(
+          new SpatialPoint(startPoint.getCoordinate),
+          new SpatialPoint(endPoint.getCoordinate)
+        )
+        .toGeoJSON
+    }
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper")
+
+  def udfWrapper: (RoadNetwork, Point, Point) => java.lang.String = evaluate
+
+}
