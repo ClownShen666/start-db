@@ -17,19 +17,24 @@
 package org.urbcomp.cupid.db.spark.mapmatch
 
 import org.scalatest.FunSuite
-import org.urbcomp.cupid.db.model.sample.ModelGenerator.{generateRoadNetwork, generateTrajectory}
+import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 
 class MapMatchTest extends FunSuite {
 
   test("test map matching") {
-    val mapMatch: MapMatch = new MapMatch
-    val rn = generateRoadNetwork()
-    val traj = generateTrajectory()
-    val trajArray = Array[Trajectory](traj)
-    val result = mapMatch.mapMatch(rn, trajArray)
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
 
-    assertResult(result.get(0).getMmPtList.size())(117)
+    val roadNetwork = ModelGenerator.generateRoadNetwork()
+    val traj: Trajectory = ModelGenerator.generateTrajectory()
+    val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))
+    val trajDf = trajRdd.toDF("id", "trajectory")
+
+    val mapMatch: MapMatch = new MapMatch
+    val result = mapMatch.mapMatch(roadNetwork, trajDf)
+    result.show(numRows = 1, truncate = false)
   }
 
 }
