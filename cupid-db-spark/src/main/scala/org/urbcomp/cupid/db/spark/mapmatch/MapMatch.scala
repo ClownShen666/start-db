@@ -22,7 +22,7 @@ import org.apache.spark.sql
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
-import org.urbcomp.cupid.db.model.trajectory.{MapMatchedTrajectory, Trajectory}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 class MapMatch {
 
