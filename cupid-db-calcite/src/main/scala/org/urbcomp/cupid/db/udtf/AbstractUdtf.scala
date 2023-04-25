@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udtf
 
 import org.apache.calcite.DataContext
 import org.apache.calcite.config.CalciteConnectionConfig
@@ -24,6 +24,7 @@ import org.apache.calcite.schema.{ScannableTable, Schema, Statistic, Statistics}
 import org.apache.calcite.sql.`type`.SqlTypeName
 import org.apache.calcite.sql.{SqlCall, SqlNode}
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF
+import org.urbcomp.cupid.db.udf.DataEngine
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 trait AbstractUdtf extends GenericUDTF {

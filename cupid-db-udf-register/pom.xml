@@ -73,6 +73,12 @@
             <artifactId>hive-exec</artifactId>
             <version>${hive.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>calcite-core</artifactId>
+                    <groupId>org.apache.calcite</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

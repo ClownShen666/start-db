@@ -44,10 +44,13 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser._
 import org.urbcomp.cupid.db.parser.visitor.CupidDBVisitor._
 import org.urbcomp.cupid.db.schema.IndexType
+import org.urbcomp.cupid.db.udf.DataEngine
 import org.urbcomp.cupid.db.udf.DataEngine.Calcite
-import org.urbcomp.cupid.db.udf.UdfFactory
 import org.urbcomp.cupid.db.util.{MetadataUtil, StringUtil}
+import org.reflections.Reflections
+import org.urbcomp.cupid.db.udtf.AbstractUdtf
 
+import scala.collection.convert.ImplicitConversions._
 import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -553,16 +556,26 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     */
   def handleFunction(ctx: ExprFuncContext, res: SqlBasicCall): SqlNode = {
     val udtfOutputColumns = mutable.HashMap.empty[String, List[String]]
-    new UdfFactory().getUdtfMap(Calcite).foreach {
-      case (name, clazz) =>
-        val instance = clazz.newInstance()
+    val reflections = new Reflections("org.urbcomp.cupid.db.udtf")
+    val udtfClasses =
+      reflections.getSubTypesOf(classOf[AbstractUdtf]).toSet[Class[_ <: AbstractUdtf]].toList
+    udtfClasses.forEach(clazz => {
+      val instance = clazz.newInstance()
+      val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
+      val registerEngines: List[DataEngine.Value] =
+        clazz
+          .getDeclaredMethod("registerEngines")
+          .invoke(instance)
+          .asInstanceOf[List[DataEngine.Value]]
+      if (registerEngines.contains(Calcite)) {
         val outputColumns: List[(String, SqlTypeName)] =
           clazz
             .getDeclaredMethod("outputColumns")
             .invoke(instance)
             .asInstanceOf[List[(String, SqlTypeName)]]
         udtfOutputColumns += (name.toLowerCase -> outputColumns.map(_._1))
-    }
+      }
+    })
 
     if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
       val nodeList = List(new SqlIdentifier("result", pos)).asJava

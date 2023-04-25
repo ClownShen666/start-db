@@ -23,7 +23,7 @@ import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam}
-import org.urbcomp.cupid.db.udf.UdfFactory
+import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
 import org.slf4j.Logger
 
 import scala.reflect.runtime.universe._
@@ -31,9 +31,10 @@ import scala.reflect.api
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
 import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.reflections.Reflections
+import scala.collection.convert.ImplicitConversions._
 import org.urbcomp.cupid.db.spark.model._
+import org.urbcomp.cupid.db.udtf.AbstractUdtf
 
 import java.lang.reflect.Method
 @Slf4j
@@ -657,12 +658,22 @@ object SparkQueryExecutor {
           }
         }
     }
-    new UdfFactory().getUdtfMap(Spark).foreach {
-      case (name, clazz) => {
+    val reflections = new Reflections("org.urbcomp.cupid.db.udtf")
+    val udtfClasses =
+      reflections.getSubTypesOf(classOf[AbstractUdtf]).toSet[Class[_ <: AbstractUdtf]].toList
+    udtfClasses.forEach(clazz => {
+      val instance = clazz.newInstance()
+      val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
+      val registerEngines: List[DataEngine.Value] =
+        clazz
+          .getDeclaredMethod("registerEngines")
+          .invoke(instance)
+          .asInstanceOf[List[DataEngine.Value]]
+      if (registerEngines.contains(Spark)) {
         spark.sql("CREATE OR REPLACE TEMPORARY FUNCTION " + name + " as '" + clazz.getName + "'")
         log.info("Spark registers udtf " + name)
       }
-    }
+    })
     spark
   }
 

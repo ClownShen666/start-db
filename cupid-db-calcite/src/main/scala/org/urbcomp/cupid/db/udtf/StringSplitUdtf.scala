@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udtf
 
 import org.apache.calcite.sql.`type`.SqlTypeName
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException
@@ -25,19 +25,20 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
+import org.urbcomp.cupid.db.udf.DataEngine
 
-import java.util
 import scala.collection.JavaConverters._
+import java.util
 
-class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
+class StringSplitUdtf extends AbstractUdtf with Serializable {
 
-  override def name(): String = "StringSplitTwice"
+  override def name(): String = "StringSplit"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  override def inputColumnsCount: Int = 2
+  override def inputColumnsCount: Int = 1
   override def outputColumns(): List[(String, SqlTypeName)] =
-    List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.VARCHAR))
+    List(("StringName", SqlTypeName.VARCHAR))
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
     //判断传入的参数是否只有一个
@@ -51,24 +52,19 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
     val fieldNames = outputColumns().map(_._1).asJava
     val fieldOIs = new util.ArrayList[ObjectInspector]
     fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
-    fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
     ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs)
   }
 
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val delimiter = objects.head.toString
-    val input = objects(1).toString
-    if (input.isEmpty) new Array[Array[AnyRef]](0)
-    else {
-      val test = input.split(delimiter)
-      val ret = new Array[Array[AnyRef]](test.length)
-      var idx = 0
-      for (i <- 0 until test.length) {
-        val result = test(i).split(":")
-        ret(idx) = result.asInstanceOf[Array[AnyRef]]
-        idx += 1
-      }
-      ret
+    val strings: Array[String] = objects.head.toString.split(" ")
+    val ret = new Array[Array[AnyRef]](strings.length)
+    var idx = 0
+    for (elem <- strings) {
+      val tmp = new Array[AnyRef](1)
+      tmp(0) = elem
+      ret(idx) = tmp
+      idx += 1
     }
+    ret
   }
 }
