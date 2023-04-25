@@ -96,7 +96,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
   override def visitLoadStmt(ctx: LoadStmtContext): SqlNode = {
     val tableName = visitTable_name(ctx.table_name()).asInstanceOf[SqlIdentifier]
-    val path = ctx.L_STRING().getText
+    val path = StringUtil.dropQuota(ctx.L_STRING().getText)
     val mappingItems = ctx
       .load_mapping_columns()
       .load_mapping_items()
@@ -111,7 +111,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       .asJava
     val mappings = new SqlNodeList(mappingItems, pos)
 
-    var hasHeader = false
+    var hasHeader = true
     if (ctx.csv_file_format().T_WITHOUT() != null) {
       hasHeader = false
     }

@@ -71,7 +71,7 @@ public class SqlLoadData extends SqlCall {
     public void unparse(SqlWriter writer, int leftPrec, int rightPrec) {
         writer.keyword("LOAD CSV INPATH");
         writer.keyword(path);
-        writer.keyword("INTO");
+        writer.keyword("TO");
         tableName.unparse(writer, leftPrec, rightPrec);
         if (mappings != null) {
             SqlWriter.Frame frame = writer.startList("(", ")");

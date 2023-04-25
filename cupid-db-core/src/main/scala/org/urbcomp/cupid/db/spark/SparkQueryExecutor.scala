@@ -17,13 +17,29 @@
 package org.urbcomp.cupid.db.spark
 
 import lombok.extern.slf4j.Slf4j
+import org.apache.calcite.sql.SqlSelect
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
-import org.locationtech.geomesa.spark.GeoMesaSparkKryoRegistrator
+import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.sql.types.StructType
+import org.geotools.data.{DataStore, DataStoreFinder}
+import org.geotools.feature.simple.{SimpleFeatureBuilder, SimpleFeatureTypeBuilder}
+import org.geotools.util.factory.Hints
+import org.locationtech.geomesa.features.ScalaSimpleFeature
+import org.locationtech.geomesa.spark.SparkUtils.SimpleFeatureRowMapping
+import org.locationtech.geomesa.spark.{GeoMesaSpark, GeoMesaSparkKryoRegistrator, SparkUtils}
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam}
 import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
+import org.urbcomp.cupid.db.util.{
+  DataTypeUtils,
+  LogUtil,
+  MetadataUtil,
+  ResourceUtil,
+  SparkSqlParam,
+  SqlParam
+}
+import org.urbcomp.cupid.db.udf.UdfFactory
 import org.slf4j.Logger
 
 import scala.reflect.runtime.universe._
@@ -33,33 +49,95 @@ import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
 import org.reflections.Reflections
 import scala.collection.convert.ImplicitConversions._
+import org.locationtech.geomesa.utils.io.WithStore
+import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
+import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
+import org.urbcomp.cupid.db.data.hbase.{CupidHBaseDataStore, CupidHBaseDataStoreFactory}
+import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
+import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.parser.SqlHelper
+import org.urbcomp.cupid.db.parser.dcl.SqlLoadData
+import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
 import org.urbcomp.cupid.db.spark.model._
 import org.urbcomp.cupid.db.udtf.AbstractUdtf
 
+import java.io.Serializable
 import java.lang.reflect.Method
+import java.time.Instant
+import scala.collection.JavaConverters.mapAsScalaMapConverter
 @Slf4j
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
 
   def execute(param: SparkSqlParam, sparkSession: SparkSession = null): Unit = {
-    if (param != null) SparkSqlParam.CACHE.set(param)
+    if (param != null) {
+      SparkSqlParam.CACHE.set(param)
+      SqlParam.CACHE.set(param)
+    }
     var spark = sparkSession
     if (spark == null) spark = getSparkSession(param.isLocal)
+
     val sql = param.getSql
+    val node = CupidDBParseDriver.parseSql(sql)
+
     try {
-      CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
-        val userName = SparkSqlParam.CACHE.get().getUserName
-        val dbTableNames = i.split("\\.")
-        val dbName = dbTableNames(0)
-        val tableName = dbTableNames(1)
-        val catalogName = MetadataUtil.makeCatalog(userName, dbName)
-        val table = MetadataAccessUtil.getTable(userName, dbName, tableName)
-        if (table == null) throw new IllegalArgumentException("Table Not Exists: " + i)
-        val sft = MetadataUtil.makeSchemaName(table.getId)
-        loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
+      node match {
+        case node: SqlLoadData => {
+          println("Running load data sql", SqlHelper.toSqlString(node))
+          val schemaName = node.tableName.names.get(0)
+          // FIXME, schema name should retrieve from cupid metadata
+          val df = spark.read.option("header", node.hasHeader).csv(node.path)
+          val tmpView = "load_data_tmp_" + Instant.now().toEpochMilli
+          df.createOrReplaceTempView(tmpView)
+          val selectSql = SqlHelper.toSqlString(SqlHelper.convertToSelectNode(node, tmpView))
+          println("[convert to select sql]", selectSql)
+          val data = spark.sql(selectSql)
+          data.show()
+
+          val userName = param.getUserName
+          val dbName = param.getDbName
+          val params = ExecutorUtil.getDataStoreParams(userName, dbName)
+
+          val rddToSave = data.rdd.mapPartitions(partition => {
+            val store = DataStoreFinder.getDataStore(params)
+            val sft = store.getSchema(schemaName)
+            val attrs = sft.getAttributeDescriptors
+            partition.map(row => {
+              val rowCols = row.schema.map(s => s.name)
+              val sf = new ScalaSimpleFeature(sft, TimeSortedUuidGenerator.createUuid().toString)
+              attrs.forEach(attr => {
+                val col = attr.getLocalName
+                if (rowCols.contains(col)) {
+                  val rawValue = row.getAs[Object](col)
+                  sf.setAttribute(col, rawValue)
+                }
+              })
+              sf.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.FALSE)
+              println("Inserting sf", sf)
+              sf.asInstanceOf[SimpleFeature]
+            })
+          })
+
+          GeoMesaSpark(params).save(rddToSave, params.asScala.toMap, schemaName)
+          SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+        }
+        case _: SqlSelect =>
+          CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
+            val userName = SparkSqlParam.CACHE.get().getUserName
+            val dbTableNames = i.split("\\.")
+            val dbName = dbTableNames(0)
+            val tableName = dbTableNames(1)
+            val catalogName = MetadataUtil.makeCatalog(userName, dbName)
+            val table = MetadataAccessUtil.getTable(userName, dbName, tableName)
+            if (table == null) throw new IllegalArgumentException("Table Not Exists: " + i)
+            val sft = MetadataUtil.makeSchemaName(table.getId)
+            loadTable(tableName, sft, catalogName, spark, param.getHbaseZookeepers)
+          }
+          val df = spark.sql(sql)
+          SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+        case _ => throw new UnsupportedOperationException("Unexpected sql kind " + node.getKind);
       }
-      val df = spark.sql(sql)
-      SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
     } finally {
       spark.stop()
       SparkSession.clearActiveSession()
@@ -88,7 +166,12 @@ object SparkQueryExecutor {
   def getSparkSession(isLocal: Boolean): SparkSession = {
     val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
-    val spark = builder.enableHiveSupport().getOrCreate().withJTS.withCupid
+    val spark = builder
+      .enableHiveSupport()
+      .getOrCreate()
+      .withJTS
+      .withCupid
+
     new UdfFactory().getUdfMap(Spark).foreach {
       case (name, clazz) =>
         val instance = clazz.newInstance()

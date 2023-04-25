@@ -22,10 +22,7 @@
 
 package org.urbcomp.cupid.db.parser;
 
-import org.apache.calcite.sql.SqlBasicCall;
-import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.SqlNodeList;
-import org.apache.calcite.sql.SqlSelect;
+import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.urbcomp.cupid.db.parser.dcl.SqlColumnMappingDeclaration;
@@ -33,6 +30,7 @@ import org.urbcomp.cupid.db.parser.dcl.SqlLoadData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SqlHelper {
@@ -47,7 +45,7 @@ public class SqlHelper {
     /**
      * Convert load node to select node, so it can run on spark with sql
      */
-    public static SqlSelect convertToSelectNode(SqlLoadData loader) {
+    public static SqlSelect convertToSelectNode(SqlLoadData loader, String tableName) {
         SqlParserPos pos = SqlParserPos.ZERO;
 
         List<SqlBasicCall> nodes = new ArrayList<>(loader.mappings.getList().size());
@@ -61,12 +59,13 @@ public class SqlHelper {
                 )
             );
         }
+        SqlIdentifier from = new SqlIdentifier(Collections.singletonList(tableName), pos);
         SqlNodeList selectList = new SqlNodeList(nodes, pos);
         return new SqlSelect(
             pos,
             null,
             selectList,
-            null,
+            from,
             null,
             null,
             null,

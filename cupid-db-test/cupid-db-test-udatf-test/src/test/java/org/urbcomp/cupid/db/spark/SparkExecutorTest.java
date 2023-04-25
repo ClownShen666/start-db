@@ -16,12 +16,14 @@
  */
 package org.urbcomp.cupid.db.spark;
 
+import org.geotools.data.DataStore;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.model.data.DataExportType;
+import org.urbcomp.cupid.db.tools.CitibikeDataUtils;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
 import static org.junit.Assert.assertNotNull;
@@ -48,7 +50,6 @@ public class SparkExecutorTest {
     @Test
     public void testExecuteLocal() {
         final SparkExecutor executor = new SparkExecutor();
-
         final SparkSqlParam param = new SparkSqlParam();
         param.setLocal(true);
         param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
@@ -57,4 +58,37 @@ public class SparkExecutorTest {
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
     }
+
+    @Test
+    public void testLoadData() {
+        String userName = "root";
+        String dbName = "default";
+        DataStore store = CitibikeDataUtils.getStore(userName, dbName);
+        CitibikeDataUtils.prepareTable(store);
+        // for hadoop just need to provide a hadoop path
+        String path = CitibikeDataUtils.getProjectRoot()
+            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/202204-citibike-tripdata_clip.csv";
+        String sql = "LOAD CSV INPATH '"
+            + path
+            + "' TO "
+            + CitibikeDataUtils.TEST_TABLE_NAME
+            + " (idx idx, ride_id ride_id,"
+            + "rideable_type rideable_type,"
+            // + "started_at toTimestamp(started_at),"
+            + "start_point st_makePoint(start_lat, start_lng)) "
+            + "WITH HEADER";
+        System.out.println("load sql is [" + sql + "]");
+        final SparkExecutor executor = new SparkExecutor();
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setLocal(true);
+        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExportType(DataExportType.LOCAL);
+        param.setSql(sql);
+        param.setUserName("root");
+        param.setDbName("default");
+
+        final MetadataResult<Object> res = executor.execute(param);
+        assertNotNull(res);
+    }
+
 }
