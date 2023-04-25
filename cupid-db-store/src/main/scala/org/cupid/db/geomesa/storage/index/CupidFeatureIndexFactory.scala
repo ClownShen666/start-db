@@ -16,7 +16,7 @@
  */
 package org.cupid.db.geomesa.storage.index
 
-import org.cupid.db.geomesa.storage.index.xzstar.XZStarIndex
+import org.cupid.db.geomesa.storage.index.xzstar.{XZStarIndex, XZStarTIndex}
 import org.cupid.db.geomesa.storage.index.t1.T1Index
 import org.cupid.db.geomesa.storage.index.z2t.{XZ2TIndex, Z2TIndex}
 import org.locationtech.geomesa.index.api.{GeoMesaFeatureIndex, GeoMesaFeatureIndexFactory}
@@ -27,7 +27,7 @@ import scala.util.Try
 
 class CupidFeatureIndexFactory extends GeoMesaFeatureIndexFactory {
 
-  private val available = Seq(Z2TIndex, XZ2TIndex, XZStarIndex, T1Index)
+  private val available = Seq(Z2TIndex, XZ2TIndex, XZStarIndex, T1Index, XZStarTIndex)
 
   override def indices(sft: SimpleFeatureType, hint: Option[String]): Seq[IndexId] = {
     hint match {
@@ -60,7 +60,8 @@ class CupidFeatureIndexFactory extends GeoMesaFeatureIndexFactory {
       case (Z2TIndex.name, 1)  => Some(new Z2TIndex(ds, sft, geom3, dtg, index.mode))
       case (XZ2TIndex.name, 1) => Some(new XZ2TIndex(ds, sft, geom3, dtg, index.mode))
 
-      case (XZStarIndex.name, 1) => Some(new XZStarIndex(ds, sft, geom2, index.mode))
+      case (XZStarIndex.name, 1)  => Some(new XZStarIndex(ds, sft, geom2, index.mode))
+      case (XZStarTIndex.name, 1) => Some(new XZStarTIndex(ds, sft, geom3, dtg, index.mode))
 
       case (T1Index.name, 1) => Some(new T1Index(ds, sft, dtg1, index.mode))
 
