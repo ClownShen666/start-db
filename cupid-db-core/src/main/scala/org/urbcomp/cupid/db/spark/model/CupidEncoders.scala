@@ -21,6 +21,8 @@ import org.apache.spark.sql.catalyst.encoders.{ExpressionEncoder, encoderFor}
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
+import scala.reflect.ClassTag
+
 /** Encoders are Spark SQL's mechanism for converting a JVM type into a Catalyst representation.
   * They are fetched from implicit scope whenever types move beween RDDs and Datasets. Because each
   * of the types supported below has a corresponding UDT, we are able to use a standard Spark Encoder
@@ -30,6 +32,8 @@ trait CupidEncoders {
   implicit def roadNetworkEncoder: Encoder[RoadNetwork] = ExpressionEncoder()
   implicit def roadSegmentEncoder: Encoder[RoadSegment] = ExpressionEncoder()
   implicit def bigDecimalEncoder: Encoder[BigDecimal] = ExpressionEncoder()
+
+  implicit def single[A](implicit c: ClassTag[A]): Encoder[A] = Encoders.kryo[A](c)
 
   implicit def tuple2[A1, A2](implicit e1: Encoder[A1], e2: Encoder[A2]): Encoder[(A1, A2)] =
     Encoders.tuple[A1, A2](e1, e2)
