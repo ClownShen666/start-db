@@ -16,8 +16,13 @@
  */
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
+import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
+import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
 import org.urbcomp.cupid.db.model.point.GPSPoint
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
+import org.urbcomp.cupid.db.model.trajectory.{MapMatchedTrajectory, Trajectory}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeoFunctions
@@ -27,45 +32,22 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 import scala.collection.mutable.ListBuffer
 
-class st_traj_noiseFilterUdf extends AbstractUdf {
+class st_traj_mapMatchUdf extends AbstractUdf {
 
-  override def name(): String = "st_traj_noiseFilter"
+  override def name(): String = "st_traj_mapMatch"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  def evaluate(trajectory: Trajectory, speedLimitInMPerS: BigDecimal): Trajectory = {
-    val gpsPoints = trajectory.getGPSPointList
-    if (gpsPoints.length <= 1) {
-      trajectory.setTid(trajectory.getTid + "_filterNoise")
-      return trajectory
+  @throws[AlgorithmExecuteException]
+  @throws[JsonProcessingException]
+  def evaluate(roadNetwork: RoadNetwork, trajectory: Trajectory): String = {
+    if (roadNetwork == null || trajectory == null) null
+    else {
+      val mapMatcher = new TiHmmMapMatcher(roadNetwork, new ManyToManyShortestPath(roadNetwork))
+      val mmTrajectory = mapMatcher.mapMatch(trajectory)
+      mmTrajectory.toGeoJSON
     }
-
-    //Filter noise
-    val filterGPSPoints = new ListBuffer[GPSPoint]
-    //We assume the first point is always correct
-    var pre = gpsPoints(0)
-    filterGPSPoints += pre
-
-    var i = 1
-    while (i < gpsPoints.length) {
-      val cur = gpsPoints(i)
-      if (cur.getTime.after(pre.getTime)) {
-        val distanceInM = GeoFunctions.getDistanceInM(cur, pre)
-        val timeSpanInS = (cur.getTime.getTime - pre.getTime.getTime) / 1000.0
-        if (distanceInM / timeSpanInS <= speedLimitInMPerS.doubleValue) {
-          filterGPSPoints += cur
-          pre = cur
-        }
-      }
-      i += 1
-    }
-
-    trajectory.setTid(trajectory.getTid + "_filterNoise")
-    trajectory.setPointList(filterGPSPoints.toList.asJava)
-    trajectory
   }
-
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: (Trajectory, BigDecimal) => Trajectory = evaluate
+  def udfWrapper1: (RoadNetwork, Trajectory) => String = evaluate
 }
