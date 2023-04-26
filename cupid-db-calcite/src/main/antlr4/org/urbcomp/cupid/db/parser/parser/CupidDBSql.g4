@@ -456,7 +456,7 @@ describeStmt :
      ;
 
 loadStmt:
-    T_LOAD T_CSV? T_INPATH L_STRING T_TO T_TABLE? table_name load_mapping_columns? csv_file_format?
+    T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_format?
 ;
 
 load_mapping_columns:
@@ -1462,13 +1462,6 @@ T_CLOSE_P      : ')' ;
 T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
 T_SUB          : '-' ;
-
-
-L_STRING    :
-             ( '\'' ( ~('\''|'\\') | ('\\' .) )* '\''
-             | '"' ( ~('"'|'\\') | ('\\' .) )* '"'
-             )+
-            ;
 
 L_ID        : L_ID_PART                                                // Identifier
             ;
