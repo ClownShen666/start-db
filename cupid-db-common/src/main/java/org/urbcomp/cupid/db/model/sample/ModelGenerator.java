@@ -125,7 +125,7 @@ public class ModelGenerator {
             .setLengthInMeter(120);
     }
 
-    public static RoadNetwork generateRoadNetwork() {
+    public static List<RoadSegment> generateRoadSegments() {
         try (
             InputStream in = ModelGenerator.class.getClassLoader()
                 .getResourceAsStream("data/roadnetwork_gcj02.csv");
@@ -157,9 +157,15 @@ public class ModelGenerator {
                     .setLengthInMeter(lengthInM);
                 roadSegments.add(rs);
             }
-            return new RoadNetwork(roadSegments);
+            return roadSegments;
         } catch (Exception e) {
             throw new RuntimeException("Generate road network error: " + e.getMessage());
         }
+
+    }
+
+    public static RoadNetwork generateRoadNetwork() {
+        return new RoadNetwork(generateRoadSegments());
+
     }
 }
