@@ -34,8 +34,6 @@ class St_rn_makeRoadNetwork extends AbstractUdf {
     new RoadNetwork(rsList.toList.asJava)
   }
 
-
-
   def udfSparkEntries: List[String] = List("udfWrapper")
 
   def udfWrapper: Seq[RoadSegment] => RoadNetwork = evaluate
