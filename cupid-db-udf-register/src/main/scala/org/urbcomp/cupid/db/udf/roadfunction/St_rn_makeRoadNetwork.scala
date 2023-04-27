@@ -31,9 +31,10 @@ class St_rn_makeRoadNetwork extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(rsList: Seq[RoadSegment]): RoadNetwork = {
-    System.out.println("EXECUTE!")
     new RoadNetwork(rsList.toList.asJava)
   }
+
+
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 

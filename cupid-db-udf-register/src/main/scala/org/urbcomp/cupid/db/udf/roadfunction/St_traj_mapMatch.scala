@@ -32,7 +32,6 @@ class St_traj_mapMatch extends AbstractUdf {
     val mapMatcher = new TiHmmMapMatcher(roadNetwork, new ManyToManyShortestPath(roadNetwork))
     val matchedTraj = mapMatcher.mapMatch(trajectory)
     matchedTraj.toGeoJSON
-
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
