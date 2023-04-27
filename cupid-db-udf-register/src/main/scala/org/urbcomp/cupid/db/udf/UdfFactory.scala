@@ -23,8 +23,6 @@ import scala.collection.mutable
 class UdfFactory extends Serializable {
   private val engineUdfMap =
     mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]]()
-  private val engineUdtfMap =
-    mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdtf]]]()
 
   {
     val reflections = new Reflections("org.urbcomp.cupid.db.udf")
@@ -44,22 +42,6 @@ class UdfFactory extends Serializable {
         engineUdfMap(engine) += (name -> clazz)
       }
     })
-    val udtfClasses =
-      reflections.getSubTypesOf(classOf[AbstractUdtf]).toSet[Class[_ <: AbstractUdtf]].toList
-    udtfClasses.forEach(clazz => {
-      val instance = clazz.newInstance()
-      val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
-      val registerEngines: List[DataEngine.Value] =
-        clazz
-          .getDeclaredMethod("registerEngines")
-          .invoke(instance)
-          .asInstanceOf[List[DataEngine.Value]]
-      registerEngines.foreach { engine =>
-        if (!engineUdtfMap.contains(engine))
-          engineUdtfMap += (engine -> mutable.Map[String, Class[_ <: AbstractUdtf]]())
-        engineUdtfMap(engine) += (name -> clazz)
-      }
-    })
   }
 
   def getUdfMap(engine: DataEngine.Value): mutable.Map[String, Class[_ <: AbstractUdf]] = {
@@ -68,10 +50,4 @@ class UdfFactory extends Serializable {
   def getEngineUdfMap
       : mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]] =
     engineUdfMap
-  def getUdtfMap(engineName: DataEngine.Value): mutable.Map[String, Class[_ <: AbstractUdtf]] = {
-    engineUdtfMap.getOrElse(engineName, mutable.Map[String, Class[_ <: AbstractUdtf]]())
-  }
-  def getEngineUdtfMap
-      : mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdtf]]] =
-    engineUdtfMap
 }

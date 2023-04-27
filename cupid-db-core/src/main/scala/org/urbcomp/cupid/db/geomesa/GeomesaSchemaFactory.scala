@@ -19,8 +19,9 @@ package org.urbcomp.cupid.db.geomesa
 import org.apache.calcite.schema.impl.{AggregateFunctionImpl, ScalarFunctionImpl, TableFunctionImpl}
 import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
-import org.urbcomp.cupid.db.udf.UdfFactory
+import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
 import org.urbcomp.cupid.db.udtf.{
+  AbstractUdtf,
   DBSCANClustering,
   Fibonacci,
   HybridTrajectorySegment,
@@ -30,15 +31,15 @@ import org.urbcomp.cupid.db.udtf.{
   TimeIntervalTrajectorySegment
 }
 
+import scala.collection.convert.ImplicitConversions._
 import java.lang.reflect.Method
 import java.util
 import org.apache.calcite.schema.Function
 import lombok.extern.slf4j.Slf4j
+import org.reflections.Reflections
 import org.urbcomp.cupid.db.udf.DataEngine.Calcite
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.util.LogUtil
-
-import scala.collection.mutable.ListBuffer
 
 /**
   * Schema Factory of Geomesa
@@ -78,9 +79,18 @@ class GeomesaSchemaFactory extends SchemaFactory {
             }
         }
     }
-    new UdfFactory().getUdtfMap(Calcite).foreach {
-      case (name, clazz) =>
-        val instance = clazz.newInstance()
+    val reflections = new Reflections("org.urbcomp.cupid.db.udtf")
+    val udtfClasses =
+      reflections.getSubTypesOf(classOf[AbstractUdtf]).toSet[Class[_ <: AbstractUdtf]].toList
+    udtfClasses.forEach(clazz => {
+      val instance = clazz.newInstance()
+      val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
+      val registerEngines: List[DataEngine.Value] =
+        clazz
+          .getDeclaredMethod("registerEngines")
+          .invoke(instance)
+          .asInstanceOf[List[DataEngine.Value]]
+      if (registerEngines.contains(Calcite)) {
         val inputColumnsCount: Int =
           clazz.getDeclaredMethod("inputColumnsCount").invoke(instance).asInstanceOf[Int]
         val function: Function =
@@ -91,7 +101,8 @@ class GeomesaSchemaFactory extends SchemaFactory {
         } else {
           log.warn("Calcite cannot register udtf " + name)
         }
-    }
+      }
+    })
   }
 
   private def initTableFunction(schemaPlus: SchemaPlus): Unit = {
