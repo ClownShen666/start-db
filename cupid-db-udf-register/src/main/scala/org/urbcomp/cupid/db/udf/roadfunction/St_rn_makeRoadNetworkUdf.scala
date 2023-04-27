@@ -23,7 +23,7 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
 class St_rn_makeRoadNetworkUdf extends AbstractUdf {
 
-  override def name(): String = "st_rn_fromGeoJson"
+  override def name(): String = "st_rn_makeRoadNetwork"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
   @throws[JsonProcessingException]
