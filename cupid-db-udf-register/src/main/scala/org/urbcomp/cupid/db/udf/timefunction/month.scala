@@ -16,7 +16,9 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-import java.time.{DateTimeException, LocalDateTime}
+import org.joda.time.DateTime
+
+import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 class month extends AbstractUdf {
@@ -28,10 +30,10 @@ class month extends AbstractUdf {
   /**
     * get month of the year
     *
-    * @param localDateTime datetime
+    * @param dateTime datetime
     * @return month of the year
     */
-  def evaluate(localDateTime: LocalDateTime): Int = localDateTime.getMonth.getValue
+  def evaluate(dateTime: DateTime): Int = dateTime.monthOfYear().get()
 
   /**
     * get month of the year
@@ -47,7 +49,7 @@ class month extends AbstractUdf {
   }
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: LocalDateTime => Int = evaluate
+  def udfWrapper: DateTime => Int = evaluate
 
   def udfWrapper2: String => Int = evaluate
 

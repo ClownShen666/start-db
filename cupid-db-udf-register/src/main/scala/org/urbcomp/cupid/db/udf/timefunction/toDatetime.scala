@@ -20,6 +20,7 @@ import java.text.ParseException
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import java.time.{DateTimeException, LocalDateTime}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 class toDatetime extends AbstractUdf {
 

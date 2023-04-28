@@ -17,8 +17,9 @@
 package org.urbcomp.cupid.db.udf.timefunction
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 import java.time.temporal.WeekFields
-import java.time.{DateTimeException, LocalDateTime}
+import java.time.{DateTimeException, LocalDateTime, LocalTime}
 
 class week extends AbstractUdf {
 
@@ -29,12 +30,12 @@ class week extends AbstractUdf {
   /**
     * get week value of the year
     *
-    * @param localDateTime datetime
+    * @param localTime datetime
     * @return week of the year
     */
-  def evaluate(localDateTime: LocalDateTime): Int = {
+  def evaluate(localTime: LocalTime): Int = {
     val weekFields = WeekFields.ISO
-    localDateTime.get(weekFields.weekBasedYear)
+    localTime.get(weekFields.weekBasedYear)
   }
 
   /**
@@ -53,7 +54,7 @@ class week extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: LocalDateTime => Int = evaluate
+  def udfWrapper: LocalTime => Int = evaluate
 
   def udfWrapper2: String => Int = evaluate
 

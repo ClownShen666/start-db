@@ -16,9 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 import java.sql.Timestamp
 import java.text.{ParseException, SimpleDateFormat}
+import scala.util.control.Breaks.{break, breakable}
 class toTimestamp extends AbstractUdf {
 
   override def name(): String = "toTimestamp"

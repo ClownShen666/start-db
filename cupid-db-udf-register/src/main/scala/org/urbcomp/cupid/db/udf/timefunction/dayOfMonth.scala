@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
+import org.joda.time.DateTime
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import java.time.{DateTimeException, LocalDateTime}
+
+import java.time.DateTimeException
 
 class dayOfMonth extends AbstractUdf {
 
@@ -28,10 +30,10 @@ class dayOfMonth extends AbstractUdf {
   /**
     * get day of month
     *
-    * @param localDateTime datetime
+    * @param dateTime datetime
     * @return day of month
     */
-  def evaluate(localDateTime: LocalDateTime): Int = localDateTime.getDayOfMonth
+  def evaluate(dateTime: DateTime): Int = dateTime.getDayOfMonth
 
   /**
     * get day of month
@@ -47,7 +49,7 @@ class dayOfMonth extends AbstractUdf {
   }
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: LocalDateTime => Int = evaluate
+  def udfWrapper: DateTime => Int = evaluate
 
   def udfWrapper2: String => Int = evaluate
 

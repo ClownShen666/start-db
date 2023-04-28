@@ -19,6 +19,7 @@ package org.urbcomp.cupid.db.udf.timefunction
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 class now extends AbstractUdf {
 

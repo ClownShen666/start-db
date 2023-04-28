@@ -16,11 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.joda.time.DateTime
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.time.format.DateTimeFormatter
-import java.time.{DateTimeException, LocalDateTime}
+import java.time.DateTimeException
 
 class datetimeFormat extends AbstractUdf {
 
@@ -36,9 +37,10 @@ class datetimeFormat extends AbstractUdf {
     * @return datetime string
     */
   @throws[DateTimeException]
-  def evaluate(dt: LocalDateTime, format: String): String = {
-    val dateTimeFormatter = DateTimeFormatter.ofPattern(format.trim)
-    dateTimeFormatter.format(dt)
+  def evaluate(dt: DateTime, format: String): String = {
+//    val dateTimeFormatter = DateTimeFormatter.ofPattern(format.trim)
+//    dateTimeFormatter.format(dt)
+    dt.formatted(format)
   }
 
   /**
@@ -51,14 +53,14 @@ class datetimeFormat extends AbstractUdf {
   @throws[DateTimeException]
   def evaluate(dtStr: String, format: String): String = {
     val to = new toDatetime
-    val localDateTime = to.evaluate(dtStr)
+    val DateTime = to.evaluate(dtStr)
     val dateTimeFormatter = DateTimeFormatter.ofPattern(format.trim)
-    dateTimeFormatter.format(localDateTime)
+    dateTimeFormatter.format(DateTime)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: (LocalDateTime, String) => String = evaluate
+  def udfWrapper: (DateTime, String) => String = evaluate
   def udfWrapper2: (String, String) => String = evaluate
 
 }

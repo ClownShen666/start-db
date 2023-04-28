@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
+import org.joda.time.DateTime
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import java.time.{DateTimeException, LocalDateTime}
+
+import java.time.DateTimeException
 
 class year extends AbstractUdf {
 
@@ -28,10 +30,10 @@ class year extends AbstractUdf {
   /**
     * get year value
     *
-    * @param localDateTime datetime
+    * @param dateTime datetime
     * @return year value
     */
-  def evaluate(localDateTime: LocalDateTime): Int = localDateTime.getYear
+  def evaluate(dateTime: DateTime): Int = dateTime.getYear
 
   /**
     * get year value
@@ -47,7 +49,7 @@ class year extends AbstractUdf {
   }
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: LocalDateTime => Int = evaluate
+  def udfWrapper: DateTime => Int = evaluate
 
   def udfWrapper2: String => Int = evaluate
 

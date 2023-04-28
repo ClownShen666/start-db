@@ -19,7 +19,8 @@ package org.urbcomp.cupid.db.udf.timefunction
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-import java.time.LocalDateTime
+import java.time.LocalTime
+
 
 class currentDatetime extends AbstractUdf {
 
@@ -28,13 +29,14 @@ class currentDatetime extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   /**
-    * get current datetime
-    *
-    * @return datetime instance
-    */
-  def evaluate(): LocalDateTime = LocalDateTime.now
+   * get current datetime
+   *
+   * @return datetime instance
+   */
+  def evaluate(): LocalTime = LocalTime.now
+
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: () => LocalDateTime = evaluate
+  def udfWrapper: () => LocalTime = evaluate
 
 }

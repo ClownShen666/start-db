@@ -16,12 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.joda.time.DateTime
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.sql.Timestamp
 import java.text.ParseException
-import java.time.LocalDateTime
 
 class datetimeToTimestamp extends AbstractUdf {
 
@@ -49,7 +49,7 @@ class datetimeToTimestamp extends AbstractUdf {
     * @throws ParseException parse exception
     */
   @throws[ParseException]
-  def evaluate(dateTime: LocalDateTime): Timestamp = {
+  def evaluate(dateTime: DateTime): Timestamp = {
     val dtString = dateTime.toString
     evaluate(dtString)
   }
@@ -57,6 +57,6 @@ class datetimeToTimestamp extends AbstractUdf {
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
   def udfWrapper: String => Timestamp = evaluate
-  def udfWrapper2: LocalDateTime => Timestamp = evaluate
+  def udfWrapper2: DateTime => Timestamp = evaluate
 
 }
