@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf
+package org.urbcomp.cupid.db.udtf
 
 import org.apache.calcite.sql.`type`.SqlTypeName
 import org.urbcomp.cupid.db.algorithm.staypointdetect.StayPointDetectResult
 import org.urbcomp.cupid.db.model.point.GPSPoint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.udf.DataEngine
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.util.GeoFunctions
 
