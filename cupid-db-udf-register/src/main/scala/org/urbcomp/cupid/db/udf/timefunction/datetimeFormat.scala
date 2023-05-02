@@ -28,7 +28,6 @@ class datetimeFormat extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-
   /**
     * Formats one datetime string into the specified format
     *

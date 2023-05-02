@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-
 import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -25,7 +24,6 @@ class dayOfYear extends AbstractUdf {
   override def name(): String = "dayOfYear"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
 
   /**
     * get day of year
@@ -40,7 +38,6 @@ class dayOfYear extends AbstractUdf {
     to.evaluate(dtString).getDayOfYear
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
-
 
   def udfWrapper: String => Int = evaluate
 

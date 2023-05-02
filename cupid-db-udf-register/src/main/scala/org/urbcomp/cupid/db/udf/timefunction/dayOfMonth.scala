@@ -27,7 +27,6 @@ class dayOfMonth extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-
   /**
     * get day of month
     *
@@ -41,7 +40,6 @@ class dayOfMonth extends AbstractUdf {
     to.evaluate(dtString).getDayOfMonth
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
-
 
   def udfWrapper: String => Int = evaluate
 

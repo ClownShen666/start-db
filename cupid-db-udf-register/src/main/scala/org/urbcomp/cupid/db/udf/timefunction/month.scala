@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-
 import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -39,7 +38,6 @@ class month extends AbstractUdf {
     to.evaluate(dtString).getMonth.getValue
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
-
 
   def udfWrapper: String => Int = evaluate
 

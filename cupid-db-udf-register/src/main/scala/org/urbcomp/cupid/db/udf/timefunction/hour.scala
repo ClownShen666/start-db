@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-
 import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -25,8 +24,6 @@ class hour extends AbstractUdf {
   override def name(): String = "hour"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-
 
   /**
     * get hour value of datetime
@@ -41,7 +38,6 @@ class hour extends AbstractUdf {
     to.evaluate(dtString).getHour
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
-
 
   def udfWrapper: String => Int = evaluate
 

@@ -26,8 +26,6 @@ class year extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-
-
   /**
     * get year value
     *
@@ -41,7 +39,6 @@ class year extends AbstractUdf {
     to.evaluate(dtString).getYear
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
-
 
   def udfWrapper: String => Int = evaluate
 

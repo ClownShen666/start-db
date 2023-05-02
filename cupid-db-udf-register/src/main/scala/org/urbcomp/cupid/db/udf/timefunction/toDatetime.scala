@@ -20,7 +20,7 @@ import java.text.ParseException
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import java.time.{DateTimeException, LocalDateTime}
 import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
-class toDatetime  {
+class toDatetime {
 
   /**
     * Converts a date string to a timestamp
@@ -76,6 +76,5 @@ class toDatetime  {
       )
     localDateTime
   }
-
 
 }

@@ -23,14 +23,11 @@
 package org.urbcomp.cupid.db.function;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.WeekFields;
-import java.util.Date;
 
 /**
  * Time UDF functions
@@ -47,12 +44,6 @@ public class TimeFunction {
         "yyyy-MM-dd HH:mm:ss.SSS",
         "yyyy-MM-dd HH:mm:ss",
         "yyyy-MM-dd" };
-
-
-
-
-
-
 
     /**
      * Converts a String to Datetime as the given format
@@ -106,8 +97,6 @@ public class TimeFunction {
         return localDateTime;
     }
 
-
-
     /**
      * Convert datetime to timestamp
      * @param timestamp Timestamp instance
@@ -121,7 +110,6 @@ public class TimeFunction {
         }
         return toDateTime(tsString);
     }
-
 
     /**
      * get current datetime
@@ -144,8 +132,6 @@ public class TimeFunction {
         return dateTimeFormatter.format(dt);
     }
 
-
-
     /**
      * get hour value of datetime
      * @param localDateTime datetime
@@ -155,10 +141,6 @@ public class TimeFunction {
     public int hour(LocalDateTime localDateTime) {
         return localDateTime.getHour();
     }
-
-
-
-
 
     /**
      * get minute value of datetime
@@ -171,7 +153,6 @@ public class TimeFunction {
         return toDateTime(dtString).getMinute();
     }
 
-
     /**
      * get second value of datetime
      * @param dtString datetime string
@@ -182,8 +163,6 @@ public class TimeFunction {
     public int second(String dtString) throws DateTimeException {
         return toDateTime(dtString).getSecond();
     }
-
-
 
     /**
      * get week value of the year
@@ -196,7 +175,6 @@ public class TimeFunction {
         WeekFields weekFields = WeekFields.ISO;
         return toDateTime(dtString).get(weekFields.weekOfYear());
     }
-
 
     /**
      * get month of the year
@@ -220,7 +198,6 @@ public class TimeFunction {
         return toDateTime(dtString).getYear();
     }
 
-
     /**
      * get day of month
      * @param dtString datetime string
@@ -232,7 +209,6 @@ public class TimeFunction {
         return toDateTime(dtString).getDayOfMonth();
     }
 
-
     /**
      * get day of week
      * @param dtString datetime string
@@ -243,7 +219,6 @@ public class TimeFunction {
     public int dayOfWeek(String dtString) throws DateTimeException {
         return toDateTime(dtString).getDayOfWeek().getValue();
     }
-
 
     /**
      * get day of year

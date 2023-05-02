@@ -40,7 +40,6 @@ class datetimeToTimestamp extends AbstractUdf {
     toTimestamp.evaluate(dtString)
   }
 
-
   def udfSparkEntries: List[String] = List("udfWrapper")
 
   def udfWrapper: String => Timestamp = evaluate

@@ -43,7 +43,6 @@ class week extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-
   def udfWrapper: String => Int = evaluate
 
 }

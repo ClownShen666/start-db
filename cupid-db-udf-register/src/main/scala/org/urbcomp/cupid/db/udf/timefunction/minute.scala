@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-
 import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -25,7 +24,6 @@ class minute extends AbstractUdf {
   override def name(): String = "minute"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
 
   /**
     * get minute value of datetime
