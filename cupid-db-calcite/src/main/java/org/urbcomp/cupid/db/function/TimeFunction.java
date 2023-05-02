@@ -23,11 +23,14 @@
 package org.urbcomp.cupid.db.function;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.WeekFields;
+import java.util.Date;
 
 /**
  * Time UDF functions
@@ -109,6 +112,50 @@ public class TimeFunction {
             tsString = tsString.substring(0, tsString.length() - 2);
         }
         return toDateTime(tsString);
+    }
+
+    /**
+     * Convert timestamp to datetime
+     * @param tsString Timestamp String
+     * @return datetime datetime instance
+     * @throws ParseException parse exception
+     */
+    @CupidDBFunction("timestampToDatetime")
+    public LocalDateTime timestampToDatetime(String tsString) throws ParseException {
+        Timestamp timestamp = toTimestamp(tsString);
+        return timestampToDatetime(timestamp);
+    }
+
+    /**
+     * Converts a date string to a timestamp
+     *
+     * @param dateString date(time) String
+     * @return timestamp
+     * @throws ParseException parse exception
+     */
+    @CupidDBFunction("toTimestamp")
+    public Timestamp toTimestamp(String dateString) throws ParseException {
+        long time = 0;
+        boolean isCorrect = false;
+        ParseException pe = null;
+        for (String format : DEFAULT_FORMATS) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+                Date date = simpleDateFormat.parse(dateString);
+                time = date.getTime();
+                isCorrect = true;
+                break;
+            } catch (ParseException ex) {
+                pe = ex;
+            }
+        }
+        if (!isCorrect && pe != null) {
+            throw new ParseException(
+                "Date format is error. Only receive " + String.join(",", DEFAULT_FORMATS),
+                pe.getErrorOffset()
+            );
+        }
+        return new Timestamp(time);
     }
 
     /**
