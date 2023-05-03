@@ -21,7 +21,10 @@ import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{GCJ02ToBD09Transformer, MatchUtil}
+import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
+  GCJ02ToBD09Transformer,
+  MatchUtil
+}
 
 class st_GCJ02ToBD09 extends AbstractUdf {
   override def name(): String = "st_GCJ02ToBD09"
@@ -45,8 +48,8 @@ class st_GCJ02ToBD09 extends AbstractUdf {
     transformer.roadSegmentTransform(st)
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper","udfWrapper2"
-    ,"udfWrapper3","udfWrapper4")
+  def udfSparkEntries: List[String] =
+    List("udfWrapper", "udfWrapper2", "udfWrapper3", "udfWrapper4")
 
   def udfWrapper: Geometry => Geometry = evaluate
   def udfWrapper2: Trajectory => Trajectory = evaluate

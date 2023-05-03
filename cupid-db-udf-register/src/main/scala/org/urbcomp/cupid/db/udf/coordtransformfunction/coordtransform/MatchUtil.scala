@@ -16,7 +16,16 @@
  */
 package org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform
 
-import org.locationtech.jts.geom.{Geometry, GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon}
+import org.locationtech.jts.geom.{
+  Geometry,
+  GeometryCollection,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon
+}
 
 object MatchUtil {
 

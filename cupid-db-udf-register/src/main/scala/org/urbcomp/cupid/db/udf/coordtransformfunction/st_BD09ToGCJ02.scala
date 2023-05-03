@@ -21,7 +21,10 @@ import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{BD09ToGCJ02Transformer, MatchUtil}
+import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
+  BD09ToGCJ02Transformer,
+  MatchUtil
+}
 
 class st_BD09ToGCJ02 extends AbstractUdf {
   override def name(): String = "st_BD09ToGCJ02"
