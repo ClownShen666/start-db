@@ -17,13 +17,11 @@
 package org.urbcomp.cupid.db.udf.coordtransformfunction
 
 import org.locationtech.jts.geom.Geometry
-
+import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
-  MatchUtil,
-  WGS84ToBD09Transformer
-}
+import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{ MatchUtil, WGS84ToBD09Transformer}
 
 class st_WGS84ToBD09 extends AbstractUdf {
   override def name(): String = "st_WGS84ToBD09"
@@ -34,7 +32,25 @@ class st_WGS84ToBD09 extends AbstractUdf {
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  val transformer = new WGS84ToBD09Transformer
+
+  def evaluate(st: Trajectory): Trajectory = {
+    transformer.trajectoryTransform(st)
+  }
+
+  def evaluate(st: RoadNetwork): RoadNetwork = {
+    transformer.roadNetworkTransform(st)
+  }
+  def evaluate(st: RoadSegment): RoadSegment = {
+    transformer.roadSegmentTransform(st)
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper","udfWrapper2"
+    ,"udfWrapper3","udfWrapper4")
 
   def udfWrapper: Geometry => Geometry = evaluate
+  def udfWrapper2: Trajectory => Trajectory = evaluate
+  def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
+
+  def udfWrapper4: RoadSegment => RoadSegment = evaluate
 }
