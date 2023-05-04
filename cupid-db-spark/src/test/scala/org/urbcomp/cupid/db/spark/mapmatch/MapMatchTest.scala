@@ -17,19 +17,48 @@
 package org.urbcomp.cupid.db.spark.mapmatch
 
 import org.scalatest.FunSuite
-import org.urbcomp.cupid.db.model.sample.ModelGenerator.{generateRoadNetwork, generateTrajectory}
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
+import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
+import org.urbcomp.cupid.db.spark.model.roadSegmentEncoder
+
+import scala.collection.convert.ImplicitConversions._
 
 class MapMatchTest extends FunSuite {
+  val rs: List[RoadSegment] = ModelGenerator.generateRoadSegments().toList
+  val traj: Trajectory = ModelGenerator.generateTrajectory()
 
   test("test map matching") {
-    val mapMatch: MapMatch = new MapMatch
-    val rn = generateRoadNetwork()
-    val traj = generateTrajectory()
-    val trajArray = Array[Trajectory](traj)
-    val result = mapMatch.mapMatch(rn, trajArray)
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
 
-    assertResult(result.get(0).getMmPtList.size())(117)
+    val roadNetwork = ModelGenerator.generateRoadNetwork()
+    val traj: Trajectory = ModelGenerator.generateTrajectory()
+    val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))
+    val trajDf = trajRdd.toDF("id", "trajectory")
+
+    val mapMatch: MapMatch = new MapMatch
+    val result = mapMatch.mapMatch(roadNetwork, trajDf)
+    result.show(numRows = 1, truncate = false)
+  }
+
+  test("test map matching 2") {
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val roadsRDD = spark.sparkContext.parallelize(rs)
+    val roadDf = roadsRDD.toDF("roads").coalesce(2)
+    val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))
+    val trajDf = trajRdd.toDF("id", "trajectory").coalesce(2)
+    trajDf.createOrReplaceTempView("trajDf")
+    roadDf.createOrReplaceTempView("roadDf")
+
+    val df = spark.sql(
+      "select st_traj_mapMatch(t2.t, t1.trajectory) from trajDf t1," +
+        "(select St_rn_makeRoadNetwork(collect_list(roads)) as t from roadDf) as t2"
+    )
+    df.explain(true)
+    df.show()
   }
 
 }

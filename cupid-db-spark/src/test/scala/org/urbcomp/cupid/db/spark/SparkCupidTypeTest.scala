@@ -63,7 +63,7 @@ class SparkCupidTypeTest extends FunSuite {
     val spark =
       SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
-    val rdd = spark.sparkContext.parallelize(Seq(rs))
+    val rdd = spark.sparkContext.parallelize(Seq(rs, rs))
     val df = rdd.toDF("roadSegment")
     assertEquals(rs, df.select("roadSegment").as[RoadSegment].collect.toList.head)
     spark.stop()

@@ -16,37 +16,35 @@
  */
 package org.urbcomp.cupid.db.spark.mapmatch
 
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.SparkConf
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.sql
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
-import org.urbcomp.cupid.db.model.trajectory.{MapMatchedTrajectory, Trajectory}
-
-import java.util
-import scala.collection.JavaConverters._
-
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 class MapMatch {
-  val conf = new SparkConf()
-  val session: SparkSession = SparkSession
-    .builder()
-    .master("local[*]")
-    .appName("MapMatchApp")
-    .config(conf)
-    .getOrCreate()
-  private val context = session.sparkContext
-  def mapMatch(
-      roadNetwork: RoadNetwork,
-      trajectory: Array[Trajectory]
-  ): util.List[MapMatchedTrajectory] = {
-    val trajRdd = context.parallelize(trajectory)
-    val bcRoadNetwork = context.broadcast[RoadNetwork](roadNetwork)
-    val mapMatchRdd = trajRdd.mapPartitions(trajIter => {
-      val mapMatcher =
-        new TiHmmMapMatcher(bcRoadNetwork.value, new ManyToManyShortestPath(roadNetwork))
-      trajIter.flatMap(traj => Option(mapMatcher.mapMatch(traj)))
+
+  def mapMatch(roadNetwork: RoadNetwork, trajDf: sql.DataFrame): sql.DataFrame = {
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    val partitionNum = spark.sparkContext.defaultParallelism
+    val repartitionRdd = trajDf.rdd.repartition(partitionNum)
+
+    val schema = StructType(Seq(StructField("item", DataTypes.StringType)))
+    val rn = spark.sparkContext.broadcast(roadNetwork)
+
+    val itemRdd = repartitionRdd.mapPartitions(iter => {
+      val mapMatcher = new TiHmmMapMatcher(rn.value, new ManyToManyShortestPath(rn.value))
+      iter
+        .map(row => {
+          mapMatcher.mapMatch(row.getAs[Trajectory](1)).toGeoJSON
+        })
+        .filter(_ != null)
+        .map(Row(_))
     })
-    mapMatchRdd.collect().toList.asJava
+    spark.createDataFrame(itemRdd, schema)
   }
 
 }
