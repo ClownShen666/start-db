@@ -46,10 +46,7 @@ class MapMatchTest extends FunSuite {
   test("test map matching 2") {
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
-    System.out.println(spark.sparkContext.getExecutorMemoryStatus)
-    System.out.println("roads size = " + rs.size)
     val roadsRDD = spark.sparkContext.parallelize(rs)
-    System.out.println("default rdd = " + roadsRDD.getNumPartitions)
     val roadDf = roadsRDD.toDF("roads").coalesce(2)
     val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))
     val trajDf = trajRdd.toDF("id", "trajectory").coalesce(2)
