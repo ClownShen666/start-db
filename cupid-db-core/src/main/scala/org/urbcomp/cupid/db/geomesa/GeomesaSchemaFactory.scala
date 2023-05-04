@@ -27,8 +27,7 @@ import org.urbcomp.cupid.db.udtf.{
   HybridTrajectorySegment,
   KMeansClustering,
   StayPointDetect,
-  StayPointTrajectorySegment,
-  TimeIntervalTrajectorySegment
+  StayPointTrajectorySegment
 }
 
 import scala.collection.convert.ImplicitConversions._
@@ -107,10 +106,6 @@ class GeomesaSchemaFactory extends SchemaFactory {
 
   private def initTableFunction(schemaPlus: SchemaPlus): Unit = {
     schemaPlus.add("fibonacci", TableFunctionImpl.create(Fibonacci.FIBONACCI2_TABLE_METHOD))
-    schemaPlus.add(
-      "st_traj_timeIntervalSegment",
-      TableFunctionImpl.create(TimeIntervalTrajectorySegment.TIMEINTERVALSEGMENT_TABLE_METHOD)
-    )
     schemaPlus.add(
       "st_traj_stayPointSegment",
       TableFunctionImpl.create(StayPointTrajectorySegment.STAYPOINTSEGMENT_TABLE_METHOD)
