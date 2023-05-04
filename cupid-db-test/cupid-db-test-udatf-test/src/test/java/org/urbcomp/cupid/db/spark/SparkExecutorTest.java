@@ -59,15 +59,30 @@ public class SparkExecutorTest {
         assertNotNull(res);
     }
 
-    @Test
-    public void testLoadData() {
+    private void testLoadSql(String sql) {
         String userName = "root";
         String dbName = "default";
         DataStore store = CitibikeDataUtils.getStore(userName, dbName);
         CitibikeDataUtils.prepareTable(store);
         // for hadoop just need to provide a hadoop path
+        final SparkExecutor executor = new SparkExecutor();
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setLocal(true);
+        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExportType(DataExportType.LOCAL);
+        param.setSql(sql);
+        param.setUserName(userName);
+        param.setDbName(dbName);
+        final MetadataResult<Object> res = executor.execute(param);
+        assertNotNull(res);
+    }
+
+    @Test
+    public void testLoadData() {
+        // for hadoop just need to provide a hadoop path
         String path = CitibikeDataUtils.getProjectRoot()
-            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/202204-citibike-tripdata_clip.csv";
+            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
+            + "202204-citibike-tripdata_clip_slice.csv";
         String sql = "LOAD CSV INPATH '"
             + path
             + "' TO "
@@ -77,18 +92,24 @@ public class SparkExecutorTest {
             // + "started_at toTimestamp(started_at),"
             + "start_point st_makePoint(start_lat, start_lng)) "
             + "WITH HEADER";
-        System.out.println("load sql is [" + sql + "]");
-        final SparkExecutor executor = new SparkExecutor();
-        final SparkSqlParam param = new SparkSqlParam();
-        param.setLocal(true);
-        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
-        param.setExportType(DataExportType.LOCAL);
-        param.setSql(sql);
-        param.setUserName("root");
-        param.setDbName("default");
+        testLoadSql(sql);
+    }
 
-        final MetadataResult<Object> res = executor.execute(param);
-        assertNotNull(res);
+    @Test
+    public void testLoadDataWithoutHeader() {
+        String path = CitibikeDataUtils.getProjectRoot()
+            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
+            + "202204-citibike-tripdata_clip_slice_without_header.csv";
+        String sql = "LOAD CSV INPATH '"
+            + path
+            + "' TO "
+            + CitibikeDataUtils.TEST_TABLE_NAME
+            + " (idx _c0, ride_id _c1,"
+            + "rideable_type _c2,"
+            // + "started_at toTimestamp(started_at),"
+            + "start_point st_makePoint(_c9, _c10)) "
+            + "WITHOUT HEADER";
+        testLoadSql(sql);
     }
 
 }

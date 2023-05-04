@@ -19,53 +19,34 @@ package org.urbcomp.cupid.db.spark
 import lombok.extern.slf4j.Slf4j
 import org.apache.calcite.sql.SqlSelect
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Row, SparkSession}
-import org.apache.spark.sql.types.StructType
-import org.geotools.data.{DataStore, DataStoreFinder}
-import org.geotools.feature.simple.{SimpleFeatureBuilder, SimpleFeatureTypeBuilder}
+import org.apache.spark.sql.SparkSession
+import org.geotools.data.DataStoreFinder
 import org.geotools.util.factory.Hints
 import org.locationtech.geomesa.features.ScalaSimpleFeature
-import org.locationtech.geomesa.spark.SparkUtils.SimpleFeatureRowMapping
-import org.locationtech.geomesa.spark.{GeoMesaSpark, GeoMesaSparkKryoRegistrator, SparkUtils}
-import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
-import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
-import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam}
-import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
-import org.urbcomp.cupid.db.util.{
-  DataTypeUtils,
-  LogUtil,
-  MetadataUtil,
-  ResourceUtil,
-  SparkSqlParam,
-  SqlParam
-}
-import org.urbcomp.cupid.db.udf.UdfFactory
-import org.slf4j.Logger
-
-import scala.reflect.runtime.universe._
-import scala.reflect.api
-import org.urbcomp.cupid.db.udf.DataEngine.Spark
-import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
-import org.reflections.Reflections
-import scala.collection.convert.ImplicitConversions._
-import org.locationtech.geomesa.utils.io.WithStore
+import org.locationtech.geomesa.spark.{GeoMesaSpark, GeoMesaSparkKryoRegistrator}
 import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
-import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
-import org.urbcomp.cupid.db.data.hbase.{CupidHBaseDataStore, CupidHBaseDataStoreFactory}
+import org.opengis.feature.simple.SimpleFeature
+import org.reflections.Reflections
+import org.slf4j.Logger
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.parser.SqlHelper
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
 import org.urbcomp.cupid.db.spark.model._
+import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
+import org.urbcomp.cupid.db.udf.DataEngine.Spark
+import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
 import org.urbcomp.cupid.db.udtf.AbstractUdtf
+import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam, SqlParam}
 
-import java.io.Serializable
 import java.lang.reflect.Method
 import java.time.Instant
 import scala.collection.JavaConverters.mapAsScalaMapConverter
+import scala.collection.convert.ImplicitConversions._
+import scala.reflect.api
+import scala.reflect.runtime.universe._
 @Slf4j
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
@@ -84,16 +65,13 @@ object SparkQueryExecutor {
     try {
       node match {
         case node: SqlLoadData => {
-          println("Running load data sql", SqlHelper.toSqlString(node))
           val schemaName = node.tableName.names.get(0)
           // FIXME, schema name should retrieve from cupid metadata
           val df = spark.read.option("header", node.hasHeader).csv(node.path)
           val tmpView = "load_data_tmp_" + Instant.now().toEpochMilli
           df.createOrReplaceTempView(tmpView)
           val selectSql = SqlHelper.toSqlString(SqlHelper.convertToSelectNode(node, tmpView))
-          println("[convert to select sql]", selectSql)
           val data = spark.sql(selectSql)
-          data.show()
 
           val userName = param.getUserName
           val dbName = param.getDbName
@@ -114,7 +92,6 @@ object SparkQueryExecutor {
                 }
               })
               sf.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.FALSE)
-              println("Inserting sf", sf)
               sf.asInstanceOf[SimpleFeature]
             })
           })
