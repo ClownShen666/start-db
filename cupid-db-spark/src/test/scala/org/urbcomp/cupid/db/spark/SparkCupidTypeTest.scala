@@ -122,4 +122,46 @@ class SparkCupidTypeTest extends FunSuite {
     )
     assertEquals(expected.sorted, li.sorted)
   }
+
+  test("st_traj_stayPointDetect spark test 2") {
+    val trajectoryStp: Trajectory =
+      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectoryStp, trajectoryStp))
+    val df = rdd.toDF("traj")
+    df.createOrReplaceTempView("table1")
+    val df3 = spark.sql(
+      "select f.starttime, f.endtime, st_mPointFromWKT(f.gpspoints) from (select st_traj_stayPointDetect(traj, 10, 10) from table1) as f"
+    )
+    df3.show()
+    val li = df3
+      .as[(Timestamp, Timestamp, MultiPoint)]
+      .collect
+      .toList
+      .map(x => (x._1.toString, x._2.toString, x._3.toString))
+    val expected = List(
+      (
+        "2018-10-09 07:28:24.0",
+        "2018-10-09 07:28:39.0",
+        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
+      ),
+      (
+        "2018-10-09 07:28:24.0",
+        "2018-10-09 07:28:39.0",
+        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
+      ),
+      (
+        "2018-10-09 07:30:01.0",
+        "2018-10-09 07:30:15.0",
+        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
+      ),
+      (
+        "2018-10-09 07:30:01.0",
+        "2018-10-09 07:30:15.0",
+        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
+      )
+    )
+    assertEquals(expected.sorted, li.sorted)
+  }
 }
