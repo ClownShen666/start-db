@@ -121,6 +121,7 @@ class SparkCupidTypeTest extends FunSuite {
       )
     )
     assertEquals(expected.sorted, li.sorted)
+    spark.stop()
   }
 
   test("st_traj_stayPointDetect spark test 2") {
@@ -163,5 +164,6 @@ class SparkCupidTypeTest extends FunSuite {
       )
     )
     assertEquals(expected.sorted, li.sorted)
+    spark.stop()
   }
 }
