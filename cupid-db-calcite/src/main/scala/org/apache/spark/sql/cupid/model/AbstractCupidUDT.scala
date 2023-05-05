@@ -30,8 +30,12 @@ abstract class AbstractCupidUDT[T >: Null: ClassTag](
 ) extends UserDefinedType[T] {
   override def typeName: String = simpleString
 
+  def serializeData(obj: T): Array[Any] = {
+    Array[Any](KryoSerializer.serialize(obj.toString))
+  }
+
   override def serialize(obj: T): InternalRow = {
-    new GenericInternalRow(Array[Any](KryoSerializer.serialize(obj.toString)))
+    new GenericInternalRow(serializeData(obj))
   }
 
   override def deserialize(datum: Any): T = {

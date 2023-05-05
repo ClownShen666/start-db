@@ -38,7 +38,7 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
 
   override def inputColumnsCount: Int = 2
   override def outputColumns(): List[(String, SqlTypeName)] = {
-    List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.TRAJECTORY))
+    List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.VARCHAR))
   }
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {

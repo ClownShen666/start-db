@@ -17,16 +17,26 @@
 package org.urbcomp.cupid.db.udtf
 
 import org.apache.calcite.sql.`type`.SqlTypeName
-import org.urbcomp.cupid.db.algorithm.staypointdetect.StayPointDetectResult
-import org.urbcomp.cupid.db.model.point.GPSPoint
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory
+import org.apache.hadoop.hive.serde2.objectinspector.{
+  ObjectInspector,
+  ObjectInspectorFactory,
+  StructObjectInspector
+}
+import org.apache.spark.sql.TrajectoryUDT
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
+import org.locationtech.jts.geom.MultiPoint
+import org.locationtech.jts.io.geojson.GeoJsonWriter
+import org.urbcomp.cupid.db.model.point.SpatialPoint
 import org.urbcomp.cupid.db.udf.DataEngine
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.util.GeoFunctions
+import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
-import scala.collection.JavaConverters.mutableSeqAsJavaListConverter
-import scala.collection.convert.ImplicitConversions.`collection asJava`
-import scala.collection.mutable
+import java.util
+import scala.collection.JavaConverters._
+import scala.collection.convert.ImplicitConversions._
 
 class StayPointDetectUdtf extends AbstractUdtf with Serializable {
   override def name(): String = "st_traj_stayPointDetect"
@@ -41,48 +51,46 @@ class StayPointDetectUdtf extends AbstractUdtf with Serializable {
     ("gpsPoints", SqlTypeName.MULTIPOINT)
   )
 
-  override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val trajectory = objects.head.asInstanceOf[Trajectory]
-    val d = objects(1).asInstanceOf[Double]
-    val t = objects(2).asInstanceOf[Double]
-    val stayPoints = mutable.MutableList.empty[Array[AnyRef]]
-    val list = trajectory.getGPSPointList
-    val trLen = list.size
-    var start = 0
-    var end = 0
-    var newSpFlag = true
-    var i = 0
-    while (i < trLen - 1) {
-      var j = i + 1
-      // find the first point that does not satisfy the conditions
-      while (j < trLen && GeoFunctions.getDistanceInM(list.get(i), list.get(j)) <= d) j += 1
-      if (j > i + 1 && (list
-            .get(j - 1)
-            .getTime
-            .getTime - list.get(i).getTime.getTime) / 1000.0 >= t) {
-        if (newSpFlag) {
-          start = i
-          newSpFlag = false
-        }
-        end = j - 1
-      }
-      i += 1
-      // form a new stay point
-      if (!newSpFlag && i > end) {
-        val res = new StayPointDetectResult
-        res.setStarTime(list.get(start).getTime)
-        res.setEndTime(list.get(end).getTime)
-        val temp = mutable.MutableList.empty[GPSPoint]
-        for (k <- start to end) {
-          temp.add(list.get(k))
-        }
-        res.setMultiPoint(temp.asJava)
-        val ir = new Array[AnyRef](1)
-        ir(0) = res
-        stayPoints.add(ir)
-        newSpFlag = true
-      }
+  override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
+    //判断传入的参数个数
+    if (argOIs.length != inputColumnsCount) {
+      throw new UDFArgumentException("有且只能有" + inputColumnsCount + "个参数")
     }
-    stayPoints.toArray
+    val fieldNames = outputColumns().map(_._1).asJava
+    val fieldOIs = new util.ArrayList[ObjectInspector]
+    fieldOIs.add(PrimitiveObjectInspectorFactory.javaTimestampObjectInspector)
+    fieldOIs.add(PrimitiveObjectInspectorFactory.javaTimestampObjectInspector)
+    fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
+    ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs)
+  }
+
+  override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
+    val trajectory = objects.head match {
+      case traj: Trajectory => traj
+      case binaryArray: java.util.ArrayList[Byte] =>
+        TrajectoryUDT.deserialize(
+          new GenericInternalRow(binaryArray.toArray.asInstanceOf[Array[Any]])
+        )
+      case data: Any => throw new Exception("Unrecognizable data " + data)
+    }
+    val d = objects(1).toString.toDouble
+    val t = objects(2).toString.toDouble
+    val detector = new org.urbcomp.cupid.db.algorithm.staypointdetect.StayPointDetect()
+    val result = detector.detect(trajectory, d, t)
+
+    result
+      .map(x => {
+        val multipoint = new MultiPoint(
+          x.getMultiPoint.map(p => p.asInstanceOf[SpatialPoint]).toArray,
+          GeometryFactoryUtils.defaultGeometryFactory
+        )
+        val data = multipoint.toString
+        Array[AnyRef](
+          x.getStarTime.asInstanceOf[AnyRef],
+          x.getEndTime.asInstanceOf[AnyRef],
+          data.asInstanceOf[AnyRef]
+        )
+      })
+      .toArray
   }
 }
