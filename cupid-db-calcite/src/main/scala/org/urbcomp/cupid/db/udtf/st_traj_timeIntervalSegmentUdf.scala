@@ -25,6 +25,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
+import org.apache.spark.sql.TrajectoryUDT
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.urbcomp.cupid.db.algorithm.trajectorysegment.TimeIntervalSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine
@@ -44,14 +46,11 @@ class st_traj_timeIntervalSegmentUdf extends AbstractUdtf with Serializable {
     List(("SubTrajectory", SqlTypeName.TRAJECTORY))
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
-    //判断传入的参数是否是两个
+    //判断传入的参数个数
     if (argOIs.length != inputColumnsCount) {
       throw new UDFArgumentException("有且只能有" + inputColumnsCount + "个参数")
     }
-    //判断参数类型
-    if (argOIs(0).getCategory != ObjectInspector.Category.PRIMITIVE) {
-      throw new UDFArgumentException("参数类型不匹配")
-    }
+
     val fieldNames = outputColumns().map(_._1).asJava
     val fieldOIs = new util.ArrayList[ObjectInspector]
     fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
@@ -59,8 +58,15 @@ class st_traj_timeIntervalSegmentUdf extends AbstractUdtf with Serializable {
   }
 
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val trajectory = objects.head.asInstanceOf[Trajectory]
-    val maxTimeIntervalInSec = objects(1).asInstanceOf[Number].doubleValue()
+    val trajectory = objects.head match {
+      case traj: Trajectory => traj
+      case binaryArray: java.util.ArrayList[Byte] =>
+        TrajectoryUDT.deserialize(
+          new GenericInternalRow(binaryArray.toArray.asInstanceOf[Array[Any]])
+        )
+      case data: Any => throw new Exception("Unrecognizable data " + data)
+    }
+    val maxTimeIntervalInSec = objects(1).toString.toDouble
     val trajectorySegment = new TimeIntervalSegment(maxTimeIntervalInSec)
     val subTrajectoryList = trajectorySegment.segment(trajectory).toArray()
     val res = new Array[Array[AnyRef]](subTrajectoryList.length)

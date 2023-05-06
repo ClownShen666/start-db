@@ -26,6 +26,7 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.model._
 
 import java.sql.Timestamp
+import scala.collection.JavaConverters.seqAsJavaList
 
 class SparkCupidTypeTest extends FunSuite {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
@@ -164,6 +165,31 @@ class SparkCupidTypeTest extends FunSuite {
       )
     )
     assertEquals(expected.sorted, li.sorted)
+    spark.stop()
+  }
+
+  test("st_traj_timeIntervalSegment") {
+    val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
+    val typeArray: Array[String] = Array[String]("Integer", "String", "Double", "Point")
+    val trajectory: Trajectory =
+      ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectory))
+    val df1 = rdd.toDF("traj")
+    df1.createOrReplaceTempView("table1")
+    val df2 = spark.sql(
+      "select d.subtrajectory from (select st_traj_timeIntervalSegment(traj, 2) from table1) as d"
+    )
+    var count = 0;
+    df2
+      .as[String]
+      .collect
+      .toList
+      .foreach(s => {
+        count += Trajectory.fromGeoJSON(s).getGPSPointList.size()
+      })
+    assertEquals(trajectory.getGPSPointList.size, count)
     spark.stop()
   }
 }
