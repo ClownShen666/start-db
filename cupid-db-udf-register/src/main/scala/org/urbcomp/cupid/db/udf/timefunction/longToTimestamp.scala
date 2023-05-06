@@ -14,27 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.roadfunction
+package org.urbcomp.cupid.db.udf.timefunction
 
-import org.apache.spark.SparkConf
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.model.sample.ModelGenerator
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import java.sql.Timestamp
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+class longToTimestamp extends AbstractUdf {
 
-import java.util
-import scala.collection.JavaConverters.seqAsJavaListConverter
-
-class St_rn_makeRoadNetwork extends AbstractUdf {
-  override def name(): String = "st_rn_makeRoadNetwork"
+  override def name(): String = "longToTimestamp"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(rsList: Seq[RoadSegment]): RoadNetwork = {
-    new RoadNetwork(rsList.toList.asJava)
-  }
-
+  /**
+    * Converts a long instance to a timestamp
+    *
+    * @param num one long instance
+    * @return timestamp instance
+    */
+  def evaluate(num: Long): Timestamp = new Timestamp(num)
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Seq[RoadSegment] => RoadNetwork = evaluate
+  def udfWrapper: Long => Timestamp = evaluate
+
 }

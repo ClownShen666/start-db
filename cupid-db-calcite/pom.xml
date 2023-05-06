@@ -18,6 +18,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <type>jar</type>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-common</artifactId>
             <version>${project.parent.version}</version>

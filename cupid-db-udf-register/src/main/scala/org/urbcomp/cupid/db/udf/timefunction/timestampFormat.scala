@@ -14,26 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.roadfunction
+package org.urbcomp.cupid.db.udf.timefunction
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Date
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+class timestampFormat extends AbstractUdf {
 
-class St_rn_makeRoadNetworkUdf extends AbstractUdf {
-
-  override def name(): String = "st_rn_makeRoadNetwork"
+  override def name(): String = "timestampFormat"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  @throws[JsonProcessingException]
-  def evaluate(rsList: Seq[RoadSegment]): RoadNetwork = {
-    if (rsList == null) null
-    else new RoadNetwork(rsList.toList.asJava)
+
+  /**
+    * Formats the timestamp in the specified format
+    *
+    * @param ts     timestamp
+    * @param string time format
+    * @return the specified format instance
+    */
+  def evaluate(ts: Timestamp, string: String): String = {
+    val simpleDateFormat = new SimpleDateFormat(string)
+    simpleDateFormat.format(new Date(ts.getTime))
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Seq[RoadSegment] => RoadNetwork = evaluate
+  def udfWrapper: (Timestamp, String) => String = evaluate
+
 }

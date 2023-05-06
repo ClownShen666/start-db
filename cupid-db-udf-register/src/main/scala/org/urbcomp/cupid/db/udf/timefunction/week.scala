@@ -14,26 +14,35 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.roadfunction
-
-import com.fasterxml.jackson.core.JsonProcessingException
-import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+package org.urbcomp.cupid.db.udf.timefunction
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class St_rn_makeRoadNetworkUdf extends AbstractUdf {
+import java.time.temporal.WeekFields
+import java.time.DateTimeException
 
-  override def name(): String = "st_rn_makeRoadNetwork"
+class week extends AbstractUdf {
+
+  override def name(): String = "week"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  @throws[JsonProcessingException]
-  def evaluate(rsList: Seq[RoadSegment]): RoadNetwork = {
-    if (rsList == null) null
-    else new RoadNetwork(rsList.toList.asJava)
+
+  /**
+    * get week value of the year
+    *
+    * @param dtString datetime string
+    * @return week of the year
+    * @throws DateTimeException parse exception
+    */
+  @throws[DateTimeException]
+  def evaluate(dtString: String): Int = {
+    val weekFields: WeekFields = WeekFields.ISO
+    val to = new toDatetime
+    to.evaluate(dtString).get(weekFields.weekOfYear)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Seq[RoadSegment] => RoadNetwork = evaluate
+  def udfWrapper: String => Int = evaluate
+
 }
