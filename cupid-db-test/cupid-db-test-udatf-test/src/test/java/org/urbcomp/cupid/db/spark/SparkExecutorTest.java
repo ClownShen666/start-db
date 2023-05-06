@@ -16,15 +16,19 @@
  */
 package org.urbcomp.cupid.db.spark;
 
-import org.geotools.data.DataStore;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.infra.MetadataResult;
+import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.tools.CitibikeDataUtils;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
+import org.urbcomp.cupid.db.util.SqlParam;
+
+import java.sql.Connection;
+import java.sql.Statement;
 
 import static org.junit.Assert.assertNotNull;
 import static org.urbcomp.cupid.db.config.DynamicConfig.DB_SPARK_JARS;
@@ -59,11 +63,22 @@ public class SparkExecutorTest {
         assertNotNull(res);
     }
 
-    private void testLoadSql(String sql) {
+    private void testLoadSql(String sql) throws Exception {
         String userName = "root";
         String dbName = "default";
-        DataStore store = CitibikeDataUtils.getStore(userName, dbName);
-        CitibikeDataUtils.prepareTable(store);
+        SqlParam.CACHE.set(new SqlParam(userName, dbName));
+
+        try (Connection connect = CalciteHelper.createConnection()) {
+            String createTableSql = "create table if not exists "
+                + CitibikeDataUtils.TEST_TABLE_NAME
+                + " (    idx Integer,"
+                + " ride_id String,"
+                + " rideable_type String,"
+                + " start_point Point)";
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate(createTableSql);
+        }
+
         // for hadoop just need to provide a hadoop path
         final SparkExecutor executor = new SparkExecutor();
         final SparkSqlParam param = new SparkSqlParam();
@@ -75,10 +90,11 @@ public class SparkExecutorTest {
         param.setDbName(dbName);
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
+
     }
 
     @Test
-    public void testLoadData() {
+    public void testLoadData() throws Exception {
         // for hadoop just need to provide a hadoop path
         String path = CitibikeDataUtils.getProjectRoot()
             + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
@@ -96,7 +112,7 @@ public class SparkExecutorTest {
     }
 
     @Test
-    public void testLoadDataWithoutHeader() {
+    public void testLoadDataWithoutHeader() throws Exception {
         String path = CitibikeDataUtils.getProjectRoot()
             + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
             + "202204-citibike-tripdata_clip_slice_without_header.csv";

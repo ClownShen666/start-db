@@ -64,17 +64,26 @@ object SparkQueryExecutor {
 
     try {
       node match {
-        case node: SqlLoadData => {
-          val schemaName = node.tableName.names.get(0)
-          // FIXME, schema name should retrieve from cupid metadata
-          val df = spark.read.option("header", node.hasHeader).csv(node.path)
+        case node: SqlLoadData =>
+          val (userName, dbName, tableName) =
+            ExecutorUtil.getUserNameDbNameAndTableName(node.tableName)
+          val catalogName = MetadataUtil.makeCatalog(userName, dbName)
+          val table = MetadataAccessUtil.getTable(userName, dbName, tableName)
+          if (table == null) {
+            throw new IllegalArgumentException(s"table not exist $tableName")
+          }
+          val schemaName = MetadataUtil.makeSchemaName(table.getId)
+          val df = spark.read
+            .option("header", node.hasHeader)
+            .options(
+              Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+            )
+            .csv(node.path)
           val tmpView = "load_data_tmp_" + Instant.now().toEpochMilli
           df.createOrReplaceTempView(tmpView)
           val selectSql = SqlHelper.toSqlString(SqlHelper.convertToSelectNode(node, tmpView))
           val data = spark.sql(selectSql)
 
-          val userName = param.getUserName
-          val dbName = param.getDbName
           val params = ExecutorUtil.getDataStoreParams(userName, dbName)
 
           val rddToSave = data.rdd.mapPartitions(partition => {
@@ -98,7 +107,6 @@ object SparkQueryExecutor {
 
           GeoMesaSpark(params).save(rddToSave, params.asScala.toMap, schemaName)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
-        }
         case _: SqlSelect =>
           CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
             val userName = SparkSqlParam.CACHE.get().getUserName
