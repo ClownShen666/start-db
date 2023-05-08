@@ -25,24 +25,26 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
+import org.urbcomp.cupid.db.algorithm.trajectorysegment.TimeIntervalSegment
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine
 
-import java.util
 import scala.collection.JavaConverters._
+import java.util
 
-class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
+class st_traj_timeIntervalSegmentUdf extends AbstractUdtf with Serializable {
 
-  override def name(): String = "StringSplitTwice"
+  override def name(): String = "st_traj_timeIntervalSegment"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   override def inputColumnsCount: Int = 2
-  override def outputColumns(): List[(String, SqlTypeName)] = {
-    List(("Col1", SqlTypeName.VARCHAR), ("Col2", SqlTypeName.VARCHAR))
-  }
+
+  override def outputColumns(): List[(String, SqlTypeName)] =
+    List(("SubTrajectory", SqlTypeName.TRAJECTORY))
 
   override def initialize(argOIs: Array[ObjectInspector]): StructObjectInspector = {
-    //判断传入的参数是否只有一个
+    //判断传入的参数是否是两个
     if (argOIs.length != inputColumnsCount) {
       throw new UDFArgumentException("有且只能有" + inputColumnsCount + "个参数")
     }
@@ -53,24 +55,22 @@ class StringSplitTwiceUdtf extends AbstractUdtf with Serializable {
     val fieldNames = outputColumns().map(_._1).asJava
     val fieldOIs = new util.ArrayList[ObjectInspector]
     fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
-    fieldOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector)
     ObjectInspectorFactory.getStandardStructObjectInspector(fieldNames, fieldOIs)
   }
 
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
-    val delimiter = objects.head.toString
-    val input = objects(1).toString
-    if (input.isEmpty) new Array[Array[AnyRef]](0)
-    else {
-      val test = input.split(delimiter)
-      val ret = new Array[Array[AnyRef]](test.length)
-      var idx = 0
-      for (i <- 0 until test.length) {
-        val result = test(i).split(":")
-        ret(idx) = result.asInstanceOf[Array[AnyRef]]
-        idx += 1
-      }
-      ret
+    val trajectory = objects.head.asInstanceOf[Trajectory]
+    val maxTimeIntervalInSec = objects(1).asInstanceOf[Number].doubleValue()
+    val trajectorySegment = new TimeIntervalSegment(maxTimeIntervalInSec)
+    val subTrajectoryList = trajectorySegment.segment(trajectory).toArray()
+    val res = new Array[Array[AnyRef]](subTrajectoryList.length)
+    var idx = 0
+    for (subTrajectory <- subTrajectoryList) {
+      val tmp = new Array[AnyRef](1)
+      tmp(0) = subTrajectory
+      res(idx) = tmp
+      idx += 1
     }
+    res
   }
 }

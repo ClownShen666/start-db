@@ -32,21 +32,6 @@ class MapMatchTest extends FunSuite {
   test("test map matching") {
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
-
-    val roadNetwork = ModelGenerator.generateRoadNetwork()
-    val traj: Trajectory = ModelGenerator.generateTrajectory()
-    val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))
-    val trajDf = trajRdd.toDF("id", "trajectory")
-
-    val mapMatch: MapMatch = new MapMatch
-    val result = mapMatch.mapMatch(roadNetwork, trajDf)
-    result.show(numRows = 1, truncate = false)
-    spark.close()
-  }
-
-  test("test map matching 2") {
-    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
-    import spark.implicits._
     val roadsRDD = spark.sparkContext.parallelize(rs)
     val roadDf = roadsRDD.toDF("roads").coalesce(2)
     val trajRdd = spark.sparkContext.parallelize(Seq((1, traj), (2, traj), (3, traj)))

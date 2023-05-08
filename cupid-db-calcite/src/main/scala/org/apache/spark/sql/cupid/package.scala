@@ -39,7 +39,7 @@ package object model {
 }
 
 private[spark] class TrajectoryUDT extends AbstractCupidUDT[Trajectory]("Trajectory", "fromGeoJSON")
-object LineStringUDT extends TrajectoryUDT
+object TrajectoryUDT extends TrajectoryUDT
 
 private[spark] class RoadNetworkUDT
     extends AbstractCupidUDT[RoadNetwork]("RoadNetwork", "fromGeoJSON")
