@@ -20,6 +20,7 @@ import org.junit.Assert.assertEquals
 import org.scalatest.FunSuite
 import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
+import org.locationtech.geomesa.utils.geohash.GeoHashIterator.geometryFactory
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -192,4 +193,44 @@ class SparkCupidTypeTest extends FunSuite {
     assertEquals(trajectory.getGPSPointList.size, count)
     spark.stop()
   }
+
+  test("DBSCANClustering") {
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(
+      Seq(
+        geometryFactory.createPoint(new Coordinate(1.000000, 2.000000)),
+        geometryFactory.createPoint(new Coordinate(1.000010, 2.000010)),
+        geometryFactory.createPoint(new Coordinate(1.000030, 2.000020)),
+        geometryFactory.createPoint(new Coordinate(1.000040, 2.000030))
+      )
+    )
+    val df = rdd.toDF("points")
+    df.createOrReplaceTempView("dbscan_test1")
+    val df3 = spark.sql(
+      "select st_dbscan_clustering(t1, 1.6, 2) " +
+        "from " +
+        "(select collect_list(points) as t1 from dbscan_test1)"
+    )
+    df3.show()
+    val res = df3
+      .as[(String, String, String)]
+      .collect
+      .toList
+    val expected = List(
+      (
+        "MULTIPOINT ((1 2), (1.00001 2.00001))",
+        "POINT (1.000005 2.000005)",
+        "GEOMETRYCOLLECTION EMPTY"
+      ),
+      (
+        "MULTIPOINT ((1.00003 2.00002), (1.00004 2.00003))",
+        "POINT (1.000035 2.000025)",
+        "GEOMETRYCOLLECTION EMPTY"
+      )
+    )
+    assertEquals(expected, res)
+    spark.stop()
+  }
+
 }
