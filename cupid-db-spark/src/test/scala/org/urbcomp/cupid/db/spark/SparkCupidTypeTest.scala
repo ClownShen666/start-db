@@ -233,4 +233,28 @@ class SparkCupidTypeTest extends FunSuite {
     spark.stop()
   }
 
+  test("st_traj_hybridSegment") {
+    val trajectoryStp: Trajectory =
+      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectoryStp))
+    val df = rdd.toDF("traj")
+    val df2 = df.selectExpr("st_traj_hybridSegment(traj, 10, 10, 10)")
+    df2.createOrReplaceTempView("table1")
+    val df3 = spark.sql("select SubTrajectory from table1")
+    var count = 0
+    var seq = 0
+    df3
+      .as[String]
+      .collect
+      .toList
+      .foreach(s => {
+        count += Trajectory.fromGeoJSON(s).getGPSPointList.size()
+        seq += 1
+      })
+    assertEquals(seq, 5)
+    assertEquals(trajectoryStp.getGPSPointList.size() - 8, count)
+    spark.stop()
+  }
 }
