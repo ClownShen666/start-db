@@ -34,25 +34,26 @@ class st_BD09ToGCJ02 extends AbstractUdf {
   def evaluate(st: Geometry): Geometry = {
     MatchUtil.MatchCoordinate(new BD09ToGCJ02Transformer, st)
   }
-//  val transformer = new BD09ToGCJ02Transformer
-//
-//  def evaluate(st: Trajectory): Trajectory = {
-//    transformer.trajectoryTransform(st)
-//  }
-//
-//  def evaluate(st: RoadNetwork): RoadNetwork = {
-//    transformer.roadNetworkTransform(st)
-//  }
-//  def evaluate(st: RoadSegment): RoadSegment = {
-//    transformer.roadSegmentTransform(st)
-//  }
+  val transformer = new BD09ToGCJ02Transformer
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def evaluate(st: Trajectory): Trajectory = {
+    transformer.trajectoryTransform(st)
+  }
+
+  def evaluate(st: RoadNetwork): RoadNetwork = {
+    transformer.roadNetworkTransform(st)
+  }
+  def evaluate(st: RoadSegment): RoadSegment = {
+    transformer.roadSegmentTransform(st)
+  }
+
+  def udfSparkEntries: List[String] =
+    List("udfWrapper", "udfWrapper2", "udfWrapper3", "udfWrapper4")
 
   def udfWrapper: Geometry => Geometry = evaluate
-//  def udfWrapper2: Trajectory => Trajectory = evaluate
-//  def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
-//
-//  def udfWrapper4: RoadSegment => RoadSegment = evaluate
+  def udfWrapper2: Trajectory => Trajectory = evaluate
+  def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
+
+  def udfWrapper4: RoadSegment => RoadSegment = evaluate
 
 }
