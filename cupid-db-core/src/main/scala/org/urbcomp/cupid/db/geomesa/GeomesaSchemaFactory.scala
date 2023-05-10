@@ -20,12 +20,7 @@ import org.apache.calcite.schema.impl.{AggregateFunctionImpl, ScalarFunctionImpl
 import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
 import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
-import org.urbcomp.cupid.db.udtf.{
-  AbstractUdtf,
-  Fibonacci,
-  KMeansClustering,
-  StayPointTrajectorySegment
-}
+import org.urbcomp.cupid.db.udtf.{AbstractUdtf, Fibonacci}
 
 import scala.collection.convert.ImplicitConversions._
 import java.lang.reflect.Method
@@ -103,15 +98,8 @@ class GeomesaSchemaFactory extends SchemaFactory {
 
   private def initTableFunction(schemaPlus: SchemaPlus): Unit = {
     schemaPlus.add("fibonacci", TableFunctionImpl.create(Fibonacci.FIBONACCI2_TABLE_METHOD))
-    schemaPlus.add(
-      "st_traj_stayPointSegment",
-      TableFunctionImpl.create(StayPointTrajectorySegment.STAYPOINTSEGMENT_TABLE_METHOD)
-    )
     schemaPlus.add("st_collect_list", AggregateFunctionImpl.create(classOf[CollectList]))
-    schemaPlus.add(
-      "st_kmeans_clustering",
-      TableFunctionImpl.create(KMeansClustering.KMEANS_CLUSTERING_TABLE_METHOD)
-    )
+
   }
 
 }
