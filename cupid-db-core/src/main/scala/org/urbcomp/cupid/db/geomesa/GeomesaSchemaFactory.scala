@@ -20,10 +20,7 @@ import org.apache.calcite.schema.impl.{AggregateFunctionImpl, ScalarFunctionImpl
 import org.apache.calcite.schema.{Schema, SchemaFactory, SchemaPlus}
 import org.urbcomp.cupid.db.function.udaf.CollectList
 import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
-import org.urbcomp.cupid.db.udtf.{
-  AbstractUdtf,
-  Fibonacci
-}
+import org.urbcomp.cupid.db.udtf.{AbstractUdtf, Fibonacci}
 
 import scala.collection.convert.ImplicitConversions._
 import java.lang.reflect.Method

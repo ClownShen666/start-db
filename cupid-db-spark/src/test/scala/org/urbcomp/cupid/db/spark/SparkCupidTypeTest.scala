@@ -258,5 +258,4 @@ class SparkCupidTypeTest extends FunSuite {
     spark.stop()
   }
 
-
 }
