@@ -257,4 +257,6 @@ class SparkCupidTypeTest extends FunSuite {
     assertEquals(trajectoryStp.getGPSPointList.size() - 8, count)
     spark.stop()
   }
+
+
 }
