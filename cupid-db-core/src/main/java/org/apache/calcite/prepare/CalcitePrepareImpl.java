@@ -82,6 +82,7 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
+import org.urbcomp.cupid.db.parser.dcl.SqlLoadData;
 import org.urbcomp.cupid.db.parser.ddl.*;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.spark.SparkExecutor;
@@ -727,7 +728,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             }
 
             final SqlParam sqlParam = SqlParam.CACHE.get();
-            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
+            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())
+                | sqlNode instanceof SqlLoadData) {
                 sqlParam.setSql(query.sql);
                 return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
             }
