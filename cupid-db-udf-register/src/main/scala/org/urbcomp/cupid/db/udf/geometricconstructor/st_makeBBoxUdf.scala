@@ -40,7 +40,7 @@ class St_makeBBoxUdf extends AbstractUdf {
       upperX: BigDecimal,
       upperY: BigDecimal
   ): Polygon = {
-    if (lowerX == null || lowerY == null || upperX ++ null || upperY == null) null
+    if (lowerX == null || lowerY == null || upperX == null || upperY == null) null
     else {
       val points: util.List[Point] = new util.ArrayList[Point](5)
       points.add(makePoint(lowerX, lowerY))
