@@ -23,21 +23,24 @@ import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
 import java.math.BigDecimal
 
-class St_makePoint extends AbstractUdf {
+class St_makePointUdf extends AbstractUdf {
 
   override def name(): String = "st_makePoint"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(x: Long, y: Long): Point = {
-    val X = x.doubleValue
-    val Y = y.doubleValue
-    if (X > 180 || X < -180 || Y > 90 || Y < -90) return null
-    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
-    geometryFactory.createPoint(new Coordinate(X, Y))
+  def evaluate(X: Double, Y: Double): Point = {
+
+    if (X == null || Y == null || X > 180 || X < -180 || Y > 90 || Y < -90) null
+    else {
+      val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
+
+      geometryFactory.createPoint(new Coordinate(X, Y))
+
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Long, Long) => Point = evaluate
+  def udfWrapper: (Double, Double) => Point = evaluate
 }
