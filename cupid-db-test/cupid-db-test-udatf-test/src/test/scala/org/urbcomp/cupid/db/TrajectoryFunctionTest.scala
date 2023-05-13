@@ -17,10 +17,15 @@
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertEquals
+import org.locationtech.jts.geom.MultiPoint
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 
 import scala.collection.JavaConverters.seqAsJavaList
+import org.urbcomp.cupid.db.spark.model._
+
+import java.sql.Timestamp
 
 class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
@@ -28,6 +33,8 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectory: Trajectory =
     ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
   val tGeo: String = trajectory.toGeoJSON
+  val trajectorySeg: Trajectory =
+    ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
   test("st_traj_asGeoJSON(Trajectory)") {
     val statement = connect.createStatement()
@@ -158,12 +165,33 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     }
     assertEquals(trajectory.getGPSPointList.size, count)
 
+    val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
+    val typeArray: Array[String] = Array[String]("Integer", "String", "Double", "Point")
+    val trajectory2: Trajectory =
+      ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectory2))
+    val df1 = rdd.toDF("traj")
+    df1.createOrReplaceTempView("table1")
+    val df2 = spark.sql(
+      "select d.subtrajectory from (select st_traj_timeIntervalSegment(traj, 2) from table1) as d"
+    )
+    var count2 = 0
+    df2
+      .as[String]
+      .collect
+      .toList
+      .foreach(s => {
+        count2 += Trajectory.fromGeoJSON(s).getGPSPointList.size()
+      })
+    assertEquals(count, count2)
+    spark.stop()
+
   }
 
   test("st_traj_stayPointSegment") {
     val statement = connect.createStatement()
-    val trajectorySeg: Trajectory =
-      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
     val tGeoSeg: String = trajectorySeg.toGeoJSON
     val resultSet =
       statement.executeQuery(
@@ -177,6 +205,29 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     }
     assertEquals(seg, 3)
     assertEquals(trajectorySeg.getGPSPointList.size - 8, count)
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectorySeg))
+    val df = rdd.toDF("traj")
+    val df2 = df.selectExpr("st_traj_stayPointSegment(traj, 10, 10)")
+    df2.createOrReplaceTempView("table1")
+    val df3 = spark.sql("select d.subtrajectory from table1 as d")
+    var count2 = 0
+    var seg2 = 0
+    df3
+      .as[String]
+      .collect
+      .toList
+      .foreach(s => {
+        count2 += Trajectory.fromGeoJSON(s).getGPSPointList.size()
+        seg2 += 1
+      })
+
+    assertEquals(seg, seg2)
+    assertEquals(count, count2)
+
+    spark.stop()
 
   }
 
@@ -197,6 +248,27 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     }
     assertEquals(seg, 5)
     assertEquals(trajectorySeg.getGPSPointList.size - 8, count)
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(Seq(trajectorySeg))
+    val df = rdd.toDF("traj")
+    val df2 = df.selectExpr("st_traj_hybridSegment(traj, 10, 10, 10)")
+    df2.createOrReplaceTempView("table1")
+    val df3 = spark.sql("select SubTrajectory from table1")
+    var count2 = 0
+    var seg2 = 0
+    df3
+      .as[String]
+      .collect
+      .toList
+      .foreach(s => {
+        count2 += Trajectory.fromGeoJSON(s).getGPSPointList.size()
+        seg2 += 1
+      })
+    assertEquals(seg, seg2)
+    assertEquals(count, count2)
+    spark.stop()
   }
 
   test("st_traj_stayPointDetect") {
@@ -221,6 +293,45 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       "[POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891)]",
       resultSet1.getObject(3).toString
     )
+
+//    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+//    import spark.implicits._
+//    val rdd = spark.sparkContext.parallelize(Seq(trajectoryStp, trajectoryStp))
+//    val df = rdd.toDF("traj")
+//    df.createOrReplaceTempView("table1")
+//    val df3 = spark.sql(
+//      "select f.starttime, f.endtime, st_mPointFromWKT(f.gpspoints) from (select st_traj_stayPointDetect(traj, 10, 10) from table1) as f"
+//    )
+//    df3.show()
+//    val li = df3
+//      .as[(Timestamp, Timestamp, MultiPoint)]
+//      .collect
+//      .toList
+//      .map(x => (x._1.toString, x._2.toString, x._3.toString))
+//    val expected = List(
+//      (
+//        "2018-10-09 07:28:24.0",
+//        "2018-10-09 07:28:39.0",
+//        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
+//      ),
+//      (
+//        "2018-10-09 07:28:24.0",
+//        "2018-10-09 07:28:39.0",
+//        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
+//      ),
+//      (
+//        "2018-10-09 07:30:01.0",
+//        "2018-10-09 07:30:15.0",
+//        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
+//      ),
+//      (
+//        "2018-10-09 07:30:01.0",
+//        "2018-10-09 07:30:15.0",
+//        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
+//      )
+//    )
+//    assertEquals(expected.sorted, li.sorted)
+//    spark.stop()
   }
 
   test("st_traj_noiseFilter_test1") {

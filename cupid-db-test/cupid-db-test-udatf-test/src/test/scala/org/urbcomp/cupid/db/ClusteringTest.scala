@@ -17,10 +17,18 @@
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertEquals
+import org.locationtech.geomesa.utils.geohash.GeoHashIterator.geometryFactory
+import org.locationtech.jts.geom.Coordinate
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 
 import scala.collection.mutable.ListBuffer
+
+import org.locationtech.geomesa.spark.jts._
+
+import org.urbcomp.cupid.db.spark.model._
+
 
 /**
   * Clustering Test
@@ -66,6 +74,43 @@ class ClusteringTest extends AbstractCalciteSparkFunctionTest {
     assert(
       sortedResults(1) == "MULTIPOINT ((1.00003 2.00002), (1.00004 2.00003))" || sortedResults(1) == "MULTIPOINT ((1.00004 2.00003), (1.00003 2.00002))"
     )
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(
+      Seq(
+        geometryFactory.createPoint(new Coordinate(1.000000, 2.000000)),
+        geometryFactory.createPoint(new Coordinate(1.000010, 2.000010)),
+        geometryFactory.createPoint(new Coordinate(1.000030, 2.000020)),
+        geometryFactory.createPoint(new Coordinate(1.000040, 2.000030))
+      )
+    )
+    val df = rdd.toDF("points2")
+    df.createOrReplaceTempView("dbscan_test2")
+    val df3 = spark.sql(
+      "select st_dbscan_clustering(t1, 1.6, 2) " +
+        "from " +
+        "(select collect_list(points2) as t1 from dbscan_test2)"
+    )
+    df3.show()
+    val res = df3
+      .as[(String, String, String)]
+      .collect
+      .toList
+    val expected = List(
+      (
+        "MULTIPOINT ((1 2), (1.00001 2.00001))",
+        "POINT (1.000005 2.000005)",
+        "GEOMETRYCOLLECTION EMPTY"
+      ),
+      (
+        "MULTIPOINT ((1.00003 2.00002), (1.00004 2.00003))",
+        "POINT (1.000035 2.000025)",
+        "GEOMETRYCOLLECTION EMPTY"
+      )
+    )
+    assertEquals(expected, res)
+    spark.stop()
   }
 
   test("kmeans") {
@@ -102,6 +147,44 @@ class ClusteringTest extends AbstractCalciteSparkFunctionTest {
     assert(
       sortedResults(1) == "MULTIPOINT ((1.00003 2.00002), (1.00004 2.00003))" || sortedResults(1) == "MULTIPOINT ((1.00004 2.00003), (1.00003 2.00002))"
     )
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val rdd = spark.sparkContext.parallelize(
+      Seq(
+        geometryFactory.createPoint(new Coordinate(1.000000, 2.000000)),
+        geometryFactory.createPoint(new Coordinate(1.000010, 2.000010)),
+        geometryFactory.createPoint(new Coordinate(1.000030, 2.000020)),
+        geometryFactory.createPoint(new Coordinate(1.000040, 2.000030))
+      )
+    )
+    val df = rdd.toDF("points2")
+    df.createOrReplaceTempView("kmeans_test2")
+    val df3 = spark.sql(
+      "select st_kmeans_clustering(t1, 2) " +
+        "from " +
+        "(select collect_list(points2) as t1 from kmeans_test2)"
+    )
+    df3.show()
+    val res = df3
+      .as[(String, String, String)]
+      .collect
+      .toList
+    assertEquals(2, res.size)
+    val expected = List(
+      (
+        "MULTIPOINT ((1 2), (1.00001 2.00001))",
+        "POINT (1.000005 2.000005)",
+        "GEOMETRYCOLLECTION EMPTY"
+      ),
+      (
+        "MULTIPOINT ((1.00003 2.00002), (1.00004 2.00003))",
+        "POINT (1.000035 2.000025)",
+        "GEOMETRYCOLLECTION EMPTY"
+      )
+    )
+    assertEquals(expected, res)
+    spark.stop()
   }
 
 }
