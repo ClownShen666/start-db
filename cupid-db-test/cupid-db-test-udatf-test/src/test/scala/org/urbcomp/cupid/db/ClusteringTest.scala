@@ -29,7 +29,6 @@ import org.locationtech.geomesa.spark.jts._
 
 import org.urbcomp.cupid.db.spark.model._
 
-
 /**
   * Clustering Test
   *
