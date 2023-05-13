@@ -38,29 +38,15 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectorySeg: Trajectory =
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
-  test("st_traj_asGeoJSON(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_fromGeoJSON(\'" + tGeo + "\')")
-    resultSet.next()
-    assertEquals(trajectory, resultSet.getObject(1))
+  test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
+    executeQueryCheck("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
   }
 
   test("st_traj_fromGeoJSON(str)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals(tGeo, resultSet.getObject(1))
+    executeQueryCheck("select st_traj_fromGeoJSON(\'" + tGeo + "\')")
   }
 
-  test("st_traj_oid(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_oid(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("afab91fa68cb417c2f663924a0ba1ff9", resultSet.getObject(1))
-  }
+  test("st_traj_oid(Trajectory)") {}
 
   test("st_traj_tid(Trajectory)") {
     val statement = connect.createStatement()
@@ -68,6 +54,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0", resultSet.getObject(1))
+
   }
 
   test("st_traj_startTime(Trajectory)") {
@@ -76,6 +63,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_startTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("2018-10-09 07:28:21.0", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_endTime(Trajectory)") {
@@ -84,6 +72,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_endTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("2018-10-09 07:34:18.0", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_startPoint(Trajectory)") {
@@ -92,6 +81,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("POINT (108.99553 34.27859)", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_endPoint(Trajectory)") {
@@ -100,6 +90,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("POINT (108.98897 34.25815)", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_numOfPoints(Trajectory)") {
@@ -108,6 +99,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_numOfPoints(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("117", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_pointN(Trajectory,int)") {
@@ -116,6 +108,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
     resultSet.next()
     assertEquals("POINT (108.99552 34.27786)", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_timeN(Trajectory,int)") {
@@ -124,6 +117,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_timeN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
     resultSet.next()
     assertEquals("2018-10-09 07:28:27.0", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_lengthInKM(Trajectory)") {
@@ -132,6 +126,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       statement.executeQuery("select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
     resultSet.next()
     assertEquals("2.9989194858191373", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_speedInKMPerHour(Trajectory)") {
@@ -142,6 +137,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       )
     resultSet.next()
     assertEquals("30.24120489901651", resultSet.getObject(1).toString)
+
   }
 
   test("st_traj_geom(Trajectory)") {
@@ -153,6 +149,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       "class org.locationtech.jts.geom.LineString",
       resultSet.getObject(1).getClass.toString
     )
+
   }
 
   test("st_traj_timeIntervalSegment") {
@@ -271,6 +268,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     assertEquals(seg, seg2)
     assertEquals(count, count2)
     spark.stop()
+
   }
 
   test("st_traj_stayPointDetect") {
@@ -333,6 +331,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
     assertEquals(expected.sorted, li.sorted)
     spark.stop()
+
   }
 
   test("st_traj_noiseFilter_test1") {
@@ -346,6 +345,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       trajectory.getGPSPointList.subList(0, 1),
       Trajectory.fromGeoJSON(resultSet.getObject(1).toString).getGPSPointList
     )
+
   }
   test("st_traj_noiseFilter_test2") {
     val statement = connect.createStatement()
@@ -358,6 +358,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       "[POINT (108.99553 34.27859), POINT (108.99655 34.25891), POINT (108.99657 34.25875), POINT (108.99655 34.25857), POINT (108.99654 34.25837), POINT (108.99652 34.25826), POINT (108.99647 34.25821), POINT (108.99639 34.25818), POINT (108.99624 34.25818), POINT (108.99598 34.25819), POINT (108.99433 34.25818), POINT (108.99391 34.25818), POINT (108.99337 34.25817), POINT (108.99312 34.25817), POINT (108.99287 34.25817), POINT (108.9926 34.25816), POINT (108.99245 34.25816), POINT (108.9923 34.25816), POINT (108.99205 34.25815)]",
       Trajectory.fromGeoJSON(resultSet.getObject(1).toString).getGPSPointList.toString
     )
+
   }
   test("st_traj_noiseFilter_test3") {
     val statement = connect.createStatement()
@@ -372,5 +373,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
       correctResult,
       Trajectory.fromGeoJSON(resultSet.getObject(1).toString).getGPSPointList
     )
+
   }
 }

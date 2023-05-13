@@ -16,18 +16,15 @@
  */
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
-import org.locationtech.jts.geom.{Coordinate, LineString, Point, Polygon}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.locationtech.jts.geom.{Point, Polygon}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.util.GeometryFactoryUtils
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.math.BigDecimal
 import java.util
-import java.util.{ArrayList, List}
 import scala.collection.JavaConverters.asScalaBufferConverter
-import scala.collection.immutable.List
 
-class St_makeBBoxUdf extends AbstractUdf {
+class st_makeBBoxUdf extends AbstractUdf {
 
   override def name(): String = "st_makeBBox"
 

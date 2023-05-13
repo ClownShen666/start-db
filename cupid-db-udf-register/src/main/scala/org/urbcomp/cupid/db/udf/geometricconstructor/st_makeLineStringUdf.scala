@@ -22,9 +22,7 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
 import java.util
-import java.util.List
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
-import scala.collection.immutable.List
 
 class st_makeLineStringUdf extends AbstractUdf {
 
@@ -44,5 +42,5 @@ class st_makeLineStringUdf extends AbstractUdf {
   def udfSparkEntries: scala.collection.immutable.List[String] =
     scala.collection.immutable.List("udfWrapper")
 
-  def udfWrapper: (util.List[Point]) => LineString = evaluate
+  def udfWrapper: util.List[Point] => LineString = evaluate
 }

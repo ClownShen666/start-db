@@ -35,6 +35,7 @@ class timestampFormat extends AbstractUdf {
     * @return the specified format instance
     */
   def evaluate(ts: Timestamp, string: String): String = {
+    if (ts == null || string == null) return null
     val simpleDateFormat = new SimpleDateFormat(string)
     simpleDateFormat.format(new Date(ts.getTime))
   }

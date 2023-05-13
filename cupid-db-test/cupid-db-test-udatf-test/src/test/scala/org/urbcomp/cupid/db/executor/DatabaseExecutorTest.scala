@@ -27,23 +27,11 @@ class DatabaseExecutorTest extends AbstractCalciteSparkFunctionTest {
     UUID.randomUUID().toString.replace("-", "_")
   }
 
-  test("test create then show databases") {
+  test("test create, show, drop database") {
     val stmt = connect.createStatement()
-    val databaseName = "test_%d".format(scala.util.Random.nextInt(100000))
+    val databaseName = "test_%s".format(generateUniqueId())
     stmt.executeUpdate("CREATE DATABASE %s".format(databaseName))
-    val rs = stmt.executeQuery("SHOW DATABASES")
-    var databases = List[String]()
-    while (rs.next()) {
-      databases = databases :+ rs.getString(1)
-    }
-    assertTrue(databases.contains(databaseName))
-  }
 
-  test("test create then drop database") {
-    val stmt = connect.createStatement()
-    val databaseName = "test_%d".format(scala.util.Random.nextInt(100000))
-
-    stmt.executeUpdate("CREATE DATABASE %s".format(databaseName))
     val rs1 = stmt.executeQuery("SHOW DATABASES")
     var databasesBefore = List[String]()
     while (rs1.next()) {
@@ -52,6 +40,7 @@ class DatabaseExecutorTest extends AbstractCalciteSparkFunctionTest {
     assertTrue(databasesBefore.contains(databaseName))
 
     stmt.executeUpdate("DROP DATABASE %s".format(databaseName))
+
     val rs2 = stmt.executeQuery("SHOW DATABASES")
     var databasesAfter = List[String]()
     while (rs2.next()) {
@@ -60,16 +49,18 @@ class DatabaseExecutorTest extends AbstractCalciteSparkFunctionTest {
     assertFalse(databasesAfter.contains(databaseName))
   }
 
-  test("test create then drop if exists database") {
+  test("test create, drop if exists database") {
     val stmt = connect.createStatement()
-    val databaseName = "test_%d".format(scala.util.Random.nextInt(100000))
+    val databaseName = "test_%s".format(generateUniqueId())
     stmt.executeUpdate("CREATE DATABASE %s".format(databaseName))
+
     val rs1 = stmt.executeQuery("SHOW DATABASES")
     var databasesBefore = List[String]()
     while (rs1.next()) {
       databasesBefore = databasesBefore :+ rs1.getString(1)
     }
     assertTrue(databasesBefore.contains(databaseName))
+
     stmt.executeUpdate("DROP DATABASE IF EXISTS %s".format(databaseName))
     val rs2 = stmt.executeQuery("SHOW DATABASES")
     var databasesAfter = List[String]()
@@ -79,15 +70,16 @@ class DatabaseExecutorTest extends AbstractCalciteSparkFunctionTest {
     assertFalse(databasesAfter.contains(databaseName))
   }
 
-  test("test create then select database") {
-    val dbNames = generateUniqueId().map(s => "test_" + s)
-    statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + dbNames(0))
-    val rs1 = executeQuery("select DATABASE()")
+  test("test create, select database") {
+    val stmt = connect.createStatement()
+    val dbName = "test_%s".format(generateUniqueId())
+    stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS %s".format(dbName))
+    val rs1 = stmt.executeQuery("select DATABASE()")
     rs1.next()
     assertEquals("default", rs1.getString(1))
-    statement.executeUpdate("USE " + dbNames(0))
-    val rs2 = executeQuery("select database()")
+    stmt.executeUpdate("USE " + dbName)
+    val rs2 = stmt.executeQuery("select database()")
     rs2.next()
-    assertEquals(dbNames(0), rs2.getString(1))
+    assertEquals(dbName, rs2.getString(1))
   }
 }

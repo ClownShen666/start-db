@@ -29,7 +29,7 @@ class ParseIntegerUdf extends AbstractUdf {
     if (num == null) null
     else {
       try {
-        num.toString.toString.toInt
+        num.toString.toInt
       } catch {
         case _ => null
       }

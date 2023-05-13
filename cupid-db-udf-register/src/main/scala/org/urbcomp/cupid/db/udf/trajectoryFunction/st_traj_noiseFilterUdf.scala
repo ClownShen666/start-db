@@ -34,6 +34,7 @@ class st_traj_noiseFilterUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(trajectory: Trajectory, speedLimitInMPerS: BigDecimal): Trajectory = {
+    if (trajectory == null || speedLimitInMPerS == null) return null
     val gpsPoints = trajectory.getGPSPointList
     if (gpsPoints.length <= 1) {
       trajectory.setTid(trajectory.getTid + "_filterNoise")

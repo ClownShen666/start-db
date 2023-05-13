@@ -16,83 +16,50 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
-
 class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToInteger('1234')")
-    resultSet.next()
-    assertEquals(1234, resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select castToInteger(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select castToInteger('1234')", List(1234))
+    executeQueryCheck("select castToInteger(null)", List(null))
   }
 
   test("castToLong") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToLong('12344')")
-    resultSet.next()
-    assertEquals(12344L, resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select castToLong(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select castToLong('12344')", List(12344L))
+    executeQueryCheck("select castToLong(null)", List(null))
   }
 
   test("castToFloat") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToFloat('123.1')")
-    resultSet.next()
-    assertEquals(123.1f, resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select castToFloat(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select castToFloat('123.1')", List(123.1f))
+    executeQueryCheck("select castToFloat(null)", List(null))
   }
 
   test("castToDouble") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToDouble('123444555.3')")
-    resultSet.next()
-    assertEquals(123444555.3d, resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select castToDouble(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select castToDouble('123444555.3')", List(123444555.3d))
+    executeQueryCheck("select castToDouble(null)", List(null))
   }
 
   test("castToBoolean") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToBoolean('true')")
-    resultSet.next()
-    assertEquals(true, resultSet.getObject(1))
+    executeQueryCheck("select castToBoolean('true')", List(true))
+    executeQueryCheck("select castToBoolean('false')", List(false))
   }
 
   test("castToString") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select castToString('1234')")
-    resultSet.next()
-    assertEquals("1234", resultSet.getObject(1))
+    executeQueryCheck("select castToString('1234')", List("1234"))
+    executeQueryCheck("select castToString(null)", List(null))
   }
 
   test("parseInteger") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select parseInteger('1234')")
-    resultSet.next()
-    assertEquals(1234, resultSet.getObject(1))
+    executeQueryCheck("select parseInteger('1234')", List(1234))
+    executeQueryCheck("select parseInteger(null)", List(null))
   }
 
   test("parseLong") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select parseLong('1234')")
-    resultSet.next()
-    assertEquals(1234L, resultSet.getObject(1))
+    executeQueryCheck("select parseLong('1234')", List(1234L))
+    executeQueryCheck("select parseLong(null)", List(null))
   }
 
   test("parseDouble") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select parseDouble('12345678901234567890')")
-    resultSet.next()
-    assertEquals(12345678901234567890d, resultSet.getObject(1))
+    executeQueryCheck("select parseDouble('12345678901234567890')", List(12345678901234567890d))
+    executeQueryCheck("select parseDouble(null)", List(null))
   }
-
 }

@@ -32,19 +32,24 @@ class st_WGS84ToBD09 extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(st: Geometry): Geometry = {
+    if (st == null) return null
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
 
   val transformer = new WGS84ToBD09Transformer
 
   def evaluate(st: Trajectory): Trajectory = {
+    if (st == null) return null
     transformer.trajectoryTransform(st)
   }
 
   def evaluate(st: RoadNetwork): RoadNetwork = {
+    if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
+
   def evaluate(st: RoadSegment): RoadSegment = {
+    if (st == null) return null
     transformer.roadSegmentTransform(st)
   }
 
@@ -54,6 +59,5 @@ class st_WGS84ToBD09 extends AbstractUdf {
   def udfWrapper: Geometry => Geometry = evaluate
   def udfWrapper2: Trajectory => Trajectory = evaluate
   def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
-
   def udfWrapper4: RoadSegment => RoadSegment = evaluate
 }

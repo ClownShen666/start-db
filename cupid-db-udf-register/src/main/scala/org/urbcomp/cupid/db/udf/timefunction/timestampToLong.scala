@@ -20,6 +20,7 @@ import java.sql.Timestamp
 import java.text.ParseException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 class timestampToLong extends AbstractUdf {
 
   override def name(): String = "timestampToLong"

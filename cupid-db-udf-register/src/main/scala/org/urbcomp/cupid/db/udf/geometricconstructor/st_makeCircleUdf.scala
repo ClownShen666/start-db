@@ -16,10 +16,10 @@
  */
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
-import org.locationtech.jts.geom.{Coordinate, Point, Polygon}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.locationtech.jts.geom.{Point, Polygon}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.util.{GeoFunctions, GeometryFactoryUtils}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+import org.urbcomp.cupid.db.util.GeoFunctions
 
 class st_makeCircleUdf extends AbstractUdf {
 
@@ -28,7 +28,7 @@ class st_makeCircleUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(center: Point, radiusInM: Double): Polygon = {
-    if (center == null || radiusInM == null) null
+    if (center == null) null
     else {
       center.buffer(GeoFunctions.getDegreeFromM(radiusInM)).asInstanceOf[Polygon]
     }

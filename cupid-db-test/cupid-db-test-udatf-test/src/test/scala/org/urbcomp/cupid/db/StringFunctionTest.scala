@@ -16,212 +16,89 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
-
 /**
   * String Function test
-  *
   * @author zaiyuan, XiangHe
   */
 class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
-
-  /**
-    * Calcite's function
-    * returns the string after converting each letter of the original string to uppercase
-    */
   test("upper") {
-    val rs = executeQuery("select upper('abcde')")
-    rs.next()
-    assertEquals("ABCDE", rs.getObject(1))
+    executeQueryCheck("select upper('abcde')", List("ABCDE"))
   }
 
-  /**
-    * Calcite's function
-    * returns the string after converting each letter of the original string to lowercase
-    */
   test("lower") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select lower('ABCDE')")
-    resultSet.next()
-    assertEquals("abcde", resultSet.getObject(1))
-    executeSpark("select lower('ABCDE')")
+    executeQueryCheck("select lower('ABCDE')", List("abcde"))
   }
 
-  /**
-    * Calcite's function
-    * index start from 1
-    * return the substring which start at index 2 and the length is 3
-    */
   test("substring1") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select substring('abcde', 2, 3)")
-    resultSet.next()
-    assertEquals("bcd", resultSet.getObject(1))
-    executeSpark("select substring('abcde', 2, 3)")
-
+    executeQueryCheck("select substring('abcde', 2, 3)", List("bcd"))
   }
 
-  /**
-    * Calcite's function
-    * index start from 1
-    * return the substring which start at index 2, the end is input's end
-    */
   test("substring2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select substring('abcde', 2)")
-    resultSet.next()
-    assertEquals("bcde", resultSet.getObject(1))
-    executeSpark("select substring('abcde', 2)")
-
+    executeQueryCheck("select substring('abcde', 2)", List("bcde"))
   }
 
   test("trim") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select trim('  abcde ')")
-    resultSet.next()
-    assertEquals("abcde", resultSet.getObject(1))
-    executeSpark("select trim('  abcde ')")
-
+    executeQueryCheck("select trim('  abcde ')", List("abcde"))
   }
 
   test("concat") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select concat('1', '2')")
-    resultSet.next()
-    assertEquals("12", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select concat(null, '2')")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-    executeSpark("select concat('1', '2')")
-
+    executeQueryCheck("select concat('1', '2'),concat(null, '2')", List("12", null))
   }
 
   test("reverse") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select reverse('abcde')")
-    resultSet.next()
-    assertEquals("edcba", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select reverse(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-    executeSpark("select reverse('abcde')")
-
+    executeQueryCheck("select reverse('abcde'),reverse(null)", List("edcba", null))
   }
 
   test("ltrim") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select ltrim('  abcde ')")
-    resultSet.next()
-    assertEquals("abcde ", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select ltrim(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-    executeSpark("select ltrim('  abcde ')")
-
+    executeQueryCheck("select ltrim('  abcde '),ltrim(null)", List("abcde ", null))
   }
 
   test("rtrim") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select rtrim('  abcde ')")
-    resultSet.next()
-    assertEquals("  abcde", resultSet.getObject(1))
-    executeSpark("select rtrim('  abcde ')")
-
+    executeQueryCheck("select rtrim('  abcde '),rtrim(null)", List("  abcde", null))
   }
 
   test("lpad1") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select lpad('abcde', 2)")
-    resultSet.next()
-    assertEquals("  abcde", resultSet.getObject(1))
-    executeSpark("select lpad('abcde', 2)")
-
+    executeQueryCheck("select lpad('abcde', 2), lpad(null, 2)", List("  abcde", null))
   }
 
   test("lpad2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select lpad('abcde', 2, 'a')")
-    resultSet.next()
-    assertEquals("ab", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select lpad(null, 5, 'a')")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-    val resultSet3 = statement.executeQuery("select lpad('abcde', 6, 'a')")
-    resultSet3.next()
-    assertEquals("aabcde", resultSet3.getObject(1))
-    //  executeSpark("select lpad('abcde', 2, 'a')")
-
+    executeQueryCheck(
+      "select lpad('abcde', 2, 'a'), lpad(null, 5, 'a'), lpad('abcde', 6, 'a')",
+      List("ab", null, "aabcde")
+    )
   }
 
   test("rpad1") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select rpad('abcde', 1)")
-    resultSet.next()
-    assertEquals("abcde ", resultSet.getObject(1))
-    executeSpark("select rpad('abcde', 1)")
-
+    executeQueryCheck("select rpad('abcde', 1), rpad(null, 1)", List("abcde ", null))
   }
 
   test("rpad2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select rpad('abcde', 1, 'e')")
-    resultSet.next()
-    assertEquals("a", resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select rpad('abcde', 6, 'e')")
-    resultSet2.next()
-    assertEquals("abcdee", resultSet2.getObject(1))
-    val resultSet3 = statement.executeQuery("select rpad('abcde', 6, null)")
-    resultSet3.next()
-    assertEquals(null, resultSet3.getObject(1))
-    //executeSpark("select rpad('abcde', 1, 'e')")
-
+    executeQueryCheck(
+      "select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e'), " +
+        "rpad('abcde', 6, null)",
+      List("a", "abcdee", null)
+    )
   }
 
   //TODO 多字节字符测试
   test("length") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select length('abc')")
-    resultSet.next()
-    assertEquals(3, resultSet.getObject(1))
-    executeSpark("select length('abc')")
-
+    executeQueryCheck("select length('abc')", List(3))
   }
 
   //TODO 多字节字符测试
   test("charLength") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select charLength('abc')")
-    resultSet.next()
-    assertEquals(3, resultSet.getObject(1))
-    executeSpark("select charLength('abc')")
-
+    executeQueryCheck("select charLength('abc')", List(3))
   }
 
   test("locate1") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select locate('bc', 'abcabc')")
-    resultSet.next()
-    assertEquals(2, resultSet.getObject(1))
-    executeSpark("select locate('bc', 'abcabc')")
-
+    executeQueryCheck("select locate('bc', 'abcabc')", List(2))
   }
 
   test("locate2") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select locate('bc', 'abcabc', 2)")
-    resultSet.next()
-    assertEquals(5, resultSet.getObject(1))
-    //executeSpark("select locate('bc', 'abcabc', 2)")
-
+    executeQueryCheck("select locate('bc', 'abcabc', 2)", List(5))
   }
 
   test("md5") {
-    val statement = connect.createStatement
-    val resultSet = statement.executeQuery("select md5('abcde')")
-    resultSet.next()
-    assertEquals("AB56B4D92B40713ACC5AF89985D4B786", resultSet.getObject(1))
-    executeSpark("select md5('abcde')")
-
+    executeQueryCheck("select md5('abcde')", List("AB56B4D92B40713ACC5AF89985D4B786"))
   }
-
 }
