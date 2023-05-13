@@ -42,16 +42,16 @@ public class RemoteServer {
 
     public RemoteServer(Server server) {
         this.server = server;
-        try {
-            this.port = server.getPort();
-        } catch (IllegalStateException e) {
-            log.info("not a HTTP server", e);
-            this.port = -1;
-        }
     }
 
     public void start() throws IOException {
         server.start();
+        try {
+            this.port = server.getPort();
+        } catch (IllegalStateException e) {
+            log.error("not a HTTP server", e);
+            this.port = -1;
+        }
         log.info("Grpc Remote Server started, listening on {}", port);
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override

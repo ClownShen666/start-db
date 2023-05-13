@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.util;
 
+import lombok.ToString;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.model.data.DataExportType;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 /**
  * @author jimo
  **/
+@ToString
 public class SparkSqlParam extends SqlParam {
 
     public static final ThreadLocal<SparkSqlParam> CACHE = new ThreadLocal<>();
