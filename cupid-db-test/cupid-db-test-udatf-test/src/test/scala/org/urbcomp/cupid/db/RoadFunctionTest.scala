@@ -198,6 +198,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
         "(select St_rn_makeRoadNetwork(collect_list(roads)) as t from roadDf) as t2"
     )
     df.explain(true)
+    df.show()
   }
 
   test("st_rn_reachableConvexHull") {
