@@ -619,40 +619,12 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       }
     })
 
-    if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
-      val nodeList = List(new SqlIdentifier("result", pos)).asJava
+    val text = ctx.ident().getText.toLowerCase
+    if (udtfOutputColumns.contains(text)) {
+      val nodeList = udtfOutputColumns(text).map(new SqlIdentifier(_, pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_timeIntervalSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_hybridSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointDetect")) {
-      val nodeList = List(
-        new SqlIdentifier("startTime", pos),
-        new SqlIdentifier("endTime", pos),
-        new SqlIdentifier("gpsPoints", pos)
-      ).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_dbscan_clustering")
-               || ctx.ident().getText.equalsIgnoreCase("st_kmeans_clustering")) {
-      val nodeList = List(
-        new SqlIdentifier("cluster", pos),
-        new SqlIdentifier("clusterCentroid", pos),
-        new SqlIdentifier("clusterBoundary", pos)
-      ).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else {
-      val text = ctx.ident().getText.toLowerCase
-      if (udtfOutputColumns.contains(text)) {
-        val nodeList = udtfOutputColumns(text).map(new SqlIdentifier(_, pos)).asJava
-        new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-      } else res
-    }
+    } else res
+
   }
 
   override def visitUseStmt(ctx: UseStmtContext): SqlUseDatabase = {

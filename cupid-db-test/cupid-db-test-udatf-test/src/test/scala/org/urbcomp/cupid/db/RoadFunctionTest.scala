@@ -20,6 +20,10 @@ import org.junit.Assert.{assertEquals, assertNotNull}
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor
+
+import org.urbcomp.cupid.db.spark.model._
+import scala.collection.convert.ImplicitConversions._
 
 /**
   * Road Segment/Network Function test
@@ -30,6 +34,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
+  val rs2: List[RoadSegment] = ModelGenerator.generateRoadSegments().toList
   val rsGeoJson: String = rs.toGeoJSON
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val tGeo: String = trajectory.toGeoJSON
@@ -177,7 +182,25 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
         "\"tid\":\"afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0\"}}",
       resultSet.getObject(1)
     )
+
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    import spark.implicits._
+    val roadsRDD = spark.sparkContext.parallelize(rs2)
+    val roadDf = roadsRDD.toDF("roads").coalesce(2)
+    val trajRdd =
+      spark.sparkContext.parallelize(Seq((1, trajectory), (2, trajectory), (3, trajectory)))
+    val trajDf = trajRdd.toDF("id", "trajectory").coalesce(2)
+    trajDf.createOrReplaceTempView("trajDf")
+    roadDf.createOrReplaceTempView("roadDf")
+
+    val df = spark.sql(
+      "select st_traj_mapMatch(t2.t, t1.trajectory) from trajDf t1," +
+        "(select St_rn_makeRoadNetwork(collect_list(roads)) as t from roadDf) as t2"
+    )
+    df.explain(true)
+    df.show()
   }
+
   test("st_rn_reachableConvexHull") {
     val statement = connect.createStatement
     val resultSet =
