@@ -91,7 +91,6 @@ class ClusteringTest extends AbstractCalciteSparkFunctionTest {
         "from " +
         "(select collect_list(points2) as t1 from dbscan_test2)"
     )
-    df3.show()
     val res = df3
       .as[(String, String, String)]
       .collect
@@ -164,7 +163,6 @@ class ClusteringTest extends AbstractCalciteSparkFunctionTest {
         "from " +
         "(select collect_list(points2) as t1 from kmeans_test2)"
     )
-    df3.show()
     val res = df3
       .as[(String, String, String)]
       .collect

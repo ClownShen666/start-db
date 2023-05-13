@@ -304,7 +304,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     val df3 = spark.sql(
       "select f.starttime, f.endtime, st_mPointFromWKT(f.gpspoints) from (select st_traj_stayPointDetect(traj, 10, 10) from table1) as f"
     )
-    df3.show()
     val li = df3
       .as[(Timestamp, Timestamp, MultiPoint)]
       .collect
