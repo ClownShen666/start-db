@@ -43,8 +43,8 @@ class MapMatchTest extends FunSuite {
       "select st_traj_mapMatch(t2.t, t1.trajectory) from trajDf t1," +
         "(select St_rn_makeRoadNetwork(collect_list(roads)) as t from roadDf) as t2"
     )
-    df.explain(true)
     df.show()
+    spark.close()
   }
 
 }
