@@ -29,9 +29,11 @@ class St_makePointUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(X: Double, Y: Double): Point = {
-
-    if (X == null || Y == null || X > 180 || X < -180 || Y > 90 || Y < -90) null
+  def evaluate(x: BigDecimal, y: BigDecimal): Point = {
+    X = x.doubleValue()
+    Y = y.doubleValue()
+    if (x == null || y == null) null
+    else if (X > 180 || X < -180 || Y > 90 || Y < -90) null
     else {
       val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
 
@@ -42,5 +44,5 @@ class St_makePointUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Double, Double) => Point = evaluate
+  def udfWrapper: (BigDecimal, BigDecimal) => Point = evaluate
 }
