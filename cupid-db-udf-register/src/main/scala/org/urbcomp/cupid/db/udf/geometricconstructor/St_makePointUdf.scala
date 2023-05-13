@@ -30,8 +30,8 @@ class St_makePointUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(x: BigDecimal, y: BigDecimal): Point = {
-    X = x.doubleValue()
-    Y = y.doubleValue()
+    val X = x.doubleValue()
+    val Y = y.doubleValue()
     if (x == null || y == null) null
     else if (X > 180 || X < -180 || Y > 90 || Y < -90) null
     else {
