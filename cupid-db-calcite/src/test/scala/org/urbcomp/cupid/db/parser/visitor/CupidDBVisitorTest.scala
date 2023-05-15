@@ -182,11 +182,11 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
 
   test("invalid create table sql will fail with exception") {
     val sql = s"""CREATE TABLE gemo_%s (
-                            |    name String,
-                            |    st Point,
-                            |    dtg Datetime
-                            |    SPATIAL INDEX spatial_index2(st, dtg) type nonsense
-                            |)"""
+                 |    name String,
+                 |    st Point,
+                 |    dtg Datetime
+                 |    SPATIAL INDEX spatial_index2(st, dtg) type nonsense
+                 |)"""
     val thrown = intercept[Exception] {
       driver.parseSql(sql)
     }
@@ -213,7 +213,21 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val selectNode = SqlHelper.convertToSelectNode(node, "tmp")
     val convertedSql =
       s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
-                          |FROM tmp""".stripMargin
+         |FROM tmp""".stripMargin
+    assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
+  }
+
+  test("convert load data with delimiter and quotes sql to node and transform it to select") {
+    val sql = CupidDBSQLSamples.LOAD_DATA_WITH_DELIMITER_AND_QUOTES_SAMPLE;
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlLoadData]
+    val expectLoadSql =
+      s"LOAD CSV INPATH 'HDFS://USER/DATA.CSV' TO gemo_table (road.oid _c0, name _c1, startp _c2, endp _c3, dtg to_timestamp(_c4)) FIELDS DELIMITER ',' QUOTES " + "'\"'" + " WITH HEADER"
+    assertEquals(expectLoadSql, SqlHelper.toSqlString(node))
+    val selectNode = SqlHelper.convertToSelectNode(node, "tmp")
+    val convertedSql =
+      s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
+         |FROM tmp""".stripMargin
     assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
   }
 }

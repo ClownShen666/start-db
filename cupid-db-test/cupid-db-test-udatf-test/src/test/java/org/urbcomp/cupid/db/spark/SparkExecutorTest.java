@@ -67,7 +67,6 @@ public class SparkExecutorTest {
         String userName = "root";
         String dbName = "default";
         SqlParam.CACHE.set(new SqlParam(userName, dbName));
-
         try (Connection connect = CalciteHelper.createConnection()) {
             String createTableSql = "create table if not exists "
                 + CitibikeDataUtils.TEST_TABLE_NAME
@@ -78,7 +77,6 @@ public class SparkExecutorTest {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate(createTableSql);
         }
-
         // for hadoop just need to provide a hadoop path
         final SparkExecutor executor = new SparkExecutor();
         final SparkSqlParam param = new SparkSqlParam();
@@ -90,7 +88,6 @@ public class SparkExecutorTest {
         param.setDbName(dbName);
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
-
     }
 
     @Test
@@ -125,6 +122,24 @@ public class SparkExecutorTest {
             // + "started_at toTimestamp(started_at),"
             + "start_point st_makePoint(_c9, _c10)) "
             + "WITHOUT HEADER";
+        testLoadSql(sql);
+    }
+
+    @Test
+    public void testLoadDataWithDelimiterAndQuotes() throws Exception {
+        String path = CitibikeDataUtils.getProjectRoot()
+            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
+            + "202204-citibike-tripdata_clip_slice_with_delimiter_and_quotes.csv";
+        String sql = "LOAD CSV INPATH '"
+            + path
+            + "' TO "
+            + CitibikeDataUtils.TEST_TABLE_NAME
+            + " (idx idx, ride_id ride_id,"
+            + "rideable_type rideable_type,"
+            // + "started_at toTimestamp(started_at),"
+            + "start_point st_makePoint(start_lat, start_lng)) "
+            + "FIELDS DELIMITER '=' QUOTES '*' "
+            + "WITH HEADER";
         testLoadSql(sql);
     }
 

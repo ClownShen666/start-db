@@ -1064,6 +1064,17 @@ public class CupidDBSqlBaseVisitor<T> extends AbstractParseTreeVisitor<T>
      * {@link #visitChildren} on {@code ctx}.</p>
      */
     @Override
+    public T visitCsv_file_options(CupidDBSqlParser.Csv_file_optionsContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The default implementation returns the result of calling
+     * {@link #visitChildren} on {@code ctx}.</p>
+     */
+    @Override
     public T visitCsv_file_format(CupidDBSqlParser.Csv_file_formatContext ctx) {
         return visitChildren(ctx);
     }

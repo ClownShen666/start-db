@@ -683,6 +683,13 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitLoad_mapping_item(CupidDBSqlParser.Load_mapping_itemContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#csv_file_options}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCsv_file_options(CupidDBSqlParser.Csv_file_optionsContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#csv_file_format}.
      * @param ctx the parse tree
      * @return the visitor result

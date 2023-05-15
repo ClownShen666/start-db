@@ -73,12 +73,39 @@ object SparkQueryExecutor {
             throw new IllegalArgumentException(s"table not exist $tableName")
           }
           val schemaName = MetadataUtil.makeSchemaName(table.getId)
-          val df = spark.read
-            .option("header", node.hasHeader)
-            .options(
-              Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
-            )
-            .csv(node.path)
+          val df = if (node.hasDelimiter && node.hasQuotes) {
+            spark.read
+              .option("header", node.hasHeader)
+              .option("delimiter", node.delimiter)
+              .option("quote", node.quote)
+              .options(
+                Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+              )
+              .csv(node.path)
+          } else if (node.hasDelimiter) {
+            spark.read
+              .option("header", node.hasHeader)
+              .option("delimiter", node.delimiter)
+              .options(
+                Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+              )
+              .csv(node.path)
+          } else if (node.hasQuotes) {
+            spark.read
+              .option("header", node.hasHeader)
+              .option("quote", node.quote)
+              .options(
+                Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+              )
+              .csv(node.path)
+          } else {
+            spark.read
+              .option("header", node.hasHeader)
+              .options(
+                Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+              )
+              .csv(node.path)
+          }
           val tmpView = "load_data_tmp_" + Instant.now().toEpochMilli
           df.createOrReplaceTempView(tmpView)
           val selectSql = SqlHelper.toSqlString(SqlHelper.convertToSelectNode(node, tmpView))
