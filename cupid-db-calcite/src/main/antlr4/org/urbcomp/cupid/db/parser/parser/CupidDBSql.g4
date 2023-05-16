@@ -456,7 +456,7 @@ describeStmt :
      ;
 
 loadStmt:
-    T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_format?
+    T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_options? csv_file_format?
 ;
 
 load_mapping_columns:
@@ -469,6 +469,10 @@ load_mapping_items:
 
 load_mapping_item:
     ident expr
+;
+
+csv_file_options:
+    T_FIELDS (T_DELIMITER string)? (T_QUOTES string)?
 ;
 
 csv_file_format:
@@ -948,6 +952,7 @@ nonReservedWords :                      // Tokens that are not reserved words an
      | T_QUERY_BAND
      | T_QUIT
      | T_QUOTED_IDENTIFIER
+     | T_QUOTES
      | T_RAISE
      | T_RANK
      | T_REAL
@@ -1286,6 +1291,7 @@ T_QUALIFY         : Q U A L I F Y ;
 T_QUERY_BAND      : Q U E R Y '_' B A N D ;
 T_QUIT            : Q U I T ;
 T_QUOTED_IDENTIFIER : Q U O T E D '_' I D E N T I F I E R ;
+T_QUOTES          : Q U O T E S ;
 T_RAISE           : R A I S E ;
 T_REAL            : R E A L ;
 T_REFERENCES      : R E F E R E N C E S ;

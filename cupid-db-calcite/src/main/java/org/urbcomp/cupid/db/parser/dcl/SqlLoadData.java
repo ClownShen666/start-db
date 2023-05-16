@@ -39,6 +39,10 @@ public class SqlLoadData extends SqlCall {
     public SqlIdentifier tableName;
     public String path;
     public SqlNodeList mappings;
+    public String delimiter;
+    public String quote;
+    public boolean hasDelimiter;
+    public boolean hasQuotes;
     public boolean hasHeader;
 
     public SqlLoadData(
@@ -46,12 +50,20 @@ public class SqlLoadData extends SqlCall {
         String path,
         SqlIdentifier tableName,
         SqlNodeList mappings,
+        String delimiter,
+        String quotes,
+        boolean hasDelimiter,
+        boolean hasQuotes,
         boolean hasHeader
     ) {
         super(pos);
         this.path = path;
         this.tableName = tableName;
         this.mappings = mappings;
+        this.delimiter = delimiter;
+        this.quote = quotes;
+        this.hasDelimiter = hasDelimiter;
+        this.hasQuotes = hasQuotes;
         this.hasHeader = hasHeader;
     }
 
@@ -80,6 +92,17 @@ public class SqlLoadData extends SqlCall {
                 m.unparse(writer, 0, 0);
             }
             writer.endList(frame);
+        }
+        if (hasDelimiter && hasQuotes) {
+            writer.keyword("FIELDS");
+        }
+        if (hasDelimiter) {
+            writer.keyword("DELIMITER");
+            writer.keyword("'" + delimiter + "'");
+        }
+        if (hasQuotes) {
+            writer.keyword("QUOTES");
+            writer.keyword("'" + quote + "'");
         }
         if (hasHeader) {
             writer.keyword("WITH HEADER");

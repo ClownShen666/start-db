@@ -84,6 +84,9 @@ public class CupidDBSQLSamples {
 
     // Load data sample
     public static final String LOAD_DATA_SAMPLE = loadSample("load-data");
+    public static final String LOAD_DATA_WITH_DELIMITER_AND_QUOTES_SAMPLE = loadSample(
+        "load-data-with-delimiter-and-quotes"
+    );
 
     private static String loadSample(String resource) {
         String path = "/sql/samples/" + resource + ".sample.sql";
