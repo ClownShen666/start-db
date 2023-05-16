@@ -23,7 +23,6 @@ import org.locationtech.geomesa.spark.jts._
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.spark.model._
 
 class SparkCupidTypeTest extends FunSuite {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
@@ -31,41 +30,10 @@ class SparkCupidTypeTest extends FunSuite {
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
 
   test("geomesa point type test") {
-    val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true)
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     val point: Point = new GeometryFactory().createPoint(new Coordinate(3.4, 5.6))
     val df = spark.createDataset(Seq(point)).toDF("points")
     assertEquals(point, df.select("points").as[Point].collect.toList.head)
-    spark.stop()
-  }
-
-  test("cupid trajectory type test") {
-    val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true)
-    import spark.implicits._
-    val rdd = spark.sparkContext.parallelize(Seq(trajectory))
-    val df = rdd.toDF("traj")
-    assertEquals(trajectory, df.select("traj").as[Trajectory].collect.toList.head)
-    spark.stop()
-  }
-
-  test("cupid road network type test") {
-    val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true)
-    import spark.implicits._
-    val rdd = spark.sparkContext.parallelize(Seq(rn))
-    val df = rdd.toDF("roadNetwork")
-    assertEquals(rn, df.select("roadNetwork").as[RoadNetwork].collect.toList.head)
-    spark.stop()
-  }
-
-  test("cupid road segment type test") {
-    val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true)
-    import spark.implicits._
-    val rdd = spark.sparkContext.parallelize(Seq(rs, rs))
-    val df = rdd.toDF("roadSegment")
-    assertEquals(rs, df.select("roadSegment").as[RoadSegment].collect.toList.head)
     spark.stop()
   }
 

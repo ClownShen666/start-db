@@ -27,7 +27,10 @@
         <dependency>
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-common</artifactId>
-            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-serializer</artifactId>
         </dependency>
         <dependency>
             <groupId>org.urbcomp</groupId>

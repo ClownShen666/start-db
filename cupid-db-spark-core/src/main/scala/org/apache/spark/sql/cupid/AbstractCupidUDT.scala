@@ -14,40 +14,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.apache.spark.sql.cupid.model
+package org.apache.spark.sql.cupid
 
-import org.apache.hadoop.hive.ql.exec.spark.KryoSerializer
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.types._
+import org.urbcomp.cupid.serializer.CupidBinarySerializer
 
-import java.lang.reflect.Method
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.reflect.{ClassTag, classTag}
 
 abstract class AbstractCupidUDT[T >: Null: ClassTag](
     override val simpleString: String,
-    val stringConstructorCallback: String
+    serializer: CupidBinarySerializer[T]
 ) extends UserDefinedType[T] {
-  override def typeName: String = simpleString
-
-  def serializeData(obj: T): Array[Any] = {
-    Array[Any](KryoSerializer.serialize(obj.toString))
-  }
 
   override def serialize(obj: T): InternalRow = {
-    new GenericInternalRow(serializeData(obj))
+    val os = new ByteArrayOutputStream();
+    serializer.write(os, obj)
+    new GenericInternalRow(Array[Any](os.toByteArray))
   }
+
+  override def sqlType: DataType = StructType(Seq(StructField("cupid", DataTypes.BinaryType)))
+
+  override def userClass: Class[T] = classTag[T].runtimeClass.asInstanceOf[Class[T]]
 
   override def deserialize(datum: Any): T = {
     val ir = datum.asInstanceOf[InternalRow]
-    val objString: String = KryoSerializer.deserialize(ir.getBinary(0), classOf[String])
-    val method: Method =
-      classTag[T].runtimeClass.getDeclaredMethod(stringConstructorCallback, classOf[String])
-    method.invoke(null, objString).asInstanceOf[T]
+    ir.getBinary(0)
+    serializer.read(new ByteArrayInputStream(ir.getBinary(0)), userClass)
   }
-
-  override def sqlType: DataType =
-    StructType(Seq(StructField(simpleString + "BinaryData", DataTypes.BinaryType)))
-
-  override def userClass: Class[T] = classTag[T].runtimeClass.asInstanceOf[Class[T]]
 }

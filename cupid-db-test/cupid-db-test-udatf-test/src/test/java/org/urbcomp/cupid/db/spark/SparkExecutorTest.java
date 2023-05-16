@@ -102,7 +102,6 @@ public class SparkExecutorTest {
             + CitibikeDataUtils.TEST_TABLE_NAME
             + " (idx idx, ride_id ride_id,"
             + "rideable_type rideable_type,"
-            // + "started_at toTimestamp(started_at),"
             + "start_point st_makePoint(start_lat, start_lng)) "
             + "WITH HEADER";
         testLoadSql(sql);
@@ -119,7 +118,6 @@ public class SparkExecutorTest {
             + CitibikeDataUtils.TEST_TABLE_NAME
             + " (idx _c0, ride_id _c1,"
             + "rideable_type _c2,"
-            // + "started_at toTimestamp(started_at),"
             + "start_point st_makePoint(_c9, _c10)) "
             + "WITHOUT HEADER";
         testLoadSql(sql);

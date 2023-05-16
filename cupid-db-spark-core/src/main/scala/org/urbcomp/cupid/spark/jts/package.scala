@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.spark
-
+package org.urbcomp.cupid.spark
 import org.apache.spark.sql.{SQLContext, SparkSession}
 
-package object model extends CupidEncoders {
+package object jts extends CupidEncoders {
 
   /**
-    * Initialization function that must be called before any Cupid functionality
-    * is accessed. This function can be called directly, or one of the `withCupid`
+    * Initialization function that must be called before any JTS functionality
+    * is accessed. This function can be called directly, or one of the `initJTS`
     * enrichment methods on [[SQLContext]] or [[SparkSession]] can be used instead.
     */
-  def initCupid(sqlContext: SQLContext): Unit = {
-    org.apache.spark.sql.model.registerTypes()
+  def initCupid(): Unit = {
+    org.apache.spark.sql.cupid.registerTypes()
   }
 
   /** Enrichment over [[SQLContext]] to add `withCupid` "literate" method. */
   implicit class SQLContextWithCupid(val sqlContext: SQLContext) extends AnyVal {
     def withCupid: SQLContext = {
-      initCupid(sqlContext)
+      initCupid()
       sqlContext
     }
   }
@@ -40,8 +39,9 @@ package object model extends CupidEncoders {
   /** Enrichment over [[SparkSession]] to add `withCupid` "literate" method. */
   implicit class SparkSessionWithCupid(val spark: SparkSession) extends AnyVal {
     def withCupid: SparkSession = {
-      initCupid(spark.sqlContext)
+      initCupid()
       spark
     }
   }
+
 }

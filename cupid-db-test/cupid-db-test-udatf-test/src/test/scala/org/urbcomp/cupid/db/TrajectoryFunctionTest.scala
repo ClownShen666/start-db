@@ -21,13 +21,9 @@ import org.locationtech.jts.geom.MultiPoint
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
-
 import scala.collection.JavaConverters.seqAsJavaList
-import org.urbcomp.cupid.db.spark.model._
-
 import java.sql.Timestamp
-
-import org.locationtech.geomesa.spark.jts._
+import org.urbcomp.cupid.spark.jts._
 
 class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val nameArray: Array[String] = Array[String]("int", "str", "double", "point")

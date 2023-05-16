@@ -24,10 +24,11 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
-import org.apache.spark.sql.TrajectoryUDT
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.serializer.serializers.TrajectoryBS
 
+import java.io.ByteArrayInputStream
 import java.util
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.convert.ImplicitConversions._
@@ -55,10 +56,9 @@ class StayPointSegmentUdtf extends AbstractUdtf with Serializable {
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
     val trajectory = objects.head match {
       case traj: Trajectory => traj
-      case binaryArray: java.util.ArrayList[Byte] =>
-        TrajectoryUDT.deserialize(
-          new GenericInternalRow(binaryArray.toArray.asInstanceOf[Array[Any]])
-        )
+      case list: java.util.ArrayList[Array[Byte]] =>
+        val buf = list.get(0)
+        new TrajectoryBS().read(new ByteArrayInputStream(buf), classOf[Trajectory])
       case data: Any => throw new Exception("Unrecognizable data " + data)
     }
     val maxStayTimeInSecond = objects(1).toString.toDouble

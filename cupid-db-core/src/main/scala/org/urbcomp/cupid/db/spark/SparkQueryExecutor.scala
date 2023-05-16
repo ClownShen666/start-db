@@ -34,7 +34,7 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.parser.SqlHelper
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
-import org.urbcomp.cupid.db.spark.model._
+import org.urbcomp.cupid.spark.jts._
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
 import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
