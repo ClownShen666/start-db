@@ -49,6 +49,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   override protected def afterAll(): Unit = {
     statement.close()
     connect.close()
+    SparkExecuteWrapper.getSparkExecute.stop()
   }
 
   protected def executeQueryCheck(sql: String, expectsList: List[Any]*): Unit = {
