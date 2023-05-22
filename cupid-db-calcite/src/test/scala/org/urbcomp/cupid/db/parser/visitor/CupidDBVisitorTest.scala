@@ -232,21 +232,13 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
   }
 
-  test("RENAME TABLE WITHOUT AS") {
-    val sql = CupidDBSQLSamples.RENAME_TABLE_WITHOUT_AS_SAMPLE;
+  test("RENAME TABLE") {
+    val sql = CupidDBSQLSamples.RENAME_TABLE_SAMPLE;
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlRenameTable]
     val expectRenameSql =
-      s"ALTER TABLE old_name RENAME TO new_name"
+      s"RENAME TABLE old_name TO new_name"
     assertEquals(expectRenameSql, SqlHelper.toSqlString(node))
   }
 
-  test("RENAME TABLE WITH AS") {
-    val sql = CupidDBSQLSamples.RENAME_TABLE_WITH_AS_SAMPLE;
-    val parsed = driver.parseSql(sql)
-    val node = parsed.asInstanceOf[SqlRenameTable]
-    val expectRenameSql =
-      s"ALTER TABLE old_name RENAME TO new_name"
-    assertEquals(expectRenameSql, SqlHelper.toSqlString(node))
-  }
 }

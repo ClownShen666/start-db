@@ -315,7 +315,7 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     }
     val newTableName = "newTable" + id
     val renameTableSql =
-      s"""ALTER TABLE %s RENAME %s;""".format(oldTableName, newTableName).stripMargin
+      s"""RENAME TABLE %s TO %s;""".format(oldTableName, newTableName).stripMargin
     stmt.executeUpdate(renameTableSql)
     stmt.executeUpdate(s"""DROP TABLE IF EXISTS %s;""".format(newTableName).stripMargin)
     val rs2 = stmt.executeQuery("show tables")

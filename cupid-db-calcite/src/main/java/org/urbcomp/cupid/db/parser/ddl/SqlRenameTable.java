@@ -60,10 +60,9 @@ public class SqlRenameTable extends SqlCall {
 
     @Override
     public void unparse(SqlWriter writer, int leftPrec, int rightPrec) {
-        writer.keyword("ALTER");
+        writer.keyword("RENAME");
         writer.keyword("TABLE");
         oldName.unparse(writer, leftPrec, rightPrec);
-        writer.keyword("RENAME");
         writer.keyword("TO");
         newName.unparse(writer, leftPrec, rightPrec);
     }

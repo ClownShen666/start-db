@@ -481,7 +481,7 @@ csv_file_format :
     ;
 
 renameTableStmt :
-    T_ALTER T_TABLE old_name T_RENAME T_AS? new_name
+    T_RENAME T_TABLE old_name T_TO new_name
     ;
 
 old_name :

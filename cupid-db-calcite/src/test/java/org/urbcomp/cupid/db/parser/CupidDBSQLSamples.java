@@ -89,8 +89,7 @@ public class CupidDBSQLSamples {
     );
 
     // Rename table
-    public static final String RENAME_TABLE_WITHOUT_AS_SAMPLE = loadSample("rename-table");
-    public static final String RENAME_TABLE_WITH_AS_SAMPLE = loadSample("rename-table-with-as");
+    public static final String RENAME_TABLE_SAMPLE = loadSample("rename-table");
 
     private static String loadSample(String resource) {
         String path = "/sql/samples/" + resource + ".sample.sql";

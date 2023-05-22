@@ -1,1 +1,0 @@
-ALTER TABLE old_name RENAME AS new_name
