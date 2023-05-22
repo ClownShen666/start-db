@@ -697,6 +697,27 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitCsv_file_format(CupidDBSqlParser.Csv_file_formatContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#renameTableStmt}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitRenameTableStmt(CupidDBSqlParser.RenameTableStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#old_name}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitOld_name(CupidDBSqlParser.Old_nameContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#new_name}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitNew_name(CupidDBSqlParser.New_nameContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#boolExpr}.
      * @param ctx the parse tree
      * @return the visitor result

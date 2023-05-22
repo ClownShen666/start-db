@@ -27,6 +27,7 @@ import org.urbcomp.cupid.db.parser.ddl.{
   SqlCupidCreateTable,
   SqlDropIndex,
   SqlIndexDeclaration,
+  SqlRenameTable,
   SqlTruncateTable,
   SqlUseDatabase
 }
@@ -229,5 +230,23 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
       s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
          |FROM tmp""".stripMargin
     assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
+  }
+
+  test("RENAME TABLE WITHOUT AS") {
+    val sql = CupidDBSQLSamples.RENAME_TABLE_WITHOUT_AS_SAMPLE;
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlRenameTable]
+    val expectRenameSql =
+      s"ALTER TABLE old_name RENAME TO new_name"
+    assertEquals(expectRenameSql, SqlHelper.toSqlString(node))
+  }
+
+  test("RENAME TABLE WITH AS") {
+    val sql = CupidDBSQLSamples.RENAME_TABLE_WITH_AS_SAMPLE;
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlRenameTable]
+    val expectRenameSql =
+      s"ALTER TABLE old_name RENAME TO new_name"
+    assertEquals(expectRenameSql, SqlHelper.toSqlString(node))
   }
 }

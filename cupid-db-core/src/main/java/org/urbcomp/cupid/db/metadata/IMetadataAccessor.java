@@ -37,6 +37,8 @@ public interface IMetadataAccessor {
 
     long insertTable(Table table);
 
+    long updateTable(Table table);
+
     long dropTable(String userName, String dbName, String tableName);
 
     List<Table> getTables(String userName, String dbName);

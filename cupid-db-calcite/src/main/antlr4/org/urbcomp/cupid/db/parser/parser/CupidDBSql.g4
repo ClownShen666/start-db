@@ -34,6 +34,7 @@ stmt :
      | selectStmt
      | createUserStmt
      | loadStmt
+     | renameTableStmt
      ;
 
 dbDotTable:
@@ -455,29 +456,41 @@ describeStmt :
        (T_DESCRIBE | T_DESC) (T_TABLE | T_VIEW)? userDotDbDotTable
      ;
 
-loadStmt:
+loadStmt :
     T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_options? csv_file_format?
-;
+    ;
 
-load_mapping_columns:
+load_mapping_columns :
    T_OPEN_P load_mapping_items T_CLOSE_P
     ;
 
-load_mapping_items:
+load_mapping_items :
     load_mapping_item (T_COMMA load_mapping_item)*
     ;
 
-load_mapping_item:
+load_mapping_item :
     ident expr
-;
+    ;
 
-csv_file_options:
+csv_file_options :
     T_FIELDS (T_DELIMITER string)? (T_QUOTES string)?
-;
+    ;
 
-csv_file_format:
+csv_file_format :
     (T_WITH|T_WITHOUT)? T_HEADER
-;
+    ;
+
+renameTableStmt :
+    T_ALTER T_TABLE old_name T_RENAME T_AS? new_name
+    ;
+
+old_name :
+       qident
+     ;
+
+new_name :
+       qident
+     ;
 
 boolExpr :                               // Boolean condition
        T_NOT? T_OPEN_P boolExpr T_CLOSE_P
