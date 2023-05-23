@@ -21,11 +21,13 @@ import io.grpc.inprocess.InProcessChannelBuilder
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.urbcomp.cupid.db.config.DynamicConfig.{getRemoteServerHostname, getRemoteServerPort}
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer
 import org.urbcomp.cupid.db.spark.data.GrpcRemote.{RowRequest, SchemaRequest}
 import org.urbcomp.cupid.db.spark.data.RemoteClient
 import org.urbcomp.cupid.db.util.SparkSqlParam
 
+import java.net.URI
 import java.util
 import java.util.concurrent.TimeUnit
 
@@ -38,12 +40,34 @@ class GrpcRemoteWriter extends IRemoteWriter {
 
   private val options: util.Map[String, String] = IRemoteWriter.options
   private val remoteClient: RemoteClient =
-    if (options.get("InProcessChannelForTest") == null)
-      new RemoteClient(
-        options.getOrDefault(SparkSqlParam.REMOTE_HOST_KEY, getRemoteServerHostname),
-        options.getOrDefault(SparkSqlParam.REMOTE_PORT_KEY, getRemoteServerPort.toString).toInt
-      )
-    else
+    if (options.get("InProcessChannelForTest") == null) {
+      log.info("wwwwww")
+      log.info("show options!")
+      if (options == null) {
+        log.info("option is null")
+      } else {
+        import scala.collection.JavaConversions._
+        for (entry <- options.entrySet) {
+          log.info(entry.getKey + ": " + entry.getValue)
+        }
+      }
+      log.info("show options finished")
+      var host = options.getOrDefault(SparkSqlParam.REMOTE_HOST_KEY, getRemoteServerHostname)
+      var port = options.getOrDefault(SparkSqlParam.REMOTE_PORT_KEY, getRemoteServerPort.toString)
+      if (host == "" || port == "0") {
+        host = getRemoteServerHostname
+        port = getRemoteServerPort.toString
+      }
+      log.info(host)
+      log.info(port)
+      val uri = new URI(null, null, host, port.toInt, null, null, null)
+      val authority = uri.getAuthority
+      val rawAuthority = uri.getRawAuthority
+      log.info("URI = " + uri)
+      log.info("Authority = " + authority)
+      log.info("Raw Authority = " + rawAuthority)
+      new RemoteClient(host, port.toInt)
+    } else
       new RemoteClient(
         InProcessChannelBuilder.forName(options.get("InProcessChannelForTest")).build()
       )

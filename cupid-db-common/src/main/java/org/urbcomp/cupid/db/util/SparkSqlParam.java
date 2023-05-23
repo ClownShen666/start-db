@@ -50,6 +50,8 @@ public class SparkSqlParam extends SqlParam {
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "print").toUpperCase()
         );
+        this.remoteHost = DynamicConfig.getRemoteServerHostname();
+        this.remotePort = DynamicConfig.getRemoteServerPort();
     }
 
     private boolean isLocal;

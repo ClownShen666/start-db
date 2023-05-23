@@ -35,6 +35,7 @@ public class CupidDbServerStart {
     public static void start() throws Exception {
         final RemoteServer remoteServer = new RemoteServer(DynamicConfig.getRemoteServerPort());
         remoteServer.start();
+        System.out.println("start remote server");
         // open for test grpc
         // remoteServer.blockUntilShutdown();
 

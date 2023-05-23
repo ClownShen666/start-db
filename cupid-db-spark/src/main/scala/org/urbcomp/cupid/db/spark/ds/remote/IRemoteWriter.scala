@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.ds.remote
 
 import org.apache.spark.sql.catalyst.InternalRow
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 
 import java.util
 
@@ -58,6 +59,16 @@ object IRemoteWriter {
   var options: util.Map[String, String] = _
 
   def getInstance(): IRemoteWriter = {
+    log.info("show options!")
+    if (options == null) {
+      log.info("option is null")
+    } else {
+      import scala.collection.JavaConversions._
+      for (entry <- options.entrySet) {
+        log.info(entry.getKey + ": " + entry.getValue)
+      }
+    }
+    log.info("show options finished")
     new GrpcRemoteWriter
   }
 }
