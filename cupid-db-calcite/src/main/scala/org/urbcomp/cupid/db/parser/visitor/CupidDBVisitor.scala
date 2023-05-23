@@ -30,6 +30,7 @@ import org.urbcomp.cupid.db.parser.ddl.{
   SqlCupidCreateTable,
   SqlDropIndex,
   SqlIndexDeclaration,
+  SqlRenameTable,
   SqlTruncateTable,
   SqlUseDatabase
 }
@@ -87,6 +88,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     case c: UpdateStmtContext          => visitUpdateStmt(c)
     case c: CreateUserStmtContext      => visitCreateUserStmt(c)
     case c: LoadStmtContext            => visitLoadStmt(c)
+    case c: RenameTableStmtContext     => visitRenameTableStmt(c)
     case _                             => throw new IllegalArgumentException("unexpected sql")
   }
 
@@ -773,6 +775,38 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
   override def visitShowIndexStmt(ctx: ShowIndexStmtContext): SqlNode = {
     new SqlShowIndex(pos, visitIdent(ctx.tableName().ident()))
+  }
+
+  override def visitRenameTableStmt(ctx: RenameTableStmtContext): SqlNode = {
+    val oldTableName = visitOld_name(ctx.old_name()).asInstanceOf[SqlIdentifier]
+    val newTableName = visitNew_name(ctx.new_name()).asInstanceOf[SqlIdentifier]
+    new SqlRenameTable(pos, oldTableName, newTableName)
+  }
+
+  override def visitOld_name(ctx: Old_nameContext): SqlNode = {
+    val names = ctx
+      .qident()
+      .ident()
+      .asScala
+      .map(ident => {
+        ident.getText
+      })
+      .toList
+      .asJava
+    new SqlIdentifier(names, pos)
+  }
+
+  override def visitNew_name(ctx: New_nameContext): SqlNode = {
+    val names = ctx
+      .qident()
+      .ident()
+      .asScala
+      .map(ident => {
+        ident.getText
+      })
+      .toList
+      .asJava
+    new SqlIdentifier(names, pos)
   }
 
   /////////////////////////////////////////////////////////////////////////

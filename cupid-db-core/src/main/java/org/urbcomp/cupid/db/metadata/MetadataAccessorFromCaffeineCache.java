@@ -116,6 +116,11 @@ public class MetadataAccessorFromCaffeineCache implements IMetadataCacheCaller {
     }
 
     @Override
+    public long updateTable(Table table) {
+        return real.updateTable(table);
+    }
+
+    @Override
     public long dropTable(String userName, String dbName, String tableName) {
         TABLE_CACHE.invalidate(buildCacheKey(userName, dbName, tableName));
         return real.dropTable(userName, dbName, tableName);

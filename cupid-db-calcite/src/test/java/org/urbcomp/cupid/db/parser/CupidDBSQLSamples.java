@@ -88,6 +88,9 @@ public class CupidDBSQLSamples {
         "load-data-with-delimiter-and-quotes"
     );
 
+    // Rename table
+    public static final String RENAME_TABLE_SAMPLE = loadSample("rename-table");
+
     private static String loadSample(String resource) {
         String path = "/sql/samples/" + resource + ".sample.sql";
         try {

@@ -100,6 +100,10 @@ public class MetadataAccessUtil {
         return ACCESSOR.insertTable(table);
     }
 
+    public static long updateTable(Table table) {
+        return ACCESSOR.updateTable(table);
+    }
+
     public static long insertField(Field field) {
         return ACCESSOR.insertField(field);
     }

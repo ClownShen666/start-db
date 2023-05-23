@@ -24,6 +24,7 @@ import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
   SqlDropIndex,
+  SqlRenameTable,
   SqlTruncateTable,
   SqlUseDatabase
 }
@@ -55,6 +56,7 @@ class CupidDBExecutorFactory extends BaseExecutorFactory {
     case n: SqlDropSchema       => DropDatabaseExecutor(n)
     case n: SqlTruncateTable    => TruncateTableExecutor(n)
     case n: SqlLoadData         => LoadDataExecutor(n)
+    case n: SqlRenameTable      => RenameTableExecutor(n)
     case _                      => throw new IllegalStateException("Not Support SQL")
   }
 }

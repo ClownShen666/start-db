@@ -92,6 +92,11 @@ public class MetadataAccessorFromCaffeineCacheTest {
         }
 
         @Override
+        public long updateTable(Table table) {
+            return 0;
+        }
+
+        @Override
         public long dropTable(String userName, String dbName, String tableName) {
             return 0;
         }
