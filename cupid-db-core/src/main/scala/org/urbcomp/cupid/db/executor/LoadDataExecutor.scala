@@ -30,6 +30,8 @@ import java.util
 import java.util.Scanner
 import java.util.regex.Pattern
 
+import scala.collection.JavaConverters._
+
 case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
   override def execute[Int](): MetadataResult[Int] = {
     // Get store config
@@ -43,14 +45,9 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
     val schemaName = MetadataUtil.makeSchemaName(table.getId)
 
     // Check mapping
-    val tableFields: Array[String] = MetadataAccessUtil
-      .getFields(userName, dbName, tableName)
-      .stream()
-      .map(field => field.getName)
-      .toArray
-      .asInstanceOf[Array[String]]
-    val mappingCorrectness = n.mappings.getList
-      .stream()
+    val tableFields =
+      MetadataAccessUtil.getFields(userName, dbName, tableName).asScala.map(_.getName).toArray
+    val mappingCorrectness = n.mappings.getList.asScala
       .map(sqlNode => {
         val field = sqlNode.asInstanceOf[SqlColumnMappingDeclaration].field.names.get(0)
         tableFields.contains(field)
@@ -76,8 +73,7 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
     }
 
     // convert mappings to Array[(Field, Expr)]
-    val mapFieldExpr = n.mappings.getList
-      .stream()
+    val mapFieldExpr = n.mappings.getList.asScala
       .map(sqlNode => {
         val field = sqlNode.asInstanceOf[SqlColumnMappingDeclaration].field.names.get(0)
         val expr = sqlNode.asInstanceOf[SqlColumnMappingDeclaration].expr.toString
@@ -87,8 +83,7 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
       .asInstanceOf[Array[(String, String)]]
 
     // map: line -> select sql -> Array[Array[(String, AnyRef)]]
-    val resultObjs = allLines
-      .stream()
+    val resultObjs = allLines.asScala
       .map(line => {
         val valueGroup = line.split(n.delimiter)
         mapFieldExpr.map(FieldExpr => {
