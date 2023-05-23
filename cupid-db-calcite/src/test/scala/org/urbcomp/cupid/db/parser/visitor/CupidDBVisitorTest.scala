@@ -19,18 +19,9 @@ import org.apache.calcite.sql._
 import org.apache.calcite.sql.ddl.{SqlDropSchema, SqlDropTable}
 import org.apache.calcite.sql.parser.SqlParser
 import org.junit.Assert.{assertEquals, assertFalse, assertNotNull, assertTrue}
-import org.scalatest.{BeforeAndAfterEach, FunSuite, nodurations}
-import org.urbcomp.cupid.db.parser.{CupidDBSQLSamples, SqlHelper}
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import org.urbcomp.cupid.db.parser.dcl.{SqlCreateUser, SqlLoadData}
-import org.urbcomp.cupid.db.parser.ddl.{
-  SqlCreateDatabase,
-  SqlCupidCreateTable,
-  SqlDropIndex,
-  SqlIndexDeclaration,
-  SqlRenameTable,
-  SqlTruncateTable,
-  SqlUseDatabase
-}
+import org.urbcomp.cupid.db.parser.ddl._
 import org.urbcomp.cupid.db.parser.dql.{
   SqlShowCreateTable,
   SqlShowDatabases,
@@ -38,7 +29,7 @@ import org.urbcomp.cupid.db.parser.dql.{
   SqlShowTables
 }
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
-import org.urbcomp.cupid.db.schema.IndexType
+import org.urbcomp.cupid.db.parser.{CupidDBSQLSamples, SqlHelper}
 import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 
 class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
@@ -151,6 +142,14 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val node = parsed.asInstanceOf[SqlCupidCreateTable]
     assertEquals("start_default_table", node.name.names.get(0))
     assertEquals(12, node.columnList.size())
+  }
+//
+  test("convert create table like statement to SqlNode") {
+    val sql = "create table targettable like sourceTable"
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlCupidCreateTableLike]
+    assertEquals("targettable", node.targetTableName.names.get(0))
+
   }
 
   test("convert update table statement to SqlNode") {

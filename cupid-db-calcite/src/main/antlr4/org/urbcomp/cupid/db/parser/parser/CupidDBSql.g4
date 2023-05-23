@@ -16,6 +16,7 @@ program : stmt T_SEMICOLON? EOF;
 stmt :
        createDatabaseStmt
      | createTableStmt
+     | createTableLikeStmt
      | createIndexStmt
      | describeStmt
      | dropDatabaseStmt
@@ -36,6 +37,8 @@ stmt :
      | loadStmt
      | renameTableStmt
      ;
+
+createTableLikeStmt: T_CREATE T_TABLE table_name T_LIKE table_name;
 
 dbDotTable:
     (db=(L_ID | T_DEFAULT | T_MUL) T_DOT)? table=(T_MUL | T_DEFAULT | L_ID)
@@ -87,7 +90,7 @@ createUserStmt :
 
 
 create_table_definition :
-      (T_AS? T_OPEN_P selectStmt T_CLOSE_P | T_AS? selectStmt | T_OPEN_P create_table_columns T_CLOSE_P | T_LIKE table_name) create_table_options?
+      (T_AS? T_OPEN_P selectStmt T_CLOSE_P | T_AS? selectStmt | T_OPEN_P create_table_columns T_CLOSE_P ) create_table_options?
      ;
 
 create_table_columns :
