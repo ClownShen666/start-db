@@ -707,7 +707,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     || sqlNode instanceof SqlDropTable
                     || sqlNode instanceof SqlDropIndex
                     || sqlNode instanceof SqlDropSchema
-                    || sqlNode instanceof SqlTruncateTable) {
+                    || sqlNode instanceof SqlTruncateTable
+                    || sqlNode instanceof SqlRenameTable) {
                     return startDBExecutorFactory.convertExecutor(sqlNode).execute();
                 }
 
