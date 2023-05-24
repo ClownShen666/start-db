@@ -145,7 +145,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 //
   test("convert create table like statement to SqlNode") {
-    val sql = "create table targettable like sourceTable"
+    val sql = CupidDBSQLSamples.CREATE_TABLE_LIKE_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlCupidCreateTableLike]
     assertEquals("targettable", node.targetTableName.names.get(0))

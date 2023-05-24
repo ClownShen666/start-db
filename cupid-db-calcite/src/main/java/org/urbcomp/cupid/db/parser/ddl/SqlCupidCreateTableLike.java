@@ -51,7 +51,7 @@ public class SqlCupidCreateTableLike extends SqlCreate {
         this.sourceTableName = sourceTableName;
     }
 
-    /** Creates a SqlCreateTable. */
+    /** Creates a SqlCreateTableLike. */
 
     public List<SqlNode> getOperandList() {
         return ImmutableNullableList.of(targetTableName, sourceTableName);

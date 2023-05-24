@@ -34,9 +34,9 @@ import scala.collection.JavaConverters._
 case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecutor {
 
   override def execute[Int](): MetadataResult[Int] = {
+
     val targetTable = n.targetTableName
     val (userName, dbName, tableName) = ExecutorUtil.getUserNameDbNameAndTableName(targetTable)
-
     val db = MetadataAccessUtil.getDatabase(userName, dbName)
     val existedTable = MetadataAccessUtil.getTable(db.getId, tableName)
     if (existedTable != null) {
