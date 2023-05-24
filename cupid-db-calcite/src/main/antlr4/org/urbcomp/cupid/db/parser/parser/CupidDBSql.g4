@@ -38,7 +38,7 @@ stmt :
      | renameTableStmt
      ;
 
-createTableLikeStmt: T_CREATE T_TABLE table_name T_LIKE table_name;
+createTableLikeStmt: T_CREATE T_TABLE (T_IF T_NOT T_EXISTS) ? table_name T_LIKE table_name;
 
 dbDotTable:
     (db=(L_ID | T_DEFAULT | T_MUL) T_DOT)? table=(T_MUL | T_DEFAULT | L_ID)
