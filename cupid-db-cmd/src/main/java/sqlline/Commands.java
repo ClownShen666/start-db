@@ -1297,7 +1297,7 @@ public class Commands {
         Properties connectProps = new Properties();
         int offset = 1;
         for (int i = 1; i < parts.length; i++) {
-            if ("-p".equals(parts[i])) {
+            if ("-engine".equals(parts[i]) || "-p".equals(parts[i])) {
                 if (parts.length - i > 2) {
                     connectProps.setProperty(parts[i + 1], parts[i + 2]);
                     i = i + 2;
