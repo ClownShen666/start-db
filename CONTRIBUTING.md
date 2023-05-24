@@ -82,7 +82,16 @@ To set username or password, you need to edit running configuration of IDE or by
 ```
 before connecting server.
 
+### Run packaged jars
 
+After running `mvn clean package`, Cupid fat jar for server and client is packaged.
+
+Server can be found under `<cupid>/cupid-db-server/target/cupid-db.jar`. 
+Running cmd `java -jar cupid-db.jar` will start server.
+
+Cupid command line client is under `<cupid>/cupid-db-cmd/target/cupid-db-cmd.jar`. 
+To connect server from console, run cmd `java -jar cupid-db-cmd.jar -u <user> -p <password> -engine <calcite|spark_local>`
+.
 
 [checkstyle]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
