@@ -67,6 +67,13 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
         val schemaName = MetadataUtil.makeSchemaName(tableId)
         sfb.setName(schemaName)
 
+        val params = ExecutorUtil.getDataStoreParams(userName, dbName)
+        val dataStore = DataStoreFinder.getDataStore(params)
+        val schema = dataStore.getSchema(schemaName)
+        if (schema != null) {
+          throw new IllegalStateException("schema already exist " + schemaName)
+        }
+
         //copy col
         val fieldMap = collection.mutable.Map[String, Field]()
         MetadataAccessUtil
@@ -86,7 +93,7 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
             fieldMap.put(field.getName, field)
           })
 
-//        copy index
+        //copy index
         val indexes = MetadataAccessUtil
           .getIndexes(sourceUserName, sourceDbName, sourceTableName)
           .asScala
@@ -106,13 +113,6 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
             MetadataAccessUtil.insertIndex(tarIndex)
           })
 
-        }
-
-        val params = ExecutorUtil.getDataStoreParams(userName, dbName)
-        val dataStore = DataStoreFinder.getDataStore(params)
-        val schema = dataStore.getSchema(schemaName)
-        if (schema != null) {
-          throw new IllegalStateException("schema already exist " + schemaName)
         }
 
         var sft = sfb.buildFeatureType()
