@@ -93,6 +93,10 @@ Cupid command line client is under `<cupid>/cupid-db-cmd/target/cupid-db-cmd.jar
 To connect server from console, run cmd `java -jar cupid-db-cmd.jar -u <user> -p <password> -engine <calcite|spark_local>`
 .
 
+### Cupid JDBC Driver Usage
+
+See examples under `<cupid>/cupid-db-jdbc-driver/src/test/java/org/urbcomp/cupid/db/jdbc/DriverTest.java`
+
 [checkstyle]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
 [spotless]: https://github.com/diffplug/spotless
