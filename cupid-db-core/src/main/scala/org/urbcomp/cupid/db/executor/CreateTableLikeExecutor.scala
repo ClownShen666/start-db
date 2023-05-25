@@ -75,7 +75,6 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
         }
 
         //copy col
-        val fieldMap = collection.mutable.Map[String, Field]()
         MetadataAccessUtil
           .getFields(sourceUserName, sourceDbName, sourceTableName)
           .forEach(field => {
@@ -90,7 +89,6 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
             val sourceField =
               new Field(0, tableId, field.getName, field.getType, field.getIsPrimary)
             MetadataAccessUtil.insertField(sourceField)
-            fieldMap.put(field.getName, field)
           })
 
         //copy index
