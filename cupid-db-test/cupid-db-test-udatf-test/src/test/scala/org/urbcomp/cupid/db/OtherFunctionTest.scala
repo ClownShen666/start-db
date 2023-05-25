@@ -20,6 +20,6 @@ class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
     //todo
-    //executeQueryCheck("select version()")
+    executeQueryCheck("select version()", List("version"))
   }
 }
