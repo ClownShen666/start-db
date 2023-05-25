@@ -143,7 +143,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals("start_default_table", node.name.names.get(0))
     assertEquals(12, node.columnList.size())
   }
-//
+
   test("convert create table like statement to SqlNode") {
     val sql = CupidDBSQLSamples.CREATE_TABLE_LIKE_SAMPLE
     val parsed = driver.parseSql(sql)
