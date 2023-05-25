@@ -38,14 +38,22 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
     val targetTable = n.targetTableName
     val (userName, dbName, tableName) = ExecutorUtil.getUserNameDbNameAndTableName(targetTable)
     val db = MetadataAccessUtil.getDatabase(userName, dbName)
-    val existedTable = MetadataAccessUtil.getTable(db.getId, tableName)
-    if (existedTable != null) {
+    val existedTargetTable = MetadataAccessUtil.getTable(db.getId, tableName)
+    if (existedTargetTable != null) {
       if (n.ifNotExists) {
         return MetadataResult.buildDDLResult(0)
       } else {
         throw new IllegalArgumentException("table already exist " + tableName)
       }
     }
+
+    val sourceTable = n.sourceTableName
+    val (sourceUserName, sourceDbName, sourceTableName) =
+      ExecutorUtil.getUserNameDbNameAndTableName(sourceTable)
+    val sourceDb = MetadataAccessUtil.getDatabase(sourceUserName, sourceDbName)
+    val existedSourceTable = MetadataAccessUtil.getTable(sourceDb.getId, sourceTableName)
+    if (existedSourceTable == null)
+      throw new IllegalArgumentException("sourceTable not exist " + tableName)
 
     var affectedRows = 0L
     MetadataAccessUtil.withRollback(
@@ -59,17 +67,8 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
         val schemaName = MetadataUtil.makeSchemaName(tableId)
         sfb.setName(schemaName)
 
-        val fieldMap = collection.mutable.Map[String, Field]()
-
         //copy col
-        val sourceTable = n.sourceTableName
-
-        val (sourceUserName, sourceDbName, sourceTableName) =
-          ExecutorUtil.getUserNameDbNameAndTableName(sourceTable)
-        val sourceDb = MetadataAccessUtil.getDatabase(sourceUserName, sourceDbName)
-        val existedSourceTable = MetadataAccessUtil.getTable(sourceDb.getId, sourceTableName)
-        if (existedSourceTable == null)
-          throw new IllegalArgumentException("table not exist " + tableName)
+        val fieldMap = collection.mutable.Map[String, Field]()
         MetadataAccessUtil
           .getFields(sourceUserName, sourceDbName, sourceTableName)
           .forEach(field => {
@@ -81,12 +80,13 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
               sfb.add(field.getName, sourceClassType)
             }
 
-            val sourceField = new Field(0, tableId, field.getName, field.getType, 0);
+            val sourceField =
+              new Field(0, tableId, field.getName, field.getType, field.getIsPrimary)
             MetadataAccessUtil.insertField(sourceField)
-            fieldMap.put(field.getName, sourceField)
+            fieldMap.put(field.getName, field)
           })
 
-        //copy index
+//        copy index
         val indexes = MetadataAccessUtil
           .getIndexes(sourceUserName, sourceDbName, sourceTableName)
           .asScala
@@ -95,7 +95,17 @@ case class CreateTableLikeExecutor(n: SqlCupidCreateTableLike) extends BaseExecu
 
         if (indexes != null) {
           checkIndexNames(indexes)
-          indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
+          indexes.foreach(index => {
+            val tarIndex = new Index(
+              tableId,
+              index.getIndexType,
+              index.getName,
+              index.getFieldsIdList,
+              index.getIndexProperties
+            )
+            MetadataAccessUtil.insertIndex(tarIndex)
+          })
+
         }
 
         val params = ExecutorUtil.getDataStoreParams(userName, dbName)
