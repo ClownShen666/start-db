@@ -16,8 +16,10 @@
  */
 package org.urbcomp.cupid.db.udf.otherfunction
 
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
+import scala.io.Source
 
 class versionUdf extends AbstractUdf {
 
@@ -26,34 +28,8 @@ class versionUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(): String = {
-    //    import java.util.jar.JarFile
-    //    import scala.xml.XML
-    //
-    //    // 打包后的 JAR 文件路径
-    //    val jarPath = "./"
-    //
-    //    // 创建 JarFile 对象
-    //    val jarFile = new JarFile(jarPath)
-    //
-    //    // 获取 pom.xml 文件的输入流
-    //    val pomEntry = jarFile.getEntry("META-INF/maven/your-group/your-artifact/pom.xml")
-    //    val inputStream = jarFile.getInputStream(pomEntry)
-    //
-    //    // 解析 pom.xml 文件
-    //    val pom = XML.load(inputStream)
-    //
-    //    // 获取 modelVersion 属性
-    //    val modelVersion = (pom \ "modelVersion").text
-    //    // 关闭 JarFile 和输入流
-    //    jarFile.close()
-    //    inputStream.close()
-    //
-    //    // 打印 modelVersion
-    //    println(s"modelVersion: $modelVersion")
-    //
-    //    modelVersion
-    //    "true"
-    getClass.getPackage.getImplementationVersion
+
+    Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString
 
   }
 

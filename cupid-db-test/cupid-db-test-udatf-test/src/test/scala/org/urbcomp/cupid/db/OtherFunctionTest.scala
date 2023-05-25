@@ -19,7 +19,6 @@ package org.urbcomp.cupid.db
 class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
-    //todo
-    executeQueryCheck("select version()", List("version"))
+    executeQueryCheck("select version()", List("1.1"))
   }
 }
