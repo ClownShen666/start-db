@@ -31,27 +31,25 @@ class st_BD09ToWGS84 extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
+  lazy val transformer = new BD09ToWGS84Transformer
+
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
-    val transformer = new BD09ToWGS84Transformer
-    MatchUtil.MatchCoordinate(transformer, st)
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st)
   }
 
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null
-    val transformer = new BD09ToWGS84Transformer
     transformer.trajectoryTransform(st)
   }
 
   def evaluate(st: RoadNetwork): RoadNetwork = {
     if (st == null) return null
-    val transformer = new BD09ToWGS84Transformer
     transformer.roadNetworkTransform(st)
   }
 
   def evaluate(st: RoadSegment): RoadSegment = {
     if (st == null) return null
-    val transformer = new BD09ToWGS84Transformer
     transformer.roadSegmentTransform(st)
   }
 

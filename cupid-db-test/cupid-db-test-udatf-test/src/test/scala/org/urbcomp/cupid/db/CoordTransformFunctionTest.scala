@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Ignore
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -113,9 +112,11 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
       )
     )
   }
+
   test("st_BD09ToWGS84(null)") {
     executeQueryCheck("select st_BD09ToWGS84(null)", List(null))
   }
+
   test("st_WGS84ToBD09(Point)") {
     executeQueryCheck(
       "select st_WGS84ToBD09(st_makePoint(1, 2))",
