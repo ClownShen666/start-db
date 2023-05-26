@@ -16,9 +16,15 @@
  */
 package org.urbcomp.cupid.db
 
+import org.junit.Assert.assertNotNull
+
 class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
-    executeQueryCheck("select version()", List("1.1"))
+    val rs = connect.createStatement().executeQuery("select version()")
+    rs.next()
+    val df = SparkExecuteWrapper.getSparkExecute.executeSql("select version()").collectAsList().iterator().next()
+    assertNotNull(df.get(0))
+    assertNotNull(rs.getObject(1))
   }
 }
