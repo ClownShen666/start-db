@@ -23,7 +23,11 @@ class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("version") {
     val rs = connect.createStatement().executeQuery("select version()")
     rs.next()
-    val df = SparkExecuteWrapper.getSparkExecute.executeSql("select version()").collectAsList().iterator().next()
+    val df = SparkExecuteWrapper.getSparkExecute
+      .executeSql("select version()")
+      .collectAsList()
+      .iterator()
+      .next()
     assertNotNull(df.get(0))
     assertNotNull(rs.getObject(1))
   }
