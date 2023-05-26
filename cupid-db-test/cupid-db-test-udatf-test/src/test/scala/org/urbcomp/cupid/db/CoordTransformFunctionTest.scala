@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db
 
+import org.junit.Ignore
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -112,7 +113,9 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
       )
     )
   }
-
+  test("st_BD09ToWGS84(null)") {
+    executeQueryCheck("select st_BD09ToWGS84(null)", List(null))
+  }
   test("st_WGS84ToBD09(Point)") {
     executeQueryCheck(
       "select st_WGS84ToBD09(st_makePoint(1, 2))",
@@ -195,6 +198,10 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
       )
     )
+  }
+
+  test("st_WGS84ToBD09(null)") {
+    executeQueryCheck("select st_BD09ToWGS84(null)", List(null))
   }
 
   test("st_GCJ02ToBD09(Point)") {
@@ -280,6 +287,10 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
+  test("st_GCJ02ToBD09(null)") {
+    executeQueryCheck("select st_GCJ02ToBD09(null)", List(null))
+  }
+
   test("st_BD09ToGCJ02(Point)") {
     executeQueryCheck(
       "select st_BD09ToGCJ02(st_makePoint(1, 2))",
@@ -363,6 +374,10 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
+  test("st_BD09ToGCJ02(null)") {
+    executeQueryCheck("select st_BD09ToGCJ02(null)", List(null))
+  }
+
   test("st_WGS84ToGCJ02(Point)") {
     executeQueryCheck("select st_WGS84ToGCJ02(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
@@ -419,6 +434,10 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
+  test("st_WGS84ToGCJ02(null)") {
+    executeQueryCheck("select st_WGS84ToGCJ02(null)", List(null))
+  }
+
   test("st_GCJ02ToWGS84(Point)") {
     executeQueryCheck("select st_GCJ02ToWGS84(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
@@ -473,5 +492,9 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select st_GCJ02ToWGS84(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
+  }
+
+  test("st_GCJ02ToWGS84(null)") {
+    executeQueryCheck("select st_GCJ02ToWGS84(null)", List(null))
   }
 }

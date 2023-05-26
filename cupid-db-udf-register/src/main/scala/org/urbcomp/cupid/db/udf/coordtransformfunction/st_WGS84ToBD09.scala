@@ -33,23 +33,25 @@ class st_WGS84ToBD09 extends AbstractUdf {
 
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
+    val transformer = new WGS84ToBD09Transformer
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
 
-  val transformer = new WGS84ToBD09Transformer
-
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null
+    val transformer = new WGS84ToBD09Transformer
     transformer.trajectoryTransform(st)
   }
 
   def evaluate(st: RoadNetwork): RoadNetwork = {
     if (st == null) return null
+    val transformer = new WGS84ToBD09Transformer
     transformer.roadNetworkTransform(st)
   }
 
   def evaluate(st: RoadSegment): RoadSegment = {
     if (st == null) return null
+    val transformer = new WGS84ToBD09Transformer
     transformer.roadSegmentTransform(st)
   }
 
