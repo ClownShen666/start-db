@@ -29,7 +29,6 @@ import java.sql.ResultSet
 import java.util
 import java.util.Scanner
 import java.util.regex.Pattern
-
 import scala.collection.JavaConverters._
 
 case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
@@ -55,21 +54,9 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
       .toArray
       .asInstanceOf[Array[Boolean]]
     if (mappingCorrectness.contains(false)) {
-      throw new IllegalArgumentException("Some fields do not exist.")
-    }
-
-    // Ready for reading
-    val reader = new Scanner(new File(n.path))
-
-    // Ignore header
-    if (n.hasHeader) {
-      reader.nextLine()
-    }
-
-    // Read all lines
-    val allLines = new util.ArrayList[String]
-    while (reader.hasNext()) {
-      allLines.add(reader.nextLine())
+      throw new IllegalArgumentException(
+        s"Fields ${mappingCorrectness.mkString(",")} do not exist."
+      )
     }
 
     // convert mappings to Array[(Field, Expr)]
@@ -82,49 +69,69 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
       .toArray
       .asInstanceOf[Array[(String, String)]]
 
-    // map: line -> select sql -> Array[Array[(String, AnyRef)]]
-    val resultObjs = allLines.asScala
-      .map(line => {
-        val valueGroup = line.split(n.delimiter)
-        mapFieldExpr.map(FieldExpr => {
-          // replace Expr with value
-          val matcher = Pattern.compile("-c[1-9]+").matcher(FieldExpr._2)
-          var rExpr = FieldExpr._2
-          while (matcher.find()) {
-            val colIndex = matcher.group().split("c")(1).toInt
-            rExpr = rExpr.replaceFirst("-c[1-9]+", valueGroup(colIndex - 1))
-          }
-          // select sql
-          val resultObj = WithClose(executeQuery(s"select $rExpr")) { rs =>
-            {
-              rs.next()
-              rs.getObject(1)
-            }
-          }
-          (FieldExpr._1, resultObj)
-        })
-      })
-      .toArray
-      .asInstanceOf[Array[Array[(String, AnyRef)]]]
-
-    // Write into geomesa
+    val writer = dataStore.getFeatureWriterAppend(schemaName, Transaction.AUTO_COMMIT)
+    val bufferSize = 1000
+    val buffer = new Array[String](bufferSize)
+    var counter = 0
     var affectedRows = 0
-    WithClose(dataStore.getFeatureWriterAppend(schemaName, Transaction.AUTO_COMMIT)) { writer =>
-      resultObjs.foreach(fieldValueArray => {
-        val sf = writer.next()
-        fieldValueArray.foreach(fieldValue => sf.setAttribute(fieldValue._1, fieldValue._2))
-        affectedRows += 1
-        writer.write()
-      })
+    // Parse and write
+    WithClose(new Scanner(new File(n.path))) { reader =>
+      {
+        // Ignore header
+        if (n.hasHeader) {
+          reader.nextLine()
+        }
+
+        while (reader.hasNext()) {
+          // Read into buffer
+          while (counter < bufferSize && reader.hasNext()) {
+            buffer(counter) = reader.nextLine()
+            counter += 1
+          }
+          // Convert and write
+          buffer
+            .take(counter)
+            .map(line => {
+              val valueGroup = line.split(n.delimiter)
+              mapFieldExpr.map(FieldExpr => {
+                // replace Expr with value
+                val matcher = Pattern.compile("_c[1-9]+").matcher(FieldExpr._2)
+                var rExpr = FieldExpr._2
+                while (matcher.find()) {
+                  val colIndex = matcher.group().split("c")(1).toInt
+                  rExpr = rExpr.replaceFirst("_c[1-9]+", valueGroup(colIndex - 1))
+                }
+                // select sql
+                val resultObj = WithClose(executeQuery(rExpr)) { rs =>
+                  {
+                    rs.next()
+                    rs.getObject(1)
+                  }
+                }
+                (FieldExpr._1, resultObj)
+              })
+            })
+            .foreach(fieldValueArray => {
+              // Write into geomesa-hbase
+              val sf = writer.next()
+              fieldValueArray.foreach(fieldValue => sf.setAttribute(fieldValue._1, fieldValue._2))
+              writer.write()
+              affectedRows += 1
+            })
+
+          // reset counter
+          counter = 0
+        }
+      }
     }
 
     dataStore.dispose()
     MetadataResult.buildDDLResult(affectedRows)
   }
 
-  def executeQuery[R](querySql: String): ResultSet = {
+  private def executeQuery(queryObj: String): ResultSet = {
     val connection = CalciteHelper.createConnection()
     val statement = connection.createStatement()
-    statement.executeQuery(querySql)
+    statement.executeQuery("select %s".format(queryObj))
   }
 }
