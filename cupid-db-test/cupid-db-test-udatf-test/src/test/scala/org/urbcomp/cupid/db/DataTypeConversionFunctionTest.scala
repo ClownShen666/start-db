@@ -40,7 +40,11 @@ class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToBoolean") {
     executeQueryCheck("select castToBoolean('true')", List(true))
+    executeQueryCheck("select castToBoolean('TRUE')", List(true))
     executeQueryCheck("select castToBoolean('false')", List(false))
+    executeQueryCheck("select castToBoolean('FALSE')", List(false))
+    executeQueryCheck("select castToBoolean(null)", List(null))
+    executeQueryCheck("select castToBoolean('notaboolean')", List(null))
   }
 
   test("castToString") {

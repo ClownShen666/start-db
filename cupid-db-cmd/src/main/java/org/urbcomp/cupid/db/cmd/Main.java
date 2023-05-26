@@ -38,6 +38,7 @@ public class Main {
     private static class CmdArg {
         String username;
         String password;
+        String engine;
         String url = "jdbc:cupid-db:url=http://127.0.0.1:8000";
         // set bigger to show full value, bug it's ugly
         int maxWidth = 100000;
@@ -64,6 +65,9 @@ public class Main {
                 + ", url='"
                 + url
                 + '\''
+                + ", engine='"
+                + engine
+                + '\''
                 + ", maxWidth="
                 + maxWidth
                 + ", batchSize="
@@ -77,11 +81,13 @@ public class Main {
         Assert.isTrue(cmdArg.check(), "missing params: " + cmdArg);
         SOURCE_BATCH_SIZE = cmdArg.batchSize;
         TABLE_MAX_WIDTH = cmdArg.maxWidth;
+
         Map<String, String> paramKv = new HashMap<>(8);
         paramKv.put("-ac", StartApplication.class.getCanonicalName());
         paramKv.put("-n", cmdArg.username);
         paramKv.put("-p", cmdArg.password);
         paramKv.put("-u", cmdArg.url);
+        paramKv.put("-engine", cmdArg.engine);
         String[] startArgs = new String[paramKv.size() * 2];
         int i = -1;
         for (Map.Entry<String, String> e : paramKv.entrySet()) {
@@ -111,6 +117,9 @@ public class Main {
                     break;
                 case "-r":
                     cmdArg.url = args[++i];
+                    break;
+                case "-engine":
+                    cmdArg.engine = args[++i];
                     break;
                 case "-maxWidth":
                     cmdArg.maxWidth = Integer.parseInt(args[++i]);
