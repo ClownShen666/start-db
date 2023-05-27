@@ -33,7 +33,12 @@ class timestampToLong extends AbstractUdf {
     * @param ts timestamp
     * @return long instance
     */
-  def evaluate(ts: Timestamp): Long = ts.getTime
+  def evaluate(ts: Timestamp): java.lang.Long = {
+    Option(ts) match {
+      case Some(s) => s.getTime
+      case _       => null
+    }
+  }
 
   /**
     * Convert the timestamp string to a Long instance
@@ -42,14 +47,16 @@ class timestampToLong extends AbstractUdf {
     * @return long instance
     */
   @throws[ParseException]
-  def evaluate(tsStr: String): Long = {
-    val toTimestamp = new toTimestamp
-    val timestamp = toTimestamp.evaluate(tsStr)
-    timestamp.getTime
+  def evaluate(tsStr: String): java.lang.Long = {
+    Option(tsStr) match {
+      case Some(s) => (new toTimestamp).evaluate(tsStr).getTime
+      case _       => null
+    }
+
   }
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: Timestamp => Long = evaluate
+  def udfWrapper: Timestamp => java.lang.Long = evaluate
 
-  def udfWrapper2: String => Long = evaluate
+  def udfWrapper2: String => java.lang.Long = evaluate
 }

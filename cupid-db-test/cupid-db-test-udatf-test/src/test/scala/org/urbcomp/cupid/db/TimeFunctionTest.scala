@@ -46,6 +46,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select timestampToLong('" + DEFAULT_TIME_STR + "')",
       List(DEFAULT_TIMESTAMP.getTime)
     )
+    executeQueryCheck("select timestampToLong(null)", List(null))
   }
 
   test("timestampToLong(timestamp)") {
@@ -119,6 +120,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("week") {
     executeQueryCheck("select week('" + DEFAULT_TIME_STR + "')", List(20))
+    executeQueryCheck("select week(null)", List(null))
   }
 
   test("month") {
@@ -127,6 +129,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("year") {
     executeQueryCheck("select year('" + DEFAULT_TIME_STR + "')", List(2021))
+    executeQueryCheck("select year(null)", List(null))
   }
 
   test("dayOfMonth") {
