@@ -31,12 +31,12 @@ class st_WGS84ToBD09 extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
+  lazy val transformer = new WGS84ToBD09Transformer
+
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
-
-  val transformer = new WGS84ToBD09Transformer
 
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null

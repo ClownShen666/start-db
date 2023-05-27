@@ -31,12 +31,12 @@ class st_GCJ02ToBD09 extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
+  lazy val transformer = new GCJ02ToBD09Transformer
+
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new GCJ02ToBD09Transformer, st)
   }
-
-  val transformer = new GCJ02ToBD09Transformer
 
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null

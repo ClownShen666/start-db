@@ -31,11 +31,12 @@ class st_BD09ToGCJ02 extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
+  lazy val transformer = new BD09ToGCJ02Transformer
+
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new BD09ToGCJ02Transformer, st)
   }
-  val transformer = new BD09ToGCJ02Transformer
 
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null
@@ -46,6 +47,7 @@ class st_BD09ToGCJ02 extends AbstractUdf {
     if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
+
   def evaluate(st: RoadSegment): RoadSegment = {
     if (st == null) return null
     transformer.roadSegmentTransform(st)

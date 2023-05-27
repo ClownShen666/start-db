@@ -31,12 +31,12 @@ class st_WGS84ToGCJ02 extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
+  lazy val transformer = new WGS84ToGCJ02Transformer
+
   def evaluate(st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new WGS84ToGCJ02Transformer, st)
   }
-
-  val transformer = new WGS84ToGCJ02Transformer
 
   def evaluate(st: Trajectory): Trajectory = {
     if (st == null) return null
