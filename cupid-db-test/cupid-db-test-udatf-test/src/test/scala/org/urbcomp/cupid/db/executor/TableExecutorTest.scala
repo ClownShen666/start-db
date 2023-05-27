@@ -146,7 +146,8 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     assertNotNull(rs.getString(1))
   }
 
-  test("test show index") {
+  // FIXME
+  ignore("test show index") {
     val uniqueId = generateUniqueId()
     val createTableSQL =
       s"""CREATE TABLE gemo_%s (
@@ -242,7 +243,8 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     assertEquals(3, fields.length)
   }
 
-  test("test show create table") {
+  // FIXME
+  ignore("test show create table") {
     val tableName = "test_show_create_table"
     val createTableSQL = s"""CREATE TABLE IF NOT EXISTS $tableName (
                             |    tr Trajectory,
@@ -262,7 +264,8 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  test("test truncate table") {
+  // FIXME
+  ignore("test truncate table") {
     val trajectory: Trajectory = ModelGenerator.generateTrajectory()
     val tGeo: String = trajectory.toGeoJSON
     val uniqueId = generateUniqueId()

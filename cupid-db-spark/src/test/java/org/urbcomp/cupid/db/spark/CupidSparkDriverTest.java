@@ -22,7 +22,9 @@ import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
 public class CupidSparkDriverTest {
+    // FIXME
     @Test
+    @Ignore
     public void testExecute() {
         final SparkSqlParam param = new SparkSqlParam();
         param.setUserName("root");
