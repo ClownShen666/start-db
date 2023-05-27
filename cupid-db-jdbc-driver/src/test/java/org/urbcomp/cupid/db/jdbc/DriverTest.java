@@ -24,16 +24,23 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
+/**
+ * Note:
+ * These tests need to run after cupid server started
+ */
 @Ignore
 public class DriverTest {
+
+    private final static String DEFAULT_USER = "root";
+    private final static String DEFAULT_PASSWORD = "cupid-db";
 
     @Test
     public void testDriver() throws SQLException {
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",
-                "cupid_db",
-                "cupid-db"
+                DEFAULT_USER,
+                DEFAULT_PASSWORD
             )
         ) {
             final Statement stmt = conn.createStatement();
@@ -49,8 +56,8 @@ public class DriverTest {
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000",
-                "cupid_db",
-                "cupid-db"
+                DEFAULT_USER,
+                DEFAULT_PASSWORD
             )
         ) {
             final Statement stmt = conn.createStatement();
@@ -70,8 +77,8 @@ public class DriverTest {
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000",
-                "cupid_db",
-                "cupid-db"
+                DEFAULT_USER,
+                DEFAULT_PASSWORD
             )
         ) {
             final Statement stmt = conn.createStatement();
@@ -94,8 +101,8 @@ public class DriverTest {
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000",
-                "cupid_db",
-                "cupid-db"
+                DEFAULT_USER,
+                DEFAULT_PASSWORD
             )
         ) {
             final Statement stmt = conn.createStatement();
@@ -114,8 +121,8 @@ public class DriverTest {
     @Test
     public void testBatchInsert() throws SQLException {
         final Properties info = new Properties();
-        info.put("user", "cupid_db");
-        info.put("password", "cupid-db");
+        info.put("user", DEFAULT_USER);
+        info.put("password", DEFAULT_PASSWORD);
         info.put("db", "default");
         try (
             Connection conn = DriverManager.getConnection(
@@ -140,8 +147,8 @@ public class DriverTest {
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",
-                "cupid_db",
-                "cupid-db"
+                DEFAULT_USER,
+                DEFAULT_PASSWORD
             )
         ) {
             final Statement stmt = conn.createStatement();
@@ -157,8 +164,8 @@ public class DriverTest {
     @Test
     public void testUseSpark() throws SQLException {
         final Properties conf = new Properties();
-        conf.put("user", "cupid_db");
-        conf.put("password", "cupid-db");
+        conf.put("user", DEFAULT_USER);
+        conf.put("password", DEFAULT_PASSWORD);
         conf.put("engine", "spark_local");
         conf.put("spark.local", "true");
         conf.put("spark.async", "false");

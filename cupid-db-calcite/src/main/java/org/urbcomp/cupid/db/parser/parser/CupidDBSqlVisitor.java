@@ -47,6 +47,13 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitStmt(CupidDBSqlParser.StmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#createTableLikeStmt}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCreateTableLikeStmt(CupidDBSqlParser.CreateTableLikeStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#dbDotTable}.
      * @param ctx the parse tree
      * @return the visitor result

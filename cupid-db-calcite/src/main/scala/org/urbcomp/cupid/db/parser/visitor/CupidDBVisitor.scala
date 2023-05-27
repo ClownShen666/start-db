@@ -28,6 +28,7 @@ import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlCreateUs
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlCupidCreateTableLike,
   SqlDropIndex,
   SqlIndexDeclaration,
   SqlRenameTable,
@@ -71,6 +72,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
   override def visitStmt(ctx: StmtContext): SqlNode = ctx.getChild(0) match {
     case c: SelectStmtContext          => visitSelectStmt(c)
     case c: CreateTableStmtContext     => visitCreateTableStmt(c)
+    case c: CreateTableLikeStmtContext => visitCreateTableLikeStmt(c)
     case c: ShowTablesStmtContext      => visitShowTablesStmt(c)
     case c: CreateDatabaseStmtContext  => visitCreateDatabaseStmt(c)
     case c: DropDatabaseStmtContext    => visitDropDatabaseStmt(c)
@@ -736,6 +738,15 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       new SqlNodeList(indexList, pos),
       query
     )
+  }
+
+  override def visitCreateTableLikeStmt(ctx: CreateTableLikeStmtContext): SqlNode = {
+    val targetTableName = visitIdent(ctx.table_name(0).qident().ident().get(0))
+    val sourceTableName = visitIdent(ctx.table_name(1).qident().ident().get(0))
+
+    val ifNotExists = null != ctx.T_EXISTS()
+
+    new SqlCupidCreateTableLike(pos, false, ifNotExists, targetTableName, sourceTableName)
   }
 
   override def visitDescribeStmt(ctx: DescribeStmtContext): SqlNode = {

@@ -23,6 +23,7 @@ import org.urbcomp.cupid.db.parser.dcl.{SqlCreateUser, SqlLoadData}
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlCupidCreateTableLike,
   SqlDropIndex,
   SqlRenameTable,
   SqlTruncateTable,
@@ -38,25 +39,26 @@ import org.urbcomp.cupid.db.parser.dql.{
 
 class CupidDBExecutorFactory extends BaseExecutorFactory {
   override def convertExecutor(node: SqlNode): BaseExecutor = node match {
-    case n: SqlShowCreateTable  => ShowCreateTableExecutor(n)
-    case n: SqlUpdate           => UpdateExecutor(n)
-    case n: SqlInsert           => InsertExecutor(n)
-    case n: SqlDelete           => DeleteExecutor(n)
-    case n: SqlCreateDatabase   => CreateDatabaseExecutor(n)
-    case n: SqlCupidCreateTable => CreateTableExecutor(n)
-    case _: SqlShowDatabases    => ShowDatabaseExecutor()
-    case _: SqlShowStatus       => ShowStatusExecutor()
-    case n: SqlUseDatabase      => UseDbExecutor(n)
-    case n: SqlCreateUser       => CreateUserExecutor(n)
-    case n: SqlShowTables       => ShowTablesExecutor(n)
-    case n: SqlShowIndex        => ShowIndexExecutor(n)
-    case n: SqlDropTable        => DropTableExecutor(n)
-    case n: SqlDropIndex        => DropIndexExecutor(n)
-    case n: SqlDescribeTable    => DescribeTableExecutor(n)
-    case n: SqlDropSchema       => DropDatabaseExecutor(n)
-    case n: SqlTruncateTable    => TruncateTableExecutor(n)
-    case n: SqlLoadData         => LoadDataExecutor(n)
-    case n: SqlRenameTable      => RenameTableExecutor(n)
-    case _                      => throw new IllegalStateException("Not Support SQL")
+    case n: SqlShowCreateTable      => ShowCreateTableExecutor(n)
+    case n: SqlUpdate               => UpdateExecutor(n)
+    case n: SqlInsert               => InsertExecutor(n)
+    case n: SqlDelete               => DeleteExecutor(n)
+    case n: SqlCreateDatabase       => CreateDatabaseExecutor(n)
+    case n: SqlCupidCreateTable     => CreateTableExecutor(n)
+    case _: SqlShowDatabases        => ShowDatabaseExecutor()
+    case _: SqlShowStatus           => ShowStatusExecutor()
+    case n: SqlUseDatabase          => UseDbExecutor(n)
+    case n: SqlCreateUser           => CreateUserExecutor(n)
+    case n: SqlShowTables           => ShowTablesExecutor(n)
+    case n: SqlShowIndex            => ShowIndexExecutor(n)
+    case n: SqlDropTable            => DropTableExecutor(n)
+    case n: SqlDropIndex            => DropIndexExecutor(n)
+    case n: SqlDescribeTable        => DescribeTableExecutor(n)
+    case n: SqlDropSchema           => DropDatabaseExecutor(n)
+    case n: SqlTruncateTable        => TruncateTableExecutor(n)
+    case n: SqlRenameTable          => RenameTableExecutor(n)
+    case n: SqlCupidCreateTableLike => CreateTableLikeExecutor(n)
+    case n: SqlLoadData             => LoadDataExecutor(n)
+    case _                          => throw new IllegalStateException("Not Support SQL")
   }
 }
