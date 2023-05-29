@@ -52,7 +52,7 @@ public class CupidDBSQLSamples {
         "CREATE DATABASE IF NOT EXISTS database_name;";
 
     // Use database
-    public static final String USE_DATABASE_SAMPLE = "USE DATABASE database_name;";
+    public static final String USE_DATABASE_SAMPLE = "USE database_name;";
 
     // Drop database
     public static final String DROP_DATABASE_SAMPLE = "DROP DATABASE database_name;";

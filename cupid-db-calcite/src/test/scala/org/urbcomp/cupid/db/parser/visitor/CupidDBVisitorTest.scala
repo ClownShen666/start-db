@@ -85,9 +85,8 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertFalse(node.ifNotExists)
   }
 
-  // FIXME
-  ignore("convert use dababase statement to SqlNode") {
-    val parsed = driver.parseSql(CupidDBSQLSamples.USE_DATABASE_SAMPLE)
+  test("convert use database statement to SqlNode") {
+    val parsed = driver.parseSql("use database_name")
     val node = parsed.asInstanceOf[SqlUseDatabase]
     assertEquals("database_name", node.getFullDatabaseName);
   }
@@ -106,15 +105,13 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals("database_name", node.name.names.get(0))
   }
 
-  // FIXME
-  ignore("convert drop table statement to SqlNode") {
+  test("convert drop table statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.DROP_TABLE_IF_EXISTS_SAMPLE)
     val node = parsed.asInstanceOf[SqlDropTable]
     assertEquals(SqlKind.DROP_TABLE, node.getKind)
     assertEquals(tableName, node.name.names.get(0))
   }
 
-  // FIXME
   ignore("convert drop index statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.DROP_INDEX_SAMPLE)
     val node = parsed.asInstanceOf[SqlDropIndex]
