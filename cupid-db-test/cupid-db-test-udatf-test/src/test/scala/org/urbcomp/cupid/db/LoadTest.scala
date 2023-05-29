@@ -16,27 +16,70 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.tools.CitibikeDataUtils
 
 import java.util.UUID
 
 class LoadTest extends AbstractCalciteSparkFunctionTest {
-  test("test load") {
-    val path = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
+
+  val PATH
+      : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
+
+  test("test load - single column - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
     val loadSql =
-      s"""LOAD CSV INPATH $path TO $randTableName (
-         |  idx idx, ride_id ride_id,
-         |  rideable_type rideable_type,
-         |  start_point st_makePoint(start_lat, start_lng))
+      s"""LOAD CSV INPATH $PATH TO $randTableName (
+         |  idx _c1)
          |  WITH HEADER""".stripMargin
-    val querySql = s"select count(1) from $randTableName"
+    val querySql = s"select count(idx) from $randTableName"
 
     val stmt = connect.createStatement()
     stmt.execute(loadSql)
 
     val resultSet = stmt.executeQuery(querySql)
-    assertNotNull(resultSet)
+    resultSet.next()
+    assertEquals(resultSet.getInt(1), 10)
+  }
+
+  test("test load - multiple columns - no udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val loadSql =
+      s"""LOAD CSV INPATH $PATH TO $randTableName (
+         |  idx _c1,
+         |  ride_id _c2,
+         |  rideable_type _c3)
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select ride_id, rideable_type from $randTableName where idx = 1"
+
+    val stmt = connect.createStatement()
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assertEquals(
+      Array(resultSet.getString(1), resultSet.getString(2)),
+      Array("8B88A6F8158F650D", "electric_bike")
+    )
+  }
+
+  test("test load - multiple columns - with udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val loadSql =
+      s"""LOAD CSV INPATH $PATH TO $randTableName (
+         |  idx _c1,
+         |  ride_id _c2,
+         |  start_point st_makePoint(_c10, _c11))
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select start_point from $randTableName where idx = 2"
+
+    val stmt = connect.createStatement()
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assertEquals(resultSet.getObject("1"), "Point(40.646475, -74.026081)")
   }
 }
