@@ -20,6 +20,7 @@ import io.grpc.Channel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
+import org.urbcomp.cupid.db.config.DynamicConfig;
 
 import java.io.Serializable;
 
@@ -30,7 +31,11 @@ public class RemoteClient implements Serializable {
     private final StreamObserver<GrpcRemote.RowRequest> requestStreamObserver;
 
     public RemoteClient() {
-        this(ManagedChannelBuilder.forAddress("localhost", 8848).usePlaintext().build());
+        this(
+            ManagedChannelBuilder.forAddress("localhost", DynamicConfig.getRemoteServerPort())
+                .usePlaintext()
+                .build()
+        );
     }
 
     public RemoteClient(String host, int port) {

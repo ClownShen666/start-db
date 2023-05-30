@@ -18,6 +18,7 @@ package org.urbcomp.cupid.db.spark.livy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.spark.ISparkSubmitter;
 import org.urbcomp.cupid.db.spark.SubmitResult;
@@ -169,18 +170,21 @@ public class LivySubmitter implements ISparkSubmitter {
         log.warn("Check Livy Session wait session exceed maxWaitTimeMs={}", maxWaitTimeMs);
     }
 
-    private String buildSqlId() {
-        return System.nanoTime() + SPLITTER + hostname;
+    private String buildSqlId(String sql) {
+        String digest = DigestUtils.md5Hex(sql);
+        return System.currentTimeMillis() / 1000 + SPLITTER + digest;
     }
 
     @Override
     public SubmitResult submit(SparkSqlParam param) {
         sessionReadLock.lock();
         try {
-            final String sqlId = buildSqlId();
+            final String sqlId = buildSqlId(param.getSql());
             param.setSqlId(sqlId);
+            param.setRemoteHost(DynamicConfig.getRemoteServerHostname());
+            param.setRemotePort(DynamicConfig.getRemoteServerPort());
             String code = buildCode(param);
-            log.info("Submitting:{}", param);
+            log.info("Submitting: {}", param);
             final LivyStatementResult res = restApi.executeStatement(
                 sessionId,
                 LivyStatementParam.builder().kind(DEFAULT_KIND).code(code).build()
