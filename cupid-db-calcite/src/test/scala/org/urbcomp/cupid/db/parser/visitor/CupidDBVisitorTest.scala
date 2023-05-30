@@ -120,8 +120,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals("tableName", node.tableName.names.get(0))
   }
 
-  // FIXME
-  ignore("convert delete statement to SqlNode") {
+  test("convert delete statement to SqlNode") {
     val sql = CupidDBSQLSamples.DELETE_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlDelete]

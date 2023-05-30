@@ -64,7 +64,7 @@ public class CupidDBSQLSamples {
 
     // Delete sample
     public static final String DELETE_SAMPLE =
-        "DELETE FROM table_name WHERE attribute='attribute_value'";
+        "DELETE FROM table_name WHERE attr = 'attribute_value'";
 
     // Show create table
     public static final String SHOW_CREATE_TABLE_SAMPLE = "SHOW CREATE TABLE table_name";
