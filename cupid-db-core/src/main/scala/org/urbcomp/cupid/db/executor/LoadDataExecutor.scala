@@ -25,8 +25,6 @@ import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlLoadData
 import org.urbcomp.cupid.db.util.MetadataUtil
 
 import java.io.File
-import java.sql.ResultSet
-import java.util
 import java.util.Scanner
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
@@ -46,16 +44,16 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
     // Check mapping
     val tableFields =
       MetadataAccessUtil.getFields(userName, dbName, tableName).asScala.map(_.getName).toArray
-    val mappingCorrectness = n.mappings.getList.asScala
+    val mappingWrongCol = n.mappings.getList.asScala
       .map(sqlNode => {
         val field = sqlNode.asInstanceOf[SqlColumnMappingDeclaration].field.names.get(0)
-        tableFields.contains(field)
+        (field, tableFields.contains(field))
       })
-      .toArray
-      .asInstanceOf[Array[Boolean]]
-    if (mappingCorrectness.contains(false)) {
+      .filter(fieldExist => !fieldExist._2)
+      .toMap
+    if (mappingWrongCol.nonEmpty) {
       throw new IllegalArgumentException(
-        s"Fields ${mappingCorrectness.mkString(",")} do not exist."
+        s"Fields ${mappingWrongCol.keySet.mkString(",")} do not exist."
       )
     }
 
@@ -129,7 +127,7 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
     MetadataResult.buildDDLResult(affectedRows)
   }
 
-  private def executeQuery(queryObj: String): ResultSet = {
+  private def executeQuery(queryObj: String) = {
     val connection = CalciteHelper.createConnection()
     val statement = connection.createStatement()
     statement.executeQuery("select %s".format(queryObj))

@@ -28,6 +28,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
   test("test load - single column - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql = s"create table if not exists $randTableName"
     val loadSql =
       s"""LOAD CSV INPATH $PATH TO $randTableName (
          |  idx _c1)
@@ -35,6 +36,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val querySql = s"select count(idx) from $randTableName"
 
     val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
     stmt.execute(loadSql)
 
     val resultSet = stmt.executeQuery(querySql)
@@ -44,6 +46,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
   test("test load - multiple columns - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql = s"create table if not exists $randTableName"
     val loadSql =
       s"""LOAD CSV INPATH $PATH TO $randTableName (
          |  idx _c1,
@@ -54,6 +57,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val querySql = s"select ride_id, rideable_type from $randTableName where idx = 1"
 
     val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
     stmt.execute(loadSql)
 
     val resultSet = stmt.executeQuery(querySql)
@@ -66,6 +70,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
   test("test load - multiple columns - with udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql = s"create table if not exists $randTableName"
     val loadSql =
       s"""LOAD CSV INPATH $PATH TO $randTableName (
          |  idx _c1,
@@ -76,6 +81,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val querySql = s"select start_point from $randTableName where idx = 2"
 
     val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
     stmt.execute(loadSql)
 
     val resultSet = stmt.executeQuery(querySql)
