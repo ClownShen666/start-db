@@ -17,8 +17,6 @@
 package org.urbcomp.cupid.db.spark.livy;
 
 import org.junit.Ignore;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.urbcomp.cupid.db.spark.SubmitResult;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
@@ -28,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 
-@RunWith(MockitoJUnitRunner.class)
+// @RunWith(MockitoJUnitRunner.class)
 public class LivySubmitterTest {
 
     // @Mock
