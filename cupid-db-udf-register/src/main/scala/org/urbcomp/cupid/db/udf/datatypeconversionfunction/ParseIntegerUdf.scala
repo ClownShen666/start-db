@@ -26,13 +26,9 @@ class ParseIntegerUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(num: AnyRef): java.lang.Integer = {
-    if (num == null) null
-    else {
-      try {
-        num.toString.toString.toInt
-      } catch {
-        case _ => null
-      }
+    Option(num) match {
+      case Some(n) => n.toString.toInt
+      case _       => null
     }
   }
 

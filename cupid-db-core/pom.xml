@@ -29,6 +29,10 @@
         </dependency>
         <dependency>
             <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-spark-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-calcite</artifactId>
             <version>${project.parent.version}</version>
             <exclusions>
@@ -164,7 +168,7 @@
             <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
             <version>${geomesa.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>org.locationtech.geomesa</groupId>
             <artifactId>geomesa-spark-sql_${scala.binary.version}</artifactId>
             <version>${geomesa.version}</version>

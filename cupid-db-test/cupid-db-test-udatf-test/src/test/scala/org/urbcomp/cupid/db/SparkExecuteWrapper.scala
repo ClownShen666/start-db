@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db
 
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
 import org.urbcomp.cupid.db.util.SparkSqlParam
@@ -32,10 +33,23 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setDbName("default")
   param.setExportType(DataExportType.PRINT)
   param.setLocal(true)
+  var sparkSession: SparkSession = null
 
-  def executeSql(sql: String): Unit = {
+  def executeSql(sql: String): Dataset[Row] = {
+    if (sparkSession == null) {
+      sparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)
+    }
     param.setSql(sql)
-    SparkQueryExecutor.execute(param, null)
+    sparkSession.sql(sql)
   }
 
+  /**
+    *Description: Single case, close the current sparkSession after execution
+   **/
+  def stop(): Unit = {
+    if (sparkSession != null) {
+      sparkSession.stop()
+      sparkSession = null
+    }
+  }
 }

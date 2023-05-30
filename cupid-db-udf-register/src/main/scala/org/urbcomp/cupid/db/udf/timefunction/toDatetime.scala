@@ -16,10 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
+
 import java.text.ParseException
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import java.time.{DateTimeException, LocalDateTime}
-import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
+
 class toDatetime {
 
   /**
@@ -32,6 +34,9 @@ class toDatetime {
     */
   @throws[DateTimeException]
   def evaluate(dateString: String, format: String): LocalDateTime = {
+    if (dateString == null || format == null) {
+      return null
+    }
     var DateString = dateString
     var Format = format
     if (dateString.length == 10) {
@@ -76,5 +81,11 @@ class toDatetime {
       )
     localDateTime
   }
+
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
+
+  def udfWrapper: (String, String) => LocalDateTime = evaluate
+
+  def udfWrapper2: String => LocalDateTime = evaluate
 
 }

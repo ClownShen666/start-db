@@ -17,16 +17,9 @@
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import org.locationtech.jts.geom.Point
-import org.urbcomp.cupid.db.model.point.GPSPoint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.util.GeoFunctions
-
-import java.math.BigDecimal
-import scala.collection.JavaConverters.seqAsJavaListConverter
-import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
-import scala.collection.mutable.ListBuffer
 
 class st_traj_pointNUdf extends AbstractUdf {
 
@@ -35,7 +28,7 @@ class st_traj_pointNUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(trajectory: Trajectory, n: Int): Point = {
-    if (trajectory == null || n == null) null
+    if (trajectory == null) null
     else trajectory.getGPSPointList.get(n)
   }
   def udfSparkEntries: List[String] = List("udfWrapper1")

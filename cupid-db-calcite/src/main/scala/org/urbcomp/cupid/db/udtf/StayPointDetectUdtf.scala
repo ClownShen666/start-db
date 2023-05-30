@@ -24,16 +24,16 @@ import org.apache.hadoop.hive.serde2.objectinspector.{
   ObjectInspectorFactory,
   StructObjectInspector
 }
-import org.apache.spark.sql.TrajectoryUDT
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.locationtech.jts.geom.MultiPoint
-import org.locationtech.jts.io.geojson.GeoJsonWriter
 import org.urbcomp.cupid.db.model.point.SpatialPoint
 import org.urbcomp.cupid.db.udf.DataEngine
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
+import org.urbcomp.cupid.serializer.serializers.TrajectoryBS
 
+import java.io.ByteArrayInputStream
 import java.util
 import scala.collection.JavaConverters._
 import scala.collection.convert.ImplicitConversions._
@@ -67,10 +67,9 @@ class StayPointDetectUdtf extends AbstractUdtf with Serializable {
   override def udtfImpl(objects: Seq[AnyRef]): Array[Array[AnyRef]] = {
     val trajectory = objects.head match {
       case traj: Trajectory => traj
-      case binaryArray: java.util.ArrayList[Byte] =>
-        TrajectoryUDT.deserialize(
-          new GenericInternalRow(binaryArray.toArray.asInstanceOf[Array[Any]])
-        )
+      case list: java.util.ArrayList[Array[Byte]] =>
+        val buf = list.get(0)
+        new TrajectoryBS().read(new ByteArrayInputStream(buf), classOf[Trajectory])
       case data: Any => throw new Exception("Unrecognizable data " + data)
     }
     val d = objects(1).toString.toDouble

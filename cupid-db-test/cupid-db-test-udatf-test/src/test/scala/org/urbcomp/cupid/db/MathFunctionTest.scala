@@ -16,139 +16,64 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
-
 import java.math.BigDecimal
 class MathFunctionTest extends AbstractCalciteSparkFunctionTest {
-
-  /**
-    * test for log
-    */
   test("log") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log(3.4,9.6)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(1.8481847568028238), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select log(null,null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck(
+      "select log(3.4,9.6) , log(null,null)",
+      List(BigDecimal.valueOf(1.848184756802823800), null)
+    )
   }
 
-  /**
-    * test for pi
-    */
   test("pi") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select pi()")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(Math.PI), resultSet.getObject(1))
+    executeQueryCheck("select pi()", List(BigDecimal.valueOf(Math.PI)))
   }
 
-  /**
-    * test for log1p
-    */
   test("log1p") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log1p(1.5)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(0.9162907318741551), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select log1p(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck(
+      "select log1p(1.5),log1p(null)",
+      List(BigDecimal.valueOf(0.9162907318741551), null)
+    )
   }
 
-  /**
-    * test for log2
-    */
   test("log2") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select log2(8.6)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(3.1043366598147353), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select log2(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck(
+      "select log2(8.6), log2(null)",
+      List(BigDecimal.valueOf(3.1043366598147353), null)
+    )
   }
 
-  /**
-    * test for pow
-    */
   test("pow") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select pow(0.5,3)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(0.125), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select pow(null,null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-
+    executeQueryCheck("select pow(0.5,3), pow(null,null)", List(BigDecimal.valueOf(0.125), null))
   }
 
-  /**
-    * test for toRadians
-    */
   test("toRadians") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select toRadians(90)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(1.5707963267948966), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select toRadians(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
-
+    executeQueryCheck(
+      "select toRadians(90), toRadians(null)",
+      List(BigDecimal.valueOf(1.5707963267948966), null)
+    )
   }
 
-  /**
-    * test for toDegrees
-    */
   test("toDegrees") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select toDegrees(1)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(57.29577951308232), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select toDegrees(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck(
+      "select toDegrees(1), toDegrees(null)",
+      List(BigDecimal.valueOf(57.29577951308232), null)
+    )
   }
 
   test("abs") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select abs(-1.9)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(1.9), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select abs(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select abs(-1.9),abs(null)", List(BigDecimal.valueOf(1.9), null))
   }
 
   test("floor") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select floor(1.9)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(1.0), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select floor(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select floor(1.9), floor(null)", List(BigDecimal.valueOf(1.0), null))
   }
 
   test("ceil") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select ceil(1.9)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(2.0), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select ceil(null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select ceil(1.9), ceil(null)", List(BigDecimal.valueOf(2.0), null))
   }
 
   test("mod") {
-    val statement = connect.createStatement()
-    val resultSet = statement.executeQuery("select mod(2.4,5)")
-    resultSet.next()
-    assertEquals(BigDecimal.valueOf(2.4), resultSet.getObject(1))
-    val resultSet2 = statement.executeQuery("select mod(null,null)")
-    resultSet2.next()
-    assertEquals(null, resultSet2.getObject(1))
+    executeQueryCheck("select mod(2.4,5), mod(null,null)", List(BigDecimal.valueOf(2.4), null))
   }
-
 }

@@ -20,17 +20,10 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
-import org.urbcomp.cupid.db.model.point.GPSPoint
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
-import org.urbcomp.cupid.db.model.trajectory.{MapMatchedTrajectory, Trajectory}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.util.GeoFunctions
-
-import java.math.BigDecimal
-import scala.collection.JavaConverters.seqAsJavaListConverter
-import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
-import scala.collection.mutable.ListBuffer
 
 class st_traj_mapMatchUdf extends AbstractUdf {
 

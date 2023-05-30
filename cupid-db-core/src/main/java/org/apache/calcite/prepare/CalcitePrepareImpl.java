@@ -698,6 +698,14 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
             Hook.PARSE_TREE.run(new Object[] { query.sql, sqlNode });
 
+            // Currently spark engine only supports load & select
+            final SqlParam sqlParam = SqlParam.CACHE.get();
+            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())
+                && (sqlNode instanceof SqlLoadData || sqlNode instanceof SqlSelect)) {
+                sqlParam.setSql(query.sql);
+                return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+            }
+
             CupidDBExecutorFactory startDBExecutorFactory = new CupidDBExecutorFactory();
             if (sqlNode.getKind().belongsTo(SqlKind.DDL)) {
 
@@ -707,7 +715,9 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     || sqlNode instanceof SqlDropTable
                     || sqlNode instanceof SqlDropIndex
                     || sqlNode instanceof SqlDropSchema
-                    || sqlNode instanceof SqlTruncateTable) {
+                    || sqlNode instanceof SqlTruncateTable
+                    || sqlNode instanceof SqlRenameTable
+                    || sqlNode instanceof SqlCupidCreateTableLike) {
                     return startDBExecutorFactory.convertExecutor(sqlNode).execute();
                 }
 
@@ -725,13 +735,6 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     null,
                     Meta.StatementType.OTHER_DDL
                 );
-            }
-
-            final SqlParam sqlParam = SqlParam.CACHE.get();
-            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())
-                | sqlNode instanceof SqlLoadData) {
-                sqlParam.setSql(query.sql);
-                return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
             }
 
             // modify start

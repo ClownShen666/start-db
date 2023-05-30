@@ -28,8 +28,10 @@ import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlCreateUs
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
+  SqlCupidCreateTableLike,
   SqlDropIndex,
   SqlIndexDeclaration,
+  SqlRenameTable,
   SqlTruncateTable,
   SqlUseDatabase
 }
@@ -70,6 +72,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
   override def visitStmt(ctx: StmtContext): SqlNode = ctx.getChild(0) match {
     case c: SelectStmtContext          => visitSelectStmt(c)
     case c: CreateTableStmtContext     => visitCreateTableStmt(c)
+    case c: CreateTableLikeStmtContext => visitCreateTableLikeStmt(c)
     case c: ShowTablesStmtContext      => visitShowTablesStmt(c)
     case c: CreateDatabaseStmtContext  => visitCreateDatabaseStmt(c)
     case c: DropDatabaseStmtContext    => visitDropDatabaseStmt(c)
@@ -87,6 +90,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     case c: UpdateStmtContext          => visitUpdateStmt(c)
     case c: CreateUserStmtContext      => visitCreateUserStmt(c)
     case c: LoadStmtContext            => visitLoadStmt(c)
+    case c: RenameTableStmtContext     => visitRenameTableStmt(c)
     case _                             => throw new IllegalArgumentException("unexpected sql")
   }
 
@@ -110,12 +114,37 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       .toList
       .asJava
     val mappings = new SqlNodeList(mappingItems, pos)
-
+    var delimiter = ","
+    var hasDelimiter = false
+    if (ctx.csv_file_options() != null) {
+      if (ctx.csv_file_options().T_DELIMITER() != null) {
+        delimiter = StringUtil.dropQuota(ctx.csv_file_options().string(0).getText)
+        hasDelimiter = true
+      }
+    }
+    var quotes = "\""
+    var hasQuotes = false
+    if (ctx.csv_file_options() != null) {
+      if (ctx.csv_file_options().T_QUOTES() != null) {
+        quotes = StringUtil.dropQuota(ctx.csv_file_options().string(1).getText)
+        hasQuotes = true
+      }
+    }
     var hasHeader = true
     if (ctx.csv_file_format().T_WITHOUT() != null) {
       hasHeader = false
     }
-    new SqlLoadData(pos, path, tableName, mappings, hasHeader)
+    new SqlLoadData(
+      pos,
+      path,
+      tableName,
+      mappings,
+      delimiter,
+      quotes,
+      hasDelimiter,
+      hasQuotes,
+      hasHeader
+    )
   }
 
   override def visitTable_name(ctx: Table_nameContext): SqlNode = {
@@ -619,40 +648,12 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       }
     })
 
-    if (ctx.ident().getText.equalsIgnoreCase("fibonacci")) {
-      val nodeList = List(new SqlIdentifier("result", pos)).asJava
+    val text = ctx.ident().getText.toLowerCase
+    if (udtfOutputColumns.contains(text)) {
+      val nodeList = udtfOutputColumns(text).map(new SqlIdentifier(_, pos)).asJava
       new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_timeIntervalSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_hybridSegment")) {
-      val nodeList = List(new SqlIdentifier("subTrajectory", pos)).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_traj_stayPointDetect")) {
-      val nodeList = List(
-        new SqlIdentifier("startTime", pos),
-        new SqlIdentifier("endTime", pos),
-        new SqlIdentifier("gpsPoints", pos)
-      ).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else if (ctx.ident().getText.equalsIgnoreCase("st_dbscan_clustering")
-               || ctx.ident().getText.equalsIgnoreCase("st_kmeans_clustering")) {
-      val nodeList = List(
-        new SqlIdentifier("cluster", pos),
-        new SqlIdentifier("clusterCentroid", pos),
-        new SqlIdentifier("clusterBoundary", pos)
-      ).asJava
-      new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-    } else {
-      val text = ctx.ident().getText.toLowerCase
-      if (udtfOutputColumns.contains(text)) {
-        val nodeList = udtfOutputColumns(text).map(new SqlIdentifier(_, pos)).asJava
-        new SqlBasicCall(SqlStdOperatorTable.AS, Array(res, new SqlNodeList(nodeList, pos)), pos)
-      } else res
-    }
+    } else res
+
   }
 
   override def visitUseStmt(ctx: UseStmtContext): SqlUseDatabase = {
@@ -739,6 +740,15 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     )
   }
 
+  override def visitCreateTableLikeStmt(ctx: CreateTableLikeStmtContext): SqlNode = {
+    val targetTableName = visitIdent(ctx.table_name(0).qident().ident().get(0))
+    val sourceTableName = visitIdent(ctx.table_name(1).qident().ident().get(0))
+
+    val ifNotExists = null != ctx.T_EXISTS()
+
+    new SqlCupidCreateTableLike(pos, false, ifNotExists, targetTableName, sourceTableName)
+  }
+
   override def visitDescribeStmt(ctx: DescribeStmtContext): SqlNode = {
     val targetTable = visitUserDotDbDotTable(ctx.userDotDbDotTable())
     new SqlDescribeTable(pos, targetTable, null)
@@ -776,6 +786,38 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
 
   override def visitShowIndexStmt(ctx: ShowIndexStmtContext): SqlNode = {
     new SqlShowIndex(pos, visitIdent(ctx.tableName().ident()))
+  }
+
+  override def visitRenameTableStmt(ctx: RenameTableStmtContext): SqlNode = {
+    val oldTableName = visitOld_name(ctx.old_name()).asInstanceOf[SqlIdentifier]
+    val newTableName = visitNew_name(ctx.new_name()).asInstanceOf[SqlIdentifier]
+    new SqlRenameTable(pos, oldTableName, newTableName)
+  }
+
+  override def visitOld_name(ctx: Old_nameContext): SqlNode = {
+    val names = ctx
+      .qident()
+      .ident()
+      .asScala
+      .map(ident => {
+        ident.getText
+      })
+      .toList
+      .asJava
+    new SqlIdentifier(names, pos)
+  }
+
+  override def visitNew_name(ctx: New_nameContext): SqlNode = {
+    val names = ctx
+      .qident()
+      .ident()
+      .asScala
+      .map(ident => {
+        ident.getText
+      })
+      .toList
+      .asJava
+    new SqlIdentifier(names, pos)
   }
 
   /////////////////////////////////////////////////////////////////////////

@@ -32,8 +32,11 @@ package object geometrictypeconversionfunction {
 
   def castToPoint(geom: Geometry): Point = {
     if (geom == null) null
-    else if (geom.isInstanceOf[Point]) geom.asInstanceOf[Point]
-    else null
+    else
+      geom match {
+        case point: Point => point
+        case _            => null
+      }
   }
 
   @throws[ParseException]
@@ -47,32 +50,47 @@ package object geometrictypeconversionfunction {
 
   def castToLineString(geom: Geometry): LineString = {
     if (geom == null) null
-    else if (geom.isInstanceOf[LineString]) geom.asInstanceOf[LineString]
-    else null
+    else
+      geom match {
+        case string: LineString => string
+        case _                  => null
+      }
   }
 
   def castToPolygon(geom: Geometry): Polygon = {
     if (geom == null) null
-    else if (geom.isInstanceOf[Polygon]) geom.asInstanceOf[Polygon]
-    else null
+    else
+      geom match {
+        case polygon: Polygon => polygon
+        case _                => null
+      }
   }
 
   def castToMPoint(geom: Geometry): MultiPoint = {
     if (geom == null) null
-    else if (geom.isInstanceOf[MultiPoint]) geom.asInstanceOf[MultiPoint]
-    else null
+    else
+      geom match {
+        case point: MultiPoint => point
+        case _                 => null
+      }
   }
 
   def castToMLineString(geom: Geometry): MultiLineString = {
     if (geom == null) null
-    else if (geom.isInstanceOf[MultiLineString]) geom.asInstanceOf[MultiLineString]
-    else null
+    else
+      geom match {
+        case string: MultiLineString => string
+        case _                       => null
+      }
   }
 
   def castToMPolygon(geom: Geometry): MultiPolygon =
     if (geom == null) null
-    else if (geom.isInstanceOf[MultiPolygon]) geom.asInstanceOf[MultiPolygon]
-    else null
+    else
+      geom match {
+        case polygon: MultiPolygon => polygon
+        case _                     => null
+      }
   @throws[ParseException]
   def geomFromWKT(wktString: String): Geometry = {
     if (wktString == null) null

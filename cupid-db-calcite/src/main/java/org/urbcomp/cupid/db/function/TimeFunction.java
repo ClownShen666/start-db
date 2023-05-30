@@ -29,7 +29,6 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.WeekFields;
 import java.util.Date;
 
 /**
@@ -212,18 +211,6 @@ public class TimeFunction {
     }
 
     /**
-     * get week value of the year
-     * @param dtString datetime string
-     * @return week of the year
-     * @throws DateTimeException parse exception
-     */
-    @CupidDBFunction("week")
-    public int week(String dtString) throws DateTimeException {
-        WeekFields weekFields = WeekFields.ISO;
-        return toDateTime(dtString).get(weekFields.weekOfYear());
-    }
-
-    /**
      * get month of the year
      * @param dtString datetime instance
      * @return month of the year
@@ -232,17 +219,6 @@ public class TimeFunction {
     @CupidDBFunction("month")
     public int month(String dtString) throws DateTimeException {
         return toDateTime(dtString).getMonth().getValue();
-    }
-
-    /**
-     * get year value
-     * @param dtString datetime string
-     * @return year value
-     * @throws DateTimeException parse exception
-     */
-    @CupidDBFunction("year")
-    public int year(String dtString) throws DateTimeException {
-        return toDateTime(dtString).getYear();
     }
 
     /**

@@ -48,7 +48,7 @@ public class SparkSqlParam extends SqlParam {
         this.isLocal = Boolean.parseBoolean(options.getOrDefault("spark.local", "true"));
         this.async = Boolean.parseBoolean(options.getOrDefault("spark.async", "false"));
         this.exportType = DataExportType.valueOf(
-            options.getOrDefault("spark.exportType", "print").toUpperCase()
+            options.getOrDefault("spark.exportType", "local").toUpperCase()
         );
     }
 

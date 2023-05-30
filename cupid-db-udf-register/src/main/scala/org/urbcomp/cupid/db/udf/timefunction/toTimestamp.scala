@@ -22,6 +22,7 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import java.sql.Timestamp
 import java.text.{ParseException, SimpleDateFormat}
 import scala.util.control.Breaks.{break, breakable}
+
 class toTimestamp extends AbstractUdf {
 
   override def name(): String = "toTimestamp"
@@ -38,6 +39,7 @@ class toTimestamp extends AbstractUdf {
     */
   @throws[ParseException]
   def evaluate(dateString: String, format: String): Timestamp = {
+    if (dateString == null || format == null) return null
     val simpleDateFormat = new SimpleDateFormat(format.trim)
     val date = simpleDateFormat.parse(dateString)
     val time = date.getTime

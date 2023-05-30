@@ -47,6 +47,13 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitStmt(CupidDBSqlParser.StmtContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#createTableLikeStmt}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCreateTableLikeStmt(CupidDBSqlParser.CreateTableLikeStmtContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#dbDotTable}.
      * @param ctx the parse tree
      * @return the visitor result
@@ -683,11 +690,39 @@ public interface CupidDBSqlVisitor<T> extends ParseTreeVisitor<T> {
     T visitLoad_mapping_item(CupidDBSqlParser.Load_mapping_itemContext ctx);
 
     /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#csv_file_options}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitCsv_file_options(CupidDBSqlParser.Csv_file_optionsContext ctx);
+
+    /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#csv_file_format}.
      * @param ctx the parse tree
      * @return the visitor result
      */
     T visitCsv_file_format(CupidDBSqlParser.Csv_file_formatContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#renameTableStmt}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitRenameTableStmt(CupidDBSqlParser.RenameTableStmtContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#old_name}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitOld_name(CupidDBSqlParser.Old_nameContext ctx);
+
+    /**
+     * Visit a parse tree produced by {@link CupidDBSqlParser#new_name}.
+     * @param ctx the parse tree
+     * @return the visitor result
+     */
+    T visitNew_name(CupidDBSqlParser.New_nameContext ctx);
 
     /**
      * Visit a parse tree produced by {@link CupidDBSqlParser#boolExpr}.

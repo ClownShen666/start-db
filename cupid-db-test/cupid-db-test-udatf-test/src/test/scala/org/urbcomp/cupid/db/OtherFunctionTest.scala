@@ -18,12 +18,14 @@ package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertNotNull
 
+import scala.io.Source
+
 class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
-    val stmt = connect.createStatement()
-    val rs = stmt.executeQuery("select version()")
-    rs.next()
-    assertNotNull(rs.getObject(1))
+    executeQueryCheck(
+      "select version()",
+      List(Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString)
+    )
   }
 }

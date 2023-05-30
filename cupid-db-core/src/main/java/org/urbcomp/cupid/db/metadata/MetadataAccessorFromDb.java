@@ -80,6 +80,11 @@ public class MetadataAccessorFromDb implements IMetadataAccessor {
     }
 
     @Override
+    public long updateTable(Table table) {
+        return noRollback(v -> AccessorFactory.getTableAccessor().update(table));
+    }
+
+    @Override
     public long dropTable(String userName, String dbName, String tableName) {
         return noRollback(v -> {
             final Table table = getTable(userName, dbName, tableName);

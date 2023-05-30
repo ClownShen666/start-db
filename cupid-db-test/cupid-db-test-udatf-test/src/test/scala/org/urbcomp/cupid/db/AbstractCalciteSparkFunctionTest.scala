@@ -16,6 +16,9 @@
  */
 package org.urbcomp.cupid.db
 
+import org.apache.spark.sql.DataFrame
+import org.junit.Assert.assertTrue
+import org.locationtech.jts.geom.Geometry
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
@@ -23,6 +26,7 @@ import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.{Connection, ResultSet, Statement}
 import java.util.TimeZone
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Test for Calcite and Geomesa
@@ -45,18 +49,97 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   override protected def afterAll(): Unit = {
     statement.close()
     connect.close()
+    SparkExecuteWrapper.getSparkExecute.stop()
   }
 
-  protected def executeSpark(sql: String): Unit = {
-    SparkExecuteWrapper.getSparkExecute.executeSql(sql)
+  protected def executeQueryCheck(sql: String, expectsList: List[Any]*): Unit = {
+    val rs = connect.createStatement().executeQuery(sql)
+    val rsBuf = rsBuffer(rs)
+    val df = SparkExecuteWrapper.getSparkExecute.executeSql(sql)
+    assertTrue(isEqualCalciteAndSpark(rsBuf, df))
+    var i: Int = 0
+    for (expects <- expectsList) {
+      var j: Int = 0
+      for (expect <- expects) {
+        assertTrue(isEqual(expect, rsBuf(i)(j)))
+        j = j + 1
+      }
+      i = i + 1
+    }
   }
 
-  protected def executeQuery(sql: String): ResultSet = {
-    //测试spark
-    executeSpark(sql)
-    statement.executeQuery(sql)
-    //返回类型统一后做两个结果的判断。
+  /**
+    * attention
+    * geometry result from calcite is String while from spark is geometry
+    */
+  private def isEqualCalciteAndSpark(rs: ArrayBuffer[ArrayBuffer[Any]], df: DataFrame): Boolean = {
+    val dfList = df.collectAsList()
+    if (dfList.size() != rs.size) return false
 
+    val rowIter1 = rs.iterator
+    val rowIter2 = dfList.iterator()
+    while (rowIter1.hasNext && rowIter2.hasNext) {
+      val row1 = rowIter1.next()
+      val row2 = rowIter2.next()
+      if (row1.length != row2.length) return false
+
+      for (i <- row1.indices) {
+        if (!isEqual(row1(i), row2.get(i))) {
+          return false
+        }
+      }
+    }
+    true
   }
 
+  private def rsBuffer(rs: ResultSet): ArrayBuffer[ArrayBuffer[Any]] = {
+    val result = ArrayBuffer[ArrayBuffer[Any]]()
+    while (rs.next()) {
+      val item = ArrayBuffer[Any]()
+      for (i <- 1 to rs.getMetaData.getColumnCount) {
+        item += rs.getObject(i)
+      }
+      result += item
+    }
+    result
+  }
+
+  private def isEqual(rsValue: Any, dfValue: Any): Boolean = {
+    rsValue match {
+      case _: java.math.BigDecimal =>
+        dfValue match {
+          case d: Double =>
+            if (java.math.BigDecimal.valueOf(d) != rsValue) return false
+          case _ =>
+            if (rsValue
+                  .asInstanceOf[java.math.BigDecimal]
+                  .compareTo(rsValue.asInstanceOf[java.math.BigDecimal]) != 0) {
+              return false
+            }
+        }
+      case _: java.lang.Double =>
+        val tolerance = 0.00000000000000001
+        dfValue match {
+          case fl: Float =>
+            if ((rsValue.asInstanceOf[Double] - fl).abs >= tolerance)
+              return false
+          case _ =>
+            if ((rsValue.asInstanceOf[Double] - dfValue.asInstanceOf[Double]).abs >= tolerance)
+              return false
+        }
+      case _ =>
+        if (dfValue.isInstanceOf[Geometry] || rsValue.isInstanceOf[Geometry]) {
+          if (rsValue.toString != dfValue.toString) {
+            return false
+          } else {
+            return true
+          }
+        } else if (rsValue != dfValue) {
+          return false
+        } else {
+          return true
+        }
+    }
+    true
+  }
 }

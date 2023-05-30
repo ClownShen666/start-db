@@ -52,7 +52,7 @@ public class CupidDBSQLSamples {
         "CREATE DATABASE IF NOT EXISTS database_name;";
 
     // Use database
-    public static final String USE_DATABASE_SAMPLE = "USE DATABASE database_name;";
+    public static final String USE_DATABASE_SAMPLE = "USE database_name;";
 
     // Drop database
     public static final String DROP_DATABASE_SAMPLE = "DROP DATABASE database_name;";
@@ -64,7 +64,7 @@ public class CupidDBSQLSamples {
 
     // Delete sample
     public static final String DELETE_SAMPLE =
-        "DELETE FROM table_name WHERE attribute='attribute_value'";
+        "DELETE FROM table_name WHERE attr = 'attribute_value'";
 
     // Show create table
     public static final String SHOW_CREATE_TABLE_SAMPLE = "SHOW CREATE TABLE table_name";
@@ -75,6 +75,10 @@ public class CupidDBSQLSamples {
     // Create table
     public static final String CREATE_TABLE_SAMPLE = loadSample("create-table");
 
+    // Create table like
+    public static final String CREATE_TABLE_LIKE_SAMPLE =
+        "create table target_table like sourceTable";
+
     // Create table with index
     public static final String CREATE_TABLE_WITH_INDEX = loadSample("create-table-with-index");
 
@@ -84,6 +88,12 @@ public class CupidDBSQLSamples {
 
     // Load data sample
     public static final String LOAD_DATA_SAMPLE = loadSample("load-data");
+    public static final String LOAD_DATA_WITH_DELIMITER_AND_QUOTES_SAMPLE = loadSample(
+        "load-data-with-delimiter-and-quotes"
+    );
+
+    // Rename table
+    public static final String RENAME_TABLE_SAMPLE = loadSample("rename-table");
 
     private static String loadSample(String resource) {
         String path = "/sql/samples/" + resource + ".sample.sql";

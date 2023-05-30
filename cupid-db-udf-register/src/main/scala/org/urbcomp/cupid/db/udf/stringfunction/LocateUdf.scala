@@ -24,11 +24,18 @@ class LocateUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  def evaluate(substr: String, str: String): Integer =
-    if (substr == null || str == null) null
-    else str.indexOf(substr) + 1
+  def evaluate(subStr: String, str: String): Integer =
+    if (subStr == null || str == null) null
+    else str.indexOf(subStr) + 1
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def evaluate(subStr: String, str: String, pos: Int): Integer = {
+
+    if (subStr == null || str == null) return null
+    str.indexOf(subStr, pos) + 1
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper1")
 
   def udfWrapper: (String, String) => Integer = evaluate
+  def udfWrapper1: (String, String, Int) => Integer = evaluate
 }

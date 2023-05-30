@@ -67,6 +67,36 @@ IntelliJ with the [Eclipse Code Formatter] so that you can apply the correct for
 Formatting will be triggered when running command `mvn package`. Or you can do format only with
 command `mvn spotless:apply`.
 
+### Local Testing
+
+Cupid server can be started by running `main` of `org.urbcomp.cupid.db.server.CupidDbServerStart`.
+
+To connect to server in local, Cupid DB provide a command line client `cupid-db-cmd`. 
+It can be started from IDE by running `main` function of`org.urbcomp.cupid.db.cmd.Main`. 
+
+To set username or password, you need to edit running configuration of IDE or by adding
+```
+        ... parseArgs(args);
+        cmdArg.username = "root";
+        cmdArg.password = "cupid-db";
+```
+before connecting server.
+
+### Run packaged jars
+
+After running `mvn clean package`, Cupid fat jar for server and client is packaged.
+
+Server can be found under `<cupid>/cupid-db-server/target/cupid-db.jar`. 
+Running cmd `java -jar cupid-db.jar` will start server.
+
+Cupid command line client is under `<cupid>/cupid-db-cmd/target/cupid-db-cmd.jar`. 
+To connect server from console, run cmd `java -jar cupid-db-cmd.jar -u <user> -p <password> -engine <calcite|spark_local>`
+.
+
+### Cupid JDBC Driver Usage
+
+See examples under `<cupid>/cupid-db-jdbc-driver/src/test/java/org/urbcomp/cupid/db/jdbc/DriverTest.java`
+
 [checkstyle]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
 [spotless]: https://github.com/diffplug/spotless

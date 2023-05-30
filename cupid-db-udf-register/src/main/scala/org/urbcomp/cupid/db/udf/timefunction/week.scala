@@ -35,14 +35,15 @@ class week extends AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dtString: String): Int = {
-    val weekFields: WeekFields = WeekFields.ISO
-    val to = new toDatetime
-    to.evaluate(dtString).get(weekFields.weekOfYear)
+  def evaluate(dtString: String): java.lang.Integer = {
+    Option(dtString) match {
+      case Some(s) => (new toDatetime).evaluate(s).get(WeekFields.ISO.weekOfYear())
+      case _       => null
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Int = evaluate
+  def udfWrapper: String => java.lang.Integer = evaluate
 
 }

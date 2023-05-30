@@ -16,6 +16,7 @@ program : stmt T_SEMICOLON? EOF;
 stmt :
        createDatabaseStmt
      | createTableStmt
+     | createTableLikeStmt
      | createIndexStmt
      | describeStmt
      | dropDatabaseStmt
@@ -34,7 +35,10 @@ stmt :
      | selectStmt
      | createUserStmt
      | loadStmt
+     | renameTableStmt
      ;
+
+createTableLikeStmt: T_CREATE T_TABLE (T_IF T_NOT T_EXISTS) ? table_name T_LIKE table_name;
 
 dbDotTable:
     (db=(L_ID | T_DEFAULT | T_MUL) T_DOT)? table=(T_MUL | T_DEFAULT | L_ID)
@@ -86,7 +90,7 @@ createUserStmt :
 
 
 create_table_definition :
-      (T_AS? T_OPEN_P selectStmt T_CLOSE_P | T_AS? selectStmt | T_OPEN_P create_table_columns T_CLOSE_P | T_LIKE table_name) create_table_options?
+      (T_AS? T_OPEN_P selectStmt T_CLOSE_P | T_AS? selectStmt | T_OPEN_P create_table_columns T_CLOSE_P ) create_table_options?
      ;
 
 create_table_columns :
@@ -455,25 +459,41 @@ describeStmt :
        (T_DESCRIBE | T_DESC) (T_TABLE | T_VIEW)? userDotDbDotTable
      ;
 
-loadStmt:
-    T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_format?
-;
+loadStmt :
+    T_LOAD T_CSV? T_INPATH string T_TO T_TABLE? table_name load_mapping_columns? csv_file_options? csv_file_format?
+    ;
 
-load_mapping_columns:
+load_mapping_columns :
    T_OPEN_P load_mapping_items T_CLOSE_P
     ;
 
-load_mapping_items:
+load_mapping_items :
     load_mapping_item (T_COMMA load_mapping_item)*
     ;
 
-load_mapping_item:
+load_mapping_item :
     ident expr
-;
+    ;
 
-csv_file_format:
+csv_file_options :
+    T_FIELDS (T_DELIMITER string)? (T_QUOTES string)?
+    ;
+
+csv_file_format :
     (T_WITH|T_WITHOUT)? T_HEADER
-;
+    ;
+
+renameTableStmt :
+    T_RENAME T_TABLE old_name T_TO new_name
+    ;
+
+old_name :
+       qident
+     ;
+
+new_name :
+       qident
+     ;
 
 boolExpr :                               // Boolean condition
        T_NOT? T_OPEN_P boolExpr T_CLOSE_P
@@ -948,6 +968,7 @@ nonReservedWords :                      // Tokens that are not reserved words an
      | T_QUERY_BAND
      | T_QUIT
      | T_QUOTED_IDENTIFIER
+     | T_QUOTES
      | T_RAISE
      | T_RANK
      | T_REAL
@@ -1286,6 +1307,7 @@ T_QUALIFY         : Q U A L I F Y ;
 T_QUERY_BAND      : Q U E R Y '_' B A N D ;
 T_QUIT            : Q U I T ;
 T_QUOTED_IDENTIFIER : Q U O T E D '_' I D E N T I F I E R ;
+T_QUOTES          : Q U O T E S ;
 T_RAISE           : R A I S E ;
 T_REAL            : R E A L ;
 T_REFERENCES      : R E F E R E N C E S ;
