@@ -47,7 +47,7 @@ public class CupidDBSQLSamples {
     public static final String TRUNCATE_TABLE_SAMPLE = "TRUNCATE TABLE table_name";
 
     // Create database
-    public static final String CREATE_DATABASE_SAMPLE = "CREATE database_name;";
+    public static final String CREATE_DATABASE_SAMPLE = "CREATE DATABASE database_name;";
     public static final String CREATE_DATABASE_IF_NOT_EXISTS_SAMPLE =
         "CREATE DATABASE IF NOT EXISTS database_name;";
 
