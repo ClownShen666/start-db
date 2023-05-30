@@ -45,11 +45,12 @@ public class DynamicConfig {
 
     /**
      * 不要统一域名，而是当前机器的IP，因为数据要发回提交spark任务的机器
-     * 参考https://cloud.tencent.com/developer/article/1610919获取IP方式，避免获取localhost
+     * 参考https://cloud.tencent.com/developer/article/1610919获取IP方式
      */
     public static String getRemoteServerHostname() {
         try {
-            String hostName = getLocalHostExactAddress().getHostName();
+            // String hostName = getLocalHostExactAddress().getHostName();
+            String hostName = "" + InetAddress.getLocalHost().getHostName();
             log.info("get host name " + hostName);
             System.out.println("get host name " + hostName);
             return hostName;
@@ -81,7 +82,6 @@ public class DynamicConfig {
                     if (candidateAddress == null) {
                         candidateAddress = inetAddr;
                     }
-
                 }
             }
         }

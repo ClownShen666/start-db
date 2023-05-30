@@ -19,14 +19,11 @@ package org.urbcomp.cupid.db;
 import org.urbcomp.cupid.db.model.sample.ModelGenerator;
 import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class ConnectRemoteServer {
 
@@ -43,10 +40,10 @@ public class ConnectRemoteServer {
         conf.put("spark.async", "false");
         conf.put("spark.exportType", "cache");
         try (
-                Connection conn = DriverManager.getConnection(
-                        "jdbc:cupid-db:url=http://192.168.4.51:8000;db=default",
-                        conf
-                )
+            Connection conn = DriverManager.getConnection(
+                "jdbc:cupid-db:url=http://192.168.4.51:8000;db=default",
+                conf
+            )
         ) {
             /*final String sqlTxt = Files.readAllLines(
                             Paths.get("cupid-db-core/src/main/resources/metadata/ddl.sql")
@@ -60,22 +57,27 @@ public class ConnectRemoteServer {
                 stat.execute(sql.trim());
             }*/
 
-            Statement stmt = conn.createStatement();
+            /*Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("select 1+1 as s");
             rs.next();
             System.out.println(rs.getString(1));
-            assert("2".equals(rs.getString(1)));
+            assert ("2".equals(rs.getString(1)));*/
 
-            /*Trajectory trajectoryStp = ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt");
+            Trajectory trajectoryStp = ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt");
             String tGeo = trajectoryStp.toGeoJSON();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery("select starttime, endtime, st_mPointFromWKT(gpspoints) from " +
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select f.starttime, f.endtime, 1+1 from " +
                     "(select st_traj_stayPointDetect(traj, 10, 10) " +
-                    "from (select st_traj_fromGeoJSON(\'" + tGeo + "\') as traj))");
+                    "from (select st_traj_fromGeoJSON(\'" + tGeo + "\') as traj)) f");
             rs.next();
-            System.out.println(rs.getTimestamp(1));
-            System.out.println(rs.getTimestamp(2));
-            System.out.println(rs.getObject(3).toString());*/
+            System.out.println(rs.getObject(1));
+            System.out.println(rs.getObject(2));
+            System.out.println(rs.getInt(3));
+            //System.out.println(rs.getInt(4));
+
+            /*ResultSet rs = stmt.executeQuery("select st_traj_asGeoJSON(st_traj_noiseFilter(st_traj_fromGeoJSON(\'" + tGeo + "\')," + "8.5))");
+            rs.next();
+            System.out.println(rs.getObject(1).toString());*/
         }
     }
 }

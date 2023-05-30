@@ -36,13 +36,11 @@ import java.util.concurrent.TimeUnit
   *
   * @author jimo
   * */
-class GrpcRemoteWriter extends IRemoteWriter {
+class GrpcRemoteWriter(options: util.Map[String, String]) extends IRemoteWriter {
 
-  private val options: util.Map[String, String] = IRemoteWriter.options
   private val remoteClient: RemoteClient =
-    if (options.get("InProcessChannelForTest") == null) {
-      log.info("wwwwww")
-      log.info("show options!")
+    if (options.getOrDefault("InProcessChannelForTest", null) == null) {
+      log.info("GrpcRemoteWriter show options!")
       if (options == null) {
         log.info("option is null")
       } else {
@@ -52,12 +50,8 @@ class GrpcRemoteWriter extends IRemoteWriter {
         }
       }
       log.info("show options finished")
-      var host = options.getOrDefault(SparkSqlParam.REMOTE_HOST_KEY, getRemoteServerHostname)
-      var port = options.getOrDefault(SparkSqlParam.REMOTE_PORT_KEY, getRemoteServerPort.toString)
-      if (host == "" || port == "0") {
-        host = getRemoteServerHostname
-        port = getRemoteServerPort.toString
-      }
+      val host = options.getOrDefault(SparkSqlParam.REMOTE_HOST_KEY, getRemoteServerHostname)
+      val port = options.getOrDefault(SparkSqlParam.REMOTE_PORT_KEY, getRemoteServerPort.toString)
       log.info(host)
       log.info(port)
       val uri = new URI(null, null, host, port.toInt, null, null, null)

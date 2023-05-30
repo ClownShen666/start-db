@@ -50,16 +50,16 @@ trait IRemoteWriter extends Serializable {
   def writeOneClose()
 }
 
-object IRemoteWriter {
+object IRemoteWriter extends Serializable {
 
   /**
     * 为什么要通过静态变量来传递参数？
     * 因为通过构造方法传不进来
     */
-  var options: util.Map[String, String] = _
 
-  def getInstance(): IRemoteWriter = {
-    log.info("show options!")
+  /*def getInstance(): IRemoteWriter = {
+    log.info("IRemoteWriter show options!")
+    log.info("options:")
     if (options == null) {
       log.info("option is null")
     } else {
@@ -68,7 +68,7 @@ object IRemoteWriter {
         log.info(entry.getKey + ": " + entry.getValue)
       }
     }
-    log.info("show options finished")
+    log.info("IRemoteWriter show options finished")
     new GrpcRemoteWriter
-  }
+  }*/
 }

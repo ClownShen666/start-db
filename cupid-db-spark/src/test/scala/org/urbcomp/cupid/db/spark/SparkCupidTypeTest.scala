@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.spark
 
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.junit.Assert.assertEquals
 import org.scalatest.FunSuite
 import org.locationtech.jts.geom._
@@ -24,9 +26,11 @@ import org.locationtech.geomesa.utils.geohash.GeoHashIterator.geometryFactory
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.cache.SparkDataSerializer
 import org.urbcomp.cupid.db.spark.model._
 
 import java.sql.Timestamp
+import java.util.Locale
 import scala.collection.JavaConverters.seqAsJavaList
 
 class SparkCupidTypeTest extends FunSuite {
@@ -137,7 +141,13 @@ class SparkCupidTypeTest extends FunSuite {
     val df3 = spark.sql(
       "select f.starttime, f.endtime, st_mPointFromWKT(f.gpspoints) from (select st_traj_stayPointDetect(traj, 10, 10) from table1) as f"
     )
+    df3.schema.fields
+      .foreach(f => System.out.println(f.name + " " + f.dataType.typeName.toLowerCase(Locale.ROOT)))
     df3.show()
+    val rows = df3.collect()
+    val row = InternalRow.fromSeq(rows.head.toSeq)
+    val bytes = SparkDataSerializer.serialize(row, df3.schema)
+    System.out.println(bytes)
     val li = df3
       .as[(Timestamp, Timestamp, MultiPoint)]
       .collect

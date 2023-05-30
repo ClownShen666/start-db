@@ -26,8 +26,8 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.unsafe.types.UTF8String;
 import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.KryoHelper;
-
 import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 
 /**
  * @author jimo
@@ -42,9 +42,11 @@ public class SparkDataSerializer {
         Object[] row = new Object[numFields];
         for (int i = 0; i < numFields; i++) {
             final String typeName = input.readString();
+            System.out.println("deserializing ...");
+            System.out.println(typeName);
             final Object o = KRYO.readObjectOrNull(
                 input,
-                DataConvertFactory.strTypeToClass(typeName)
+                DataConvertFactory.strTypeToClass(typeName.toLowerCase(Locale.ROOT))
             );
             row[i] = o;
         }
@@ -63,10 +65,12 @@ public class SparkDataSerializer {
             if (data instanceof UTF8String) {
                 data = data.toString();
             }
+            System.out.println("serializing ...");
+            System.out.println(dataType + ": " + data);
             KRYO.writeObjectOrNull(
                 output,
                 data,
-                DataConvertFactory.strTypeToClass(dataType.typeName())
+                DataConvertFactory.strTypeToClass(dataType.typeName().toLowerCase(Locale.ROOT))
             );
         }
         return output.toBytes();

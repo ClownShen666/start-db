@@ -23,5 +23,5 @@ message RowRequest {
 }
 
 message RowResponse {
- optional string res = 1;
+  optional string res = 1;
 }

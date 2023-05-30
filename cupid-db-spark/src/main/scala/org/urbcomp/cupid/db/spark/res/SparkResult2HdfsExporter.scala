@@ -50,6 +50,7 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
     data
       .coalesce(1)
       .write
+      .format("geomesa")
       .mode(SaveMode.Overwrite)
       .option("header", value = false)
       .option("sep", DynamicConfig.getHdfsDataSplitter)
