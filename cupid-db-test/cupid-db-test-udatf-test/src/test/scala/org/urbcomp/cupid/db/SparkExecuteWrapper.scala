@@ -33,9 +33,12 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setDbName("default")
   param.setExportType(DataExportType.PRINT)
   param.setLocal(true)
-  val sparkSession: SparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)
+  var sparkSession: SparkSession = null
 
   def executeSql(sql: String): Dataset[Row] = {
+    if (sparkSession == null) {
+      sparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)
+    }
     param.setSql(sql)
     sparkSession.sql(sql)
   }
@@ -43,6 +46,10 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   /**
     *Description: Single case, close the current sparkSession after execution
    **/
-  def stop(): Unit = sparkSession.stop()
-
+  def stop(): Unit = {
+    if (sparkSession != null) {
+      sparkSession.stop()
+      sparkSession = null
+    }
+  }
 }
