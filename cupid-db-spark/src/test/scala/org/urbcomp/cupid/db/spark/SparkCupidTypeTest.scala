@@ -61,5 +61,4 @@ class SparkCupidTypeTest extends FunSuite {
     spark.sql("desc ttt").show()
     spark.stop()
   }
-
 }

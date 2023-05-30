@@ -736,7 +736,6 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     Meta.StatementType.OTHER_DDL
                 );
             }
-
             // modify start
             switch (sqlNode.getKind()) {
                 case DELETE:

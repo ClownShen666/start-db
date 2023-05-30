@@ -29,6 +29,7 @@ import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
 import org.opengis.feature.simple.SimpleFeature
 import org.reflections.Reflections
 import org.slf4j.Logger
+import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.parser.SqlHelper
@@ -56,9 +57,7 @@ object SparkQueryExecutor {
       SparkSqlParam.CACHE.set(param)
       SqlParam.CACHE.set(param)
     }
-    var spark = sparkSession
-    if (spark == null) spark = getSparkSession(param.isLocal)
-
+    val spark = if (sparkSession != null) sparkSession else getSparkSession(param.isLocal)
     val sql = param.getSql
     val node = CupidDBParseDriver.parseSql(sql)
 

@@ -59,13 +59,13 @@ public class SparkDataReadHdfs implements ISparkDataRead {
                 fields.stream().map(DataTypeField::getName).toArray(String[]::new),
                 data
             );
-        } catch (IOException | URISyntaxException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private List<Object[]> readData(FileSystem fs, String dataPathDir, List<DataTypeField> fields)
-        throws IOException {
+        throws Exception {
         final List<String> dataLines = readHdfsFile(fs, dataPathDir);
         List<Object[]> data = new ArrayList<>(Math.max(1, dataLines.size()));
 
@@ -80,7 +80,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
     /**
      * 根据数据类型反序列化为原始类型
      */
-    private Object[] deserializeToRow(String[] items, List<DataTypeField> fields) {
+    private Object[] deserializeToRow(String[] items, List<DataTypeField> fields) throws Exception {
         if (fields.isEmpty() || items.length != fields.size()) {
             log.error("data and schema is inconsistent:{}<->{}", items, fields);
             throw new IllegalArgumentException("data and schema is inconsistent");

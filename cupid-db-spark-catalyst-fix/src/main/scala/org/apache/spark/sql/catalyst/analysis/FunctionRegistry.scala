@@ -172,6 +172,7 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
     if (functionBuilders(normalizedName).contains(newFunction)) {
       logWarning(s"The function $normalizedName is registered multiple times.")
     } else {
+      logInfo("Add function " + normalizedName + " " + newFunction)
       functionBuilders(normalizedName) += newFunction
     }
   }
@@ -182,7 +183,12 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
       if (!functionBuilders.contains(normalizedName)) {
         throw new AnalysisException(s"Undefined function $name")
       }
+      logInfo("normalizedName: " + normalizedName)
       val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
+      logInfo("functions: ")
+      functions.foreach { func: FunctionBuilder =>
+        logInfo(func.toString())
+      }
       if (functions.isEmpty) throw new AnalysisException(s"No matched function name $name !")
       else if (functions.size == 1) {
         try {
