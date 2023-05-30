@@ -78,7 +78,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertTrue(parsed.isInstanceOf[SqlShowIndex])
   }
 
-  test("convert create dababase statement to SqlNode") {
+  test("convert create database statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.CREATE_DATABASE_SAMPLE)
     val node = parsed.asInstanceOf[SqlCreateDatabase]
     assertEquals("database_name", node.getDatabaseName.names.get(0))
@@ -86,19 +86,19 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("convert use database statement to SqlNode") {
-    val parsed = driver.parseSql("use database_name")
+    val parsed = driver.parseSql(CupidDBSQLSamples.USE_DATABASE_SAMPLE)
     val node = parsed.asInstanceOf[SqlUseDatabase]
     assertEquals("database_name", node.getFullDatabaseName);
   }
 
-  test("convert create dababase if not exists statement to SqlNode") {
+  test("convert create database if not exists statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.CREATE_DATABASE_IF_NOT_EXISTS_SAMPLE)
     val node = parsed.asInstanceOf[SqlCreateDatabase]
     assertEquals("database_name", node.getDatabaseName.names.get(0))
     assertTrue(node.ifNotExists);
   }
 
-  test("convert drop dababase statement to SqlNode") {
+  test("convert drop database statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.DROP_DATABASE_SAMPLE)
     val node = parsed.asInstanceOf[SqlDropSchema]
     assertEquals(SqlKind.DROP_SCHEMA, node.getKind)
