@@ -615,7 +615,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
   }
 
   override def visitDropIndexStmt(ctx: DropIndexStmtContext): SqlNode = {
-    new SqlDropIndex(pos, ctx.L_ID().getText, visitIdent(ctx.tableName().ident()))
+    new SqlDropIndex(pos, ctx.L_ID().getText, visitIdentOrigin(ctx.tableName().ident()))
   }
 
   /**
