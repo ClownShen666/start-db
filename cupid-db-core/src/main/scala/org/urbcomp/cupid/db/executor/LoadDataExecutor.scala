@@ -25,6 +25,7 @@ import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlLoadData
 import org.urbcomp.cupid.db.util.MetadataUtil
 
 import java.io.{BufferedReader, FileInputStream, InputStreamReader}
+import java.sql.{Connection, ResultSet}
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
@@ -73,6 +74,7 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
     val writer = dataStore.getFeatureWriterAppend(schemaName, Transaction.AUTO_COMMIT)
     val bufferSize = 1000
     var affectedRows = 0
+    val connection = CalciteHelper.createConnection()
     // Parse and write
     WithClose(new BufferedReader(new InputStreamReader(new FileInputStream(n.path)), bufferSize)) {
       reader =>
@@ -90,18 +92,18 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
               val valueGroup = line.split(n.delimiter)
               mapFieldExpr.map(FieldExpr => {
                 // replace Expr with value
-                val matcher = Pattern.compile("_c[0-9]+").matcher(FieldExpr._2)
+                val matcher = Pattern.compile("_c\\d+").matcher(FieldExpr._2)
                 var rExpr = FieldExpr._2
                 while (matcher.find()) {
                   val colIndex = matcher.group().split("c")(1).toInt
-                  rExpr = rExpr.replaceFirst("_c[0-9]+", valueGroup(colIndex - 1))
+                  rExpr = rExpr.replaceFirst("_c\\d+", valueGroup(colIndex - 1))
                 }
                 // For special situation
                 if (tableFields.getOrElse(FieldExpr._1, "NULL").equals("String")) {
                   rExpr = "\"" + rExpr + "\""
                 }
                 // select sql
-                val resultObj = WithClose(executeQuery(rExpr.replace("`", ""))) { rs =>
+                val resultObj = WithClose(executeQuery(connection, rExpr.replace("`", ""))) { rs =>
                   {
                     rs.next()
                     rs.getObject(1)
@@ -120,13 +122,13 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
         }
     }
     writer.close()
+    connection.close()
 
     dataStore.dispose()
     MetadataResult.buildDDLResult(affectedRows)
   }
 
-  private def executeQuery(queryObj: String) = {
-    val connection = CalciteHelper.createConnection()
+  private def executeQuery(connection: Connection, queryObj: String): ResultSet = {
     val statement = connection.createStatement()
     statement.executeQuery("select %s".format(queryObj))
   }
