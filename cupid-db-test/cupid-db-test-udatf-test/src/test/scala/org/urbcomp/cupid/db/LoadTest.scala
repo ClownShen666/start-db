@@ -28,9 +28,9 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
   test("test load - single column - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
-    val createTableSql = s"create table if not exists $randTableName"
+    val createTableSql = s"create table if not exists $randTableName (idx Integer)"
     val loadSql =
-      s"""LOAD CSV INPATH $PATH TO $randTableName (
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
          |  idx _c1)
          |  WITH HEADER""".stripMargin
     val querySql = s"select count(idx) from $randTableName"
@@ -46,9 +46,10 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
   test("test load - multiple columns - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
-    val createTableSql = s"create table if not exists $randTableName"
+    val createTableSql =
+      s"create table if not exists $randTableName (idx Integer, ride_id String, rideable_type String)"
     val loadSql =
-      s"""LOAD CSV INPATH $PATH TO $randTableName (
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
          |  idx _c1,
          |  ride_id _c2,
          |  rideable_type _c3)
@@ -62,17 +63,16 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
     val resultSet = stmt.executeQuery(querySql)
     resultSet.next()
-    assertEquals(
-      Array(resultSet.getString(1), resultSet.getString(2)),
-      Array("8B88A6F8158F650D", "electric_bike")
-    )
+    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
+    assert(resultSet.getString(2).equals("electric_bike"))
   }
 
   test("test load - multiple columns - with udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
-    val createTableSql = s"create table if not exists $randTableName"
+    val createTableSql =
+      s"create table if not exists $randTableName (idx Integer, ride_id String, start_point Point)"
     val loadSql =
-      s"""LOAD CSV INPATH $PATH TO $randTableName (
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
          |  idx _c1,
          |  ride_id _c2,
          |  start_point st_makePoint(_c10, _c11))
@@ -86,6 +86,6 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
     val resultSet = stmt.executeQuery(querySql)
     resultSet.next()
-    assertEquals(resultSet.getObject("1"), "Point(40.646475, -74.026081)")
+    assert(resultSet.getString(1).equals("POINT (40.646475 -74.026081)"))
   }
 }

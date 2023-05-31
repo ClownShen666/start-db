@@ -24,8 +24,7 @@ import org.urbcomp.cupid.db.metadata.{CalciteHelper, MetadataAccessUtil}
 import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlLoadData}
 import org.urbcomp.cupid.db.util.MetadataUtil
 
-import java.io.File
-import java.util.Scanner
+import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
@@ -43,11 +42,15 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
 
     // Check mapping
     val tableFields =
-      MetadataAccessUtil.getFields(userName, dbName, tableName).asScala.map(_.getName).toArray
+      MetadataAccessUtil
+        .getFields(userName, dbName, tableName)
+        .asScala
+        .map(field => (field.getName, field.getType))
+        .toMap
     val mappingWrongCol = n.mappings.getList.asScala
       .map(sqlNode => {
         val field = sqlNode.asInstanceOf[SqlColumnMappingDeclaration].field.names.get(0)
-        (field, tableFields.contains(field))
+        (field, tableFields.keySet.contains(field))
       })
       .filter(fieldExist => !fieldExist._2)
       .toMap
@@ -69,38 +72,36 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
 
     val writer = dataStore.getFeatureWriterAppend(schemaName, Transaction.AUTO_COMMIT)
     val bufferSize = 1000
-    val buffer = new Array[String](bufferSize)
-    var counter = 0
     var affectedRows = 0
     // Parse and write
-    WithClose(new Scanner(new File(n.path))) { reader =>
-      {
-        // Ignore header
-        if (n.hasHeader) {
-          reader.nextLine()
-        }
-
-        while (reader.hasNext()) {
-          // Read into buffer
-          while (counter < bufferSize && reader.hasNext()) {
-            buffer(counter) = reader.nextLine()
-            counter += 1
+    WithClose(new BufferedReader(new InputStreamReader(new FileInputStream(n.path)), bufferSize)) {
+      reader =>
+        {
+          // Ignore header
+          if (n.hasHeader) {
+            reader.readLine()
           }
-          // Convert and write
-          buffer
-            .take(counter)
+
+          reader
+            .lines()
+            .iterator()
+            .asScala
             .map(line => {
               val valueGroup = line.split(n.delimiter)
               mapFieldExpr.map(FieldExpr => {
                 // replace Expr with value
-                val matcher = Pattern.compile("_c[1-9]+").matcher(FieldExpr._2)
+                val matcher = Pattern.compile("_c[0-9]+").matcher(FieldExpr._2)
                 var rExpr = FieldExpr._2
                 while (matcher.find()) {
                   val colIndex = matcher.group().split("c")(1).toInt
-                  rExpr = rExpr.replaceFirst("_c[1-9]+", valueGroup(colIndex - 1))
+                  rExpr = rExpr.replaceFirst("_c[0-9]+", valueGroup(colIndex - 1))
+                }
+                // For special situation
+                if (tableFields.getOrElse(FieldExpr._1, "NULL").equals("String")) {
+                  rExpr = "\"" + rExpr + "\""
                 }
                 // select sql
-                val resultObj = WithClose(executeQuery(rExpr)) { rs =>
+                val resultObj = WithClose(executeQuery(rExpr.replace("`", ""))) { rs =>
                   {
                     rs.next()
                     rs.getObject(1)
@@ -113,15 +114,12 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
               // Write into geomesa-hbase
               val sf = writer.next()
               fieldValueArray.foreach(fieldValue => sf.setAttribute(fieldValue._1, fieldValue._2))
-              writer.write()
               affectedRows += 1
+              writer.write()
             })
-
-          // reset counter
-          counter = 0
         }
-      }
     }
+    writer.close()
 
     dataStore.dispose()
     MetadataResult.buildDDLResult(affectedRows)
