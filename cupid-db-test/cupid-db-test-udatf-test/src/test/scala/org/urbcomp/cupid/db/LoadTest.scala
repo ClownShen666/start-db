@@ -1,0 +1,91 @@
+/* 
+ * Copyright (C) 2022  ST-Lab
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.urbcomp.cupid.db
+
+import org.junit.Assert.assertEquals
+import org.urbcomp.cupid.db.tools.CitibikeDataUtils
+
+import java.util.UUID
+
+class LoadTest extends AbstractCalciteSparkFunctionTest {
+
+  val PATH
+      : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
+
+  test("test load - single column - no udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql = s"create table if not exists $randTableName (idx Integer)"
+    val loadSql =
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
+         |  idx _c1)
+         |  WITH HEADER""".stripMargin
+    val querySql = s"select count(idx) from $randTableName"
+
+    val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assertEquals(resultSet.getInt(1), 10)
+  }
+
+  test("test load - multiple columns - no udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql =
+      s"create table if not exists $randTableName (idx Integer, ride_id String, rideable_type String)"
+    val loadSql =
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
+         |  idx _c1,
+         |  ride_id _c2,
+         |  rideable_type _c3)
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select ride_id, rideable_type from $randTableName where idx = 1"
+
+    val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
+    assert(resultSet.getString(2).equals("electric_bike"))
+  }
+
+  test("test load - multiple columns - with udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql =
+      s"create table if not exists $randTableName (idx Integer, ride_id String, start_point Point)"
+    val loadSql =
+      s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
+         |  idx _c1,
+         |  ride_id _c2,
+         |  start_point st_makePoint(_c10, _c11))
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select start_point from $randTableName where idx = 2"
+
+    val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assert(resultSet.getString(1).equals("POINT (40.646475 -74.026081)"))
+  }
+}

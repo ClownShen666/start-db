@@ -19,7 +19,7 @@ package org.urbcomp.cupid.db.executor
 import org.apache.calcite.sql._
 import org.apache.calcite.sql.ddl.{SqlDropSchema, SqlDropTable}
 import org.urbcomp.cupid.db.infra.{BaseExecutor, BaseExecutorFactory}
-import org.urbcomp.cupid.db.parser.dcl.SqlCreateUser
+import org.urbcomp.cupid.db.parser.dcl.{SqlCreateUser, SqlLoadData}
 import org.urbcomp.cupid.db.parser.ddl.{
   SqlCreateDatabase,
   SqlCupidCreateTable,
@@ -58,6 +58,7 @@ class CupidDBExecutorFactory extends BaseExecutorFactory {
     case n: SqlTruncateTable        => TruncateTableExecutor(n)
     case n: SqlRenameTable          => RenameTableExecutor(n)
     case n: SqlCupidCreateTableLike => CreateTableLikeExecutor(n)
+    case n: SqlLoadData             => LoadDataExecutor(n)
     case _                          => throw new IllegalStateException("Not Support SQL")
   }
 }
