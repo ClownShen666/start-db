@@ -62,8 +62,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     assertEquals(false, value == null)
   }
 
-  // FIXME
-  ignore("bool equal test") {
+  test("bool equal test") {
     val stmt = connect.createStatement()
     stmt.execute("create table t_bool (bool7 bool);")
     stmt.execute("insert into t_bool values (true);")
@@ -74,8 +73,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     }
   }
 
-  // FIXME
-  ignore("chinese string insert test") {
+  test("chinese string insert test") {
     val stmt = connect.createStatement()
     stmt.execute("""
                        |create table t_string10 (string6 string)
@@ -91,8 +89,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     }
   }
 
-  // FIXME
-  ignore("geometry equal test") {
+  test("geometry equal test") {
     val stmt = connect.createStatement()
     stmt.execute("create table t_point (point13 point)")
     stmt.execute("""
