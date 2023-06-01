@@ -25,8 +25,7 @@ import org.urbcomp.cupid.db.util.SparkSqlParam
 
 class RemoteTableTest extends FunSuite {
 
-  // FIXME
-  ignore("remote source") {
+  test("remote source") {
     val serverName = InProcessServerBuilder.generateName()
     val server = new RemoteServer(
       InProcessServerBuilder.forName(serverName).addService(new RemoteServiceImpl).build()
