@@ -24,10 +24,9 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   val DEFAULT_DATETIME: LocalDateTime = LocalDateTime.of(2021, 5, 20, 11, 21, 1, 234000000)
   val DEFAULT_TIMESTAMP: Timestamp = Timestamp.valueOf(DEFAULT_TIME_STR)
   val DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"
-
   test("toTimestamp(str, format)") {
     executeQueryCheck(
-      "select toTimestamp('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
+      "select toTimestamp('" + DEFAULT_TIME_STR + " ', '" + DEFAULT_FORMAT + "')",
       List(DEFAULT_TIMESTAMP)
     )
   }
@@ -37,8 +36,11 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("currentTimestamp") {
-    //executeQueryCheck("select timestampFormat(currentTimestamp(), 'yyyy-MM-dd')")
-    // todo FIXME
+    executeQueryCheck(
+      "select timestampFormat( currentTimestamp(1), 'yyyy-MM-dd')",
+      List(new Timestamp(System.currentTimeMillis).toString.substring(0, "yyyy-MM-dd".length))
+    )
+
   }
 
   test("timestampToLong(str)") {
