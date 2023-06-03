@@ -28,10 +28,7 @@ class currentTimestamp extends AbstractUdf {
 
   def evaluate(): Timestamp = new Timestamp(System.currentTimeMillis)
 
-  def evaluate(flagOfReturnString: Integer): java.lang.String =
-    new Timestamp(System.currentTimeMillis).toString
-  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
+  def udfSparkEntries: List[String] = List("udfWrapper")
 
   def udfWrapper: () => Timestamp = evaluate
-  def udfWrapper2: (Integer) => java.lang.String = evaluate
 }
