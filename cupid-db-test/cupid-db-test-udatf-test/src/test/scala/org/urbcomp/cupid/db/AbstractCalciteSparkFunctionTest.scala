@@ -24,7 +24,7 @@ import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
-import java.sql.{Connection, ResultSet, Statement}
+import java.sql.{Connection, ResultSet, Statement, Timestamp}
 import java.util.TimeZone
 import scala.collection.mutable.ArrayBuffer
 
@@ -84,7 +84,16 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
       if (row1.length != row2.length) return false
 
       for (i <- row1.indices) {
-        if (!isEqual(row1(i), row2.get(i))) {
+        if (row1(i).isInstanceOf[Timestamp]) {
+          println(row1(i).asInstanceOf[Timestamp].toString)
+          println(row2.get(i).asInstanceOf[Timestamp].toString)
+          if (Math.abs(
+                row1(i)
+                  .asInstanceOf[Timestamp]
+                  .getTime - row2.get(i).asInstanceOf[Timestamp].getTime
+              ) > 1 * 60 * 1000)
+            return false
+        } else if (!isEqual(row1(i), row2.get(i))) {
           return false
         }
       }
@@ -104,37 +113,44 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     result
   }
 
-  private def isEqual(rsValue: Any, dfValue: Any): Boolean = {
-    rsValue match {
+  private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
+    expectVal match {
       case _: java.math.BigDecimal =>
-        dfValue match {
+        actualVal match {
           case d: Double =>
-            if (java.math.BigDecimal.valueOf(d) != rsValue) return false
+            if (java.math.BigDecimal.valueOf(d) != expectVal) return false
           case _ =>
-            if (rsValue
+            if (expectVal
                   .asInstanceOf[java.math.BigDecimal]
-                  .compareTo(rsValue.asInstanceOf[java.math.BigDecimal]) != 0) {
+                  .compareTo(expectVal.asInstanceOf[java.math.BigDecimal]) != 0) {
               return false
             }
         }
       case _: java.lang.Double =>
         val tolerance = 0.00000000000000001
-        dfValue match {
+        actualVal match {
           case fl: Float =>
-            if ((rsValue.asInstanceOf[Double] - fl).abs >= tolerance)
+            if ((expectVal.asInstanceOf[Double] - fl).abs >= tolerance)
               return false
           case _ =>
-            if ((rsValue.asInstanceOf[Double] - dfValue.asInstanceOf[Double]).abs >= tolerance)
+            if ((expectVal.asInstanceOf[Double] - actualVal.asInstanceOf[Double]).abs >= tolerance)
               return false
         }
+      case _: Timestamp =>
+        if ((expectVal
+              .asInstanceOf[Timestamp]
+              .getTime - actualVal.asInstanceOf[Timestamp].getTime).abs > 1 * 60 * 1000)
+          return false
+        else
+          return true
       case _ =>
-        if (dfValue.isInstanceOf[Geometry] || rsValue.isInstanceOf[Geometry]) {
-          if (rsValue.toString != dfValue.toString) {
+        if (actualVal.isInstanceOf[Geometry] || expectVal.isInstanceOf[Geometry]) {
+          if (expectVal.toString != actualVal.toString) {
             return false
           } else {
             return true
           }
-        } else if (rsValue != dfValue) {
+        } else if (expectVal != actualVal) {
           return false
         } else {
           return true

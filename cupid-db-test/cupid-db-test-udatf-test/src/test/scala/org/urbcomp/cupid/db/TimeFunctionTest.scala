@@ -27,7 +27,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   val FLAG_OF_RETURN_STRING = 1
   test("toTimestamp(str, format)") {
     executeQueryCheck(
-      "select toTimestamp('" + DEFAULT_TIME_STR + " ', '" + DEFAULT_FORMAT + "')",
+      "select toTimestamp('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
       List(DEFAULT_TIMESTAMP)
     )
   }
@@ -37,11 +37,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("currentTimestamp") {
-    executeQueryCheck(
-      "select timestampFormat( currentTimestamp(" + FLAG_OF_RETURN_STRING + "), 'yyyy-MM-dd')",
-      List(new Timestamp(System.currentTimeMillis).toString.substring(0, "yyyy-MM-dd".length))
-    )
-
+    executeQueryCheck("select currentTimestamp()", List(new Timestamp(System.currentTimeMillis)))
   }
 
   test("timestampToLong(str)") {
