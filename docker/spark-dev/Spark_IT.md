@@ -3,12 +3,12 @@
 1. 打包db-spark包
 
 ```shell
-mvn package -pl cupid-db-spark -am -Dmaven.test.skip=true
+mvn package -pl cupid-db-spark -am -Dmaven.test.skip=true -DskipTests
 ```
 
 2. 将包复制到 docker/spark-dev/apps, 这目录会被容器挂载
 
-3. 启动容器：
+3. 启动容器()：
 
 ```shell
 cd docker/spark-dev
