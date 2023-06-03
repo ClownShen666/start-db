@@ -3,7 +3,7 @@
 1. 打包db-spark包
 
 ```shell
-mvn package -pl cupid-db-spark -am -Dmaven.test.skip=true -DskipTests
+mvn clean package -U -pl cupid-db-spark -am "-Dmaven.test.skip=true" -DskipTests
 ```
 
 2. 将包复制到 docker/spark-dev/apps, 这目录会被容器挂载
