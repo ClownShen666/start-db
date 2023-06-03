@@ -84,16 +84,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
       if (row1.length != row2.length) return false
 
       for (i <- row1.indices) {
-        if (row1(i).isInstanceOf[Timestamp]) {
-          println(row1(i).asInstanceOf[Timestamp].toString)
-          println(row2.get(i).asInstanceOf[Timestamp].toString)
-          if (Math.abs(
-                row1(i)
-                  .asInstanceOf[Timestamp]
-                  .getTime - row2.get(i).asInstanceOf[Timestamp].getTime
-              ) > 1 * 60 * 1000)
-            return false
-        } else if (!isEqual(row1(i), row2.get(i))) {
+        if (!isEqual(row1(i), row2.get(i))) {
           return false
         }
       }
