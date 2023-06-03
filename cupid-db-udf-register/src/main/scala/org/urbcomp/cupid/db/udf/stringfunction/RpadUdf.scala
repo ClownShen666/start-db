@@ -39,7 +39,15 @@ class RpadUdf extends AbstractUdf {
     }
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def evaluate(str: String, len: Int, pad: String): String = {
+    val res = Util.pad(str, len, pad)
+    if (res == null) return null
+    if (res.length == len) return res
+    str + Util.pad(str, len, pad)
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
   def udfWrapper: (String, Int) => String = evaluate
+  def udfWrapper2: (String, Int, String) => String = evaluate
 }

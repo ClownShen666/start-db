@@ -95,7 +95,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("locate2") {
-    executeQueryCheck("select locate('bc', 'abcabc', 2)", List(5))
+    executeQueryCheck("select locate('bc', 'abcabc', 2), locate(null, 'abcabc', 2)", List(5, null))
   }
 
   test("md5") {
