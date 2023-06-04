@@ -27,17 +27,7 @@ class PadUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def evaluate(str: String, len: Int, pad: String): String = {
-    if (str == null || pad == null) null
-    else if (len < str.length) str.substring(0, len)
-    else {
-      val sb = new mutable.StringBuilder()
-      var i = 0
-      while (i < len - str.length) {
-        sb.append(pad)
-        i += 1
-      }
-      sb.toString()
-    }
+    Util.pad(str, len, pad)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
