@@ -147,7 +147,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  // FIXME
+  // FIXME can run but failed for string not match
   ignore("st_bufferPoint(point, distanceInM)") {
     executeQueryCheck(
       "select st_bufferPoint(st_makePoint(116.307683,39.978879), 1)",

@@ -700,10 +700,18 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
             // Currently spark engine only supports load & select
             final SqlParam sqlParam = SqlParam.CACHE.get();
-            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())
-                && (sqlNode instanceof SqlLoadData || sqlNode instanceof SqlSelect)) {
-                sqlParam.setSql(query.sql);
-                return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+
+            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
+                if (sqlNode instanceof SqlLoadData) {
+                    sqlParam.setSql(query.sql);
+                    return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+                }
+
+                // TODO DO NOT run into spark when run select sql for insert
+                if (sqlNode instanceof SqlSelect) {
+                    sqlParam.setSql(query.sql);
+                    return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+                }
             }
 
             CupidDBExecutorFactory startDBExecutorFactory = new CupidDBExecutorFactory();

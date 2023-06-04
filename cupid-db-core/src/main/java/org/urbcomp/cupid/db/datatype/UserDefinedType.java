@@ -16,30 +16,31 @@
  */
 package org.urbcomp.cupid.db.datatype;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
-/**
- * 抽象的数据类型
- *
- * @author jimo
- **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonDeserialize(using = DataTypeFieldDeserializer.class)
-public class DataTypeField {
-
-    private String name;
-    /**
-     * integer, string...
-     */
-    private Object type;
+public class UserDefinedType {
+    private String type;
+    @JsonProperty("class")
+    private String clazz;
+    private String pyClass;
+    private SqlType sqlType;
     private boolean nullable;
-
     private Map<String, Object> metadata;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class SqlType {
+        private String type;
+        private List<DataTypeField> fields;
+    }
 }

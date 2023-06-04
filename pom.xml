@@ -28,7 +28,7 @@
     </modules>
 
     <properties>
-        <protobuf-java.version>3.22.2</protobuf-java.version>
+        <protobuf-java.version>2.5.0</protobuf-java.version>
         <antlr.version>4.9.2</antlr.version>
         <junit.version>4.13.1</junit.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
@@ -65,6 +65,7 @@
         <scalatest.maven.plugin.version>2.0.2</scalatest.maven.plugin.version>
         <geojson.jackson.version>1.14</geojson.jackson.version>
         <jackson-jts-dt.version>2.14</jackson-jts-dt.version>
+        <jackson-databind.verion>2.10.1</jackson-databind.verion>
         <org.jgrapht.version>1.4.0</org.jgrapht.version>
         <rtree.version>0.10</rtree.version>
         <grumpy.version>0.4.7</grumpy.version>
@@ -100,6 +101,35 @@
             </dependency>
 
             <dependency>
+                <artifactId>protobuf-java</artifactId>
+                <groupId>com.google.protobuf</groupId>
+                <version>${protobuf-java.version}</version>
+            </dependency>
+
+            <!-- jackson dependency -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-databind.verion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-databind.verion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-databind.verion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.graphhopper.external</groupId>
+                <artifactId>jackson-datatype-jts</artifactId>
+                <version>${jackson-jts-dt.version}</version>
+            </dependency>
+
+            <!-- avatica dependency -->
+            <dependency>
                 <groupId>org.apache.calcite.avatica</groupId>
                 <artifactId>avatica-server</artifactId>
                 <version>${avatica.version}</version>
@@ -111,15 +141,13 @@
                 <version>${slf4j.version}</version>
             </dependency>
 
+
+            <!-- hbase dependency -->
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-client</artifactId>
                 <version>${hbase.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <artifactId>protobuf-java</artifactId>
-                        <groupId>com.google.protobuf</groupId>
-                    </exclusion>
                     <exclusion>
                         <groupId>org.apache.curator</groupId>
                         <artifactId>curator-framework</artifactId>
@@ -131,6 +159,18 @@
                     <exclusion>
                         <groupId>org.apache.curator</groupId>
                         <artifactId>curator-client</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.hbase</groupId>
+                <artifactId>hbase-mapreduce</artifactId>
+                <version>${hbase.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.el</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -185,17 +225,37 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connection.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-io-comon</artifactId>
+                <version>${jts.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-io</artifactId>
+                <version>${jts.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.locationtech.jts</groupId>
                 <artifactId>jts-core</artifactId>
                 <version>${jts.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>compile</scope>
             </dependency>
+
+            <!-- Cupid Shaded -->
+            <dependency>
+                <groupId>io.github.Spatio-Temporal-Lab</groupId>
+                <artifactId>cupid-shaded-avatica-core</artifactId>
+                <version>${avatica.version}</version>
+            </dependency>
+
 
             <!-- Cupid DB -->
             <dependency>
@@ -492,4 +552,5 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
+
 </project>

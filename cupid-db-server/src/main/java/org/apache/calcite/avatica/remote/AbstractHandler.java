@@ -148,6 +148,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
             final Service.Response response = request.accept(service);
             return new HandlerResponse<>(encode(response), HTTP_OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return convertToErrorResponse(e);
         }
     }
