@@ -141,18 +141,17 @@ public class SparkExecutorTest {
         testLoadSql(sql);
     }
 
-
     @Test
     public void testLoadDataWithoutColumnMapping() throws Exception {
         String path = CitibikeDataUtils.getProjectRoot()
-                + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
-                + "202204-citibike-tripdata_clip_slice_without_column_mapping.csv";
+            + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/"
+            + "202204-citibike-tripdata_clip_slice_without_column_mapping.csv";
         String sql = "LOAD CSV INPATH '"
-                + path
-                + "' TO "
-                + CitibikeDataUtils.TEST_TABLE_NAME
-                + "FIELDS DELIMITER '=' QUOTES '*' "
-                + "WITH HEADER";
+            + path
+            + "' TO "
+            + CitibikeDataUtils.TEST_TABLE_NAME
+            + "FIELDS DELIMITER '=' QUOTES '*' "
+            + "WITH HEADER";
         testLoadSql(sql);
     }
 

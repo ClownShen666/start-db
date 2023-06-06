@@ -93,7 +93,7 @@ public class CupidDBSQLSamples {
     );
 
     public static final String LOAD_DATA_WITHOUT_COLUMN_MAPPING_SAMPLE = loadSample(
-            "load-data-without-column-mapping"
+        "load-data-without-column-mapping"
     );
 
     // Rename table

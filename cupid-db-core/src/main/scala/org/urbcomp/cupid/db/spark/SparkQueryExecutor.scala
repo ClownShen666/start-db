@@ -100,7 +100,7 @@ object SparkQueryExecutor {
               .csv(node.path)
           } else if (node.mappings == null && !node.hasHeader) {
             throw new IllegalArgumentException("header not exist");
-          }else {
+          } else {
             spark.read
               .option("header", node.hasHeader)
               .options(
