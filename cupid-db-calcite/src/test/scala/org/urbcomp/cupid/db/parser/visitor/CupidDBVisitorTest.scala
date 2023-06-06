@@ -231,6 +231,20 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
   }
 
+  test("convert load data without column mapping sql to node and transform it to select") {
+    val sql = CupidDBSQLSamples.LOAD_DATA_WITHOUT_COLUMN_MAPPING_SAMPLE;
+    val parsed = driver.parseSql(sql)
+    val node = parsed.asInstanceOf[SqlLoadData]
+    val expectLoadSql =
+      s"LOAD CSV INPATH 'HDFS://USER/DATA.CSV' TO gemo_table FIELDS DELIMITER ',' QUOTES " + "'\"'" + " WITH HEADER"
+    assertEquals(expectLoadSql, SqlHelper.toSqlString(node))
+    val selectNode = SqlHelper.convertToSelectNode(node, "tmp")
+    val convertedSql =
+      s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
+         |FROM tmp""".stripMargin
+    assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
+  }
+
   test("RENAME TABLE") {
     val sql = CupidDBSQLSamples.RENAME_TABLE_SAMPLE
     val parsed = driver.parseSql(sql)
