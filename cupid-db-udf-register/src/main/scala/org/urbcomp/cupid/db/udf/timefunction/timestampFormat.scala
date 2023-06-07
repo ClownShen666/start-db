@@ -43,12 +43,12 @@ class timestampFormat extends AbstractUdf {
       return simpleDateFormat.format(new Date(ts.asInstanceOf[Timestamp].getTime))
     else if (ts.isInstanceOf[java.lang.Long]) {
       // can not directly pass the ts's long value to new Date( spark will get a wrong answer)
-      val v: Long = ts.toString.reverse.toLong
       val l: Long = Stream
-        .iterate(v)(_ / 10)
+        .iterate(ts.toString.reverse.toLong)(_ / 10)
         .takeWhile(_ != 0)
         .map(_ % 10)
         .foldLeft(0L)((acc, digit) => acc * 10 + digit)
+
       simpleDateFormat.format(new Date(l).getTime)
     } else if (ts.isInstanceOf[String])
       return simpleDateFormat.format(new Date(Timestamp.valueOf(ts.asInstanceOf[String]).getTime))
