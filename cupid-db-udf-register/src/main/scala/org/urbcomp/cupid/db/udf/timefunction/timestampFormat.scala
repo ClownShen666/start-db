@@ -34,10 +34,26 @@ class timestampFormat extends AbstractUdf {
     * @param string time format
     * @return the specified format instance
     */
-  def evaluate(ts: Timestamp, string: String): String = {
-    if (ts == null || string == null) return null
+  def evaluate(ts: Any, string: String): String = {
+
+    if (ts == null || string == null) return null // deal with the null input
+
     val simpleDateFormat = new SimpleDateFormat(string)
-    simpleDateFormat.format(new Date(ts.getTime))
+    if (ts.isInstanceOf[Timestamp])
+      return simpleDateFormat.format(new Date(ts.asInstanceOf[Timestamp].getTime))
+    else if (ts.isInstanceOf[java.lang.Long]) {
+      // can not directly pass the ts's long value to new Date( spark will get a wrong answer)
+      val v: Long = ts.toString.reverse.toLong
+      val l: Long = Stream
+        .iterate(v)(_ / 10)
+        .takeWhile(_ != 0)
+        .map(_ % 10)
+        .foldLeft(0L)((acc, digit) => acc * 10 + digit)
+      simpleDateFormat.format(new Date(l).getTime)
+    } else if (ts.isInstanceOf[String])
+      return simpleDateFormat.format(new Date(Timestamp.valueOf(ts.asInstanceOf[String]).getTime))
+    else null
+
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")

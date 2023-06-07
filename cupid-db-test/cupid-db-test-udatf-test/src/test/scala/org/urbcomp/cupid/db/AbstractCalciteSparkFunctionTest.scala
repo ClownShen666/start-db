@@ -127,13 +127,6 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
             if ((expectVal.asInstanceOf[Double] - actualVal.asInstanceOf[Double]).abs >= tolerance)
               return false
         }
-      case _: Timestamp =>
-        if ((expectVal
-              .asInstanceOf[Timestamp]
-              .getTime - actualVal.asInstanceOf[Timestamp].getTime).abs > 1 * 60 * 1000)
-          return false
-        else
-          return true
       case _ =>
         if (actualVal.isInstanceOf[Geometry] || expectVal.isInstanceOf[Geometry]) {
           if (expectVal.toString != actualVal.toString) {
