@@ -43,8 +43,7 @@ public class SqlOperatorTables extends ReflectiveSqlOperatorTable {
         return CalciteCatalogReader.operatorTable(
             GeometricConstructorFunction.class.getName(),
             TimeFunction.class.getName(),
-            OtherFunction.class.getName(),
-            StringFunction.class.getName()
+            OtherFunction.class.getName()
         );
     }
 

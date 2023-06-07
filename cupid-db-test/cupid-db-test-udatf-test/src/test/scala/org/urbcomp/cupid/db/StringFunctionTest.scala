@@ -57,6 +57,13 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     executeQueryCheck("select rtrim('  abcde '),rtrim(null)", List("  abcde", null))
   }
 
+  test("pad") {
+    executeQueryCheck(
+      "select pad('abcde', 2, 'a'), pad(null, 5, 'a'), pad('abcde', 7, 'a')",
+      List("ab", null, "aa")
+    )
+  }
+
   test("lpad1") {
     executeQueryCheck("select lpad('abcde', 2), lpad(null, 2)", List("  abcde", null))
   }
@@ -95,7 +102,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("locate2") {
-    executeQueryCheck("select locate('bc', 'abcabc', 2)", List(5))
+    executeQueryCheck("select locate('bc', 'abcabc', 2), locate(null, 'abcabc', 2)", List(5, null))
   }
 
   test("md5") {

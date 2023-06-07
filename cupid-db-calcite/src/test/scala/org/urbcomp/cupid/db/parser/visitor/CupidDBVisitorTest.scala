@@ -34,19 +34,19 @@ import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 
 class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
 
-  def driver = CupidDBParseDriver
+  def driver: CupidDBParseDriver.type = CupidDBParseDriver
 
-  def testUser = "cupid_db";
-  def testDatabase = "default";
-  def tableName = "table_name";
+  def testUser = "cupid_db"
+  def testDatabase = "default"
+  def tableName = "table_name"
 
   override def beforeEach(): Unit = {
     SqlParam.CACHE.set(new SqlParam(testUser, testDatabase))
   }
 
   def calciteParse(sql: String): SqlNode = {
-    val parser = SqlParser.create(sql);
-    parser.parseStmt();
+    val parser = SqlParser.create(sql)
+    parser.parseStmt()
   }
 
   test("convert show databases to SqlNode") {
@@ -69,7 +69,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   test("convert show tables to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.SHOW_TABLES)
     assertTrue(parsed.isInstanceOf[SqlShowTables])
-    val node = parsed.asInstanceOf[SqlShowTables];
+    val node = parsed.asInstanceOf[SqlShowTables]
     assertEquals(MetadataUtil.combineUserDbKey(testUser, testDatabase), node.fullDatabaseName())
   }
 
@@ -88,14 +88,14 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   test("convert use database statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.USE_DATABASE_SAMPLE)
     val node = parsed.asInstanceOf[SqlUseDatabase]
-    assertEquals("database_name", node.getFullDatabaseName);
+    assertEquals("database_name", node.getFullDatabaseName)
   }
 
   test("convert create database if not exists statement to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.CREATE_DATABASE_IF_NOT_EXISTS_SAMPLE)
     val node = parsed.asInstanceOf[SqlCreateDatabase]
     assertEquals("database_name", node.getDatabaseName.names.get(0))
-    assertTrue(node.ifNotExists);
+    assertTrue(node.ifNotExists)
   }
 
   test("convert drop database statement to SqlNode") {
@@ -133,7 +133,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val sql = CupidDBSQLSamples.SHOW_CREATE_TABLE_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlShowCreateTable]
-    assertEquals(tableName, node.getTableName.names.get(0));
+    assertEquals(tableName, node.getTableName.names.get(0))
   }
 
   test("convert create table statement to SqlNode") {
@@ -153,26 +153,26 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("convert update table statement to SqlNode") {
-    val sql = CupidDBSQLSamples.UPDATE_SAMPLE;
-    val parser = SqlParser.create(sql);
-    val calciteNode = parser.parseStmt().asInstanceOf[SqlUpdate];
+    val sql = CupidDBSQLSamples.UPDATE_SAMPLE
+    val parser = SqlParser.create(sql)
+    val calciteNode = parser.parseStmt().asInstanceOf[SqlUpdate]
     val parsed = driver.parseSql(sql)
-    val node = parsed.asInstanceOf[SqlUpdate];
-    assertEquals(calciteNode.getTargetColumnList.size(), node.getTargetColumnList.size());
-    assertEquals(calciteNode.getSourceExpressionList.size(), node.getSourceExpressionList.size());
+    val node = parsed.asInstanceOf[SqlUpdate]
+    assertEquals(calciteNode.getTargetColumnList.size(), node.getTargetColumnList.size())
+    assertEquals(calciteNode.getSourceExpressionList.size(), node.getSourceExpressionList.size())
   }
 
   test("convert create user statement to SqlNode") {
     val sql = CupidDBSQLSamples.CREATE_USER_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlCreateUser]
-    assertEquals("test_user", node.getUserName.names.get(0));
+    assertEquals("test_user", node.getUserName.names.get(0))
     assertEquals("password", node.getPassword)
   }
 
   test("convert create table with index to SqlNode") {
     val sql = CupidDBSQLSamples.CREATE_TABLE_WITH_INDEX
-    val parsed = driver.parseSql(sql);
+    val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlCupidCreateTable]
     assertEquals(3, node.indexList.size())
     val index1 = node.indexList.get(1).asInstanceOf[SqlIndexDeclaration]
@@ -204,7 +204,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("convert load data sql to node and transform it to select") {
-    val sql = CupidDBSQLSamples.LOAD_DATA_SAMPLE;
+    val sql = CupidDBSQLSamples.LOAD_DATA_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlLoadData]
     val expectLoadSql =
@@ -218,7 +218,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("convert load data with delimiter and quotes sql to node and transform it to select") {
-    val sql = CupidDBSQLSamples.LOAD_DATA_WITH_DELIMITER_AND_QUOTES_SAMPLE;
+    val sql = CupidDBSQLSamples.LOAD_DATA_WITH_DELIMITER_AND_QUOTES_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlLoadData]
     val expectLoadSql =
@@ -232,7 +232,7 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("RENAME TABLE") {
-    val sql = CupidDBSQLSamples.RENAME_TABLE_SAMPLE;
+    val sql = CupidDBSQLSamples.RENAME_TABLE_SAMPLE
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlRenameTable]
     val expectRenameSql =

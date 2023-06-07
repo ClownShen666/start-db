@@ -147,7 +147,6 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  // FIXME
   test("st_bufferPoint(point, distanceInM)") {
 //    executeQueryCheck(
 //      "select st_bufferPoint(st_makePoint(116.307683,39.978879), 1)",
@@ -156,6 +155,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
 //      )
 //    )
     // todo
+ 
   }
 
   test("st_convexHull(geom)") {

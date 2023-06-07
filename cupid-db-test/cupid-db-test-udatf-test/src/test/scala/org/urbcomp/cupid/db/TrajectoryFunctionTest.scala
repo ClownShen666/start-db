@@ -34,13 +34,11 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectorySeg: Trajectory =
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
-  // FIXME
-  ignore("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
+  test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
     executeQueryCheck("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
   }
 
-  // FIXME
-  ignore("st_traj_fromGeoJSON(str)") {
+  test("st_traj_fromGeoJSON(str)") {
     executeQueryCheck("select st_traj_fromGeoJSON(\'" + tGeo + "\')")
   }
 
