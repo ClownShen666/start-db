@@ -16,11 +16,13 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 class timestampFormat extends AbstractUdf {
 
   override def name(): String = "timestampFormat"
@@ -39,20 +41,19 @@ class timestampFormat extends AbstractUdf {
     if (ts == null || string == null) return null // deal with the null input
 
     val simpleDateFormat = new SimpleDateFormat(string)
-    if (ts.isInstanceOf[Timestamp])
-      return simpleDateFormat.format(new Date(ts.asInstanceOf[Timestamp].getTime))
-    else if (ts.isInstanceOf[java.lang.Long]) {
-      // can not directly pass the ts's long value to new Date( spark will get a wrong answer)
-      val l: Long = Stream
-        .iterate(ts.toString.reverse.toLong)(_ / 10)
-        .takeWhile(_ != 0)
-        .map(_ % 10)
-        .foldLeft(0L)((acc, digit) => acc * 10 + digit)
-
-      simpleDateFormat.format(new Date(l).getTime)
-    } else if (ts.isInstanceOf[String])
-      return simpleDateFormat.format(new Date(Timestamp.valueOf(ts.asInstanceOf[String]).getTime))
-    else null
+    ts match {
+      case timestamp: Timestamp => simpleDateFormat.format(new Date(timestamp.getTime))
+      case _: Long =>
+        val l: Long = Stream
+          .iterate(ts.toString.reverse.toLong)(_ / 10)
+          .takeWhile(_ != 0)
+          .map(_ % 10)
+          .foldLeft(0L)((acc, digit) => acc * 10 + digit)
+        simpleDateFormat.format(new Date(l).getTime)
+      case _: String =>
+        simpleDateFormat.format(new Date(Timestamp.valueOf(ts.asInstanceOf[String]).getTime))
+      case _ => null
+    }
 
   }
 

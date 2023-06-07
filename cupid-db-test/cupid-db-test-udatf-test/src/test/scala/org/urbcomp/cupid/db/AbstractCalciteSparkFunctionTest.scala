@@ -24,7 +24,7 @@ import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
-import java.sql.{Connection, ResultSet, Statement, Timestamp}
+import java.sql.{Connection, ResultSet, Statement}
 import java.util.TimeZone
 import scala.collection.mutable.ArrayBuffer
 
