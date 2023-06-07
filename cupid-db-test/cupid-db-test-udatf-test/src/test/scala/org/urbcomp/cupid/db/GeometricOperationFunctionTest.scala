@@ -155,7 +155,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
 //      )
 //    )
     // todo
- 
+
   }
 
   test("st_convexHull(geom)") {
