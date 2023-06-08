@@ -100,7 +100,14 @@ object SparkQueryExecutor {
               .csv(node.path)
           } else if (node.mappings == null && !node.hasHeader) {
             throw new IllegalArgumentException("header not exist");
-          } else {
+          } else if (node.mappings == null && node.hasHeader) {
+            spark.read
+              .option("header",node.hasHeader)
+              .options(
+                Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
+              )
+              .csv(node.path)
+          }else {
             spark.read
               .option("header", node.hasHeader)
               .options(
