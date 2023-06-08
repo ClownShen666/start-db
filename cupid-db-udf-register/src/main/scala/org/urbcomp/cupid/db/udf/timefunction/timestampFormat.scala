@@ -41,23 +41,20 @@ class timestampFormat extends AbstractUdf {
 
     val simpleDateFormat = new SimpleDateFormat(string)
     ts match {
-      case timestamp: Timestamp => simpleDateFormat.format(new Date(timestamp.getTime))
-      case _: Long              =>
-//        val l: Long = Stream
-//          .iterate(ts.toString.reverse.toLong)(_ / 10)
-//          .takeWhile(_ != 0)
-//          .map(_ % 10)
-//          .foldLeft(0L)((acc, digit) => acc * 10 + digit)
-        var l: Long = 0L
-        var v = ts.toString.reverse.toLong
+      case timestamp: Timestamp =>
+        simpleDateFormat.format(new Date(timestamp.getTime))
+      case l: Long =>
+        var v = l.toString.reverse.toLong
+        var dl = 0L
         while (v != 0) {
-          l = l * 10 + (v % 10)
+          dl = dl * 10 + (v % 10)
           v = v / 10
         }
-        simpleDateFormat.format(new Date(l).getTime)
-      case _: String =>
-        simpleDateFormat.format(new Date(Timestamp.valueOf(ts.asInstanceOf[String]).getTime))
-      case _ => null
+        simpleDateFormat.format(new Date(dl).getTime)
+      case string: String =>
+        simpleDateFormat.format(new Date(Timestamp.valueOf(string).getTime))
+      case _ =>
+        null
     }
 
   }
