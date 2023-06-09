@@ -63,7 +63,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
             final String basePath = DynamicConfig.getSparkHdfsResultPath();
             String schemaPathDir = basePath + DynamicConfig.getResultSchemaName(sqlId);
             String dataPathDir = basePath + DynamicConfig.getResultDataName(sqlId);
-            System.out.println("HDFS DATA PATH: " + dataPathDir);
+            log.info("HDFS DATA PATH: " + dataPathDir);
             /*
               FIXME: Not available until ser/de completed
               final List<DataTypeField> fields = readFields(fs, schemaPathDir);
@@ -76,7 +76,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
                 data
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            // FIXME: Print exception stack trace using logger
             throw new RuntimeException(e);
         }
     }
@@ -84,7 +84,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
     private StructType readSchema(FileSystem fs, String schemaPathDir) throws Exception {
         final List<String> fieldLine = readHdfsFile(fs, schemaPathDir);
         if (fieldLine.isEmpty()) {
-            throw new RuntimeException("Schema is empty: " + schemaPathDir);
+            throw new Exception("Schema is empty: " + schemaPathDir);
         }
         final String schemaJson = fieldLine.get(0);
         AbstractDataType val = null;
@@ -96,34 +96,29 @@ public class SparkDataReadHdfs implements ISparkDataRead {
         if (val instanceof StructType) {
             return (StructType) val;
         } else {
-            throw new RuntimeException("Schema cannot be deserialized: " + schemaJson);
+            throw new Exception("Schema cannot be deserialized: " + schemaJson);
         }
     }
 
     private List<Object[]> readDataframe(String dataPathDir, StructType schema) throws Exception {
         SparkSession spark = SparkQueryExecutor.getSparkSession(true);
-        try {
-            // FIXME: Reading dataframe without using geomesa format due to compatibility
-            Dataset<Row> df = spark.read()
-                .schema(schema)
-                .option("header", false)
-                .option("sep", DynamicConfig.getHdfsDataSplitter())
-                .load(dataPathDir);
-            log.info("Fetch data from HDFS: ");
-            df.printSchema();
-            df.show();
-            StructField[] fields = schema.fields();
-            return Arrays.stream((Row[]) df.collect()).map(row -> {
-                Object[] temp = new Object[fields.length];
-                for (int i = 0; i < fields.length; ++i) {
-                    temp[i] = row.getAs(fields[i].name());
-                }
-                return temp;
-            }).collect(Collectors.toList());
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        // FIXME: Reading dataframe without using geomesa format due to compatibility
+        Dataset<Row> df = spark.read()
+            .schema(schema)
+            .option("header", false)
+            .option("sep", DynamicConfig.getHdfsDataSplitter())
+            .load(dataPathDir);
+        log.info("Fetch data from HDFS: ");
+        df.printSchema();
+        df.show();
+        StructField[] fields = schema.fields();
+        return Arrays.stream((Row[]) df.collect()).map(row -> {
+            Object[] temp = new Object[fields.length];
+            for (int i = 0; i < fields.length; ++i) {
+                temp[i] = row.getAs(fields[i].name());
+            }
+            return temp;
+        }).collect(Collectors.toList());
     }
 
     private List<Object[]> readData(FileSystem fs, String dataPathDir, List<DataTypeField> fields)
@@ -154,10 +149,10 @@ public class SparkDataReadHdfs implements ISparkDataRead {
         return row;
     }
 
-    private List<DataTypeField> readFields(FileSystem fs, String schemaPathDir) throws IOException {
+    private List<DataTypeField> readFields(FileSystem fs, String schemaPathDir) throws Exception {
         final List<String> fieldLine = readHdfsFile(fs, schemaPathDir);
         if (fieldLine.isEmpty()) {
-            throw new RuntimeException("Schema is empty: " + schemaPathDir);
+            throw new Exception("Schema is empty: " + schemaPathDir);
         }
         final String schemaJson = fieldLine.get(0);
         return JacksonUtil.MAPPER.readValue(schemaJson, new TypeReference<List<DataTypeField>>() {

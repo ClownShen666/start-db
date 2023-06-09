@@ -457,12 +457,7 @@ public abstract class AbstractCursor implements Cursor {
         }
 
         public <T> T getObject(Class<T> type) throws SQLException {
-            try {
-                return (T) getObject();
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            return (T) getObject();
         }
     }
 

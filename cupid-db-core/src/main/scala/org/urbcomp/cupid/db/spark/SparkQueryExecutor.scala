@@ -152,8 +152,8 @@ object SparkQueryExecutor {
       }
     } catch {
       case e: Exception =>
-        e.printStackTrace()
-        throw new RuntimeException(e)
+        // FIXME: Print exception stack trace using logger
+        throw e
     } finally {
       spark.stop()
       SparkSession.clearActiveSession()
