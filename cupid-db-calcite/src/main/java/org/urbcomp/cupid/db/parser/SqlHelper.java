@@ -75,13 +75,13 @@ public class SqlHelper {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            for (int i = 0; i < Objects.requireNonNull(csvFields).length; i++) {
+            for (String csvField : Objects.requireNonNull(csvFields)) {
                 nodes.add(
                     new SqlBasicCall(
                         SqlStdOperatorTable.AS,
                         Arrays.asList(
-                            new SqlIdentifier(csvFields[i], pos),
-                            new SqlIdentifier("_c" + i, pos)
+                            new SqlIdentifier(csvField, pos),
+                            new SqlIdentifier(csvField, pos)
                         ).toArray(new SqlNode[] {}),
                         pos
                     )
