@@ -50,25 +50,4 @@ trait IRemoteWriter extends Serializable {
   def writeOneClose()
 }
 
-object IRemoteWriter extends Serializable {
-
-  /**
-    * 为什么要通过静态变量来传递参数？
-    * 因为通过构造方法传不进来
-    */
-
-  /*def getInstance(): IRemoteWriter = {
-    log.info("IRemoteWriter show options!")
-    log.info("options:")
-    if (options == null) {
-      log.info("option is null")
-    } else {
-      import scala.collection.JavaConversions._
-      for (entry <- options.entrySet) {
-        log.info(entry.getKey + ": " + entry.getValue)
-      }
-    }
-    log.info("IRemoteWriter show options finished")
-    new GrpcRemoteWriter
-  }*/
-}
+object IRemoteWriter extends Serializable {}

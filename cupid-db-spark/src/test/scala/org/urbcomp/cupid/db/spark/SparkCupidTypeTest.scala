@@ -35,20 +35,6 @@ class SparkCupidTypeTest extends FunSuite {
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     val point: Point = new GeometryFactory().createPoint(new Coordinate(3.4, 5.6))
     val df = spark.createDataset(Seq(point)).toDF("points")
-    /*df.coalesce(1)
-      .write
-      // .format("geomesa")
-      .mode(SaveMode.Overwrite)
-      .option("header", value = true)
-      .option("sep", DynamicConfig.getHdfsDataSplitter)
-      .save("hdfs://localhost:8000/mymy2")
-    val df2 = spark.read
-    // .format("geomesa")
-      .option("header", value = true)
-      .option("sep", DynamicConfig.getHdfsDataSplitter)
-      .load("hdfs://localhost:8000/mymy2")
-    df2.printSchema()
-    df2.show()*/
     assertEquals(point, df.select("points").as[Point].collect.toList.head)
     spark.stop()
   }

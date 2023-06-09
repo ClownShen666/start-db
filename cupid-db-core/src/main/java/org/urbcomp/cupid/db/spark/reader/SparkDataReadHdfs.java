@@ -103,10 +103,10 @@ public class SparkDataReadHdfs implements ISparkDataRead {
     private List<Object[]> readDataframe(String dataPathDir, StructType schema) throws Exception {
         SparkSession spark = SparkQueryExecutor.getSparkSession(true);
         try {
+            // FIXME: Reading dataframe without using geomesa format due to compatibility
             Dataset<Row> df = spark.read()
                 .schema(schema)
-                // .format("geomesa")
-                // .option("header", true)
+                .option("header", false)
                 .option("sep", DynamicConfig.getHdfsDataSplitter())
                 .load(dataPathDir);
             log.info("Fetch data from HDFS: ");
@@ -116,8 +116,6 @@ public class SparkDataReadHdfs implements ISparkDataRead {
             return Arrays.stream((Row[]) df.collect()).map(row -> {
                 Object[] temp = new Object[fields.length];
                 for (int i = 0; i < fields.length; ++i) {
-                    // log.info("Field type: " + row.getAs(fields[i].name()).getClass());
-                    // log.info("Field value: " + row.getAs(fields[i].name()));
                     temp[i] = row.getAs(fields[i].name());
                 }
                 return temp;

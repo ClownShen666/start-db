@@ -30,7 +30,6 @@ public class DataConvertFactory {
      * 将 val转换为 type类型的数据
      */
     public static Object convert(String val, DataTypeField type) throws Exception {
-        System.out.println("DataConvertFactory convert " + val + " " + type);
         switch (type.getType()) {
             case "integer":
             case "int":
@@ -45,12 +44,11 @@ public class DataConvertFactory {
             case "trajectory":
                 return (Trajectory) Trajectory.fromGeoJSON(val);
             default:
-                throw new RuntimeException("Unknown DataTypeField " + type);
+                throw new NoClassDefFoundError("Unknown DataTypeField " + type);
         }
     }
 
     public static Class<?> strTypeToClass(String typeName) {
-        System.out.println("DataConvertFactory strTypeToClass " + typeName);
         switch (typeName) {
             case "integer":
             case "int":
@@ -64,7 +62,7 @@ public class DataConvertFactory {
             case "trajectory":
                 return Trajectory.class;
             default:
-                throw new RuntimeException("Unknown typeName " + typeName);
+                throw new NoClassDefFoundError("Unknown typeName " + typeName);
         }
     }
 }

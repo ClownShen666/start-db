@@ -34,12 +34,6 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
     val sqlId = param.getSqlId
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
 
-    /*val typeFields =
-      data.schema.fields.map(
-        s =>
-          new DataTypeField(s.name, s.dataType.simpleString, s.nullable, metadataToMap(s.metadata))
-      )
-    val fieldJson = JacksonUtil.MAPPER.writeValueAsString(typeFields)*/
     log.info("HDFS schema path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
     val schemaJson = data.schema.json
     import data.sparkSession.implicits._
@@ -51,12 +45,12 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
       .text(hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
     log.info("HDFS dataframe path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
     // We use default parquet format instead of csv because csv does not support Geomesa types and UDTs
+    // FIXME: Reading dataframe without using geomesa format due to compatibility
     data
       .coalesce(1)
       .write
-      // .format("geomesa")
       .mode(SaveMode.Overwrite)
-      // .option("header", value = true)
+      .option("header", value = false)
       .option("sep", DynamicConfig.getHdfsDataSplitter)
       .save(hdfsPath + DynamicConfig.getResultDataName(sqlId))
   }

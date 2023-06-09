@@ -19,7 +19,6 @@ package org.urbcomp.cupid.db.spark.cache;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.DefaultSerializers;
 import org.apache.spark.sql.catalyst.InternalRow;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.StructField;
@@ -33,6 +32,7 @@ import java.util.Locale;
 /**
  * @author jimo
  **/
+// FIXME: Only compatible with int and string
 public class SparkDataSerializer {
 
     private final static Kryo KRYO = KryoHelper.getKryo();
@@ -43,8 +43,6 @@ public class SparkDataSerializer {
         Object[] row = new Object[numFields];
         for (int i = 0; i < numFields; i++) {
             final String typeName = input.readString();
-            System.out.println("deserializing ...");
-            System.out.println(typeName.toLowerCase(Locale.ROOT));
             final Object o = KRYO.readObjectOrNull(
                 input,
                 DataConvertFactory.strTypeToClass(typeName.toLowerCase(Locale.ROOT))
@@ -55,7 +53,6 @@ public class SparkDataSerializer {
     }
 
     public static byte[] serialize(InternalRow row, StructType schema) {
-        System.out.println("serializing " + row);
         final Output output = new Output(new ByteArrayOutputStream());
         final int numFields = row.numFields();
         output.writeInt(numFields);
@@ -66,24 +63,6 @@ public class SparkDataSerializer {
             Object data = row.get(i, dataType);
             if (data instanceof UTF8String) {
                 data = data.toString();
-            }
-            System.out.println("serializing ...");
-            System.out.println(dataType.typeName().toLowerCase(Locale.ROOT) + ": " + data);
-            if (dataType.typeName().toLowerCase(Locale.ROOT).equals("timestamp")) {
-                System.out.println("hit!");
-                System.out.println(
-                    ((java.sql.Timestamp) data).getTime()
-                        + " "
-                        + ((java.sql.Timestamp) data).toString()
-                );
-                System.out.println(
-                    ((java.util.Date) data).getTime() + " " + ((java.util.Date) data).toString()
-                );
-                DefaultSerializers.DateSerializer ss = new DefaultSerializers.DateSerializer();
-                Output temp = new Output(new ByteArrayOutputStream());
-                ss.write(KRYO, temp, (java.util.Date) data);
-                System.out.println(temp.toBytes());
-                System.out.println("hit finished");
             }
             KRYO.writeObjectOrNull(
                 output,

@@ -193,7 +193,6 @@ public class DriverTest {
         conf.put("spark.local", "false");
         conf.put("spark.async", "false");
         conf.put("spark.exportType", "cache");
-        // conf.put("spark.exportType", "print");
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",
