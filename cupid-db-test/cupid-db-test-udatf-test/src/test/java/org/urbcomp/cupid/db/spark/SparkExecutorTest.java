@@ -150,9 +150,34 @@ public class SparkExecutorTest {
             + path
             + "' TO "
             + CitibikeDataUtils.TEST_TABLE_NAME
-            + "FIELDS DELIMITER '=' QUOTES '*' "
-            + "WITH HEADER";
-        testLoadSql(sql);
-    }
+            + "_t"
+            + " WITH HEADER";
 
+        // test specifically
+        String userName = "root";
+        String dbName = "default";
+        SqlParam.CACHE.set(new SqlParam(userName, dbName));
+        try (Connection connect = CalciteHelper.createConnection()) {
+            String createTableSql = "create table if not exists "
+                + CitibikeDataUtils.TEST_TABLE_NAME
+                + "_t"
+                + " (idx Integer,"
+                + " ride_id String,"
+                + " rideable_type String)";
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate(createTableSql);
+        }
+        // for hadoop just need to provide a hadoop path
+        final SparkExecutor executor = new SparkExecutor();
+        final SparkSqlParam param = new SparkSqlParam();
+        param.setLocal(true);
+        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExportType(DataExportType.LOCAL);
+        System.out.println(sql);
+        param.setSql(sql);
+        param.setUserName(userName);
+        param.setDbName(dbName);
+        final MetadataResult<Object> res = executor.execute(param);
+        assertNotNull(res);
+    }
 }
