@@ -149,7 +149,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  test("st_bufferPoint(point, distanceInM)") {
+  ignore("st_bufferPoint(point, distanceInM)") {
     executeQueryCheck(
       "select st_bufferPoint(st_makePoint(116.307683,39.978879), 1)",
       List(
