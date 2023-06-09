@@ -32,6 +32,8 @@ import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
 import org.urbcomp.cupid.db.parser.{CupidDBSQLSamples, SqlHelper}
 import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 
+import java.nio.file.Paths
+
 class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
 
   def driver: CupidDBParseDriver.type = CupidDBParseDriver
@@ -232,16 +234,26 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("convert load data without column mapping sql to node and transform it to select") {
+    // To get path of real csv
+    var path = Paths.get("").toAbsolutePath
+    while (!path.endsWith("cupid-db")) path = path.getParent
+    val vsvPath = path
+      .normalize()
+      .toString + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice_without_column_mapping.csv"
+
+    // run example
     val sql = CupidDBSQLSamples.LOAD_DATA_WITHOUT_COLUMN_MAPPING_SAMPLE;
     val parsed = driver.parseSql(sql)
     val node = parsed.asInstanceOf[SqlLoadData]
     val expectLoadSql =
       s"LOAD CSV INPATH 'HDFS://USER/DATA.CSV' TO gemo_table FIELDS DELIMITER ',' QUOTES " + "'\"'" + " WITH HEADER"
-    assertEquals(expectLoadSql, SqlHelper.toSqlString(node).replaceAll("`", ""))
+    assertEquals(expectLoadSql, SqlHelper.toSqlString(node))
+
+    // change path to real path
+    node.path = vsvPath
     val selectNode = SqlHelper.convertToSelectNode(node, "tmp")
-    println(SqlHelper.toSqlString(selectNode));
     val convertedSql =
-      s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
+      s"""SELECT idx AS idx, ride_id AS ride_id, rideable_type AS rideable_type
          |FROM tmp""".stripMargin
     assertEquals(convertedSql, SqlHelper.toSqlString(selectNode))
   }
