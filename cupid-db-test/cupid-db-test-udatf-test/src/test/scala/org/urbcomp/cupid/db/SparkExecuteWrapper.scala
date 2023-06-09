@@ -34,7 +34,6 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
   param.setExportType(DataExportType.PRINT)
   param.setLocal(true)
   var sparkSession: SparkSession = null
-
   def executeSql(sql: String): Dataset[Row] = {
     if (sparkSession == null) {
       sparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)

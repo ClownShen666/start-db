@@ -26,11 +26,6 @@ class currentTimestamp extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
-  /**
-    * get current timestamp
-    *
-    * @return current timestamp
-    */
   def evaluate(): Timestamp = new Timestamp(System.currentTimeMillis)
 
   def udfSparkEntries: List[String] = List("udfWrapper")

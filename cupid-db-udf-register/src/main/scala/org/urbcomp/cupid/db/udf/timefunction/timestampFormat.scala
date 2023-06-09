@@ -16,11 +16,13 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Date
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
+
 class timestampFormat extends AbstractUdf {
 
   override def name(): String = "timestampFormat"
@@ -34,10 +36,27 @@ class timestampFormat extends AbstractUdf {
     * @param string time format
     * @return the specified format instance
     */
-  def evaluate(ts: Timestamp, string: String): String = {
-    if (ts == null || string == null) return null
+  def evaluate(ts: Any, string: String): String = {
+    if (ts == null || string == null) return null // deal with the null input
+
     val simpleDateFormat = new SimpleDateFormat(string)
-    simpleDateFormat.format(new Date(ts.getTime))
+    ts match {
+      case timestamp: Timestamp =>
+        simpleDateFormat.format(new Date(timestamp.getTime))
+      case l: Long =>
+        var v = l.toString.reverse.toLong
+        var dl = 0L
+        while (v != 0) {
+          dl = dl * 10 + (v % 10)
+          v = v / 10
+        }
+        simpleDateFormat.format(new Date(dl).getTime)
+      case string: String =>
+        simpleDateFormat.format(new Date(Timestamp.valueOf(string).getTime))
+      case _ =>
+        null
+    }
+
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")

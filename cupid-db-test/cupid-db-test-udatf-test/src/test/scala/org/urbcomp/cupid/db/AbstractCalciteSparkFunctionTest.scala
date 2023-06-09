@@ -104,37 +104,37 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     result
   }
 
-  private def isEqual(rsValue: Any, dfValue: Any): Boolean = {
-    rsValue match {
+  private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
+    expectVal match {
       case _: java.math.BigDecimal =>
-        dfValue match {
+        actualVal match {
           case d: Double =>
-            if (java.math.BigDecimal.valueOf(d) != rsValue) return false
+            if (java.math.BigDecimal.valueOf(d) != expectVal) return false
           case _ =>
-            if (rsValue
+            if (expectVal
                   .asInstanceOf[java.math.BigDecimal]
-                  .compareTo(rsValue.asInstanceOf[java.math.BigDecimal]) != 0) {
+                  .compareTo(expectVal.asInstanceOf[java.math.BigDecimal]) != 0) {
               return false
             }
         }
       case _: java.lang.Double =>
         val tolerance = 0.00000000000000001
-        dfValue match {
+        actualVal match {
           case fl: Float =>
-            if ((rsValue.asInstanceOf[Double] - fl).abs >= tolerance)
+            if ((expectVal.asInstanceOf[Double] - fl).abs >= tolerance)
               return false
           case _ =>
-            if ((rsValue.asInstanceOf[Double] - dfValue.asInstanceOf[Double]).abs >= tolerance)
+            if ((expectVal.asInstanceOf[Double] - actualVal.asInstanceOf[Double]).abs >= tolerance)
               return false
         }
       case _ =>
-        if (dfValue.isInstanceOf[Geometry] || rsValue.isInstanceOf[Geometry]) {
-          if (rsValue.toString != dfValue.toString) {
+        if (actualVal.isInstanceOf[Geometry] || expectVal.isInstanceOf[Geometry]) {
+          if (expectVal.toString != actualVal.toString) {
             return false
           } else {
             return true
           }
-        } else if (rsValue != dfValue) {
+        } else if (expectVal != actualVal) {
           return false
         } else {
           return true
