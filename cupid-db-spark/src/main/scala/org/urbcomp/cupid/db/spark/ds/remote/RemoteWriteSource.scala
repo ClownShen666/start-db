@@ -88,11 +88,15 @@ class RemoteBatchWrite(options: util.Map[String, String]) extends BatchWrite {
   }
 
   override def commit(messages: Array[WriterCommitMessage]): Unit = {
-    factory.writer.remoteWriter.commit()
+    if (factory != null && factory.writer != null && factory.writer.remoteWriter != null) {
+      factory.writer.remoteWriter.commit()
+    }
   }
 
   override def abort(messages: Array[WriterCommitMessage]): Unit = {
-    factory.writer.remoteWriter.abort()
+    if (factory != null && factory.writer != null && factory.writer.remoteWriter != null) {
+      factory.writer.remoteWriter.abort()
+    }
   }
 }
 
