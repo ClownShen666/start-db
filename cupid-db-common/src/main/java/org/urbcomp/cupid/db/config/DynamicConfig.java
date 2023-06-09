@@ -52,11 +52,9 @@ public class DynamicConfig {
             // String hostName = getLocalHostExactAddress().getHostName();
             String hostName = "" + InetAddress.getLocalHost().getHostName();
             log.info("get host name " + hostName);
-            System.out.println("get host name " + hostName);
             return hostName;
         } catch (Exception e) {
             log.warn("get hostname error", e);
-            System.out.println("get hostname error " + e);
             return "localhost";
         }
     }

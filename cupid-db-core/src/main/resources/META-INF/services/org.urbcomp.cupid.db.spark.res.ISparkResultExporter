@@ -1,1 +1,2 @@
 org.urbcomp.cupid.db.spark.res.SparkLocalResultExporter
+org.urbcomp.cupid.db.spark.res.SparkResult2HdfsExporter

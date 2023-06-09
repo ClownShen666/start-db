@@ -24,12 +24,21 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hbase.exceptions.IllegalArgumentIOException;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser;
+import org.apache.spark.sql.types.AbstractDataType;
+import org.apache.spark.sql.types.StructField;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.DataTypeField;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.spark.ISparkDataRead;
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor;
 import org.urbcomp.cupid.db.util.JacksonUtil;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.StructType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +46,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jimo
@@ -52,15 +63,68 @@ public class SparkDataReadHdfs implements ISparkDataRead {
             final String basePath = DynamicConfig.getSparkHdfsResultPath();
             String schemaPathDir = basePath + DynamicConfig.getResultSchemaName(sqlId);
             String dataPathDir = basePath + DynamicConfig.getResultDataName(sqlId);
-            final List<DataTypeField> fields = readFields(fs, schemaPathDir);
-            List<Object[]> data = readData(fs, dataPathDir, fields);
-
+            System.out.println("HDFS DATA PATH: " + dataPathDir);
+            /*
+              FIXME: Not available until ser/de completed
+              final List<DataTypeField> fields = readFields(fs, schemaPathDir);
+              List<Object[]> data = readData(fs, dataPathDir, fields);
+            */
+            StructType schema = readSchema(fs, schemaPathDir);
+            List<Object[]> data = readDataframe(dataPathDir, schema);
             return (MetadataResult<T>) MetadataResult.buildResult(
-                fields.stream().map(DataTypeField::getName).toArray(String[]::new),
+                Arrays.stream(schema.fields()).map(StructField::name).toArray(String[]::new),
                 data
             );
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    private StructType readSchema(FileSystem fs, String schemaPathDir) throws Exception {
+        final List<String> fieldLine = readHdfsFile(fs, schemaPathDir);
+        if (fieldLine.isEmpty()) {
+            throw new RuntimeException("Schema is empty: " + schemaPathDir);
+        }
+        final String schemaJson = fieldLine.get(0);
+        AbstractDataType val = null;
+        try {
+            val = DataType.fromJson(schemaJson);
+        } catch (Exception e) {
+            val = LegacyTypeStringParser.parseString(schemaJson);
+        }
+        if (val instanceof StructType) {
+            return (StructType) val;
+        } else {
+            throw new RuntimeException("Schema cannot be deserialized: " + schemaJson);
+        }
+    }
+
+    private List<Object[]> readDataframe(String dataPathDir, StructType schema) throws Exception {
+        SparkSession spark = SparkQueryExecutor.getSparkSession(true);
+        try {
+            Dataset<Row> df = spark.read()
+                .schema(schema)
+                // .format("geomesa")
+                // .option("header", true)
+                .option("sep", DynamicConfig.getHdfsDataSplitter())
+                .load(dataPathDir);
+            log.info("Fetch data from HDFS: ");
+            df.printSchema();
+            df.show();
+            StructField[] fields = schema.fields();
+            return Arrays.stream((Row[]) df.collect()).map(row -> {
+                Object[] temp = new Object[fields.length];
+                for (int i = 0; i < fields.length; ++i) {
+                    // log.info("Field type: " + row.getAs(fields[i].name()).getClass());
+                    // log.info("Field value: " + row.getAs(fields[i].name()));
+                    temp[i] = row.getAs(fields[i].name());
+                }
+                return temp;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -115,7 +179,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
         if (path == null) {
             throw new IllegalArgumentIOException("hdfs result not exist: " + pathDir);
         }
-        log.info("Read HDFS result:{}", path);
+        log.info("Read HDFS result: {}", path);
         List<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(path)))) {
             final String line = br.readLine();
@@ -126,6 +190,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
 
     private FileSystem getFileSystem() throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
+        conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
         String hdfsPath = DynamicConfig.getHdfsPath();
         System.setProperty("HADOOP_USER_NAME", DynamicConfig.getHadoopUser());
         return FileSystem.get(new URI(hdfsPath), conf);

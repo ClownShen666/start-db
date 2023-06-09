@@ -334,35 +334,36 @@ public abstract class AbstractCursor implements Cursor {
         }
 
         public byte getByte() throws SQLException {
-            return (byte) getLong();
+            return Byte.parseByte(getString());
+
         }
 
         public short getShort() throws SQLException {
-            return (short) getLong();
+            return Short.parseShort(getString());
         }
 
         public int getInt() throws SQLException {
-            return (int) getLong();
+            return Integer.parseInt(getString());
         }
 
         public long getLong() throws SQLException {
-            throw cannotConvert("long");
+            return Long.parseLong(getString());
         }
 
         public float getFloat() throws SQLException {
-            return (float) getDouble();
+            return Float.parseFloat(getString());
         }
 
         public double getDouble() throws SQLException {
-            throw cannotConvert("double");
+            return Double.parseDouble(getString());
         }
 
         public BigDecimal getBigDecimal() throws SQLException {
-            throw cannotConvert("BigDecimal");
+            return new BigDecimal(getString());
         }
 
         public BigDecimal getBigDecimal(int scale) throws SQLException {
-            throw cannotConvert("BigDecimal with scale");
+            return new BigDecimal(getString()).setScale(scale);
         }
 
         public byte[] getBytes() throws SQLException {
@@ -418,15 +419,21 @@ public abstract class AbstractCursor implements Cursor {
         }
 
         public Date getDate(Calendar calendar) throws SQLException {
-            throw cannotConvert("Date");
+            Object o = getObject();
+            if (o instanceof Long) return new Date(Long.parseLong(o.toString()));
+            else return Date.valueOf(o.toString());
         }
 
         public Time getTime(Calendar calendar) throws SQLException {
-            throw cannotConvert("Time");
+            Object o = getObject();
+            if (o instanceof Long) return new Time(Long.parseLong(o.toString()));
+            else return Time.valueOf(o.toString());
         }
 
         public Timestamp getTimestamp(Calendar calendar) throws SQLException {
-            throw cannotConvert("Timestamp");
+            Object o = getObject();
+            if (o instanceof Long) return new Timestamp(Long.parseLong(o.toString()));
+            else return Timestamp.valueOf(o.toString());
         }
 
         public URL getURL() throws SQLException {
@@ -450,7 +457,12 @@ public abstract class AbstractCursor implements Cursor {
         }
 
         public <T> T getObject(Class<T> type) throws SQLException {
-            throw cannotConvert("Object (with type)");
+            try {
+                return (T) getObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
         }
     }
 

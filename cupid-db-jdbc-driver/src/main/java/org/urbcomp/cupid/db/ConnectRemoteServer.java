@@ -28,17 +28,104 @@ import java.util.Properties;
 public class ConnectRemoteServer {
 
     public static void main(String[] args) throws Exception {
-        test_remote();
+        test_remote_hdfs();
     }
 
-    public static void test_remote() throws Exception {
+    private static void test_query_simple(Connection conn) throws Exception {
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("select 1+1 as s");
+        rs.next();
+        System.out.println(rs.getString(1));
+        assert ("2".equals(rs.getString(1)));
+        stmt.close();
+    }
+
+    private static void test_query_udf_udtf(Connection conn) throws Exception {
+        Trajectory trajectoryStp = ModelGenerator.generateTrajectory(
+            "data/stayPointSegmentationTraj.txt"
+        );
+        String tGeo = trajectoryStp.toGeoJSON();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(
+            "select f.starttime, f.endtime, f.gpspoints from "
+                + "(select st_traj_stayPointDetect(traj, 10, 10) "
+                + "from (select st_traj_fromGeoJSON(\'"
+                + tGeo
+                + "\') as traj)) f"
+        );
+        rs.next();
+        System.out.println(rs.getTimestamp(1));
+        System.out.println(rs.getTimestamp(2));
+        System.out.println(rs.getObject(3));
+        stmt.close();
+    }
+
+    private static void test_query_noiseFilter1(Connection conn) throws Exception {
+        Trajectory trajectoryStp = ModelGenerator.generateTrajectory(
+            "data/stayPointSegmentationTraj.txt"
+        );
+        String tGeo = trajectoryStp.toGeoJSON();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(
+            "select st_traj_asGeoJSON(st_traj_noiseFilter(st_traj_fromGeoJSON(\'"
+                + tGeo
+                + "\'),"
+                + "1)) as aaa"
+        );
+        rs.next();
+        Object o = rs.getObject(1);
+        System.out.println(o.getClass());
+        System.out.println(rs.getObject(1).toString());
+        assert (o.toString().equals(trajectoryStp.getGPSPointList().subList(0, 1).toString()));
+        stmt.close();
+    }
+
+    private static void test_query_noiseFilter2(Connection conn) throws Exception {
+        Trajectory trajectoryStp = ModelGenerator.generateTrajectory(
+            "data/stayPointSegmentationTraj.txt"
+        );
+        String tGeo = trajectoryStp.toGeoJSON();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(
+            "select st_traj_asGeoJSON(st_traj_noiseFilter(st_traj_fromGeoJSON(\'"
+                + tGeo
+                + "\'),"
+                + "8.5)) as aaa"
+        );
+        rs.next();
+        Object o = rs.getObject(1);
+        System.out.println(o.getClass());
+        System.out.println(rs.getObject(1).toString());
+        assert (Trajectory.fromGeoJSON(o.toString())
+            .getGPSPointList()
+            .toString()
+            .equals(
+                "[POINT (108.99553 34.27859), POINT (108.99655 34.25891), POINT (108.99657 34.25875), POINT (108.99655 34.25857), POINT (108.99654 34.25837), POINT (108.99652 34.25826), POINT (108.99647 34.25821), POINT (108.99639 34.25818), POINT (108.99624 34.25818), POINT (108.99598 34.25819), POINT (108.99433 34.25818), POINT (108.99391 34.25818), POINT (108.99337 34.25817), POINT (108.99312 34.25817), POINT (108.99287 34.25817), POINT (108.9926 34.25816), POINT (108.99245 34.25816), POINT (108.9923 34.25816), POINT (108.99205 34.25815)]"
+            ));
+        stmt.close();
+    }
+
+    private static void test_query_geomesa_type(Connection conn) throws Exception {
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(
+            "select st_translate(st_makePoint(1, 2), 1, 1) as a, st_translate(st_makeBBox(1, 2, 3, 4), 1, 1) as b"
+        );
+        rs.next();
+        Object o = rs.getObject(1);
+        System.out.println(o.getClass());
+        System.out.println(rs.getObject(1).toString());
+        System.out.println(rs.getObject(2).toString());
+        stmt.close();
+    }
+
+    private static void test_remote_hdfs() throws Exception {
         final Properties conf = new Properties();
         conf.put("user", "root");
         conf.put("password", "cupid-db");
         conf.put("engine", "spark_cluster");
         conf.put("spark.local", "false");
         conf.put("spark.async", "false");
-        conf.put("spark.exportType", "cache");
+        conf.put("spark.exportType", "hdfs");
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://192.168.4.51:8000;db=default",
@@ -56,34 +143,14 @@ public class ConnectRemoteServer {
                 final Statement stat = conn.createStatement();
                 stat.execute(sql.trim());
             }*/
-
-            /*Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select 1+1 as s");
-            rs.next();
-            System.out.println(rs.getString(1));
-            assert ("2".equals(rs.getString(1)));*/
-
-            Trajectory trajectoryStp = ModelGenerator.generateTrajectory(
-                "data/stayPointSegmentationTraj.txt"
-            );
-            String tGeo = trajectoryStp.toGeoJSON();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(
-                "select f.starttime, f.endtime, 1+1 from "
-                    + "(select st_traj_stayPointDetect(traj, 10, 10) "
-                    + "from (select st_traj_fromGeoJSON(\'"
-                    + tGeo
-                    + "\') as traj)) f"
-            );
-            rs.next();
-            System.out.println(rs.getObject(1));
-            System.out.println(rs.getObject(2));
-            System.out.println(rs.getInt(3));
-            // System.out.println(rs.getInt(4));
-
-            /*ResultSet rs = stmt.executeQuery("select st_traj_asGeoJSON(st_traj_noiseFilter(st_traj_fromGeoJSON(\'" + tGeo + "\')," + "8.5))");
-            rs.next();
-            System.out.println(rs.getObject(1).toString());*/
+            test_query_simple(conn);
+            test_query_udf_udtf(conn);
+            test_query_noiseFilter1(conn);
+            test_query_noiseFilter2(conn);
+            test_query_geomesa_type(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

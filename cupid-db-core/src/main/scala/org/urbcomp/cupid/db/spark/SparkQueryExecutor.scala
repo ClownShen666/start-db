@@ -130,9 +130,9 @@ object SparkQueryExecutor {
               sf.asInstanceOf[SimpleFeature]
             })
           })
-
           GeoMesaSpark(params).save(rddToSave, params.asScala.toMap, schemaName)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+
         case _: SqlSelect =>
           CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
             val userName = SparkSqlParam.CACHE.get().getUserName
@@ -147,8 +147,13 @@ object SparkQueryExecutor {
           }
           val df = spark.sql(sql)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+
         case _ => throw new UnsupportedOperationException("Unexpected sql kind " + node.getKind);
       }
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+        throw new RuntimeException(e)
     } finally {
       spark.stop()
       SparkSession.clearActiveSession()

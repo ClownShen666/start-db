@@ -22,6 +22,7 @@ import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.datatype.DataTypeField
 import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.util.{JacksonUtil, SparkSqlParam}
 
 /**
@@ -33,28 +34,31 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
     val sqlId = param.getSqlId
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
 
-    val typeFields =
+    /*val typeFields =
       data.schema.fields.map(
         s =>
           new DataTypeField(s.name, s.dataType.simpleString, s.nullable, metadataToMap(s.metadata))
       )
-    val fieldJson = JacksonUtil.MAPPER.writeValueAsString(typeFields)
+    val fieldJson = JacksonUtil.MAPPER.writeValueAsString(typeFields)*/
+    log.info("HDFS schema path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
+    val schemaJson = data.schema.json
     import data.sparkSession.implicits._
-    val schemaDf = List(fieldJson).toDF()
+    val schemaDf = List(schemaJson).toDF()
     schemaDf
       .coalesce(1)
       .write
       .mode(SaveMode.Overwrite)
       .text(hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
-
+    log.info("HDFS dataframe path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
+    // We use default parquet format instead of csv because csv does not support Geomesa types and UDTs
     data
       .coalesce(1)
       .write
-      .format("geomesa")
+      // .format("geomesa")
       .mode(SaveMode.Overwrite)
-      .option("header", value = false)
+      // .option("header", value = true)
       .option("sep", DynamicConfig.getHdfsDataSplitter)
-      .csv(hdfsPath + DynamicConfig.getResultDataName(sqlId))
+      .save(hdfsPath + DynamicConfig.getResultDataName(sqlId))
   }
 
   def metadataToMap(md: Metadata): java.util.Map[String, Object] = {
