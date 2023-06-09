@@ -64,7 +64,7 @@ class SparkCupidTypeTest extends FunSuite {
   }
 
   // FIXME
-  ignore("cupid road segment type test 2") {
+  /*ignore("cupid road segment type test 2") {
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq((1, rs)))
@@ -76,5 +76,5 @@ class SparkCupidTypeTest extends FunSuite {
     df.registerTempTable("ttt")
     spark.sql("desc ttt").show()
     spark.stop()
-  }
+  }*/
 }
