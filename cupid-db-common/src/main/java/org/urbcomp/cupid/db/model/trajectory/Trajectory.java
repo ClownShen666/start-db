@@ -308,7 +308,10 @@ public class Trajectory implements java.io.Serializable {
             f.setGeometry(new org.geojson.Point(gp.getX(), gp.getY()));
             fcp.add(f);
         }
-        return new ObjectMapper().writeValueAsString(fcp);
+        return new ObjectMapper().writeValueAsString(fcp)
+            .replace("\"{", "{")
+            .replace("}\"", "}")
+            .replace("\\", "");
     }
 
     /**
@@ -330,7 +333,12 @@ public class Trajectory implements java.io.Serializable {
             Map<String, Attribute> attributeMap = new HashMap<>();
             for (Map.Entry<String, Object> entry : f.getProperties().entrySet()) {
                 if (!entry.getKey().equals("time")) {
-                    JSONObject jsonObj = JSONObject.parseObject((String) entry.getValue());
+                    String correctStr = entry.getValue()
+                        .toString()
+                        .replace("=", ":\"")
+                        .replaceFirst(",", "\",")
+                        .replace("}", "\"}");
+                    JSONObject jsonObj = JSONObject.parseObject(correctStr);
                     String typeName = jsonObj.getString("type");
                     Class type = DataTypeUtils.getClass(typeName);
                     attributeMap.put(
@@ -338,7 +346,11 @@ public class Trajectory implements java.io.Serializable {
                         new Attribute(
                             typeName,
                             Geometry.class.isAssignableFrom(type)
-                                ? type.cast(geometryJSON.read(jsonObj.toString()))
+                                ? type.cast(
+                                    geometryJSON.read(
+                                        jsonObj.toString().replace("\"[", "[").replace("]\"", "]")
+                                    )
+                                )
                                 : JSONObject.parseObject(jsonObj.getString("value"), type)
                         )
                     );

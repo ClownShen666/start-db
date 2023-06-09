@@ -31,8 +31,7 @@ class SparkCupidTypeTest extends FunSuite {
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
 
-  // FIXME
-  ignore("geomesa point type test") {
+  test("geomesa point type test") {
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     val point: Point = new GeometryFactory().createPoint(new Coordinate(3.4, 5.6))
     val df = spark.createDataset(Seq(point)).toDF("points")
@@ -54,8 +53,7 @@ class SparkCupidTypeTest extends FunSuite {
     spark.stop()
   }
 
-  // FIXME
-  ignore("cupid functionRegistry test") {
+  test("cupid functionRegistry test") {
     val spark =
       SparkQueryExecutor.getSparkSession(isLocal = true)
     val className = spark.sessionState.functionRegistry.getClass.getCanonicalName

@@ -42,12 +42,8 @@ public class SqlOperatorTables extends ReflectiveSqlOperatorTable {
     private static SqlOperatorTable createSpatial() {
         return CalciteCatalogReader.operatorTable(
             GeometricConstructorFunction.class.getName(),
-            DataTypeConversionFunction.class.getName(),
-            GeometricOperationFunction.class.getName(),
-
             TimeFunction.class.getName(),
-            OtherFunction.class.getName(),
-            StringFunction.class.getName()
+            OtherFunction.class.getName()
         );
     }
 
