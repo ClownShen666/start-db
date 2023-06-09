@@ -85,7 +85,7 @@ public class SqlLoadData extends SqlCall {
         writer.keyword("'" + path + "'");
         writer.keyword("TO");
         tableName.unparse(writer, leftPrec, rightPrec);
-        if (mappings != null) {
+        if (!mappings.getList().isEmpty()) {
             SqlWriter.Frame frame = writer.startList("(", ")");
             for (SqlNode m : mappings) {
                 writer.sep(",");

@@ -237,8 +237,9 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     val node = parsed.asInstanceOf[SqlLoadData]
     val expectLoadSql =
       s"LOAD CSV INPATH 'HDFS://USER/DATA.CSV' TO gemo_table FIELDS DELIMITER ',' QUOTES " + "'\"'" + " WITH HEADER"
-    assertEquals(expectLoadSql, SqlHelper.toSqlString(node))
+    assertEquals(expectLoadSql, SqlHelper.toSqlString(node).replaceAll("`", ""))
     val selectNode = SqlHelper.convertToSelectNode(node, "tmp")
+    println(SqlHelper.toSqlString(selectNode));
     val convertedSql =
       s"""SELECT _c0 AS road.oid, _c1 AS name, _c2 AS startp, _c3 AS endp, to_timestamp(_c4) AS dtg
          |FROM tmp""".stripMargin

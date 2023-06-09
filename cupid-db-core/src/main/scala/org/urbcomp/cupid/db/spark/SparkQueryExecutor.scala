@@ -43,6 +43,7 @@ import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam, SqlParam
 
 import java.lang.reflect.Method
 import java.time.Instant
+import java.util
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.collection.convert.ImplicitConversions._
 import scala.reflect.api
@@ -98,16 +99,16 @@ object SparkQueryExecutor {
                 Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
               )
               .csv(node.path)
-          } else if (node.mappings == null && !node.hasHeader) {
+          } else if (node.mappings.getList.isEmpty && !node.hasHeader) {
             throw new IllegalArgumentException("header not exist");
-          } else if (node.mappings == null && node.hasHeader) {
+          } else if (node.mappings.getList.isEmpty && node.hasHeader) {
             spark.read
-              .option("header",node.hasHeader)
+              .option("header", node.hasHeader)
               .options(
                 Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> param.getHbaseZookeepers)
               )
               .csv(node.path)
-          }else {
+          } else {
             spark.read
               .option("header", node.hasHeader)
               .options(
