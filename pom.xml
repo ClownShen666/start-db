@@ -64,7 +64,7 @@
         <spatial4j.version>0.8</spatial4j.version>
         <scalatest.maven.plugin.version>2.0.2</scalatest.maven.plugin.version>
         <geojson.jackson.version>1.14</geojson.jackson.version>
-        <jackson-jts-dt.version>2.5.1.2</jackson-jts-dt.version>
+        <jackson-jts-dt.version>2.14</jackson-jts-dt.version>
         <org.jgrapht.version>1.4.0</org.jgrapht.version>
         <rtree.version>0.10</rtree.version>
         <grumpy.version>0.4.7</grumpy.version>

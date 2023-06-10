@@ -31,7 +31,7 @@ public interface ISparkSubmitter {
         if (engine == ExecuteEngine.SPARK_LOCAL) {
             return new LocalSparkSubmitter();
         }
-        return new LivySubmitter();
+        return LivySubmitter.getSingleton();
     }
 
     /**

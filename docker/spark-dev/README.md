@@ -55,12 +55,15 @@ bin/spark-submit --class org.apache.spark.examples.SparkPi --master spark://loca
 
 ```shell
 # CREATING A LIVY SESSION
-curl -X POST -d '{"kind": "spark","driverMemory":"512M","executorMemory":"512M"}' -H "Content-Type: application/json" http://localhost:8998/sessions/
+curl -X POST -d '{"kind": "spark","driverMemory":"512M","executorMemory":"512M", "jars":["/opt/spark-apps/cupid-db-spark-1.0.0-SNAPSHOT.jar"]}' -H "Content-Type: application/json" http://localhost:8998/sessions/
 
 # SUBMITTING A SIMPLE LOGIC TO TEST SPARK SHELL
 curl -X POST -d '{"code": "1 + 1"}' -H "Content-Type: application/json" http://localhost:8998/sessions/0/statements
 
 # SUBMITTING A SPARK CODE
 curl -X POST -d '{"code": "val data = Array(1,2,3); sc.parallelize(data).count"}' -H "Content-Type: application/json" http://localhost:8998/sessions/0/statements
+
+# Delete a session
+curl -X DELETE http://localhost:8998/sessions/0
 ```
 

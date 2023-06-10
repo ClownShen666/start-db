@@ -29,7 +29,7 @@ class SparkResult2RemoteExporter extends ISparkResultExporter {
     data
       .coalesce(1)
       .write
-      .format(RemoteWriteSource.getClass.getCanonicalName)
+      .format(RemoteWriteSource.getClass.getCanonicalName.split("\\$").head)
       .mode(SaveMode.Overwrite)
       .option(RemoteWriteSource.SCHEMA_KEY, data.schema.json)
       .option(SparkSqlParam.SQL_ID_KEY, param.getSqlId)

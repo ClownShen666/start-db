@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.res
 
 import org.urbcomp.cupid.db.model.data.DataExportType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 
 import java.util.ServiceLoader
 import scala.collection.mutable
@@ -34,6 +35,7 @@ object SparkResultExporterFactory {
     while (it.hasNext) {
       val exporter = it.next()
       map.put(exporter.getType, exporter)
+      log.info("add exporter " + exporter + " with type " + exporter.getType)
     }
     map
   }

@@ -35,18 +35,21 @@ import static org.urbcomp.cupid.db.config.DynamicConfig.DB_SPARK_JARS;
 
 public class SparkExecutorTest {
 
+    // @Test
     @Ignore
     public void testExecute() {
         DynamicConfig.updateProperties(
             DB_SPARK_JARS,
-            "/opt/spark/examples/jars/spark-examples_2.12-3.0.2.jar"
+            "/opt/spark-apps/cupid-db-spark-1.0.0-SNAPSHOT.jar"
         );
 
         final SparkExecutor executor = new SparkExecutor();
 
         final SparkSqlParam param = new SparkSqlParam();
+        param.setLocal(false);
+        param.setExecuteEngine(ExecuteEngine.SPARK_CLUSTER);
         param.setExportType(DataExportType.PRINT);
-        param.setSql("1+1");
+        param.setSql("select 1+1");
         final MetadataResult<Object> res = executor.execute(param);
         assertNotNull(res);
     }

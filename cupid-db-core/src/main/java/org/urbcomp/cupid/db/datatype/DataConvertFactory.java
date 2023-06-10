@@ -16,6 +16,11 @@
  */
 package org.urbcomp.cupid.db.datatype;
 
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.io.geojson.GeoJsonReader;
+import org.urbcomp.cupid.db.model.trajectory.Trajectory;
+import org.urbcomp.cupid.db.util.GeometryFactoryUtils;
+
 /**
  * @author jimo
  **/
@@ -24,14 +29,22 @@ public class DataConvertFactory {
     /**
      * 将 val转换为 type类型的数据
      */
-    public static Object convert(String val, DataTypeField type) {
+    public static Object convert(String val, DataTypeField type) throws Exception {
         switch (type.getType()) {
             case "integer":
             case "int":
                 return Integer.parseInt(val);
             case "string":
-            default:
                 return val;
+            case "timestamp":
+                return java.sql.Timestamp.valueOf(val);
+            case "multipoint":
+                return (MultiPoint) new GeoJsonReader(GeometryFactoryUtils.defaultGeometryFactory())
+                    .read(val);
+            case "trajectory":
+                return (Trajectory) Trajectory.fromGeoJSON(val);
+            default:
+                throw new NoClassDefFoundError("Unknown DataTypeField " + type);
         }
     }
 
@@ -41,8 +54,15 @@ public class DataConvertFactory {
             case "int":
                 return int.class;
             case "string":
-            default:
                 return String.class;
+            case "timestamp":
+                return java.sql.Timestamp.class;
+            case "multipoint":
+                return MultiPoint.class;
+            case "trajectory":
+                return Trajectory.class;
+            default:
+                throw new NoClassDefFoundError("Unknown typeName " + typeName);
         }
     }
 }
