@@ -19,8 +19,11 @@ package org.urbcomp.cupid.db.config;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,14 +45,46 @@ public class DynamicConfig {
 
     /**
      * 不要统一域名，而是当前机器的IP，因为数据要发回提交spark任务的机器
+     * 参考https://cloud.tencent.com/developer/article/1610919获取IP方式
      */
     public static String getRemoteServerHostname() {
         try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
+            // String hostName = getLocalHostExactAddress().getHostName();
+            String hostName = "" + InetAddress.getLocalHost().getHostName();
+            log.info("get host name " + hostName);
+            return hostName;
+        } catch (Exception e) {
             log.warn("get hostname error", e);
             return "localhost";
         }
+    }
+
+    public static InetAddress getLocalHostExactAddress() throws SocketException,
+        UnknownHostException {
+        InetAddress candidateAddress = null;
+
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface iface = networkInterfaces.nextElement();
+            // 该网卡接口下的ip会有多个，需要一个个的遍历判断
+            for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs
+                .hasMoreElements();) {
+                InetAddress inetAddr = inetAddrs.nextElement();
+                // 排除loopback回环类型地址（不管是IPv4还是IPv6 只要是回环地址都会返回true）
+                if (!inetAddr.isLoopbackAddress()) {
+                    if (inetAddr.isSiteLocalAddress()) {
+                        // 如果是site-local地址，绝大部分情况下是ip地址值
+                        return inetAddr;
+                    }
+                    // 若不是site-local地址 那就记录下该地址当作候选
+                    if (candidateAddress == null) {
+                        candidateAddress = inetAddr;
+                    }
+                }
+            }
+        }
+        // 如果除去loopback回环之外无其它地址了，回退到原始方案
+        return candidateAddress == null ? InetAddress.getLocalHost() : candidateAddress;
     }
 
     public static int getRemoteServerPort() {
@@ -57,7 +92,7 @@ public class DynamicConfig {
     }
 
     public static String getLivyUrl() {
-        return properties.getProperty("livy.url", "http://localhost:8998");
+        return properties.getProperty("livy.url", "http://192.168.4.51:8998");
     }
 
     public static int getSparkDriverCores() {
@@ -84,13 +119,16 @@ public class DynamicConfig {
      * 这个jar包要放在Livy Server能够访问的地方，如果是本地，就要放在Livy Server机器上
      */
     public static List<String> getDbSparkJars() {
-        final String jar = properties.getProperty(DB_SPARK_JARS, "/opt/cupid-db-spark-shaded.jar");
+        final String jar = properties.getProperty(
+            DB_SPARK_JARS,
+            "/opt/spark-apps/cupid-db-spark-1.0.0-SNAPSHOT.jar"
+        );
         final String[] jars = jar.split(",");
         return Arrays.asList(jars);
     }
 
     public static String getHdfsPath() {
-        return properties.getProperty("hdfs.path", "hdfs://localhost:9000");
+        return properties.getProperty("hdfs.path", "hdfs://192.168.4.51:9000");
     }
 
     public static String getHdfsDataSplitter() {
@@ -114,6 +152,6 @@ public class DynamicConfig {
     }
 
     public static String getHBaseZookeepers() {
-        return properties.getProperty("hbase.zookeepers", "127.0.0.1:2181");
+        return properties.getProperty("hbase.zookeepers", "192.168.4.51:2181");
     }
 }

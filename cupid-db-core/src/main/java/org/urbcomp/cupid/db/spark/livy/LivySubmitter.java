@@ -18,6 +18,7 @@ package org.urbcomp.cupid.db.spark.livy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.spark.ISparkSubmitter;
 import org.urbcomp.cupid.db.spark.SubmitResult;
@@ -78,8 +79,14 @@ public class LivySubmitter implements ISparkSubmitter {
         if (checkSession) {
             createNewSession();
             ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
-            pool.scheduleAtFixedRate(new CheckSessionTask(), 0, 3, TimeUnit.SECONDS);
+            pool.scheduleAtFixedRate(new CheckSessionTask(), 0, 10, TimeUnit.SECONDS);
         }
+    }
+
+    private final static LivySubmitter INSTANCE = new LivySubmitter();
+
+    public static LivySubmitter getSingleton() {
+        return INSTANCE;
     }
 
     private class CheckSessionTask implements Runnable {
@@ -163,17 +170,21 @@ public class LivySubmitter implements ISparkSubmitter {
         log.warn("Check Livy Session wait session exceed maxWaitTimeMs={}", maxWaitTimeMs);
     }
 
-    private String buildSqlId() {
-        return System.nanoTime() + SPLITTER + hostname;
+    private String buildSqlId(String sql) {
+        String digest = DigestUtils.md5Hex(sql);
+        return System.currentTimeMillis() / 1000 + SPLITTER + digest;
     }
 
     @Override
     public SubmitResult submit(SparkSqlParam param) {
         sessionReadLock.lock();
         try {
-            final String sqlId = buildSqlId();
+            final String sqlId = buildSqlId(param.getSql());
             param.setSqlId(sqlId);
+            param.setRemoteHost(DynamicConfig.getRemoteServerHostname());
+            param.setRemotePort(DynamicConfig.getRemoteServerPort());
             String code = buildCode(param);
+            log.info("Submitting: {}", param);
             final LivyStatementResult res = restApi.executeStatement(
                 sessionId,
                 LivyStatementParam.builder().kind(DEFAULT_KIND).code(code).build()
@@ -193,7 +204,7 @@ public class LivySubmitter implements ISparkSubmitter {
                 JacksonUtil.MAPPER.writeValueAsString(param)
             );
             return String.format(
-                "org.urbcomp.cupid.db.spark.CupidSparkDriver.main(Array(\"%s\"))",
+                "org.urbcomp.cupid.db.spark.CupidSparkDriver.main(Array(s\"\"\"%s\"\"\"))",
                 encodeParam
             );
         } catch (JsonProcessingException e) {

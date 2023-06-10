@@ -162,7 +162,7 @@ public class DriverTest {
     }
 
     @Test
-    public void testUseSpark() throws SQLException {
+    public void testUseSparkLocal() throws SQLException {
         final Properties conf = new Properties();
         conf.put("user", DEFAULT_USER);
         conf.put("password", DEFAULT_PASSWORD);
@@ -170,6 +170,29 @@ public class DriverTest {
         conf.put("spark.local", "true");
         conf.put("spark.async", "false");
         conf.put("spark.exportType", "local");
+        try (
+            Connection conn = DriverManager.getConnection(
+                "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",
+                conf
+            )
+        ) {
+            final Statement stmt = conn.createStatement();
+
+            final ResultSet rs = stmt.executeQuery("select 1 as s");
+            rs.next();
+            assertEquals("1", rs.getString(1));
+        }
+    }
+
+    @Test
+    public void testUseSparkRemote() throws SQLException {
+        final Properties conf = new Properties();
+        conf.put("user", "cupid_db");
+        conf.put("password", "cupid-db");
+        conf.put("engine", "spark_cluster");
+        conf.put("spark.local", "false");
+        conf.put("spark.async", "false");
+        conf.put("spark.exportType", "cache");
         try (
             Connection conn = DriverManager.getConnection(
                 "jdbc:cupid-db:url=http://127.0.0.1:8000;db=default",

@@ -16,7 +16,7 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import com.desoss.jackson.datatype.jts.JtsModule;
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.calcite.avatica.metrics.MetricsSystem;
 import org.apache.calcite.avatica.metrics.Timer;

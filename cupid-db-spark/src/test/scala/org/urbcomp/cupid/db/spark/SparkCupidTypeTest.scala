@@ -16,10 +16,12 @@
  */
 package org.urbcomp.cupid.db.spark
 
+import org.apache.spark.sql.SaveMode
 import org.junit.Assert.assertEquals
 import org.scalatest.FunSuite
 import org.locationtech.jts.geom._
 import org.locationtech.geomesa.spark.jts._
+import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -58,5 +60,4 @@ class SparkCupidTypeTest extends FunSuite {
     spark.sql("desc ttt").show()
     spark.stop()
   }
-
 }

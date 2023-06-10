@@ -26,12 +26,13 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.unsafe.types.UTF8String;
 import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.KryoHelper;
-
 import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 
 /**
  * @author jimo
  **/
+// FIXME: Only compatible with int and string
 public class SparkDataSerializer {
 
     private final static Kryo KRYO = KryoHelper.getKryo();
@@ -44,7 +45,7 @@ public class SparkDataSerializer {
             final String typeName = input.readString();
             final Object o = KRYO.readObjectOrNull(
                 input,
-                DataConvertFactory.strTypeToClass(typeName)
+                DataConvertFactory.strTypeToClass(typeName.toLowerCase(Locale.ROOT))
             );
             row[i] = o;
         }
@@ -66,7 +67,7 @@ public class SparkDataSerializer {
             KRYO.writeObjectOrNull(
                 output,
                 data,
-                DataConvertFactory.strTypeToClass(dataType.typeName())
+                DataConvertFactory.strTypeToClass(dataType.typeName().toLowerCase(Locale.ROOT))
             );
         }
         return output.toBytes();

@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.spark.ds.remote
 
 import org.apache.spark.sql.catalyst.InternalRow
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 
 import java.util
 
@@ -49,15 +50,4 @@ trait IRemoteWriter extends Serializable {
   def writeOneClose()
 }
 
-object IRemoteWriter {
-
-  /**
-    * 为什么要通过静态变量来传递参数？
-    * 因为通过构造方法传不进来
-    */
-  var options: util.Map[String, String] = _
-
-  def getInstance(): IRemoteWriter = {
-    new GrpcRemoteWriter
-  }
-}
+object IRemoteWriter extends Serializable {}

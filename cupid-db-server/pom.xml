@@ -41,7 +41,12 @@
             <artifactId>avatica-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.desoss</groupId>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-spark-sql_${scala.binary.version}</artifactId>
+            <version>${geomesa.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphhopper.external</groupId>
             <artifactId>jackson-datatype-jts</artifactId>
             <version>${jackson-jts-dt.version}</version>
             <exclusions>
@@ -55,7 +60,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
