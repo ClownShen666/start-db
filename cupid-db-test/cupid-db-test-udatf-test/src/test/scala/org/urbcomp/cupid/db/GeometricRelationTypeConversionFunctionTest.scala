@@ -76,7 +76,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
+  // FIXME: EPSG difference
   ignore("st_asGeoJSON(geom)") {
     executeQueryCheck(
       "select st_asGeoJSON(st_makePoint(1, 2))",
@@ -144,13 +144,11 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_asWKT(geom)") {
+  test("st_asWKT(geom)") {
     executeQueryCheck("select st_asWKT(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
 
-  // FIXME
-  ignore("st_castToPoint(geom)") {
+  test("st_castToPoint(geom)") {
     executeQueryCheck(
       "select st_castToPoint(st_makePoint(1, 2)), " +
         "st_castToPoint(st_makeBBox(1, 2, 3, 4))",
