@@ -1,8 +1,7 @@
 version: "3.3"
 services:
   spark-master:
-    # 该镜像打包请看custom-spark目录
-    image: jimo/spark-cluster:3.0.2
+    image: cluster-apache-spark:3.0.2
     ports:
       - "8080:8080"
       - "7077:7077"
@@ -13,7 +12,7 @@ services:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
   spark-worker-a:
-    image: jimo/spark-cluster:3.0.2
+    image: cluster-apache-spark:3.0.2
     ports:
       - "8081:8080"
       - "7000:7000"
@@ -30,27 +29,61 @@ services:
     volumes:
       - ./apps:/opt/spark-apps
       - ./data:/opt/spark-data
-#  spark-worker-b:
-#    image: monokultur/cluster-apache-spark:3.0.2
-#    ports:
-#      - "8082:8080"
-#      - "7001:7000"
-#    depends_on:
-#      - spark-master
-#    environment:
-#      - SPARK_MASTER=spark://spark-master:7077
-#      - SPARK_WORKER_CORES=1
-#      - SPARK_WORKER_MEMORY=1G
-#      - SPARK_DRIVER_MEMORY=1G
-#      - SPARK_EXECUTOR_MEMORY=1G
-#      - SPARK_WORKLOAD=worker
-#      - SPARK_LOCAL_IP=spark-worker-b
-#    volumes:
-#      - ./apps:/opt/spark-apps
-#      - ./data:/opt/spark-data
+  spark-worker-b:
+    image: cluster-apache-spark:3.0.2
+    ports:
+      - "8082:8080"
+      - "7001:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-b
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+
   livy:
-    image: livy:0.7.1
+    image: livy:0.8.0
     ports:
       - "8998:8998"
     volumes:
     - ./apps:/opt/spark-apps
+    depends_on:
+      - spark-master
+      - spark-worker-a
+      - spark-worker-b
+
+  hadoop:
+    image: julienlau/hadoop-single-node-cluster:3.3.3
+    ports:
+      - "9864:9864"
+      - "9870:9870"
+      - "8088:8088"
+      - "9000:9000"
+      - "9866:9866"
+
+  mysql:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_ROOT_PASSWORD: cupid_db
+      MYSQL_USER: cupid_db
+      MYSQL_PASSWORD: cupid_db
+      MYSQL_DATABASE: meta_data
+    ports:
+      - '3306:3306'
+      
+  geomesa-hbase:
+    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
+    hostname: geomesa-hbase-local
+    ports:
+      - '2181:2181'
+      - '16010:16010'
+      - '16000:16000'
+      - '16020:16020'
+      - '16030:16030'
