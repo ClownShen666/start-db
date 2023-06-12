@@ -31,7 +31,8 @@ class st_asGeoJSONUdf extends AbstractUdf {
     if (geom == null) null
     else {
       val geoJsonWriter = new GeoJsonWriter
-      geoJsonWriter.write(geom)
+      val ret: String = geoJsonWriter.write(geom)
+      ret
     }
   }
 

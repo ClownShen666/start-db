@@ -30,6 +30,8 @@ import org.apache.spark.sql.catalyst.expressions.xml._
 import org.apache.spark.sql.catalyst.trees.TreeNodeTag
 import org.apache.spark.sql.types._
 
+import scala.collection.mutable.ListBuffer
+
 /**
   * A catalog for looking up user defined functions, used by an [[Analyzer]].
   *
@@ -152,7 +154,7 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
 
   @GuardedBy("this")
   private val functionBuilders =
-    new mutable.HashMap[FunctionIdentifier, mutable.Set[(ExpressionInfo, FunctionBuilder)]]
+    new mutable.HashMap[FunctionIdentifier, ListBuffer[(ExpressionInfo, FunctionBuilder)]]
 
   // Resolution of the function name is always case insensitive, but the database name
   // depends on the caller
@@ -168,7 +170,7 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
     val normalizedName = normalizeFuncName(name)
     val newFunction = (info, builder)
     if (!functionBuilders.contains(normalizedName))
-      functionBuilders += (normalizedName -> mutable.Set[(ExpressionInfo, FunctionBuilder)]())
+      functionBuilders += (normalizedName -> ListBuffer[(ExpressionInfo, FunctionBuilder)]())
     if (functionBuilders(normalizedName).contains(newFunction)) {
       logWarning(s"The function $normalizedName is registered multiple times.")
     } else {
@@ -184,7 +186,8 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
         throw new AnalysisException(s"Undefined function $name")
       }
       logInfo("normalizedName: " + normalizedName)
-      val functions: List[FunctionBuilder] = functionBuilders(normalizedName).toList.map(_._2)
+      val functions: List[FunctionBuilder] =
+        functionBuilders(normalizedName).toList.map(_._2).reverse
       logInfo("functions: ")
       functions.foreach { func: FunctionBuilder =>
         logInfo(func.toString())

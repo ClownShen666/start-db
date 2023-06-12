@@ -76,7 +76,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
+  // FIXME: Should update WKUtils
   ignore("st_asGeoJSON(geom)") {
     executeQueryCheck(
       "select st_asGeoJSON(st_makePoint(1, 2))",
@@ -144,13 +144,11 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_asWKT(geom)") {
+  test("st_asWKT(geom)") {
     executeQueryCheck("select st_asWKT(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
 
-  // FIXME
-  ignore("st_castToPoint(geom)") {
+  test("st_castToPoint(geom)") {
     executeQueryCheck(
       "select st_castToPoint(st_makePoint(1, 2)), " +
         "st_castToPoint(st_makeBBox(1, 2, 3, 4))",
@@ -158,8 +156,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_castToLineString(geom)") {
+  test("st_castToLineString(geom)") {
     executeQueryCheck(
       "select st_castToLineString(st_geomFromWKT('LINESTRING(0 0,1 1,1 2)'))," +
         " st_castToLineString(st_makeBBox(1, 2, 3, 4))",
@@ -167,8 +164,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_castToPolygon(geom)") {
+  test("st_castToPolygon(geom)") {
     executeQueryCheck(
       "select st_castToPolygon(st_geomFromWKT('POLYGON((10 11,12 12,13 14,15 16,10 11))'))" +
         ", st_castToPolygon(st_makePoint(1, 2))",
