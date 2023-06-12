@@ -31,7 +31,8 @@ class st_geomFromWKTUdf extends AbstractUdf {
     if (wktString == null) null
     else {
       val wktReader = new WKTReader
-      wktReader.read(wktString)
+      val geom: Geometry = wktReader.read(wktString)
+      geom
     }
   }
 
