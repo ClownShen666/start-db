@@ -21,9 +21,12 @@ import org.locationtech.jts.geom.MultiPoint
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor
+
 import scala.collection.JavaConverters.seqAsJavaList
 import java.sql.Timestamp
 import org.urbcomp.cupid.spark.jts._
+
+import scala.collection.mutable.ListBuffer
 
 class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
@@ -267,8 +270,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   }
 
-  // FIXME
-  ignore("st_traj_stayPointDetect") {
+  test("st_traj_stayPointDetect") {
     val statement = connect.createStatement()
     val trajectoryStp: Trajectory =
       ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
@@ -276,20 +278,29 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     val resultSet1 = statement.executeQuery(
       "select st_traj_stayPointDetect(st_traj_fromGeoJSON(\'" + tGeoStp + "\'),10,10)"
     )
-    resultSet1.next()
-    assertEquals("2018-10-09 07:28:24.0", resultSet1.getObject(1).toString)
-    assertEquals("2018-10-09 07:28:39.0", resultSet1.getObject(2).toString)
-    assertEquals(
-      "[POINT (108.99552 34.27822), POINT (108.99552 34.27822), POINT (108.99552 34.27822), POINT (108.99552 34.27822), POINT (108.99552 34.27822), POINT (108.99552 34.27822)]",
-      resultSet1.getObject(3).toString
+    val results1 = new ListBuffer[(String, String, String)]()
+    while (resultSet1.next()) {
+      results1 += (
+        (
+          resultSet1.getTimestamp(1).toString,
+          resultSet1.getTimestamp(2).toString,
+          resultSet1.getObject(3).toString
+        )
+      )
+    }
+    val expected1 = List(
+      (
+        "2018-10-09 07:28:24.0",
+        "2018-10-09 07:28:39.0",
+        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
+      ),
+      (
+        "2018-10-09 07:30:01.0",
+        "2018-10-09 07:30:15.0",
+        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
+      )
     )
-    resultSet1.next()
-    assertEquals("2018-10-09 07:30:01.0", resultSet1.getObject(1).toString)
-    assertEquals("2018-10-09 07:30:15.0", resultSet1.getObject(2).toString)
-    assertEquals(
-      "[POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891), POINT (108.99546 34.26891)]",
-      resultSet1.getObject(3).toString
-    )
+    assertEquals(expected1.sorted, results1.toList.sorted)
 
     val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
     import spark.implicits._
@@ -328,7 +339,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
     assertEquals(expected.sorted, li.sorted)
     spark.stop()
-
   }
 
   test("st_traj_noiseFilter_test1") {
