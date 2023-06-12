@@ -122,7 +122,6 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   }
 
   private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
-    log.info("expectval: " + expectVal + ", actualval: " + actualVal)
     expectVal match {
       case _: java.math.BigDecimal =>
         actualVal match {
