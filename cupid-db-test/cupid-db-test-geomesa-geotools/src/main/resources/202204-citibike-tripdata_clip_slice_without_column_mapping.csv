@@ -1,0 +1,11 @@
+idx,ride_id,rideable_type
+1,8B88A6F8158F650D,electric_bike
+2,DBBDC9A659ACA86E,classic_bike
+3,75E644F939E5AA42,classic_bike
+4,759BD7783D9A5C78,docked_bike
+5,A05C1B6D30D9695C,docked_bike
+6,7E115349BA1089D7,classic_bike
+7,0EDF2289E3413DDE,classic_bike
+8,2EB1349614CB02E8,classic_bike
+9,4B4C9A7BA8B6E5E6,electric_bike
+10,7FA0B4BF1DA94893,classic_bike

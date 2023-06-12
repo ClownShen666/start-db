@@ -28,10 +28,12 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 import org.urbcomp.cupid.db.parser.dcl.SqlColumnMappingDeclaration;
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class SqlHelper {
 
@@ -48,16 +50,43 @@ public class SqlHelper {
     public static SqlSelect convertToSelectNode(SqlLoadData loader, String tableName) {
         SqlParserPos pos = SqlParserPos.ZERO;
 
-        List<SqlBasicCall> nodes = new ArrayList<>(loader.mappings.getList().size());
-        for (SqlNode mapping : loader.mappings.getList()) {
-            SqlColumnMappingDeclaration decl = (SqlColumnMappingDeclaration) mapping;
-            nodes.add(
-                new SqlBasicCall(
-                    SqlStdOperatorTable.AS,
-                    Arrays.asList(decl.expr, decl.field).toArray(new SqlNode[] {}),
-                    pos
+        List<SqlBasicCall> nodes = null;
+        if (!loader.mappings.getList().isEmpty()) {
+            nodes = new ArrayList<>(loader.mappings.getList().size());
+            for (SqlNode mapping : loader.mappings.getList()) {
+                SqlColumnMappingDeclaration decl = (SqlColumnMappingDeclaration) mapping;
+                nodes.add(
+                    new SqlBasicCall(
+                        SqlStdOperatorTable.AS,
+                        Arrays.asList(decl.expr, decl.field).toArray(new SqlNode[] {}),
+                        pos
+                    )
+                );
+            }
+        } else {
+            nodes = new ArrayList<>();
+            String[] csvFields = null;
+            try (
+                BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(Files.newInputStream(Paths.get(loader.path)))
                 )
-            );
+            ) {
+                csvFields = reader.readLine().split(loader.delimiter);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (String csvField : Objects.requireNonNull(csvFields)) {
+                nodes.add(
+                    new SqlBasicCall(
+                        SqlStdOperatorTable.AS,
+                        Arrays.asList(
+                            new SqlIdentifier(csvField, pos),
+                            new SqlIdentifier(csvField, pos)
+                        ).toArray(new SqlNode[] {}),
+                        pos
+                    )
+                );
+            }
         }
         SqlIdentifier from = new SqlIdentifier(Collections.singletonList(tableName), pos);
         SqlNodeList selectList = new SqlNodeList(nodes, pos);
