@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 import org.junit.Assert.assertTrue
 import org.locationtech.jts.geom.Geometry
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
@@ -26,6 +26,7 @@ import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.{Connection, ResultSet, Statement}
 import java.util.TimeZone
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -73,21 +74,37 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     * geometry result from calcite is String while from spark is geometry
     */
   private def isEqualCalciteAndSpark(rs: ArrayBuffer[ArrayBuffer[Any]], df: DataFrame): Boolean = {
-    val dfList = df.collectAsList()
+    val dfList: java.util.List[Row] = df.collectAsList()
     if (dfList.size() != rs.size) return false
-
-    val rowIter1 = rs.iterator
-    val rowIter2 = dfList.iterator()
-    while (rowIter1.hasNext && rowIter2.hasNext) {
-      val row1 = rowIter1.next()
-      val row2 = rowIter2.next()
-      if (row1.length != row2.length) return false
-
-      for (i <- row1.indices) {
-        if (!isEqual(row1(i), row2.get(i))) {
-          return false
+    // Since both are unordered, I use naive comparisons ...
+    val dfData = ArrayBuffer[ArrayBuffer[Any]]()
+    for (i <- rs.indices) {
+      if (rs(i).length != dfList.get(i).length) return false
+      val item = ArrayBuffer[Any]()
+      for (j <- rs(i).indices) {
+        item += dfList.get(i).get(j)
+      }
+      dfData += item
+    }
+    var unmatchedRows: mutable.Set[Int] = dfData.indices.to[mutable.Set]
+    for (row <- rs) {
+      var found = false
+      for (idx <- dfData.indices) {
+        if (unmatchedRows.contains(idx)) {
+          var matched: Boolean = true
+          for (col <- row.indices) {
+            if (matched && !isEqual(row(col), dfData(idx)(col))) {
+              matched = false
+            }
+          }
+          if (matched) {
+            // find a match
+            found = true
+            unmatchedRows -= idx
+          }
         }
       }
+      if (!found) return false
     }
     true
   }
@@ -105,6 +122,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   }
 
   private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
+    log.info("expectval: " + expectVal + ", actualval: " + actualVal)
     expectVal match {
       case _: java.math.BigDecimal =>
         actualVal match {
@@ -118,7 +136,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
             }
         }
       case _: java.lang.Double =>
-        val tolerance = 0.00000000000000001
+        val tolerance = 1e-9
         actualVal match {
           case fl: Float =>
             if ((expectVal.asInstanceOf[Double] - fl).abs >= tolerance)

@@ -172,7 +172,7 @@ class FullFunctionRegistry extends FunctionRegistry with Logging {
     if (functionBuilders(normalizedName).contains(newFunction)) {
       logWarning(s"The function $normalizedName is registered multiple times.")
     } else {
-      logInfo("Add function " + normalizedName + " " + newFunction)
+      logDebug("Add function " + normalizedName + " " + newFunction)
       functionBuilders(normalizedName) += newFunction
     }
   }

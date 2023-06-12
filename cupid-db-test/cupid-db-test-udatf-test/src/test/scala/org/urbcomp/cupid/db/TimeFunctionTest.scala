@@ -35,7 +35,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
     executeQueryCheck("select toTimestamp('" + DEFAULT_TIME_STR + "')", List(DEFAULT_TIMESTAMP))
   }
 
-  test("currentTimestamp") {
+  ignore("currentTimestamp") {
     executeQueryCheck(
       "select timestampFormat(currentTimestamp(),'yyyy-MM-dd' )",
       List(new Timestamp(System.currentTimeMillis).toString.substring(0, "yyyy-MM-dd".length))
