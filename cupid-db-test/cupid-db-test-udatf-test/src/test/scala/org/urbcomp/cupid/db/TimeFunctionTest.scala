@@ -35,6 +35,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
     executeQueryCheck("select toTimestamp('" + DEFAULT_TIME_STR + "')", List(DEFAULT_TIMESTAMP))
   }
 
+  // FIXME ci failed for value mismatch, maybe caused by timezone
   ignore("currentTimestamp") {
     executeQueryCheck(
       "select timestampFormat(currentTimestamp(),'yyyy-MM-dd' )",

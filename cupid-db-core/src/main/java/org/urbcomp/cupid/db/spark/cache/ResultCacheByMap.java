@@ -35,12 +35,13 @@ public class ResultCacheByMap implements IResultCache {
 
     @Override
     public void addRow(String sqlId, Object[] row) {
-        ROW_CACHE.computeIfAbsent(sqlId, s -> new ArrayList<>(8)).add(row);
+        ROW_CACHE.get(sqlId).add(row);
     }
 
     @Override
     public void addSchema(String sqlId, List<DataTypeField> schema) {
         SCHEMA_CACHE.put(sqlId, schema);
+        ROW_CACHE.put(sqlId, new ArrayList<>(8));
     }
 
     @Override

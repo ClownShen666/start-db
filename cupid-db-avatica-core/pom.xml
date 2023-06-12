@@ -18,14 +18,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.calcite.avatica</groupId>
-            <artifactId>avatica-core</artifactId>
-            <version>${avatica.version}</version>
+            <groupId>io.github.Spatio-Temporal-Lab</groupId>
+            <artifactId>cupid-shaded-avatica-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.urbcomp</groupId>
             <artifactId>cupid-db-common</artifactId>
-            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>scala-library</artifactId>

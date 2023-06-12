@@ -30,22 +30,29 @@ public class DataConvertFactory {
      * 将 val转换为 type类型的数据
      */
     public static Object convert(String val, DataTypeField type) throws Exception {
-        switch (type.getType()) {
-            case "integer":
-            case "int":
-                return Integer.parseInt(val);
-            case "string":
-                return val;
-            case "timestamp":
-                return java.sql.Timestamp.valueOf(val);
-            case "multipoint":
-                return (MultiPoint) new GeoJsonReader(GeometryFactoryUtils.defaultGeometryFactory())
-                    .read(val);
-            case "trajectory":
-                return (Trajectory) Trajectory.fromGeoJSON(val);
-            default:
-                throw new NoClassDefFoundError("Unknown DataTypeField " + type);
+        Object fieldType = type.getType();
+        if (fieldType instanceof String) {
+            String t = (String) fieldType;
+            switch (t) {
+                case "integer":
+                case "int":
+                    return Integer.parseInt(val);
+                case "string":
+                    return val;
+                case "timestamp":
+                    return java.sql.Timestamp.valueOf(val);
+                case "multipoint":
+                    return (MultiPoint) new GeoJsonReader(
+                        GeometryFactoryUtils.defaultGeometryFactory()
+                    ).read(val);
+                case "trajectory":
+                    return (Trajectory) Trajectory.fromGeoJSON(val);
+            }
+        } else if (fieldType instanceof UserDefinedType) {
+            // TODO support UDF and other type
+            return null;
         }
+        throw new UnsupportedOperationException("unsupported type " + fieldType.getClass());
     }
 
     public static Class<?> strTypeToClass(String typeName) {
