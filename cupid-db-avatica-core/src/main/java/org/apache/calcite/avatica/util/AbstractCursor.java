@@ -1038,16 +1038,20 @@ public abstract class AbstractCursor implements Cursor {
 
         @Override
         public Object getObject() throws SQLException {
-            return getTimestamp(localCalendar);
+            return super.getObject();
         }
 
         @Override
         public Timestamp getTimestamp(Calendar calendar) throws SQLException {
-            final Number v = getNumber();
-            if (v == null) {
-                return null;
+            try {
+                return super.getTimestamp(calendar);
+            } catch (SQLException e) {
+                final Number v = getNumber();
+                if (v == null) {
+                    return null;
+                }
+                return longToTimestamp(v.longValue(), calendar);
             }
-            return longToTimestamp(v.longValue(), calendar);
         }
 
         @Override

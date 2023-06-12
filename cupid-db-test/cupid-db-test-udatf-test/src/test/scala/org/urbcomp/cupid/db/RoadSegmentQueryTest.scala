@@ -23,7 +23,7 @@ import org.urbcomp.cupid.db.model.sample.ModelGenerator
 /**
   * test for RoadSegmentQuery
   *
-  * @author WangBohongd
+  * @author WangBohong
   * @date 2022-06-16
   */
 class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
@@ -31,9 +31,9 @@ class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON
 
-  // FIXME
-  ignore("basic roadSegment query") {
+  test("basic roadSegment query") {
     val stmt = connect.createStatement()
+    statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     val rs = stmt.executeQuery("select count(1) from t_road_segment_test")
     assertTrue(rs.next())
   }
