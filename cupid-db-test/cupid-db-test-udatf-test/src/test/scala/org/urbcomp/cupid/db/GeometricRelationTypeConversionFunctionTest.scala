@@ -76,8 +76,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME: EPSG difference
-  ignore("st_asGeoJSON(geom)") {
+  test("st_asGeoJSON(geom)") {
     executeQueryCheck(
       "select st_asGeoJSON(st_makePoint(1, 2))",
       List(
@@ -156,8 +155,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_castToLineString(geom)") {
+  test("st_castToLineString(geom)") {
     executeQueryCheck(
       "select st_castToLineString(st_geomFromWKT('LINESTRING(0 0,1 1,1 2)'))," +
         " st_castToLineString(st_makeBBox(1, 2, 3, 4))",
@@ -165,8 +163,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME
-  ignore("st_castToPolygon(geom)") {
+  test("st_castToPolygon(geom)") {
     executeQueryCheck(
       "select st_castToPolygon(st_geomFromWKT('POLYGON((10 11,12 12,13 14,15 16,10 11))'))" +
         ", st_castToPolygon(st_makePoint(1, 2))",
