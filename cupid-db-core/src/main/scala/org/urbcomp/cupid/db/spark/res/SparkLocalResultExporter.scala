@@ -17,10 +17,13 @@
 package org.urbcomp.cupid.db.spark.res
 
 import org.apache.spark.sql.DataFrame
-import org.urbcomp.cupid.db.datatype.StructTypeJson
+import com.alibaba.fastjson.JSON
+import org.apache.spark.sql.types.Metadata
+import org.urbcomp.cupid.db.datatype.DataTypeField
 import org.urbcomp.cupid.db.model.data.DataExportType
 import org.urbcomp.cupid.db.spark.cache.ResultCacheFactory
 import org.urbcomp.cupid.db.util.SparkSqlParam
+import scala.collection.JavaConverters._
 
 /**
   * @author jimo
@@ -32,7 +35,21 @@ class SparkLocalResultExporter extends ISparkResultExporter {
     val sqlId = param.getSqlId
     val schema = data.schema
     ResultCacheFactory.getGlobalInstance
-      .addSchema(sqlId, StructTypeJson.deserializeJson(schema.json))
+      .addSchema(
+        sqlId,
+        schema.fields
+          .map(
+            s =>
+              new DataTypeField(
+                s.name,
+                s.dataType.simpleString,
+                s.nullable,
+                metadataToMap(s.metadata)
+              )
+          )
+          .toList
+          .asJava
+      )
     val numFields = schema.fields.length
     data
       .coalesce(1)
@@ -44,5 +61,10 @@ class SparkLocalResultExporter extends ISparkResultExporter {
         }
         ResultCacheFactory.getGlobalInstance.addRow(sqlId, rowArr)
       })
+  }
+
+  def metadataToMap(md: Metadata): java.util.Map[String, Object] = {
+    val json = md.json
+    JSON.parseObject(json)
   }
 }
