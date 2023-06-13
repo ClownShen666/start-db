@@ -17,9 +17,7 @@
 package org.urbcomp.cupid.db.datatype;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -29,8 +27,6 @@ import java.util.Map;
  * @author jimo
  **/
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonDeserialize(using = DataTypeFieldDeserializer.class)
 public class DataTypeField {
 
@@ -42,4 +38,13 @@ public class DataTypeField {
     private boolean nullable;
 
     private Map<String, Object> metadata;
+
+    public DataTypeField() {}
+
+    public DataTypeField(String name, Object type, boolean nullable, Map<String, Object> metadata) {
+        this.name = name;
+        this.type = type;
+        this.nullable = nullable;
+        this.metadata = metadata;
+    }
 }

@@ -344,6 +344,7 @@ public class SqlLine {
 
         // cupid modify start
         String engine = null;
+        String properties = null;
         // cupid modify end
         boolean nicknameFromConfig = false;
 
@@ -429,6 +430,14 @@ public class SqlLine {
                     case "-engine":
                         engine = args[++i];
                         break;
+                    case "-properties":
+                        properties = "";
+                        // expand properties
+                        for (String s : args[++i].split(",")) {
+                            String[] kv = s.split("=");
+                            properties += "-p " + kv[0] + " " + kv[1] + " ";
+                        }
+                        break;
                     // cupid modify end
                     default:
                         return Status.ARGS;
@@ -446,10 +455,9 @@ public class SqlLine {
 
         if (url != null || user != null || pass != null || driver != null
         // cupid modify start
-
             || engine != null
+            || properties != null
             // cupid modify end
-
             || connectionConfig != null) {
             String com = COMMAND_PREFIX
                 + "connect "
@@ -458,6 +466,7 @@ public class SqlLine {
                 + (pass == null ? "" : "-p password " + escapeAndQuote(pass) + " ")
                 // cupid modify start
                 + (engine == null ? "" : "-engine engine " + escapeAndQuote(engine) + " ")
+                + (properties == null ? "" : properties + " ")
                 // cupid modify end
                 + (connectionConfig == null
                     ? escapeAndQuote(url)

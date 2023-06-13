@@ -36,10 +36,11 @@ public class Main {
     private static int TABLE_MAX_WIDTH = 100000;
 
     private static class CmdArg {
-        String username;
-        String password;
-        String engine;
-        String url = "jdbc:cupid-db:url=http://127.0.0.1:8000";
+        String username = "";
+        String password = "";
+        String engine = "";
+        String url = "";
+        String properties = "";
         // set bigger to show full value, bug it's ugly
         int maxWidth = 100000;
         // batch size of source command execute
@@ -72,7 +73,9 @@ public class Main {
                 + maxWidth
                 + ", batchSize="
                 + batchSize
-                + '}';
+                + ", properties={"
+                + properties
+                + "}}";
         }
     }
 
@@ -88,6 +91,7 @@ public class Main {
         paramKv.put("-p", cmdArg.password);
         paramKv.put("-u", cmdArg.url);
         paramKv.put("-engine", cmdArg.engine);
+        paramKv.put("-properties", cmdArg.properties);
         String[] startArgs = new String[paramKv.size() * 2];
         int i = -1;
         for (Map.Entry<String, String> e : paramKv.entrySet()) {
@@ -126,6 +130,9 @@ public class Main {
                     break;
                 case "-batchSize":
                     cmdArg.batchSize = Integer.parseInt(args[++i]);
+                    break;
+                case "-properties":
+                    cmdArg.properties = args[++i];
                     break;
                 default:
             }

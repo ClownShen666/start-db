@@ -30,6 +30,8 @@ import org.urbcomp.cupid.db.util.{JacksonUtil, SparkSqlParam}
   * */
 class SparkResult2HdfsExporter extends ISparkResultExporter {
 
+  override def getType: DataExportType = DataExportType.HDFS
+
   override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
     val sqlId = param.getSqlId
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
@@ -54,11 +56,4 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
       .option("sep", DynamicConfig.getHdfsDataSplitter)
       .save(hdfsPath + DynamicConfig.getResultDataName(sqlId))
   }
-
-  def metadataToMap(md: Metadata): java.util.Map[String, Object] = {
-    val json = md.json
-    JSON.parseObject(json)
-  }
-
-  override def getType: DataExportType = DataExportType.HDFS
 }
