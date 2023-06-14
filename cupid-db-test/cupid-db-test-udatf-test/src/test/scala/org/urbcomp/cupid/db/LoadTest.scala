@@ -106,7 +106,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val loadSql =
       s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
          |  idx _c1,
-         |  ride_id _c3,
+         |  ride_id _c2,
          |  start_point st_makePoint(_c10, _c11))
          |  WITH HEADER
          |""".stripMargin
