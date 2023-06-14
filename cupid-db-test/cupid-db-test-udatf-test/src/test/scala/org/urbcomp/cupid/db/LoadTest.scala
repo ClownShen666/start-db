@@ -86,7 +86,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
          |  FIELDS DELIMITER "!"
          |  WITH HEADER
          |""".stripMargin
-    val querySql = s"select ride_id, rideable_type , tra from $randTableName where idx = 1"
+    val querySql = s"select ride_id, rideable_type , traj from $randTableName where idx = 1"
 
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
