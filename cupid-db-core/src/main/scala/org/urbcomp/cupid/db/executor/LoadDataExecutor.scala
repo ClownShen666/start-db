@@ -21,6 +21,8 @@ import org.locationtech.geomesa.utils.io.WithClose
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.{CalciteHelper, MetadataAccessUtil}
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.parser.dcl.{SqlColumnMappingDeclaration, SqlLoadData}
 import org.urbcomp.cupid.db.util.MetadataUtil
 
@@ -102,7 +104,6 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
                 if (tableFields.getOrElse(FieldExpr._1, "NULL").equals("String")) {
                   rExpr = "\"" + rExpr + "\""
                 }
-                // select sql
                 val resultObj = WithClose(executeQuery(connection, rExpr.replace("`", ""))) { rs =>
                   {
                     rs.next()
@@ -115,7 +116,17 @@ case class LoadDataExecutor(n: SqlLoadData) extends BaseExecutor {
             .foreach(fieldValueArray => {
               // Write into geomesa-hbase
               val sf = writer.next()
-              fieldValueArray.foreach(fieldValue => sf.setAttribute(fieldValue._1, fieldValue._2))
+
+              fieldValueArray.foreach(fieldValue => {
+                fieldValue._2 match {
+                  case rs: RoadSegment =>
+                    ExecutorUtil.writeRoadSegment(fieldValue._1, sf, rs)
+                  case traj: Trajectory =>
+                    ExecutorUtil.writeTrajectory(fieldValue._1, sf, traj)
+                  case _ =>
+                    sf.setAttribute(fieldValue._1, fieldValue._2)
+                }
+              })
               affectedRows += 1
               writer.write()
             })

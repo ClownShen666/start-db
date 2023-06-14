@@ -17,14 +17,20 @@
 package org.urbcomp.cupid.db
 
 import org.junit.Assert.assertEquals
+import org.urbcomp.cupid.db.model.sample.ModelGenerator
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.tools.CitibikeDataUtils
 
 import java.util.UUID
 
 class LoadTest extends AbstractCalciteSparkFunctionTest {
 
+  val trajectory: Trajectory = ModelGenerator.generateTrajectory()
+  val tGeo: String = trajectory.toGeoJSON
   val PATH
       : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
+  val PATH_OF_TRA
+      : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_with_tra.csv"
 
   test("test load - single column - no udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
@@ -67,6 +73,32 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     assert(resultSet.getString(2).equals("electric_bike"))
   }
 
+  test("test load -traj - with udf") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql =
+      s"create table if not exists $randTableName(idx Integer, ride_id String, rideable_type String, traj Trajectory)"
+    val loadSql =
+      s"""LOAD CSV INPATH \"$PATH_OF_TRA\" TO $randTableName (
+         |  idx _c1 ,
+         |  ride_id _c2 ,
+         |  rideable_type _c3,
+         |  traj st_traj_fromGeoJSON(_c4))
+         |  FIELDS DELIMITER "!"
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select ride_id, rideable_type , tra from $randTableName where idx = 1"
+
+    val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
+    stmt.execute(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
+    assert(resultSet.getString(2).equals("electric_bike"))
+    assert(resultSet.getString(3).equals(tGeo))
+  }
+
   test("test load - multiple columns - with udf") {
     val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
     val createTableSql =
@@ -74,7 +106,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val loadSql =
       s"""LOAD CSV INPATH \"$PATH\" TO $randTableName (
          |  idx _c1,
-         |  ride_id _c2,
+         |  ride_id _c3,
          |  start_point st_makePoint(_c10, _c11))
          |  WITH HEADER
          |""".stripMargin
