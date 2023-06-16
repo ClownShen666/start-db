@@ -20,6 +20,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.urbcomp.cupid.db.metadata.accessor.IndexAccessor;
 import org.urbcomp.cupid.db.metadata.accessor.TableAccessor;
 import org.urbcomp.cupid.db.metadata.entity.*;
+import org.urbcomp.cupid.db.util.LogUtil;
 import org.urbcomp.cupid.db.util.UserDbTable;
 
 import java.util.List;
@@ -217,6 +218,7 @@ public class MetadataAccessUtil {
                 // rollback
                 sqlSession.rollback();
             }
+            LogUtil.getLogger().error("", t);
             throw t;
         } finally {
             sqlSession.close();

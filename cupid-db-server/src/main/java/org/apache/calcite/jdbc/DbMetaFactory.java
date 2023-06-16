@@ -16,13 +16,14 @@
  */
 package org.apache.calcite.jdbc;
 
-import lombok.SneakyThrows;
 import org.apache.calcite.avatica.Meta;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.calcite.schema.Table;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
+import org.urbcomp.cupid.db.util.LogUtil;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -34,14 +35,18 @@ public class DbMetaFactory implements Meta.Factory {
 
     private static SchemaPlus ROOT_SCHEMA;
 
-    @SneakyThrows
     @Override
     public Meta create(List<String> list) {
-        final Connection connection = CalciteHelper.createConnection();
-        final CalciteConnection calciteConnection = connection.unwrap(CalciteConnection.class);
-        ROOT_SCHEMA = calciteConnection.getRootSchema();
-        // init UDF here
-        return new CalciteMetaImpl((CalciteConnectionImpl) connection);
+        try {
+            final Connection connection = CalciteHelper.createConnection();
+            final CalciteConnection calciteConnection = connection.unwrap(CalciteConnection.class);
+            ROOT_SCHEMA = calciteConnection.getRootSchema();
+            // init UDF here
+            return new CalciteMetaImpl((CalciteConnectionImpl) connection);
+        } catch (SQLException e) {
+            LogUtil.getLogger().error("", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public static void addTable(String name, Table table) {

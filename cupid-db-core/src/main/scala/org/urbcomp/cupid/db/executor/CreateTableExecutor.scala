@@ -26,6 +26,7 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.metadata.entity.{Field, Index, Table}
 import org.urbcomp.cupid.db.parser.ddl.{SqlCupidCreateTable, SqlIndexDeclaration}
 import org.urbcomp.cupid.db.schema.IndexType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.transformer.{
   RoadSegmentAndGeomesaTransformer,
   TrajectoryAndFeatureTransformer
@@ -83,7 +84,21 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
         val params = ExecutorUtil.getDataStoreParams(userName, dbName)
+        var params_string = ""
+        if (params == null) params_string = "NULL"
+        else {
+          params_string = "{"
+          import scala.collection.JavaConversions._
+          for (entry <- params.entrySet) {
+            params_string += ("key: " + entry.getKey + ", value: " + entry.getValue + "; ")
+          }
+          params_string += "}"
+        }
+        log.info("create table params = " + params_string)
         val dataStore = DataStoreFinder.getDataStore(params)
+        if (dataStore == null) {
+          throw new IllegalArgumentException("Cannot find data store!")
+        }
         val schema = dataStore.getSchema(schemaName)
         if (schema != null) {
           throw new IllegalStateException("schema already exist " + schemaName)

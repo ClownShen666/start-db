@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.common
 
+import org.urbcomp.cupid.db.config.DynamicConfig
+
 /**
   * Config Provider
   *
@@ -30,6 +32,5 @@ object ConfigProvider {
       ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS -> getHBaseZookeepers
     )
 
-  def getHBaseZookeepers: String =
-    ConfigurationFactory.getInstance.getProperty(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS)
+  def getHBaseZookeepers: String = DynamicConfig.getHBaseZookeepers
 }

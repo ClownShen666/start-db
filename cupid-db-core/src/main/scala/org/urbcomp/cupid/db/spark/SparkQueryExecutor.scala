@@ -162,7 +162,7 @@ object SparkQueryExecutor {
       }
     } catch {
       case e: Exception =>
-        // FIXME: Print exception stack trace using logger
+        log.error("", e)
         throw e
     } finally {
       spark.stop()

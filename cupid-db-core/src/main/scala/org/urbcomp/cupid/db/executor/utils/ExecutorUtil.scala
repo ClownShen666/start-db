@@ -20,8 +20,10 @@ import org.apache.calcite.sql.SqlIdentifier
 import org.locationtech.jts.geom.LineString
 import org.opengis.feature.simple.SimpleFeature
 import org.urbcomp.cupid.db.common.{ConfigProvider, ConfigurationConstants}
+import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.util.{GeoFunctions, SqlParam, WKTUtils}
 
 import java.util
@@ -87,7 +89,7 @@ object ExecutorUtil {
     val params: util.Map[String, String] = new util.HashMap[String, String]
     val CATALOG: String = userName + "." + dbName
     params.put(ConfigurationConstants.GEOMESA_HBASE_CATALOG, CATALOG)
-    params.put(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS, ConfigProvider.getHBaseZookeepers)
+    params.put(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS, DynamicConfig.getHBaseZookeepers)
     params
   }
 }
