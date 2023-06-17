@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.cmd;
 
+import org.apache.commons.lang3.StringUtils;
 import org.locationtech.jts.util.Assert;
 import sqlline.BuiltInProperty;
 import sqlline.SqlLine;
@@ -81,6 +82,19 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         CmdArg cmdArg = parseArgs(args);
+
+        cmdArg.username = "root";
+        cmdArg.password = "cupid-db";
+        if (StringUtils.isEmpty(cmdArg.engine)) {
+            cmdArg.engine = "spark_cluster";
+        }
+        if (StringUtils.isEmpty(cmdArg.url)) {
+            cmdArg.url = "jdbc:cupid-db:url=http://127.0.0.1:8000";
+        }
+        if (StringUtils.isEmpty(cmdArg.properties)) {
+            cmdArg.properties = "spark.exportType=hdfs";
+        }
+
         Assert.isTrue(cmdArg.check(), "missing params: " + cmdArg);
         SOURCE_BATCH_SIZE = cmdArg.batchSize;
         TABLE_MAX_WIDTH = cmdArg.maxWidth;
@@ -91,7 +105,9 @@ public class Main {
         paramKv.put("-p", cmdArg.password);
         paramKv.put("-u", cmdArg.url);
         paramKv.put("-engine", cmdArg.engine);
-        paramKv.put("-properties", cmdArg.properties);
+        if (!StringUtils.isEmpty(cmdArg.properties)) {
+            paramKv.put("-properties", cmdArg.properties);
+        }
         String[] startArgs = new String[paramKv.size() * 2];
         int i = -1;
         for (Map.Entry<String, String> e : paramKv.entrySet()) {
