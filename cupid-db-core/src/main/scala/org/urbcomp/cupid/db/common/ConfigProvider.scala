@@ -32,5 +32,6 @@ object ConfigProvider {
       ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS -> getHBaseZookeepers
     )
 
-  def getHBaseZookeepers: String = DynamicConfig.getHBaseZookeepers
+  def getHBaseZookeepers: String =
+    ConfigurationFactory.getInstance.getProperty(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS)
 }
