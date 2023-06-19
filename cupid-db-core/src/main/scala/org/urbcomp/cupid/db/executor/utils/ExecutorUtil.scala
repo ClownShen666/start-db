@@ -89,7 +89,7 @@ object ExecutorUtil {
     val params: util.Map[String, String] = new util.HashMap[String, String]
     val CATALOG: String = userName + "." + dbName
     params.put(ConfigurationConstants.GEOMESA_HBASE_CATALOG, CATALOG)
-    params.put(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS, DynamicConfig.getHBaseZookeepers)
+    params.put(ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS, ConfigProvider.getHBaseZookeepers)
     params
   }
 }
