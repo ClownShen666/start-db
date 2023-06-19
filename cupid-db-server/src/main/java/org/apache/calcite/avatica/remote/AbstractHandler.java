@@ -24,6 +24,7 @@ import org.apache.calcite.avatica.remote.Service.Response;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.server.AuthenticationHelper;
+import org.urbcomp.cupid.db.util.LogUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.io.IOException;
@@ -148,7 +149,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
             final Service.Response response = request.accept(service);
             return new HandlerResponse<>(encode(response), HTTP_OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.getLogger().error("", e);
             return convertToErrorResponse(e);
         }
     }

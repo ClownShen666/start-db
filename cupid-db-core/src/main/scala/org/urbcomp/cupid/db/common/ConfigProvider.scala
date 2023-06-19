@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.common
 
+import org.urbcomp.cupid.db.config.DynamicConfig
+
 /**
   * Config Provider
   *

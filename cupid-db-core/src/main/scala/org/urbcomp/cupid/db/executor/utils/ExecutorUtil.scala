@@ -20,8 +20,10 @@ import org.apache.calcite.sql.SqlIdentifier
 import org.locationtech.jts.geom.LineString
 import org.opengis.feature.simple.SimpleFeature
 import org.urbcomp.cupid.db.common.{ConfigProvider, ConfigurationConstants}
+import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.util.{GeoFunctions, SqlParam, WKTUtils}
 
 import java.util

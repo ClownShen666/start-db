@@ -76,7 +76,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
                 data
             );
         } catch (Exception e) {
-            // FIXME: Print exception stack trace using logger
+            log.error("", e);
             throw new RuntimeException(e);
         }
     }

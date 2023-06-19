@@ -72,7 +72,7 @@ public class LivySubmitter implements ISparkSubmitter {
 
     public LivySubmitter(LivyRestApi restApi, boolean checkSession) {
         this.sleepMs = 3000;
-        this.maxWaitTimeMs = 120 * 1000;
+        this.maxWaitTimeMs = 300 * 1000;
         this.restApi = restApi;
         this.hostname = getHostname();
 
