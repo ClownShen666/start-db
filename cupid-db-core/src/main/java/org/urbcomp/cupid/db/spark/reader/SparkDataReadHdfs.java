@@ -127,9 +127,11 @@ public class SparkDataReadHdfs implements ISparkDataRead {
         List<Object[]> data = new ArrayList<>(Math.max(1, dataLines.size()));
 
         for (String line : dataLines) {
-            final String[] items = line.split(DynamicConfig.getHdfsDataSplitter());
-            Object[] row = deserializeToRow(items, fields);
-            data.add(row);
+            if (line != null) {
+                final String[] items = line.split(DynamicConfig.getHdfsDataSplitter());
+                Object[] row = deserializeToRow(items, fields);
+                data.add(row);
+            }
         }
         return data;
     }

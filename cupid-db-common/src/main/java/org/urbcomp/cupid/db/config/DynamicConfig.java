@@ -92,7 +92,7 @@ public class DynamicConfig {
     }
 
     public static String getLivyUrl() {
-        return properties.getProperty("livy.url", "http://192.168.4.51:8998");
+        return properties.getProperty("livy.url", "http://livy-local:8998");
     }
 
     public static int getSparkDriverCores() {
@@ -128,7 +128,7 @@ public class DynamicConfig {
     }
 
     public static String getHdfsPath() {
-        return properties.getProperty("hdfs.path", "hdfs://192.168.4.51:9000");
+        return properties.getProperty("hdfs.path", "hdfs://hadoop-local:9000");
     }
 
     public static String getHdfsDataSplitter() {
@@ -152,6 +152,6 @@ public class DynamicConfig {
     }
 
     public static String getHBaseZookeepers() {
-        return properties.getProperty("hbase.zookeepers", "192.168.4.51:2181");
+        return properties.getProperty("hbase.zookeepers", "geomesa-hbase-local:2181");
     }
 }

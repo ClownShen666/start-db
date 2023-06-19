@@ -78,6 +78,19 @@ spark worker: http://localhost:8081/，http://localhost:8082/
 livy: http://localhost:8998/
 hadoop: http://localhost:9870/
 
+## 添加hosts
+为了使得本地能通过docker里的主机名访问到对应的spark和hbase等服务，需添加以下hosts
+
+```
+127.0.0.1 geomesa-hbase-local
+127.0.0.1 hadoop-local
+127.0.0.1 mysql-local
+127.0.0.1 livy-local
+```
+
+并将代码中对应的服务配置替换成对应的主机名
+
+
 ## 准备cupid-spark jar
 
 进入cupid-db目录

@@ -186,13 +186,14 @@
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>protobuf-java</artifactId>
-                        <groupId>com.google.protobuf</groupId>
-                    </exclusion>
-                </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-spark-sql_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-filter_${scala.binary.version}</artifactId>
@@ -213,6 +214,13 @@
                 <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-spark-jts_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+            </dependency>
+
             <!-- Mybatis Core -->
             <dependency>
                 <groupId>org.mybatis</groupId>
@@ -288,6 +296,16 @@
                 <artifactId>cupid-db-spark-sql-fix</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.urbcomp</groupId>
+                <artifactId>cupid-db-udf-register</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.urbcomp</groupId>
+                <artifactId>cupid-db-spark</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Spark dependency -->
             <dependency>
@@ -304,6 +322,13 @@
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-sql_${scala.binary.version}</artifactId>
                 <version>${spark.version}</version>
+            </dependency>
+
+            <!-- hadoop client -->
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${hadoop.version}</version>
             </dependency>
 
             <!-- Kryo -->

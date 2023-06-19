@@ -49,6 +49,7 @@ services:
       - ./data:/opt/spark-data
 
   livy:
+    hostname: livy-local
     image: livy:0.8.0
     ports:
       - "8998:8998"
@@ -60,6 +61,7 @@ services:
       - spark-worker-b
 
   hadoop:
+    hostname: hadoop-local
     image: julienlau/hadoop-single-node-cluster:3.3.3
     ports:
       - "9864:9864"
@@ -69,6 +71,7 @@ services:
       - "9866:9866"
 
   mysql:
+    hostname: mysql-local
     image: 'mysql:5.7'
     environment:
       MYSQL_ROOT_PASSWORD: cupid_db
