@@ -42,7 +42,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     val (userName, dbName, tableName) = ExecutorUtil.getUserNameDbNameAndTableName(targetTable)
 
     val db = MetadataAccessUtil.getDatabase(userName, dbName)
-    val existedTable = MetadataAccessUtil.getTable(db.getId, tableName)
+    val existedTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
     if (existedTable != null) {
       if (n.ifNotExists) {
         return MetadataResult.buildDDLResult(0)
@@ -56,7 +56,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
       _ => {
         affectedRows =
           MetadataAccessUtil.insertTable(new Table(0L /* unused */, db.getId, tableName, "hbase"))
-        val createdTable = MetadataAccessUtil.getTable(db.getId, tableName)
+        val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
 
         val sfb = new SimpleFeatureTypeBuilder
@@ -95,6 +95,20 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           params_string += "}"
         }
         log.info("create table params = " + params_string)
+
+        {
+          val it = DataStoreFinder.getAllDataStores
+          while (it.hasNext) {
+            log.info("all datastore: " + it.next().toString)
+          }
+        }
+        {
+          val it = DataStoreFinder.getAvailableDataStores
+          while (it.hasNext) {
+            log.info("available datastore: " + it.next().toString)
+          }
+        }
+
         val dataStore = DataStoreFinder.getDataStore(params)
         if (dataStore == null) {
           throw new IllegalArgumentException("Cannot find data store!")
