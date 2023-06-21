@@ -29,7 +29,6 @@ import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
 import org.opengis.feature.simple.SimpleFeature
 import org.reflections.Reflections
 import org.slf4j.Logger
-import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
@@ -37,16 +36,15 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.parser.SqlHelper
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
-import org.urbcomp.cupid.spark.jts._
 import org.urbcomp.cupid.db.spark.res.SparkResultExporterFactory
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
 import org.urbcomp.cupid.db.udf.{DataEngine, UdfFactory}
 import org.urbcomp.cupid.db.udtf.AbstractUdtf
 import org.urbcomp.cupid.db.util.{LogUtil, MetadataUtil, SparkSqlParam, SqlParam}
+import org.urbcomp.cupid.spark.jts._
 
 import java.lang.reflect.Method
 import java.time.Instant
-import java.util
 import scala.collection.JavaConverters.mapAsScalaMapConverter
 import scala.collection.convert.ImplicitConversions._
 import scala.reflect.api
@@ -133,15 +131,16 @@ object SparkQueryExecutor {
               val sf = new ScalaSimpleFeature(sft, TimeSortedUuidGenerator.createUuid().toString)
               attrs.forEach(attr => {
                 val col = attr.getLocalName
-                if (rowCols.contains(col.split("\\.").head)) {
-                  val rawValue = row.getAs[Object](col.split("\\.").head)
+                val firstColName = col.split("\\.").head
+                if (rowCols.contains(firstColName)) {
+                  val rawValue = row.getAs[Object](firstColName)
                   rawValue match {
                     case rs: RoadSegment =>
-                      ExecutorUtil.writeRoadSegment(col.split("\\.").head, sf, rs)
+                      ExecutorUtil.writeRoadSegment(firstColName, sf, rs)
                     case traj: Trajectory =>
-                      ExecutorUtil.writeTrajectory(col.split("\\.").head, sf, traj)
+                      ExecutorUtil.writeTrajectory(firstColName, sf, traj)
                     case _ =>
-                      sf.setAttribute(col.split("\\.").head, rawValue)
+                      sf.setAttribute(firstColName, rawValue)
                   }
                 }
               })
