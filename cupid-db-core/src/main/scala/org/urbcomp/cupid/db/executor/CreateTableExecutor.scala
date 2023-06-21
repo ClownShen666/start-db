@@ -84,31 +84,6 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
         val params = ExecutorUtil.getDataStoreParams(userName, dbName)
-        var params_string = ""
-        if (params == null) params_string = "NULL"
-        else {
-          params_string = "{"
-          import scala.collection.JavaConversions._
-          for (entry <- params.entrySet) {
-            params_string += ("key: " + entry.getKey + ", value: " + entry.getValue + "; ")
-          }
-          params_string += "}"
-        }
-        log.info("create table params = " + params_string)
-
-        {
-          val it = DataStoreFinder.getAllDataStores
-          while (it.hasNext) {
-            log.info("all datastore: " + it.next().toString)
-          }
-        }
-        {
-          val it = DataStoreFinder.getAvailableDataStores
-          while (it.hasNext) {
-            log.info("available datastore: " + it.next().toString)
-          }
-        }
-
         val dataStore = DataStoreFinder.getDataStore(params)
         if (dataStore == null) {
           throw new IllegalArgumentException("Cannot find data store!")
