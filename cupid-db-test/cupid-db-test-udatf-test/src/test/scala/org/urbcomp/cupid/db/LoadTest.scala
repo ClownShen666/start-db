@@ -136,7 +136,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
          |  ride_id ride_id ,
          |  rideable_type rideable_type,
          |  traj st_traj_fromGeoJSON(traj))
-         |  FIELDS DELIMITER "!"
+         |  FIELDS DELIMITER "!" QUOTES "'"
          |  WITH HEADER
          |""".stripMargin
     val querySql = s"select ride_id, rideable_type , traj  from $randTableName where idx = 1"
