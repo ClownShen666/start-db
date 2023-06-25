@@ -50,6 +50,9 @@ public class SparkSqlParam extends SqlParam {
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "local").toUpperCase()
         );
+        this.redisHost = options.getOrDefault("spark.redis.host", null);
+        this.redisPort = Integer.parseInt(options.getOrDefault("spark.redis.port", "0"));
+        this.redisAuth = options.getOrDefault("spark.redis.auth", null);
     }
 
     private boolean isLocal;
@@ -64,6 +67,10 @@ public class SparkSqlParam extends SqlParam {
     private int remotePort;
 
     private DataExportType exportType;
+
+    private String redisHost = null;
+    private int redisPort;
+    private String redisAuth = null;
 
     public boolean isLocal() {
         return isLocal;
@@ -111,5 +118,29 @@ public class SparkSqlParam extends SqlParam {
 
     public void setExportType(DataExportType exportType) {
         this.exportType = exportType;
+    }
+
+    public String getRedisHost() {
+        return this.redisHost;
+    }
+
+    public void setRedisHost(String redisHost) {
+        this.redisHost = redisHost;
+    }
+
+    public int getRedisPort() {
+        return this.redisPort;
+    }
+
+    public void setRedisPort(int redisPort) {
+        this.redisPort = redisPort;
+    }
+
+    public String getRedisAuth() {
+        return this.redisAuth;
+    }
+
+    public void setRedisAuth(String redisAuth) {
+        this.redisAuth = redisAuth;
     }
 }

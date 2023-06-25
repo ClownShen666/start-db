@@ -183,6 +183,9 @@ public class LivySubmitter implements ISparkSubmitter {
             param.setSqlId(sqlId);
             param.setRemoteHost(DynamicConfig.getRemoteServerHostname());
             param.setRemotePort(DynamicConfig.getRemoteServerPort());
+            param.setRedisHost(DynamicConfig.getSparkRedisHost());
+            param.setRedisPort(DynamicConfig.getSparkRedisPort());
+            param.setRedisAuth(DynamicConfig.getSparkRedisAuth());
             String code = buildCode(param);
             log.info("Submitting: {}", param);
             final LivyStatementResult res = restApi.executeStatement(

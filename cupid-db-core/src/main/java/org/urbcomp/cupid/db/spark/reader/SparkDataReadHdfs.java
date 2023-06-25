@@ -83,8 +83,8 @@ public class SparkDataReadHdfs implements ISparkDataRead {
 
     private StructType readSchema(FileSystem fs, String schemaPathDir) throws Exception {
         final List<String> fieldLine = readHdfsFile(fs, schemaPathDir);
-        if (fieldLine.isEmpty()) {
-            throw new Exception("Schema is empty: " + schemaPathDir);
+        if (fieldLine.size() != 1) {
+            throw new Exception("Schema size is " + fieldLine.size() + "!");
         }
         final String schemaJson = fieldLine.get(0);
         AbstractDataType val = null;
@@ -101,7 +101,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
     }
 
     private List<Object[]> readDataframe(String dataPathDir, StructType schema) throws Exception {
-        SparkSession spark = SparkQueryExecutor.getSparkSession(true);
+        SparkSession spark = SparkQueryExecutor.getSparkSession(true, scala.Option.apply(null));
         // FIXME: Reading dataframe without using geomesa format due to compatibility
         Dataset<Row> df = spark.read()
             .schema(schema)

@@ -154,4 +154,16 @@ public class DynamicConfig {
     public static String getHBaseZookeepers() {
         return properties.getProperty("hbase.zookeepers", "geomesa-hbase-local:2181");
     }
+
+    public static String getSparkRedisHost() {
+        return properties.getProperty("spark.redis.host", "192.168.4.51");
+    }
+
+    public static int getSparkRedisPort() {
+        return Integer.parseInt(properties.getProperty("spark.redis.port", "6379"));
+    }
+
+    public static String getSparkRedisAuth() {
+        return properties.getProperty("spark.redis.auth", "");
+    }
 }
