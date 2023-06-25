@@ -16,7 +16,9 @@
  */
 package org.urbcomp.cupid.db.spark
 
-import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.catalyst.parser.LegacyTypeStringParser
+import org.apache.spark.sql.types.{AbstractDataType, DataType, StructType}
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.junit.Assert.assertEquals
 import org.scalatest.FunSuite
 import org.locationtech.jts.geom._
@@ -25,6 +27,9 @@ import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import org.apache.spark.sql.types.AbstractDataType
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
+import org.urbcomp.cupid.db.spark.reader.SparkDataReadRedis
 
 class SparkCupidTypeTest extends FunSuite {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
@@ -32,7 +37,13 @@ class SparkCupidTypeTest extends FunSuite {
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
 
   test("geomesa point type test") {
-    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true, Some(
+      SparkQueryExecutor.RedisConf(
+        DynamicConfig.getSparkRedisHost,
+        DynamicConfig.getSparkRedisPort,
+        DynamicConfig.getSparkRedisAuth
+      )
+    ))
     val point: Point = new GeometryFactory().createPoint(new Coordinate(3.4, 5.6))
     val df = spark.createDataset(Seq(point)).toDF("points")
     assertEquals(point, df.select("points").as[Point].collect.toList.head)
@@ -41,14 +52,26 @@ class SparkCupidTypeTest extends FunSuite {
 
   test("cupid functionRegistry test") {
     val spark =
-      SparkQueryExecutor.getSparkSession(isLocal = true)
+      SparkQueryExecutor.getSparkSession(isLocal = true, Some(
+        SparkQueryExecutor.RedisConf(
+          DynamicConfig.getSparkRedisHost,
+          DynamicConfig.getSparkRedisPort,
+          DynamicConfig.getSparkRedisAuth
+        )
+      ))
     val className = spark.sessionState.functionRegistry.getClass.getCanonicalName
     assertEquals("FullFunctionRegistry", className.split("\\.").last)
     spark.stop()
   }
 
   test("cupid road segment type test 2") {
-    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
+    val spark = SparkQueryExecutor.getSparkSession(isLocal = true, Some(
+      SparkQueryExecutor.RedisConf(
+        DynamicConfig.getSparkRedisHost,
+        DynamicConfig.getSparkRedisPort,
+        DynamicConfig.getSparkRedisAuth
+      )
+    ))
     import spark.implicits._
     val rdd = spark.sparkContext.parallelize(Seq((1, rs)))
     val df = rdd.toDF("a", "b")
