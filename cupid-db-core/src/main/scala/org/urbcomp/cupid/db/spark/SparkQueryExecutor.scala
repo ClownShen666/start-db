@@ -808,6 +808,7 @@ object SparkQueryExecutor {
         conf.set("spark.redis.host", r.redisHost)
         conf.set("spark.redis.port", r.redisPort.toString)
         if (r.redisAuth != "") conf.set("spark.redis.auth", r.redisAuth)
+      case None =>
     }
     conf
   }
