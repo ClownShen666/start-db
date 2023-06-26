@@ -803,12 +803,10 @@ object SparkQueryExecutor {
     conf.set("spark.kryo.registrator", classOf[GeoMesaSparkKryoRegistrator].getName)
     conf.set("spark.kryoserializer.buffer.max", "256m")
     conf.set("spark.kryoserializer.buffer", "64m")
-    redisConf match {
-      case Some(r) =>
-        conf.set("spark.redis.host", r.redisHost)
-        conf.set("spark.redis.port", r.redisPort.toString)
-        if (r.redisAuth != "") conf.set("spark.redis.auth", r.redisAuth)
-      case None =>
+    if (redisConf.isDefined) {
+      conf.set("spark.redis.host", redisConf.get.redisHost)
+      conf.set("spark.redis.port", redisConf.get.redisPort.toString)
+      if (redisConf.get.redisAuth != "") conf.set("spark.redis.auth", redisConf.get.redisAuth)
     }
     conf
   }

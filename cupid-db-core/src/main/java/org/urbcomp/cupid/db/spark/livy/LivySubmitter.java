@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.urbcomp.cupid.db.config.DynamicConfig;
+import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.spark.ISparkSubmitter;
 import org.urbcomp.cupid.db.spark.SubmitResult;
 import org.urbcomp.cupid.db.util.Base64Util;
@@ -183,9 +184,11 @@ public class LivySubmitter implements ISparkSubmitter {
             param.setSqlId(sqlId);
             param.setRemoteHost(DynamicConfig.getRemoteServerHostname());
             param.setRemotePort(DynamicConfig.getRemoteServerPort());
-            param.setRedisHost(DynamicConfig.getSparkRedisHost());
-            param.setRedisPort(DynamicConfig.getSparkRedisPort());
-            param.setRedisAuth(DynamicConfig.getSparkRedisAuth());
+            if (param.getExportType() == DataExportType.REDIS) {
+                param.setRedisHost(DynamicConfig.getSparkRedisHost());
+                param.setRedisPort(DynamicConfig.getSparkRedisPort());
+                param.setRedisAuth(DynamicConfig.getSparkRedisAuth());
+            }
             String code = buildCode(param);
             log.info("Submitting: {}", param);
             final LivyStatementResult res = restApi.executeStatement(

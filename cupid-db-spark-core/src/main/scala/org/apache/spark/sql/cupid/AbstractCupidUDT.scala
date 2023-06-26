@@ -41,7 +41,6 @@ abstract class AbstractCupidUDT[T >: Null: ClassTag](
 
   override def deserialize(datum: Any): T = {
     val ir = datum.asInstanceOf[InternalRow]
-    ir.getBinary(0)
     serializer.read(new ByteArrayInputStream(ir.getBinary(0)), userClass)
   }
 }
