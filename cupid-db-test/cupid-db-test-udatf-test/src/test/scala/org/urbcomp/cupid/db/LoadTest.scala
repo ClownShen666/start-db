@@ -32,6 +32,8 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
       : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
   val PATH_OF_TRA
       : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_with_tra_road.csv"
+  val PATH_OF_DATA_FOR_SPARK
+      : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_with_tra_road_for_spark.csv"
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON
 
@@ -131,7 +133,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val createTableSql =
       s"create table if not exists $randTableName(idx Integer, ride_id String, rideable_type String, traj Trajectory, road RoadSegment)"
     val loadSql =
-      s"""LOAD CSV INPATH \"$PATH_OF_TRA\" TO $randTableName (
+      s"""LOAD CSV INPATH \"$PATH_OF_DATA_FOR_SPARK\" TO $randTableName (
          |  idx idx ,
          |  ride_id ride_id ,
          |  rideable_type rideable_type,
