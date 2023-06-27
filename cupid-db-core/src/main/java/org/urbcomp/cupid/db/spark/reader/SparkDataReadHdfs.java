@@ -34,7 +34,7 @@ import org.urbcomp.cupid.db.datatype.DataConvertFactory;
 import org.urbcomp.cupid.db.datatype.DataTypeField;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.spark.ISparkDataRead;
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor;
+import org.urbcomp.cupid.db.spark.SparkExecutor;
 import org.urbcomp.cupid.db.util.JacksonUtil;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author jimo
+ * @author jimo, Hang Wu
  **/
 @Slf4j
 public class SparkDataReadHdfs implements ISparkDataRead {
@@ -101,7 +101,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
     }
 
     private List<Object[]> readDataframe(String dataPathDir, StructType schema) throws Exception {
-        SparkSession spark = SparkQueryExecutor.getSparkSession(true, scala.Option.apply(null));
+        SparkSession spark = SparkExecutor.getSparkSession();
         // FIXME: Reading dataframe without using geomesa format due to compatibility
         Dataset<Row> df = spark.read()
             .schema(schema)

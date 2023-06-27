@@ -25,18 +25,17 @@ import org.apache.spark.sql.types.StructField;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.spark.ISparkDataRead;
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor;
+import org.urbcomp.cupid.db.spark.SparkExecutor;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.StructType;
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor.RedisConf;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author jimo
+ * @author Hang Wu
  **/
 @Slf4j
 public class SparkDataReadRedis implements ISparkDataRead {
@@ -45,16 +44,7 @@ public class SparkDataReadRedis implements ISparkDataRead {
     public <T> MetadataResult<T> read(String sqlId) {
         try {
             log.info("Redis table: " + sqlId);
-            SparkSession spark = SparkQueryExecutor.getSparkSession(
-                true,
-                scala.Option.apply(
-                    new RedisConf(
-                        DynamicConfig.getSparkRedisHost(),
-                        DynamicConfig.getSparkRedisPort(),
-                        DynamicConfig.getSparkRedisAuth()
-                    )
-                )
-            );
+            SparkSession spark = SparkExecutor.getSparkSession();
             StructType schema = readSchema(spark, DynamicConfig.getResultSchemaName(sqlId));
             List<Object[]> data = readDataframe(
                 spark,
