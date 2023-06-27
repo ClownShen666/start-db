@@ -78,6 +78,9 @@
         <grpc.version>1.19.0</grpc.version>
         <kryo.version>5.3.0</kryo.version>
         <chill.version>0.10.0</chill.version>
+        <redis.version>3.1.0</redis.version>
+        <jedis.version>3.9.0</jedis.version>
+        <commons-pool2.version>2.11.1</commons-pool2.version>
     </properties>
 
     <dependencyManagement>
@@ -182,6 +185,17 @@
             </dependency>
 
             <!--   Geomesa Dependency    -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${commons-pool2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>

@@ -57,7 +57,7 @@ class SparkLocalResultExporter extends ISparkResultExporter {
         var rowArr: Array[AnyRef] = Array()
         for (i <- 0 until numFields) {
           val value = row.get(i)
-          rowArr +:= value.asInstanceOf[AnyRef]
+          rowArr :+= value.asInstanceOf[AnyRef]
         }
         ResultCacheFactory.getGlobalInstance.addRow(sqlId, rowArr)
       })

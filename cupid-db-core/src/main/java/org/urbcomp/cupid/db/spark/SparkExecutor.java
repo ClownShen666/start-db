@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.spark;
 
+import org.apache.spark.sql.SparkSession;
+import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 
@@ -25,6 +27,27 @@ import java.util.concurrent.TimeoutException;
  * @author jimo
  **/
 public class SparkExecutor {
+    private static SparkSession spark = null;
+    static {
+        if (DynamicConfig.getSparkRedisHost().isEmpty()) {
+            spark = SparkQueryExecutor.getSparkSession(true, scala.Option.apply(null));
+        } else {
+            spark = SparkQueryExecutor.getSparkSession(
+                true,
+                scala.Option.apply(
+                    new SparkQueryExecutor.RedisConf(
+                        DynamicConfig.getSparkRedisHost(),
+                        DynamicConfig.getSparkRedisPort(),
+                        DynamicConfig.getSparkRedisAuth()
+                    )
+                )
+            );
+        }
+    }
+
+    public static SparkSession getSparkSession() {
+        return spark;
+    }
 
     /**
      * 提交到spark并返回结果

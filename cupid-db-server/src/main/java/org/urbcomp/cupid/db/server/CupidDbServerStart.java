@@ -21,7 +21,9 @@ import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.jdbc.DbMetaFactory;
 import org.urbcomp.cupid.db.config.DynamicConfig;
 import org.urbcomp.cupid.db.server.daemon.DaemonManager;
+import org.urbcomp.cupid.db.spark.SparkExecutor;
 import org.urbcomp.cupid.db.spark.data.RemoteServer;
+import org.urbcomp.cupid.db.spark.livy.LivySubmitter;
 
 /**
  * @author jimo
@@ -33,6 +35,8 @@ public class CupidDbServerStart {
     }
 
     public static void start() throws Exception {
+        LivySubmitter.getSingleton();
+        SparkExecutor.getSparkSession();
         final RemoteServer remoteServer = new RemoteServer(DynamicConfig.getRemoteServerPort());
         remoteServer.start();
         // open for test grpc

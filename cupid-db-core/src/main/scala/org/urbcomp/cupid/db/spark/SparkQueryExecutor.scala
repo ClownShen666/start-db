@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.spark
 
+import com.redislabs.provider.redis.RedisConfig
 import lombok.extern.slf4j.Slf4j
 import org.apache.calcite.sql.SqlSelect
 import org.apache.spark.SparkConf
@@ -53,12 +54,20 @@ import scala.reflect.runtime.universe._
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
 
+  case class RedisConf(redisHost: String, redisPort: Int, redisAuth: String)
+
   def execute(param: SparkSqlParam, sparkSession: SparkSession = null): Unit = {
     if (param != null) {
       SparkSqlParam.CACHE.set(param)
       SqlParam.CACHE.set(param)
     }
-    val spark = if (sparkSession != null) sparkSession else getSparkSession(param.isLocal)
+    val redisConf: Option[RedisConf] =
+      if (param.getRedisHost != null)
+        Some(RedisConf(param.getRedisHost, param.getRedisPort, param.getRedisAuth))
+      else None
+    log.info("redisConf = " + redisConf)
+    val spark =
+      if (sparkSession != null) sparkSession else getSparkSession(param.isLocal, redisConf)
     val sql = param.getSql
     val node = CupidDBParseDriver.parseSql(sql)
 
@@ -189,8 +198,8 @@ object SparkQueryExecutor {
     clazz.getMethods.filter(method => method.getName == name && !method.isBridge)
   }
 
-  def getSparkSession(isLocal: Boolean): SparkSession = {
-    val builder = SparkSession.builder().config(buildSparkConf()).appName("Cupid-SPARK")
+  def getSparkSession(isLocal: Boolean, redisConf: Option[RedisConf] = None): SparkSession = {
+    val builder = SparkSession.builder().config(buildSparkConf(redisConf)).appName("Cupid-SPARK")
     if (isLocal) builder.master("local[*]")
     val spark = builder
       .enableHiveSupport()
@@ -786,7 +795,7 @@ object SparkQueryExecutor {
     spark
   }
 
-  def buildSparkConf(): SparkConf = {
+  def buildSparkConf(redisConf: Option[RedisConf]): SparkConf = {
     val conf = new SparkConf()
     conf.set("spark.sql.adaptive.enabled", "true")
     conf.set("spark.sql.crossJoin.enabled", "true")
@@ -794,6 +803,11 @@ object SparkQueryExecutor {
     conf.set("spark.kryo.registrator", classOf[GeoMesaSparkKryoRegistrator].getName)
     conf.set("spark.kryoserializer.buffer.max", "256m")
     conf.set("spark.kryoserializer.buffer", "64m")
+    if (redisConf.isDefined) {
+      conf.set("spark.redis.host", redisConf.get.redisHost)
+      conf.set("spark.redis.port", redisConf.get.redisPort.toString)
+      if (redisConf.get.redisAuth != "") conf.set("spark.redis.auth", redisConf.get.redisAuth)
+    }
     conf
   }
 

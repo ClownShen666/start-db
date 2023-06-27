@@ -45,7 +45,7 @@ public class SparkSqlParamTest {
         assertEquals(
             "{\"userName\":\"jimo\",\"dbName\":\"db\",\"sql\":\"select 1+1\",\"options\":{},"
                 + "\"hbaseZookeepers\":\"localhost:2181\",\"async\":true,\"remotePort\":0,\"exportType\":\"PRINT\","
-                + "\"local\":true}",
+                + "\"redisPort\":0,\"local\":true}",
             s
         );
         final String encodeStr = Base64Util.encode(s);

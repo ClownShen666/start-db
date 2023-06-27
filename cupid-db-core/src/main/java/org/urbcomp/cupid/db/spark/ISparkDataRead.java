@@ -21,6 +21,7 @@ import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.spark.reader.SparkDataReadCache;
 import org.urbcomp.cupid.db.spark.reader.SparkDataReadDummy;
 import org.urbcomp.cupid.db.spark.reader.SparkDataReadHdfs;
+import org.urbcomp.cupid.db.spark.reader.SparkDataReadRedis;
 
 /**
  * 根据不同存储方式读取spark返回的数据
@@ -38,6 +39,8 @@ public interface ISparkDataRead {
             case LOCAL:
             case CACHE:
                 return new SparkDataReadCache();
+            case REDIS:
+                return new SparkDataReadRedis();
             default:
                 throw new IllegalArgumentException("Not Support Type Yet:" + type);
         }

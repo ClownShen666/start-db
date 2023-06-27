@@ -23,5 +23,6 @@ public enum DataExportType {
     PRINT,
     HDFS,
     CACHE,
-    LOCAL
+    LOCAL,
+    REDIS
 }
