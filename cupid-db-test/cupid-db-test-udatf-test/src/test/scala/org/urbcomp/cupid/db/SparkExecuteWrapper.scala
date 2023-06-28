@@ -42,6 +42,11 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
     sparkSession.sql(sql)
   }
 
+  def executeSqlBySelfDefined(sql: String): Unit = {
+    param.setSql(sql)
+    SparkQueryExecutor.execute(param, sparkSession)
+  }
+
   /**
     *Description: Single case, close the current sparkSession after execution
    **/
