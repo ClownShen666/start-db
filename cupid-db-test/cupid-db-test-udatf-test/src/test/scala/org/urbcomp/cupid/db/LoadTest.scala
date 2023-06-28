@@ -32,6 +32,8 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
       : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_clip_slice.csv"
   val PATH_OF_TRA
       : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_with_tra_road.csv"
+  val PATH_OF_DATA_FOR_SPARK
+      : String = CitibikeDataUtils.getProjectRoot + "/cupid-db-test/cupid-db-test-geomesa-geotools/src/main/resources/" + "202204-citibike-tripdata_with_tra_road_for_spark.csv"
   val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rsGeoJson: String = rs.toGeoJSON
 
@@ -124,5 +126,34 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val resultSet = stmt.executeQuery(querySql)
     resultSet.next()
     assert(resultSet.getString(1).equals("POINT (40.646475 -74.026081)"))
+  }
+
+  test("test load -traj   - with udf in spark") {
+    val randTableName = s"Table_${UUID.randomUUID().toString.replace("-", "_")}"
+    val createTableSql =
+      s"create table if not exists $randTableName(idx Integer, ride_id String, rideable_type String, traj Trajectory, road RoadSegment)"
+    val loadSql =
+      s"""LOAD CSV INPATH \"$PATH_OF_DATA_FOR_SPARK\" TO $randTableName (
+         |  idx idx ,
+         |  ride_id ride_id ,
+         |  rideable_type rideable_type,
+         |  traj st_traj_fromGeoJSON(traj),
+         |  road st_rs_fromGeoJSON(road))
+         |  FIELDS DELIMITER "!" QUOTES "'"
+         |  WITH HEADER
+         |""".stripMargin
+    val querySql = s"select ride_id, rideable_type , traj ,road from $randTableName where idx = 1"
+
+    val stmt = connect.createStatement()
+    stmt.execute(createTableSql)
+    SparkExecuteWrapper.getSparkExecute.executeSqlBySelfDefined(loadSql)
+
+    val resultSet = stmt.executeQuery(querySql)
+    resultSet.next()
+    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
+    assert(resultSet.getString(2).equals("electric_bike"))
+    assert(resultSet.getString(3).equals(tGeo))
+    assert(resultSet.getString(4).equals(rsGeoJson))
+
   }
 }

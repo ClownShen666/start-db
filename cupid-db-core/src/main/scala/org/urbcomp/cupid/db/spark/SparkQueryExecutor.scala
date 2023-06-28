@@ -33,6 +33,8 @@ import org.slf4j.Logger
 import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.parser.SqlHelper
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver
@@ -140,9 +142,17 @@ object SparkQueryExecutor {
               val sf = new ScalaSimpleFeature(sft, TimeSortedUuidGenerator.createUuid().toString)
               attrs.forEach(attr => {
                 val col = attr.getLocalName
-                if (rowCols.contains(col)) {
-                  val rawValue = row.getAs[Object](col)
-                  sf.setAttribute(col, rawValue)
+                val firstColName = col.split("\\.").head
+                if (rowCols.contains(firstColName)) {
+                  val rawValue = row.getAs[Object](firstColName)
+                  rawValue match {
+                    case rs: RoadSegment =>
+                      ExecutorUtil.writeRoadSegment(firstColName, sf, rs)
+                    case traj: Trajectory =>
+                      ExecutorUtil.writeTrajectory(firstColName, sf, traj)
+                    case _ =>
+                      sf.setAttribute(firstColName, rawValue)
+                  }
                 }
               })
               sf.getUserData.put(Hints.USE_PROVIDED_FID, java.lang.Boolean.FALSE)
