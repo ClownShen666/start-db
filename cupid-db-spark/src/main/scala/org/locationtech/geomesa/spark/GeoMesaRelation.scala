@@ -121,7 +121,6 @@ case class GeoMesaRelation(
     lazy val debug =
       s"filt = $filter, filters = ${filters.mkString(",")}, requiredColumns = ${requiredColumns.mkString(",")}"
 
-
     val filt = {
       val sum = Seq.newBuilder[org.opengis.filter.Filter]
       filter.foreach(sum += _)
