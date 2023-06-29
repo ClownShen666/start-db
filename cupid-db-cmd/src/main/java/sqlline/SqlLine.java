@@ -645,6 +645,8 @@ public class SqlLine {
                     output(loc("command-canceled"));
                 } catch (SQLException sqle) {
                     handleException(sqle);
+                } finally {
+                    exit = true;
                 }
             } catch (Throwable t) {
                 handleException(t);

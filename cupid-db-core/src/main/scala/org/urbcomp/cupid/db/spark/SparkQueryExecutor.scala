@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.spark
 
-import com.redislabs.provider.redis.RedisConfig
 import lombok.extern.slf4j.Slf4j
 import org.apache.calcite.sql.SqlSelect
 import org.apache.spark.SparkConf
@@ -30,7 +29,6 @@ import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
 import org.opengis.feature.simple.SimpleFeature
 import org.reflections.Reflections
 import org.slf4j.Logger
-import org.urbcomp.cupid.db.config.DynamicConfig
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
@@ -56,6 +54,7 @@ import scala.reflect.runtime.universe._
 object SparkQueryExecutor {
   val log: Logger = LogUtil.getLogger
 
+  var sparkSessionCache: SparkSession = null
   case class RedisConf(redisHost: String, redisPort: Int, redisAuth: String)
 
   def execute(param: SparkSqlParam, sparkSession: SparkSession = null): Unit = {
@@ -68,8 +67,11 @@ object SparkQueryExecutor {
         Some(RedisConf(param.getRedisHost, param.getRedisPort, param.getRedisAuth))
       else None
     log.info("redisConf = " + redisConf)
-    val spark =
-      if (sparkSession != null) sparkSession else getSparkSession(param.isLocal, redisConf)
+    var spark: SparkSession = null
+    if (sparkSession != null) spark = sparkSession
+    else if (sparkSessionCache != null) spark = sparkSessionCache
+    else spark = getSparkSession(param.isLocal, redisConf)
+    if (sparkSessionCache == null) sparkSessionCache = spark
     val sql = param.getSql
     val node = CupidDBParseDriver.parseSql(sql)
 
@@ -182,10 +184,6 @@ object SparkQueryExecutor {
     } catch {
       case e: Exception =>
         log.error("", e)
-        throw e
-    } finally {
-      spark.stop()
-      SparkSession.clearActiveSession()
     }
   }
 
