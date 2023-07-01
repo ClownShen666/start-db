@@ -120,7 +120,7 @@ case class GeoMesaRelation(
   ): RDD[Row] = {
     lazy val debug =
       s"filt = $filter, filters = ${filters.mkString(",")}, requiredColumns = ${requiredColumns.mkString(",")}"
-    println("我是走的这里 ")
+
     val filt = {
       val sum = Seq.newBuilder[org.opengis.filter.Filter]
       filter.foreach(sum += _)
