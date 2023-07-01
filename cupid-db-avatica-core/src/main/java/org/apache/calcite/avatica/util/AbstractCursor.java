@@ -19,6 +19,12 @@ package org.apache.calcite.avatica.util;
 import org.apache.calcite.avatica.AvaticaSite;
 import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.ColumnMetaData;
+import org.geojson.GeometryCollection;
+import org.locationtech.jts.geom.*;
+import org.opengis.geometry.Geometry;
+import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork;
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment;
+import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -234,6 +240,13 @@ public abstract class AbstractCursor implements Cursor {
                 }
             case Types.JAVA_OBJECT:
             case Types.OTHER: // e.g. map
+                // cupid-db modify start
+                Accessor accessor = findCustomAccessor(columnMetaData.type.rep.typeId, getter);
+                if (accessor != null) {
+                    return accessor;
+                }
+                // cupid-db modify end
+
                 if (columnMetaData.type.getName().startsWith("INTERVAL_")) {
                     int end = columnMetaData.type.getName().indexOf("(");
                     if (end < 0) {
@@ -248,11 +261,42 @@ public abstract class AbstractCursor implements Cursor {
                         return new IntervalDayTimeAccessor(getter, range, columnMetaData.scale);
                     }
                 }
+
                 return new ObjectAccessor(getter);
             default:
                 throw new RuntimeException("unknown type " + columnMetaData.type.id);
         }
     }
+
+    // cupid-db modify start
+    private Accessor findCustomAccessor(int typeId, Getter getter) {
+        switch (typeId) {
+            case CupidTypes.POINT:
+                return new PointAccessor(getter);
+            case CupidTypes.MULTIPOINT:
+                return new MultiPointAccessor(getter);
+            case CupidTypes.LINESTRING:
+                return new LineStringAccessor(getter);
+            case CupidTypes.MULTILINESTRING:
+                return new MultiLineStringAccessor(getter);
+            case CupidTypes.POLYGON:
+                return new PolygonAccessor(getter);
+            case CupidTypes.MULTIPOLYGON:
+                return new MultiPolygonAccessor(getter);
+            case CupidTypes.GEOMETRY:
+                return new GeometryAccessor(getter);
+            case CupidTypes.GEOMETRYCOLLECTION:
+                return new GeometryCollectionAccessor(getter);
+            case CupidTypes.TRAJECTORY:
+                return new TrajectoryAccessor(getter);
+            case CupidTypes.ROAD_SEGMENT:
+                return new RoadSegmentAccessor(getter);
+            case CupidTypes.ROAD_NETWORK:
+                return new RoadNetworkAccessor(getter);
+        }
+        return null;
+    }
+    // cupid-db modify end
 
     protected abstract Getter createGetter(int ordinal);
 
@@ -1516,6 +1560,195 @@ public abstract class AbstractCursor implements Cursor {
             super(getter);
         }
     }
+
+    // *** Cupid modify start (support custom type accessors) ***
+
+    private static class PointAccessor extends AccessorImpl {
+        PointAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(Point.class)) {
+                return (T) JsonUtil.readValue(JsonUtil.writeValue(this.getObject()), Point.class);
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class MultiPointAccessor extends AccessorImpl {
+        MultiPointAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(MultiPoint.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    MultiPoint.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class LineStringAccessor extends AccessorImpl {
+        LineStringAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(LineString.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    LineString.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class MultiLineStringAccessor extends AccessorImpl {
+        MultiLineStringAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(MultiLineString.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    MultiLineString.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class PolygonAccessor extends AccessorImpl {
+        PolygonAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(Polygon.class)) {
+                return (T) JsonUtil.readValue(JsonUtil.writeValue(this.getObject()), Polygon.class);
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class MultiPolygonAccessor extends AccessorImpl {
+        MultiPolygonAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(MultiPolygon.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    MultiPolygon.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class GeometryAccessor extends AccessorImpl {
+        GeometryAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(Geometry.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    Geometry.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class GeometryCollectionAccessor extends AccessorImpl {
+        GeometryCollectionAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(GeometryCollection.class)) {
+                return (T) JsonUtil.readValue(
+                    JsonUtil.writeValue(this.getObject()),
+                    GeometryCollection.class
+                );
+            }
+            return (T) getObject();
+        }
+    }
+
+    private static class TrajectoryAccessor extends AccessorImpl {
+        TrajectoryAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(Trajectory.class)) {
+                try {
+                    return (T) Trajectory.fromGeoJSON(getString());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            return (T) getObject();
+        }
+
+    }
+
+    private static class RoadNetworkAccessor extends AccessorImpl {
+        RoadNetworkAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(RoadNetwork.class)) {
+                try {
+                    return (T) RoadNetwork.fromGeoJSON(getString());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            return (T) getObject();
+        }
+
+    }
+
+    private static class RoadSegmentAccessor extends AccessorImpl {
+        RoadSegmentAccessor(Getter getter) {
+            super(getter);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T getObject(Class<T> type) throws SQLException {
+            if (type.isAssignableFrom(RoadSegment.class)) {
+                try {
+                    return (T) RoadSegment.fromGeoJSON(getString());
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            return (T) getObject();
+        }
+    }
+    // Cupid modify end
 
     /**
      * Gets a value from a particular field of the current record of this
