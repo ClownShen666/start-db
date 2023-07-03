@@ -35,6 +35,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.graphhopper.external</groupId>
+            <artifactId>jackson-datatype-jts</artifactId>
+        </dependency>
     </dependencies>
 
 

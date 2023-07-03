@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.calcite.avatica.util.CupidTypes;
 import org.locationtech.jts.geom.*;
 import org.urbcomp.cupid.com.google.protobuf.Descriptors.FieldDescriptor;
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork;
@@ -407,18 +408,18 @@ public class ColumnMetaData {
         STRING(String.class, Types.VARCHAR),
 
         // cupid-db add start
-        POINT(Point.class, 100001),
-        MULTIPOINT(MultiPoint.class, 100002),
-        LINESTRING(LineString.class, 100003),
-        MULTILINESTRING(MultiLineString.class, 100004),
-        POLYGON(Polygon.class, 100005),
-        MULTIPOLYGON(MultiPolygon.class, 100006),
-        GEOMETRY(Geometry.class, 100007),
-        GEOMETRYCOLLECTION(GeometryCollection.class, 100008),
-        DATETIME(LocalDateTime.class, 100009),
-        TRAJECTORY(Trajectory.class, 100010),
-        ROAD_NETWORK(RoadNetwork.class, 100011),
-        ROAD_SEGMENT(RoadSegment.class, 100012),
+        POINT(Point.class, CupidTypes.POINT),
+        MULTIPOINT(MultiPoint.class, CupidTypes.MULTIPOINT),
+        LINESTRING(LineString.class, CupidTypes.LINESTRING),
+        MULTILINESTRING(MultiLineString.class, CupidTypes.MULTILINESTRING),
+        POLYGON(Polygon.class, CupidTypes.POLYGON),
+        MULTIPOLYGON(MultiPolygon.class, CupidTypes.MULTIPOLYGON),
+        GEOMETRY(Geometry.class, CupidTypes.GEOMETRY),
+        GEOMETRYCOLLECTION(GeometryCollection.class, CupidTypes.GEOMETRYCOLLECTION),
+        DATETIME(LocalDateTime.class, CupidTypes.DATETIME),
+        TRAJECTORY(Trajectory.class, CupidTypes.TRAJECTORY),
+        ROAD_NETWORK(RoadNetwork.class, CupidTypes.ROAD_NETWORK),
+        ROAD_SEGMENT(RoadSegment.class, CupidTypes.ROAD_SEGMENT),
         // cupid-db add end
 
         /**

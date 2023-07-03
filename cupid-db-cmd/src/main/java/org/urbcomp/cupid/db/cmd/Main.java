@@ -83,16 +83,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         CmdArg cmdArg = parseArgs(args);
 
-        cmdArg.username = "root";
-        cmdArg.password = "cupid-db";
         if (StringUtils.isEmpty(cmdArg.engine)) {
-            cmdArg.engine = "spark_cluster";
+            cmdArg.engine = "calcite";
         }
         if (StringUtils.isEmpty(cmdArg.url)) {
             cmdArg.url = "jdbc:cupid-db:url=http://127.0.0.1:8000";
         }
         if (StringUtils.isEmpty(cmdArg.properties)) {
-            cmdArg.properties = "spark.exportType=hdfs";
+            cmdArg.properties = "spark.exportType=local";
         }
 
         Assert.isTrue(cmdArg.check(), "missing params: " + cmdArg);
