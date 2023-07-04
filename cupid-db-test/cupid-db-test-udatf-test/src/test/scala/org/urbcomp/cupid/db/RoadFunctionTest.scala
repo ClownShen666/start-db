@@ -65,8 +65,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
     // todo test error
   }
 
-  // FIXME
-  ignore("st_rn_makeRoadNetwork") {
+  test("st_rn_makeRoadNetwork") {
     val statement = connect.createStatement
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     val set = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -86,7 +85,6 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
       "class org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork",
       resultSet.getObject(1).getClass.toString
     )
-    // todo test error
   }
 
   test("st_rs_fromGeoJSON") {
