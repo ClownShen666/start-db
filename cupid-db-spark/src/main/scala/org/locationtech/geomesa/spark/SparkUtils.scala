@@ -62,7 +62,7 @@ object SparkUtils extends LazyLogging {
         val fieldType = schema.fields(schemaIndex).dataType
 
         fieldType match {
-          case Timestamp =>
+          case TimestampType =>
             sf: SimpleFeature => {
               val name = sf.getProperties.asScala
                 .filter(p => p.getName.toString.equals(col))
