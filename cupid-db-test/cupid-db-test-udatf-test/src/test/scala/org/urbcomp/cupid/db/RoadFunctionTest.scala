@@ -171,7 +171,6 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
     // todo test error
   }
 
-  // FIXME ci out of memory error
   test("st_rn_reachableConcavexHull") {
     executeQueryCheck(
       "select st_rn_reachableConcaveHull(st_rn_fromGeoJson(\'"
