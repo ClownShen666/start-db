@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db
 
+import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -36,6 +37,28 @@ class RoadFunctionTest2 extends AbstractCalciteSparkFunctionTest {
   val trajectory: Trajectory = ModelGenerator.generateTrajectory()
   val tGeo: String = trajectory.toGeoJSON
   val rnGeoJson: String = rn.toGeoJSON
+
+  test("st_rn_makeRoadNetwork") {
+    val statement = connect.createStatement
+    statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
+    val set = statement.executeQuery("select count(1) from t_road_segment_test")
+    set.next()
+    val count = set.getObject(1)
+    if (count == 0) {
+      statement.execute(
+        "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
+      )
+    }
+    val resultSet =
+      statement.executeQuery(
+        "select st_rn_makeRoadNetwork(collect_list(b)) from t_road_segment_test"
+      )
+    resultSet.next()
+    assertEquals(
+      "class org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork",
+      resultSet.getObject(1).getClass.toString
+    )
+  }
 
   test("st_rn_reachableConvexHull") {
     executeQueryCheck(
