@@ -16,13 +16,10 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-
 import scala.collection.convert.ImplicitConversions._
-import org.urbcomp.cupid.spark.jts._
 
 /**
   * Road Segment/Network Function test
