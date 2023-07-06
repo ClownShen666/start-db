@@ -29,12 +29,7 @@ import scala.collection.convert.ImplicitConversions._
   */
 class RoadFunctionTest2 extends AbstractCalciteSparkFunctionTest {
 
-  val rs: RoadSegment = ModelGenerator.generateRoadSegment()
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
-  val rs2: List[RoadSegment] = ModelGenerator.generateRoadSegments().toList
-  val rsGeoJson: String = rs.toGeoJSON
-  val trajectory: Trajectory = ModelGenerator.generateTrajectory()
-  val tGeo: String = trajectory.toGeoJSON
   val rnGeoJson: String = rn.toGeoJSON
 
   test("st_rn_reachableConvexHull") {
