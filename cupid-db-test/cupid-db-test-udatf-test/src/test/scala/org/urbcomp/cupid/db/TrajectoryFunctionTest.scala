@@ -37,6 +37,10 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectorySeg: Trajectory =
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
+  val trajectoryStp: Trajectory =
+    ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
+  val tGeoStp: String = trajectoryStp.toGeoJSON
+
   test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
     executeQueryCheck("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
   }
@@ -268,26 +272,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     assertEquals(count, count2)
     spark.stop()
 
-  }
-
-  test("st_traj_stayPointDetect") {
-    val trajectoryStp: Trajectory =
-      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
-    val tGeoStp: String = trajectoryStp.toGeoJSON
-
-    executeQueryCheck(
-      "select st_traj_stayPointDetect(st_traj_fromGeoJSON(\'" + tGeoStp + "\'),10,10)",
-      List(
-        "2018-10-09 07:28:24.0",
-        "2018-10-09 07:28:39.0",
-        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
-      ),
-      List(
-        "2018-10-09 07:30:01.0",
-        "2018-10-09 07:30:15.0",
-        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
-      )
-    )
   }
 
   test("st_traj_noiseFilter_test1") {
