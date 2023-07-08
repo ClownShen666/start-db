@@ -151,6 +151,8 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
           } else {
             return true
           }
+        } else if (actualVal.isInstanceOf[java.sql.Timestamp]) {
+          return actualVal.toString.equals(expectVal.toString)
         } else if (expectVal != actualVal) {
           return false
         } else {
