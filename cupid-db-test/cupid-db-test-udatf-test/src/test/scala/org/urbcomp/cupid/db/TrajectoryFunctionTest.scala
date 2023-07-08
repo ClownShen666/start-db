@@ -37,10 +37,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectorySeg: Trajectory =
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
-  val trajectoryStp: Trajectory =
-    ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
-  val tGeoStp: String = trajectoryStp.toGeoJSON
-
   test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
     executeQueryCheck("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
   }
