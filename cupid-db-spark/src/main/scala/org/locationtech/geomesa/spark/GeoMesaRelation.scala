@@ -174,7 +174,6 @@ case class GeoMesaRelation(
             SelfClosingIterator(engine.getFeatureReader(query, Transaction.AUTO_COMMIT))
         }
     }
-    println("I have get the place of buildscan  ")
     val extractors = SparkUtils.getExtractors(requiredColumns, schema)
     result.map(SparkUtils.sf2row(schema, _, extractors))
   }
