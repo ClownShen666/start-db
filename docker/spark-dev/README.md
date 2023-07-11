@@ -7,6 +7,7 @@
 - hadoop 
 - hbase
 - mysql
+- cupid-server
 
 其中 spark-cluster和livy有定制改动，需要本地准备
 
@@ -64,11 +65,19 @@ docker build -t livy:0.8.0 .
 cd -
 ```
 
+**cupid-server**
+需要提前在根目录执行`mvn package`准备好cupid-server jar 包.
+
+```
+cd cupid
+docker build -t cupid-server:2.0.0 .
+cd -
+```
 
 ## 启动服务 
 
 ```
-docker compose up --force-recreate
+docker compose --profile local --profile cluster --profile server up --force-recreate
 ```
 
 对应的服务地址
@@ -78,6 +87,8 @@ spark worker: http://localhost:8081/，http://localhost:8082/
 livy: http://localhost:8998/
 hadoop: http://localhost:9870/
 
+
+cupid server: 对应的jdbc服务端口号8848 
 ## 添加hosts
 为了使得本地能通过docker里的主机名访问到对应的spark和hbase等服务，需添加以下hosts
 
