@@ -203,7 +203,7 @@ object SparkQueryExecutor {
       .options(Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> hbaseZookeepers))
       .option("geomesa.feature", baseName)
       .load()
-      .createTempView(tableName)
+      .createOrReplaceTempView(tableName)
   }
 
   def getAllMethods[T](clazz: Class[T], name: String): Array[Method] = {
