@@ -76,8 +76,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  // FIXME: Should update WKUtils
-  ignore("st_asGeoJSON(geom)") {
+  test("st_asGeoJSON(geom)") {
     executeQueryCheck(
       "select st_asGeoJSON(st_makePoint(1, 2))",
       List(
