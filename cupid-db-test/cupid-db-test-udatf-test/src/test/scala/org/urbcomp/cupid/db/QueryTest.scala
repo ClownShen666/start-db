@@ -64,7 +64,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
 
   test("bool equal test") {
     val stmt = connect.createStatement()
-    stmt.execute("create table t_bool (bool7 bool);")
+    stmt.execute("create table if not exists t_bool (bool7 bool);")
     stmt.execute("insert into t_bool values (true);")
 
     val rs = stmt.executeQuery("select * from t_bool where bool7 = true;")
@@ -76,7 +76,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
   test("chinese string insert test") {
     val stmt = connect.createStatement()
     stmt.execute("""
-                       |create table t_string10 (string6 string)
+                       |create table if not exists t_string10 (string6 string)
                        |""".stripMargin)
 
     stmt.execute("""
@@ -91,7 +91,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
 
   test("geometry equal test") {
     val stmt = connect.createStatement()
-    stmt.execute("create table t_point (point13 point)")
+    stmt.execute("create table if not exists t_point (point13 point)")
     stmt.execute("""
                    |insert into t_point values (st_PointFromWkt("Point(10 20)"))
                    |""".stripMargin)
