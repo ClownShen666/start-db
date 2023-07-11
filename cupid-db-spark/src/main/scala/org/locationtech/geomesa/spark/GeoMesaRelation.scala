@@ -174,7 +174,6 @@ case class GeoMesaRelation(
             SelfClosingIterator(engine.getFeatureReader(query, Transaction.AUTO_COMMIT))
         }
     }
-
     val extractors = SparkUtils.getExtractors(requiredColumns, schema)
     result.map(SparkUtils.sf2row(schema, _, extractors))
   }

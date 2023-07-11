@@ -26,18 +26,6 @@ class GeometricConstructorFunctionTest extends AbstractCalciteSparkFunctionTest 
     executeQueryCheck("select st_makePoint(1.1, 2)", List(expected))
   }
 
-  test("st_makeLineString(points)") {
-    // todo need build a table
-  }
-
-  test("st_makePolygon(shell)") {
-    // todo need build a table
-  }
-
-  test("st_makePolygon(shell, holes)") {
-    // todo need build a table
-  }
-
   test("st_makeBBox(lowerX, lowerY, upperX, upperY)") {
     executeQueryCheck(
       "select st_makeBBox(1.2, 2, 3, 4)",
