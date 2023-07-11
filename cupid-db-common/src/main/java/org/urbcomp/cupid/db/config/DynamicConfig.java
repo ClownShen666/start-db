@@ -17,11 +17,12 @@
 package org.urbcomp.cupid.db.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.io.InputStreamReader;
+import java.net.*;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
@@ -38,6 +39,21 @@ public class DynamicConfig {
     public static final String DB_SPARK_JARS = "livy.spark.db.jars";
 
     private final static Properties properties = new Properties();
+
+    static {
+        Configuration conf = new Configuration();
+        String hdfsPath = getHdfsPath();
+        System.setProperty("HADOOP_USER_NAME", getHadoopUser());
+        try {
+            FileSystem fs = FileSystem.get(new URI(hdfsPath), conf);
+            final String confPath = "/opt/spark-apps/cupid.conf";
+            properties.load(new InputStreamReader(fs.open(new Path(confPath))));
+            log.info(properties.toString());
+        } catch (Exception e) {
+            log.error("", e);
+        }
+
+    }
 
     public static void updateProperties(String key, String value) {
         properties.put(key, value);

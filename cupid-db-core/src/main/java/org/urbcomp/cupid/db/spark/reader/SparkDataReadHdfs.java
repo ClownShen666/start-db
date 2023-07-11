@@ -141,8 +141,8 @@ public class SparkDataReadHdfs implements ISparkDataRead {
      */
     private Object[] deserializeToRow(String[] items, List<DataTypeField> fields) throws Exception {
         if (fields.isEmpty() || items.length != fields.size()) {
-            log.error("data and schema is inconsistent:{}<->{}", items, fields);
-            throw new IllegalArgumentException("data and schema is inconsistent");
+            log.error("data and schema is inconsistent: {} <-> {}", items, fields);
+            throw new IllegalArgumentException("data and schema are inconsistent");
         }
         Object[] row = new Object[items.length];
         for (int i = 0; i < items.length; i++) {
@@ -172,7 +172,7 @@ public class SparkDataReadHdfs implements ISparkDataRead {
             }
         }
         if (path == null) {
-            throw new IllegalArgumentIOException("hdfs result not exist: " + pathDir);
+            throw new IllegalArgumentIOException("hdfs result does not exist: " + pathDir);
         }
         log.info("Read HDFS result: {}", path);
         List<String> lines = new ArrayList<>();
@@ -185,7 +185,6 @@ public class SparkDataReadHdfs implements ISparkDataRead {
 
     private FileSystem getFileSystem() throws IOException, URISyntaxException {
         Configuration conf = new Configuration();
-        conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
         String hdfsPath = DynamicConfig.getHdfsPath();
         System.setProperty("HADOOP_USER_NAME", DynamicConfig.getHadoopUser());
         return FileSystem.get(new URI(hdfsPath), conf);
