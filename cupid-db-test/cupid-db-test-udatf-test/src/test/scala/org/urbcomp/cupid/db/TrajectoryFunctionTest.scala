@@ -48,106 +48,77 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("st_traj_oid(Trajectory)") {}
 
   test("st_traj_tid(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0", resultSet.getObject(1))
-
+    executeQueryCheck(
+      "select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0")
+    )
   }
 
   test("st_traj_startTime(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_startTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2018-10-09 07:28:21.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("2018-10-09 07:28:21.0")
+    )
   }
 
   test("st_traj_endTime(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_endTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2018-10-09 07:34:18.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_endTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("2018-10-09 07:34:18.0")
+    )
   }
 
   test("st_traj_startPoint(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("POINT (108.99553 34.27859)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.99553 34.27859)")
+    )
   }
 
   test("st_traj_endPoint(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("POINT (108.98897 34.25815)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.98897 34.25815)")
+    )
   }
 
   test("st_traj_numOfPoints(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_numOfPoints(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("117", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.99553 34.27859)")
+    )
   }
 
   test("st_traj_pointN(Trajectory,int)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
-    resultSet.next()
-    assertEquals("POINT (108.99552 34.27786)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)",
+      List("POINT (108.99552 34.27786)")
+    )
   }
 
   test("st_traj_timeN(Trajectory,int)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_timeN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
-    resultSet.next()
-    assertEquals("2018-10-09 07:28:27.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_timeN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)",
+      List("2018-10-09 07:28:27.0")
+    )
   }
 
   test("st_traj_lengthInKM(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2.9989194858191373", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List(2.9989194858191373)
+    )
   }
 
   test("st_traj_speedInKMPerHour(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery(
-        "select st_traj_speedInKMPerHour(st_traj_fromGeoJSON(\'" + tGeo + "\'))"
-      )
-    resultSet.next()
-    assertEquals("30.24120489901651", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_speedInKMPerHour(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List(30.24120489901651)
+    )
   }
 
   test("st_traj_geom(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals(
-      "class org.locationtech.jts.geom.LineString",
-      resultSet.getObject(1).getClass.toString
-    )
+    executeQueryCheck("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
 
   }
 
