@@ -38,8 +38,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
   val tGeo: String = trajectory.toGeoJSON
   val rnGeoJson: String = rn.toGeoJSON
 
-  // FIXME
-  ignore("st_rn_shortestPath") {
+  test("st_rn_shortestPath") {
     val statement = connect.createStatement
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     val set = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -61,7 +60,6 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
           "[116.3671875,53.05442186546102],[116.3671875,53.05442186546102]]}}"
       )
     )
-    // todo test error
   }
 
   test("st_rn_makeRoadNetwork") {
@@ -146,8 +144,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  // FIXME
-  ignore("st_traj_mapMatch(Trajectory)") {
+  test("st_traj_mapMatch(Trajectory)") {
     val statement = connect.createStatement()
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     val set = statement.executeQuery("select count(1) from t_road_segment_test")
@@ -167,7 +164,6 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
           "\"tid\":\"afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0\"}}"
       )
     )
-    // todo test error
   }
 
   test("st_rn_reachableConcavexHull") {
