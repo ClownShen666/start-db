@@ -39,11 +39,6 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
       sparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)
     }
     param.setSql(sql)
-    sparkSession.sql(sql)
-  }
-
-  def executeSqlBySelfDefined(sql: String): Unit = {
-    param.setSql(sql)
     SparkQueryExecutor.execute(param, sparkSession)
   }
 
