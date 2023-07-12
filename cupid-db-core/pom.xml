@@ -280,6 +280,12 @@
             <groupId>com.redislabs</groupId>
             <artifactId>spark-redis_${scala.binary.version}</artifactId>
             <version>${redis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>redis.clients</groupId>
+                    <artifactId>jedis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

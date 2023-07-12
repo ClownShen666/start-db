@@ -44,6 +44,9 @@ class SparkResult2RedisExporter extends ISparkResultExporter {
       .write
       .format("org.apache.spark.sql.redis")
       .option("table", DynamicConfig.getResultSchemaName(sqlId))
+      .option("host", DynamicConfig.getSparkRedisHost)
+      .option("port", DynamicConfig.getSparkRedisPort)
+      .option("auth", DynamicConfig.getSparkRedisAuth)
       .mode(SaveMode.Overwrite)
       .save()
     log.info("Redis dataframe table: " + DynamicConfig.getResultDataName(sqlId))
@@ -52,6 +55,9 @@ class SparkResult2RedisExporter extends ISparkResultExporter {
       .write
       .format("org.apache.spark.sql.redis")
       .option("table", DynamicConfig.getResultDataName(sqlId))
+      .option("host", DynamicConfig.getSparkRedisHost)
+      .option("port", DynamicConfig.getSparkRedisPort)
+      .option("auth", DynamicConfig.getSparkRedisAuth)
       .mode(SaveMode.Overwrite)
       .option("model", "binary")
       .save()
