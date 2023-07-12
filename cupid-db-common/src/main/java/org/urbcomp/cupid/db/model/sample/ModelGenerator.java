@@ -42,6 +42,10 @@ public class ModelGenerator {
     }
 
     public static Trajectory generateTrajectory(String trajFile) {
+        return generateTrajectory(trajFile, -1);
+    }
+
+    public static Trajectory generateTrajectory(String trajFile, int maxLength) {
         try (
             InputStream in = ModelGenerator.class.getClassLoader().getResourceAsStream(trajFile);
             BufferedReader br = new BufferedReader(
@@ -63,6 +67,9 @@ public class ModelGenerator {
                     )
                 )
                 .collect(Collectors.toList());
+            if (maxLength > 0) {
+                pointsList = pointsList.subList(0, maxLength);
+            }
             return new Trajectory(oid + pointsList.get(0).getTime(), oid, pointsList);
         } catch (IOException e) {
             throw new RuntimeException("Generate trajectory error: " + e.getMessage());
@@ -126,6 +133,10 @@ public class ModelGenerator {
     }
 
     public static List<RoadSegment> generateRoadSegments() {
+        return generateRoadSegments(-1);
+    }
+
+    public static List<RoadSegment> generateRoadSegments(int maxLength) {
         try (
             InputStream in = ModelGenerator.class.getClassLoader()
                 .getResourceAsStream("data/roadnetwork_gcj02.csv");
@@ -156,6 +167,7 @@ public class ModelGenerator {
                     .setSpeedLimit(speedLimit)
                     .setLengthInMeter(lengthInM);
                 roadSegments.add(rs);
+                if (maxLength >= 0 && roadSegments.size() >= maxLength) break;
             }
             return roadSegments;
         } catch (Exception e) {
@@ -166,6 +178,9 @@ public class ModelGenerator {
 
     public static RoadNetwork generateRoadNetwork() {
         return new RoadNetwork(generateRoadSegments());
+    }
 
+    public static RoadNetwork generateRoadNetwork(int maxLength) {
+        return new RoadNetwork(generateRoadSegments(maxLength));
     }
 }

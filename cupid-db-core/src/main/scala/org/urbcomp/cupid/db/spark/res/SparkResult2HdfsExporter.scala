@@ -35,7 +35,6 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
   override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
     val sqlId = param.getSqlId
     val hdfsPath = DynamicConfig.getSparkHdfsResultPath
-
     log.info("HDFS schema path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
     val schemaJson = data.schema.json
     import data.sparkSession.implicits._
@@ -45,7 +44,7 @@ class SparkResult2HdfsExporter extends ISparkResultExporter {
       .write
       .mode(SaveMode.Overwrite)
       .text(hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
-    log.info("HDFS dataframe path: " + hdfsPath + DynamicConfig.getResultSchemaName(sqlId))
+    log.info("HDFS dataframe path: " + hdfsPath + DynamicConfig.getResultDataName(sqlId))
     // We use default parquet format instead of csv because csv does not support Geomesa types and UDTs
     // FIXME: Reading dataframe without using geomesa format due to compatibility
     data
