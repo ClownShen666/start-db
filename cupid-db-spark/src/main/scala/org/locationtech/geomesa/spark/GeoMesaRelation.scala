@@ -16,8 +16,6 @@
  */
 package org.locationtech.geomesa.spark
 
-import java.util.{Collections, Locale}
-
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.rdd.RDD
@@ -43,7 +41,7 @@ import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.locationtech.jts.geom.Envelope
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
-import scala.collection.Iterator
+import java.util.{Collections, Locale}
 import scala.util.control.NonFatal
 
 /**
@@ -132,19 +130,38 @@ case class GeoMesaRelation(
     // avoid closures on complex objects
     val schema = this.schema // note: referencing case class members evidently serializes the whole class??
     val typeName = sft.getTypeName
+    var requiredAttributesOfStorage = new Array[String](0)
+    requiredAttributes.foreach(re => {
+      if (schema.fields
+            .count(st => st.name == re && st.dataType.typeName.equals("trajectory")) == 1) {
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".tid")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".oid")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".start_time")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".end_time")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".geom")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".geoJson")
+
+      } else if (schema.fields
+                   .count(st => st.name == re && st.dataType.typeName.equals("roadsegment")) == 1) {
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".rsId")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".geom")
+        requiredAttributesOfStorage = requiredAttributesOfStorage :+ (re + ".rsGeoJson")
+
+      } else requiredAttributesOfStorage = requiredAttributesOfStorage :+ re
+    })
 
     val result: RDD[SimpleFeature] = cached match {
       case None =>
         logger.debug(s"Building scan, $debug")
         val conf = new Configuration(sqlContext.sparkContext.hadoopConfiguration)
-        val query = new Query(typeName, filt, requiredAttributes)
+        val query = new Query(typeName, filt, requiredAttributesOfStorage)
         GeoMesaSpark(params.asJava).rdd(conf, sqlContext.sparkContext, params, query)
 
       case Some(IndexedRDD(rdd)) =>
         logger.debug(s"Building in-memory scan, $debug")
         val cql = ECQL.toCQL(filt)
         rdd.flatMap { engine =>
-          val query = new Query(typeName, ECQL.toFilter(cql), requiredAttributes)
+          val query = new Query(typeName, ECQL.toFilter(cql), requiredAttributesOfStorage)
           SelfClosingIterator(engine.getFeatureReader(query, Transaction.AUTO_COMMIT))
         }
 
@@ -153,13 +170,11 @@ case class GeoMesaRelation(
         val cql = ECQL.toCQL(filt)
         rdd.flatMap {
           case (_, engine) =>
-            val query = new Query(typeName, ECQL.toFilter(cql), requiredAttributes)
+            val query = new Query(typeName, ECQL.toFilter(cql), requiredAttributesOfStorage)
             SelfClosingIterator(engine.getFeatureReader(query, Transaction.AUTO_COMMIT))
         }
     }
-
     val extractors = SparkUtils.getExtractors(requiredColumns, schema)
-
     result.map(SparkUtils.sf2row(schema, _, extractors))
   }
 

@@ -16,12 +16,10 @@
  */
 package org.locationtech.geomesa.spark
 
-import java.sql.Timestamp
-import java.util.Date
-
 import com.typesafe.scalalogging.LazyLogging
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import org.apache.spark.sql.cupid.{AbstractCupidUDT, CupidTypes}
 import org.apache.spark.sql.jts.JTSTypes
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.{DataTypes, StructField, StructType, TimestampType}
@@ -33,7 +31,11 @@ import org.locationtech.geomesa.utils.uuid.TimeSortedUuidGenerator
 import org.opengis.feature.`type`.AttributeDescriptor
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.FilterFactory2
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
+import java.sql.Timestamp
+import java.util.Date
 import scala.util.Try
 
 object SparkUtils extends LazyLogging {
@@ -56,20 +58,55 @@ object SparkUtils extends LazyLogging {
     requiredColumns.map {
       case "__fid__" => IdExtractor
       case col =>
-        val index = requiredAttributes.indexOf(col)
         val schemaIndex = schema.fieldIndex(col)
         val fieldType = schema.fields(schemaIndex).dataType
-        if (fieldType == TimestampType) { sf: SimpleFeature =>
-          {
-            val attr = sf.getAttribute(index)
-            if (attr == null) {
-              null
-            } else {
-              new Timestamp(attr.asInstanceOf[Date].getTime)
+
+        fieldType match {
+          case TimestampType =>
+            sf: SimpleFeature => {
+              val name = sf.getProperties.asScala
+                .filter(p => p.getName.toString.equals(col))
+                .head
+                .getName
+                .toString
+              val attr = sf.getAttribute(name)
+              if (attr == null) {
+                null
+              } else {
+                new Timestamp(attr.asInstanceOf[Date].getTime)
+              }
             }
-          }
-        } else { sf: SimpleFeature =>
-          sf.getAttribute(index)
+          case TrajectoryUDT =>
+            sf: SimpleFeature => {
+              val name = sf.getProperties.asScala
+                .filter(p => p.getName.toString.endsWith(".tid"))
+                .head
+                .getName
+                .toString
+              val js = sf.getAttribute(name.substring(0, name.length - 4) + ".geoJson")
+              Trajectory.fromGeoJSON(js.asInstanceOf[String])
+            }
+
+          case RoadSegmentUDT =>
+            sf: SimpleFeature => {
+              val name = sf.getProperties.asScala
+                .filter(p => p.getName.toString.endsWith(".rsId"))
+                .head
+                .getName
+                .toString
+              val js = sf.getAttribute(name.substring(0, name.size - 5) + ".rsGeoJson")
+              RoadSegment.fromGeoJSON(js.asInstanceOf[String])
+            }
+
+          case _ =>
+            sf: SimpleFeature => {
+              val name = sf.getProperties.asScala
+                .filter(p => p.getName.toString.equals(col))
+                .head
+                .getName
+                .toString
+              sf.getAttribute(name)
+            }
         }
     }
   }
@@ -131,8 +168,29 @@ object SparkUtils extends LazyLogging {
   }
 
   def createStructType(sft: SimpleFeatureType): StructType = {
+    var sfb = new SimpleFeatureTypeBuilder()
+    sfb.setName(sft.getName)
     val fields = sft.getAttributeDescriptors.asScala.flatMap(createStructField).toList
-    StructType(StructField("__fid__", DataTypes.StringType, nullable = false) :: fields)
+    var nf = new Array[StructField](0)
+    val f = fields.asJava
+    var i = 0
+    while (i < f.size) {
+      val name = f.get(i).name
+      if (f.get(i).name.endsWith(".tid")) {
+
+        val fi = new StructField(name.substring(0, name.size - 4), TrajectoryUDT, true)
+        nf = nf :+ fi
+        i = i + 5
+      } else if (name.endsWith(".rsId")) {
+        val fi = new StructField(name.substring(0, name.size - 5), RoadSegmentUDT, true)
+        nf = nf :+ fi
+        i = i + 2
+
+      } else nf = nf :+ f.get(i)
+      i = i + 1
+
+    }
+    StructType(StructField("__fid__", DataTypes.StringType, nullable = false) :: nf.toList)
   }
 
   private def createStructField(ad: AttributeDescriptor): Option[StructField] = {
@@ -250,4 +308,8 @@ object SparkUtils extends LazyLogging {
       feature
     }
   }
+  private object TrajectoryUDT
+      extends AbstractCupidUDT[Trajectory]("trajectory", CupidTypes.trajectorySerializer)
+  private object RoadSegmentUDT
+      extends AbstractCupidUDT[RoadSegment]("roadSegment", CupidTypes.roadSegmentSerializer)
 }

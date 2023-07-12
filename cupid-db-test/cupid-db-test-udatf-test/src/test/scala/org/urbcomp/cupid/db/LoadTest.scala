@@ -142,11 +142,13 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
          |  FIELDS DELIMITER "!" QUOTES "'"
          |  WITH HEADER
          |""".stripMargin
-    val querySql = s"select ride_id, rideable_type , traj ,road from $randTableName where idx = 1"
+    val querySql =
+      s"select ride_id, rideable_type , traj , road, idx from $randTableName where idx = 1"
 
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     SparkExecuteWrapper.getSparkExecute.executeSqlBySelfDefined(loadSql)
+    SparkExecuteWrapper.getSparkExecute.executeSqlBySelfDefined(querySql)
 
     val resultSet = stmt.executeQuery(querySql)
     resultSet.next()

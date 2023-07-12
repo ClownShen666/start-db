@@ -22,6 +22,7 @@ import org.locationtech.jts.geom.Geometry
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.{Connection, ResultSet, Statement}
@@ -123,6 +124,8 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
 
   private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
     expectVal match {
+      case _: Trajectory =>
+        return actualVal.toString.equals(expectVal.toString)
       case _: java.math.BigDecimal =>
         actualVal match {
           case d: Double =>
@@ -151,6 +154,11 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
           } else {
             return true
           }
+        } else if (actualVal.isInstanceOf[java.sql.Timestamp]) {
+          return actualVal.toString.equals(expectVal.toString)
+        } else if (actualVal.isInstanceOf[Trajectory]) {
+
+          return actualVal.asInstanceOf[Trajectory].toString.equals(expectVal.toString)
         } else if (expectVal != actualVal) {
           return false
         } else {

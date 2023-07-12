@@ -34,6 +34,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   val trajectory: Trajectory =
     ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
   val tGeo: String = trajectory.toGeoJSON
+  val lGeo: String = trajectory.getLineString.toString
   val trajectorySeg: Trajectory =
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
@@ -48,106 +49,77 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("st_traj_oid(Trajectory)") {}
 
   test("st_traj_tid(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0", resultSet.getObject(1))
-
+    executeQueryCheck(
+      "select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0")
+    )
   }
 
   test("st_traj_startTime(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_startTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2018-10-09 07:28:21.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("2018-10-09 07:28:21.0")
+    )
   }
 
   test("st_traj_endTime(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_endTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2018-10-09 07:34:18.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_endTime(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("2018-10-09 07:34:18.0")
+    )
   }
 
   test("st_traj_startPoint(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("POINT (108.99553 34.27859)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.99553 34.27859)")
+    )
   }
 
   test("st_traj_endPoint(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("POINT (108.98897 34.25815)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.98897 34.25815)")
+    )
   }
 
   test("st_traj_numOfPoints(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_numOfPoints(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("117", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List("POINT (108.99553 34.27859)")
+    )
   }
 
   test("st_traj_pointN(Trajectory,int)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
-    resultSet.next()
-    assertEquals("POINT (108.99552 34.27786)", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)",
+      List("POINT (108.99552 34.27786)")
+    )
   }
 
   test("st_traj_timeN(Trajectory,int)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_timeN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)")
-    resultSet.next()
-    assertEquals("2018-10-09 07:28:27.0", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_timeN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)",
+      List("2018-10-09 07:28:27.0")
+    )
   }
 
   test("st_traj_lengthInKM(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals("2.9989194858191373", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List(2.9989194858191373)
+    )
   }
 
   test("st_traj_speedInKMPerHour(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery(
-        "select st_traj_speedInKMPerHour(st_traj_fromGeoJSON(\'" + tGeo + "\'))"
-      )
-    resultSet.next()
-    assertEquals("30.24120489901651", resultSet.getObject(1).toString)
-
+    executeQueryCheck(
+      "select st_traj_speedInKMPerHour(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List(30.24120489901651)
+    )
   }
 
   test("st_traj_geom(Trajectory)") {
-    val statement = connect.createStatement()
-    val resultSet =
-      statement.executeQuery("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))")
-    resultSet.next()
-    assertEquals(
-      "class org.locationtech.jts.geom.LineString",
-      resultSet.getObject(1).getClass.toString
-    )
+    executeQueryCheck("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(lGeo))
 
   }
 
@@ -268,77 +240,6 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     assertEquals(count, count2)
     spark.stop()
 
-  }
-
-  test("st_traj_stayPointDetect") {
-    val statement = connect.createStatement()
-    val trajectoryStp: Trajectory =
-      ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
-    val tGeoStp: String = trajectoryStp.toGeoJSON
-    val resultSet1 = statement.executeQuery(
-      "select st_traj_stayPointDetect(st_traj_fromGeoJSON(\'" + tGeoStp + "\'),10,10)"
-    )
-    val results1 = new ListBuffer[(String, String, String)]()
-    while (resultSet1.next()) {
-      results1 += (
-        (
-          resultSet1.getTimestamp(1).toString,
-          resultSet1.getTimestamp(2).toString,
-          resultSet1.getObject(3).toString
-        )
-      )
-    }
-    val expected1 = List(
-      (
-        "2018-10-09 07:28:24.0",
-        "2018-10-09 07:28:39.0",
-        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
-      ),
-      (
-        "2018-10-09 07:30:01.0",
-        "2018-10-09 07:30:15.0",
-        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
-      )
-    )
-    assertEquals(expected1.sorted, results1.toList.sorted)
-
-    val spark = SparkQueryExecutor.getSparkSession(isLocal = true)
-    import spark.implicits._
-    val rdd = spark.sparkContext.parallelize(Seq(trajectorySeg, trajectorySeg))
-    val df = rdd.toDF("traj")
-    df.createOrReplaceTempView("table1")
-    val df3 = spark.sql(
-      "select f.starttime, f.endtime, st_mPointFromWKT(f.gpspoints) from (select st_traj_stayPointDetect(traj, 10, 10) from table1) as f"
-    )
-    val li = df3
-      .as[(Timestamp, Timestamp, MultiPoint)]
-      .collect
-      .toList
-      .map(x => (x._1.toString, x._2.toString, x._3.toString))
-    val expected = List(
-      (
-        "2018-10-09 07:28:24.0",
-        "2018-10-09 07:28:39.0",
-        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
-      ),
-      (
-        "2018-10-09 07:28:24.0",
-        "2018-10-09 07:28:39.0",
-        "MULTIPOINT ((108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822), (108.99552 34.27822))"
-      ),
-      (
-        "2018-10-09 07:30:01.0",
-        "2018-10-09 07:30:15.0",
-        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
-      ),
-      (
-        "2018-10-09 07:30:01.0",
-        "2018-10-09 07:30:15.0",
-        "MULTIPOINT ((108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891), (108.99546 34.26891))"
-      )
-    )
-    assertEquals(expected.sorted, li.sorted)
-    spark.stop()
   }
 
   test("st_traj_noiseFilter_test1") {

@@ -11,6 +11,8 @@ services:
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
+    profiles:
+      - cluster
   spark-worker-a:
     image: cluster-apache-spark:3.0.2
     ports:
@@ -29,6 +31,8 @@ services:
     volumes:
       - ./apps:/opt/spark-apps
       - ./data:/opt/spark-data
+    profiles:
+      - cluster      
   spark-worker-b:
     image: cluster-apache-spark:3.0.2
     ports:
@@ -47,7 +51,8 @@ services:
     volumes:
       - ./apps:/opt/spark-apps
       - ./data:/opt/spark-data
-
+    profiles:
+      - cluster
   livy:
     hostname: livy-local
     image: livy:0.8.0
@@ -59,7 +64,8 @@ services:
       - spark-master
       - spark-worker-a
       - spark-worker-b
-
+    profiles:
+      - cluster
   hadoop:
     hostname: hadoop-local
     image: julienlau/hadoop-single-node-cluster:3.3.3
@@ -69,7 +75,8 @@ services:
       - "8088:8088"
       - "9000:9000"
       - "9866:9866"
-
+    profiles:
+      - cluster
   mysql:
     hostname: mysql-local
     image: 'mysql:5.7'
@@ -80,7 +87,9 @@ services:
       MYSQL_DATABASE: meta_data
     ports:
       - '3306:3306'
-      
+    profiles:
+      - local
+      - cluster
   geomesa-hbase:
     image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
     hostname: geomesa-hbase-local
@@ -90,3 +99,15 @@ services:
       - '16000:16000'
       - '16020:16020'
       - '16030:16030'
+    profiles:
+      - local
+      - cluster  
+  cupid-sever:
+    hostname: cupid-server
+    image: 'cupid-server:2.0.0'
+    environment:
+      CUPID_PORT: 8848
+    volumes:
+      - ./apps:/opt/apps
+    profiles:
+      - server
