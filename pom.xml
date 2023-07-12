@@ -25,6 +25,7 @@
         <module>cupid-db-spark-sql-fix</module>
         <module>cupid-db-spark-core</module>
         <module>cupid-db-serializer</module>
+        <module>cupid-db-geomesa-jts-fix</module>
     </modules>
 
     <properties>
@@ -314,6 +315,11 @@
             <dependency>
                 <groupId>org.urbcomp</groupId>
                 <artifactId>cupid-db-spark-sql-fix</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.urbcomp</groupId>
+                <artifactId>cupid-db-geomesa-jts-fix</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
