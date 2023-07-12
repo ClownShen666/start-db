@@ -39,12 +39,14 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
       sparkSession = SparkQueryExecutor.getSparkSession(param.isLocal)
     }
     param.setSql(sql)
-    sparkSession.sql(sql)
+    SparkQueryExecutor.execute(param, sparkSession)
   }
 
-  def executeSqlBySelfDefined(sql: String): Unit = {
-    param.setSql(sql)
-    SparkQueryExecutor.execute(param, sparkSession)
+  def renewSparkSession(): Unit = {
+    if (sparkSession != null) {
+      sparkSession.close()
+    }
+    sparkSession = null
   }
 
   /**

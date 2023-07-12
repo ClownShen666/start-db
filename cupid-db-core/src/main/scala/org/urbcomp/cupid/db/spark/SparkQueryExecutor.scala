@@ -19,7 +19,7 @@ package org.urbcomp.cupid.db.spark
 import lombok.extern.slf4j.Slf4j
 import org.apache.calcite.sql.SqlSelect
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.geotools.data.DataStoreFinder
 import org.geotools.util.factory.Hints
 import org.locationtech.geomesa.features.ScalaSimpleFeature
@@ -57,7 +57,7 @@ object SparkQueryExecutor {
   var sparkSessionCache: SparkSession = null
   case class RedisConf(redisHost: String, redisPort: Int, redisAuth: String)
 
-  def execute(param: SparkSqlParam, sparkSession: SparkSession = null): Unit = {
+  def execute(param: SparkSqlParam, sparkSession: SparkSession = null): DataFrame = {
     if (param != null) {
       SparkSqlParam.CACHE.set(param)
       SqlParam.CACHE.set(param)
@@ -163,6 +163,7 @@ object SparkQueryExecutor {
           })
           GeoMesaSpark(params).save(rddToSave, params.asScala.toMap, schemaName)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+          data
 
         case _: SqlSelect =>
           CupidSparkTableExtractVisitor.getTableList(sql).foreach { i =>
@@ -178,12 +179,15 @@ object SparkQueryExecutor {
           }
           val df = spark.sql(sql)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
+          df
 
         case _ => throw new UnsupportedOperationException("Unexpected sql kind " + node.getKind);
       }
     } catch {
-      case e: Exception =>
+      case e: Exception => {
         log.error("", e)
+        null
+      }
     }
   }
 
@@ -199,7 +203,7 @@ object SparkQueryExecutor {
       .options(Map("hbase.catalog" -> catalogName, "hbase.zookeepers" -> hbaseZookeepers))
       .option("geomesa.feature", baseName)
       .load()
-      .createTempView(tableName)
+      .createOrReplaceTempView(tableName)
   }
 
   def getAllMethods[T](clazz: Class[T], name: String): Array[Method] = {

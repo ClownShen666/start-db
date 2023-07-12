@@ -147,8 +147,8 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
 
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
-    SparkExecuteWrapper.getSparkExecute.executeSqlBySelfDefined(loadSql)
-    SparkExecuteWrapper.getSparkExecute.executeSqlBySelfDefined(querySql)
+    SparkExecuteWrapper.getSparkExecute.executeSql(loadSql)
+    SparkExecuteWrapper.getSparkExecute.executeSql(querySql)
 
     val resultSet = stmt.executeQuery(querySql)
     resultSet.next()

@@ -24,8 +24,6 @@ class ShowSparkResultExporter extends ISparkResultExporter {
 
   override def getType: DataExportType = DataExportType.PRINT
 
-  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {
-    data.show()
-  }
+  override def exportData(param: SparkSqlParam, data: DataFrame): Unit = {}
 
 }
