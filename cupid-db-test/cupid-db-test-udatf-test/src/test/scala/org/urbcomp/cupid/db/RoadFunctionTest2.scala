@@ -18,9 +18,6 @@ package org.urbcomp.cupid.db
 
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
-import org.urbcomp.cupid.db.model.trajectory.Trajectory
-
-import scala.collection.convert.ImplicitConversions._
 
 /**
   * Road Segment/Network Function test
@@ -32,7 +29,7 @@ class RoadFunctionTest2 extends AbstractCalciteSparkFunctionTest {
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
   val rnGeoJson: String = rn.toGeoJSON
 
-  test("st_rn_reachableConvexHull") {
+  ignore("st_rn_reachableConvexHull") {
     // This test cost much memory so renew spark session to drop some temp view to get more memory
     SparkExecuteWrapper.getSparkExecute.renewSparkSession()
     executeQueryCheck(

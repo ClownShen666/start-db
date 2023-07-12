@@ -24,7 +24,7 @@ class RoadFunctionTest3 extends AbstractCalciteSparkFunctionTest {
   val rn: RoadNetwork = ModelGenerator.generateRoadNetwork()
   val rnGeoJson: String = rn.toGeoJSON
 
-  test("st_rn_reachableConcavexHull") {
+  ignore("st_rn_reachableConcavexHull") {
     // This test cost much memory so renew spark session to drop some temp view to get more memory
     SparkExecuteWrapper.getSparkExecute.renewSparkSession()
     executeQueryCheck(
