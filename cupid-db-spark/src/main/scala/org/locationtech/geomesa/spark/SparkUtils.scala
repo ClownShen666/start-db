@@ -55,7 +55,7 @@ object SparkUtils extends LazyLogging {
     type EXTRACTOR = SimpleFeature => AnyRef
     val IdExtractor: SimpleFeature => AnyRef = sf => sf.getID
 
-    requiredColumns.map {
+    requiredAttributes.map {
       case "__fid__" => IdExtractor
       case col =>
         val schemaIndex = schema.fieldIndex(col)
