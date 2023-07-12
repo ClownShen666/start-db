@@ -815,9 +815,6 @@ object SparkQueryExecutor {
       conf.set("spark.redis.host", redisConf.get.redisHost)
       conf.set("spark.redis.port", redisConf.get.redisPort.toString)
       if (redisConf.get.redisAuth != "") conf.set("spark.redis.auth", redisConf.get.redisAuth)
-      conf.set("spark.redis.timeout", "5000")
-      conf.set("redis.timeout", "5000")
-      conf.set("spark.redis.max.pipeline.size", "10000")
     }
     conf
   }
