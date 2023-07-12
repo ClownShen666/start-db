@@ -179,7 +179,7 @@ object SparkQueryExecutor {
           }
           val df = spark.sql(sql)
           SparkResultExporterFactory.getInstance(param.getExportType).exportData(param, df)
-          df
+          df.drop("__fid__")
 
         case _ => throw new UnsupportedOperationException("Unexpected sql kind " + node.getKind);
       }
