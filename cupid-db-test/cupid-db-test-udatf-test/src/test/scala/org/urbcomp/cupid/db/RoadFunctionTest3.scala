@@ -25,8 +25,8 @@ class RoadFunctionTest3 extends AbstractCalciteSparkFunctionTest {
   val rnGeoJson: String = rn.toGeoJSON
 
   test("st_rn_reachableConcavexHull") {
-    // Drop a tempView to avoid OOM
-    SparkExecuteWrapper.getSparkExecute.sparkSession.catalog.dropTempView("t_road_segment_test")
+    // This test cost much memory so renew spark session to drop some temp view to get more memory
+    SparkExecuteWrapper.getSparkExecute.renewSparkSession()
     executeQueryCheck(
       "select st_rn_reachableConcaveHull(st_rn_fromGeoJson(\'"
         + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \"Drive\")",

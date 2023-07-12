@@ -33,6 +33,8 @@ class RoadFunctionTest2 extends AbstractCalciteSparkFunctionTest {
   val rnGeoJson: String = rn.toGeoJSON
 
   test("st_rn_reachableConvexHull") {
+    // This test cost much memory so renew spark session to drop some temp view to get more memory
+    SparkExecuteWrapper.getSparkExecute.renewSparkSession()
     executeQueryCheck(
       "select st_rn_reachableConvexHull(st_rn_fromGeoJson(\'"
         + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \"Drive\")",

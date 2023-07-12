@@ -42,6 +42,13 @@ class SparkExecuteWrapper private (param: SparkSqlParam) {
     SparkQueryExecutor.execute(param, sparkSession)
   }
 
+  def renewSparkSession(): Unit = {
+    if (sparkSession != null) {
+      sparkSession.close()
+    }
+    sparkSession = null
+  }
+
   /**
     *Description: Single case, close the current sparkSession after execution
    **/
