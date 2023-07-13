@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -50,9 +49,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
 
-    val resultSet = stmt.executeQuery(querySql)
-    resultSet.next()
-    assertEquals(resultSet.getInt(1), 10)
+    executeQueryCheck(querySql, List(10))
   }
 
   test("test load - multiple columns - no udf") {
@@ -67,15 +64,10 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
          |  WITH HEADER
          |""".stripMargin
     val querySql = s"select ride_id, rideable_type from $randTableName where idx = 1"
-
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-
-    val resultSet = stmt.executeQuery(querySql)
-    resultSet.next()
-    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
-    assert(resultSet.getString(2).equals("electric_bike"))
+    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike"))
   }
 
   test("test load -traj -road  - with udf") {
@@ -97,13 +89,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-
-    val resultSet = stmt.executeQuery(querySql)
-    resultSet.next()
-    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
-    assert(resultSet.getString(2).equals("electric_bike"))
-    assert(resultSet.getString(3).equals(tGeo))
-    assert(resultSet.getString(4).equals(rsGeoJson))
+    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
   }
 
   test("test load - multiple columns - with udf") {
@@ -122,10 +108,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-
-    val resultSet = stmt.executeQuery(querySql)
-    resultSet.next()
-    assert(resultSet.getString(1).equals("POINT (40.646475 -74.026081)"))
+    executeQueryCheck(querySql, List("POINT (40.646475 -74.026081)"))
   }
 
   test("test load -traj   - with udf in spark") {
@@ -149,13 +132,6 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute(createTableSql)
     SparkExecuteWrapper.getSparkExecute.executeSql(loadSql)
     SparkExecuteWrapper.getSparkExecute.executeSql(querySql)
-
-    val resultSet = stmt.executeQuery(querySql)
-    resultSet.next()
-    assert(resultSet.getString(1).equals("8B88A6F8158F650D"))
-    assert(resultSet.getString(2).equals("electric_bike"))
-    assert(resultSet.getString(3).equals(tGeo))
-    assert(resultSet.getString(4).equals(rsGeoJson))
-
+    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
   }
 }
