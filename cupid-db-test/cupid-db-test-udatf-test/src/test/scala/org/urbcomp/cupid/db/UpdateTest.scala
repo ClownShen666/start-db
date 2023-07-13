@@ -16,15 +16,9 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
-
 class UpdateTest extends AbstractCalciteSparkFunctionTest {
 
-  /**
-    * test for update
-    */
   test("update data") {
-    val statement = connect.createStatement()
     val resultSet = statement.executeQuery("select max(idx) from t_test")
     resultSet.next()
     val maxIdx = resultSet.getObject(1)
@@ -35,10 +29,7 @@ class UpdateTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       s"update default.t_test set ride_id = 'temp', start_point = st_makePoint(3.1, 2) where idx = $id"
     )
-    val resultSet1 = statement.executeQuery(s"select ride_id from t_test where idx = $id")
-    resultSet1.next()
-    val value = resultSet1.getObject(1).asInstanceOf[String]
-    assertEquals("temp", value)
+    executeQueryCheck(s"select ride_id from t_test where idx = $id", List("temp"))
   }
 
 }
