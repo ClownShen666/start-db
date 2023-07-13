@@ -16,12 +16,23 @@
  */
 package org.urbcomp.cupid.db
 
+import org.urbcomp.cupid.db.model.sample.ModelGenerator
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
+import scala.collection.JavaConverters.seqAsJavaList
+
 /**
   * st_distanceSphere
   * st_distanceSpheroid
   * spark's answer is 0
   */
 class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
+
+  val nameArray: Array[String] = Array[String]("int", "str", "double", "point")
+  val typeArray: Array[String] = Array[String]("Integer", "String", "Double", "Point")
+  val trajectory: Trajectory =
+    ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
+  val lGeo: String = trajectory.getLineString.toString
+
   test("st_translate(geom, deltaX, deltaY)") {
     executeQueryCheck(
       "select st_translate(st_makePoint(1, 2), 1, 1), st_translate(st_makeBBox(1, 2, 3, 4), 1, 1)",
@@ -62,7 +73,10 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select st_pointN(st_makePoint(1, 2), 1), st_pointN(st_makeBBox(1, 2, 3, 4), 1)",
       List(null, null)
     )
-    // todo check LineString
+    executeQueryCheck(
+      "select st_pointN(st_lineStringFromWKT(\"" + lGeo + "\"), 1)",
+      List("POINT (108.99553 34.27859)")
+    )
   }
 
   test("st_area(geom)") {
@@ -125,11 +139,17 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_lengthSphere(lineString)") {
-    // todo 测试linestring的结果
+    executeQueryCheck(
+      "select st_lengthSphere(st_lineStringFromWKT(\"" + lGeo + "\"))",
+      List(2995.567882733306)
+    )
   }
 
   test("st_lengthSpheroid(lineString)") {
-    // todo 测试linestring的结果
+    executeQueryCheck(
+      "select st_lengthSpheroid(st_lineStringFromWKT(\"" + lGeo + "\"))",
+      List(3.3267615900931954e8)
+    )
   }
 
   test("st_difference(geom1, geom2)") {
@@ -152,6 +172,11 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select st_convexHull(st_makePoint(116.307683,39.978879))",
       List("POINT (116.307683 39.978879)")
     )
-    // todo LineString等完成之后，再测
+    executeQueryCheck(
+      "select st_convexHull(st_lineStringFromWKT(\"" + lGeo + "\"))",
+      List(
+        "POLYGON ((108.98991 34.25814, 108.98897 34.25815, 108.99553 34.27859, 108.99657 34.25875, 108.99654 34.25837, 108.99652 34.25826, 108.99647 34.25821, 108.99639 34.25818, 108.99066 34.25814, 108.98991 34.25814))"
+      )
+    )
   }
 }

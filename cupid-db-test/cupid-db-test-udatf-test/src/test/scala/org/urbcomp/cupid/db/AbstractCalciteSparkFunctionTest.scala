@@ -123,6 +123,8 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   }
 
   private def isEqual(expectVal: Any, actualVal: Any): Boolean = {
+    println("expect val is " + expectVal)
+    println("actual val is " + actualVal)
     expectVal match {
       case _: Trajectory =>
         return actualVal.toString.equals(expectVal.toString)

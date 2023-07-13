@@ -24,7 +24,7 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 class st_lengthSpheroidUdf extends AbstractUdf {
 
-  override def name(): String = "st_lengthSpheroidd"
+  override def name(): String = "st_lengthSpheroid"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
