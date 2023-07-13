@@ -22,6 +22,7 @@ import org.locationtech.jts.geom.Geometry
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
 import org.urbcomp.cupid.db.metadata.CalciteHelper
+import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
@@ -87,7 +88,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
       }
       dfData += item
     }
-    var unmatchedRows: mutable.Set[Int] = dfData.indices.to[mutable.Set]
+    val unmatchedRows: mutable.Set[Int] = dfData.indices.to[mutable.Set]
     for (row <- rs) {
       var found = false
       for (idx <- dfData.indices) {
@@ -156,14 +157,19 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
           }
         } else if (actualVal.isInstanceOf[java.sql.Timestamp]) {
           return actualVal.toString.equals(expectVal.toString)
-        } else if (actualVal.isInstanceOf[Trajectory]) {
-
-          return actualVal.asInstanceOf[Trajectory].toString.equals(expectVal.toString)
-        } else if (expectVal != actualVal) {
-          return false
-        } else {
-          return true
-        }
+        } else
+          actualVal match {
+            case trajectory: Trajectory =>
+              return trajectory.toString.equals(expectVal.toString)
+            case segment: RoadSegment =>
+              return segment.toString.equals(expectVal.toString)
+            case _ =>
+              if (expectVal != actualVal) {
+                return false
+              } else {
+                return true
+              }
+          }
     }
     true
   }
