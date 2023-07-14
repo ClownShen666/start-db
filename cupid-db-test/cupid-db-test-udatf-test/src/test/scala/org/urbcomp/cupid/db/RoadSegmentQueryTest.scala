@@ -32,7 +32,9 @@ class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
   val rsGeoJson: String = rs.toGeoJSON
 
   test("basic roadSegment query") {
-    executeQueryCheck("select count(1) from t_road_segment_test")
+    statement.execute("drop table if exists t_basic_road_segment_query_test")
+    statement.execute("create table if not exists t_basic_road_segment_query_test (rs RoadSegment)")
+    executeQueryCheck("select count(1) from t_basic_road_segment_query_test", List(0))
   }
 
   test("roadSegment query") {
