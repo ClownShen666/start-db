@@ -35,14 +35,14 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
   test("testInsert") {
     val statement = connect.createStatement()
 
-    statement.execute("drop table if  exists t_test;")
+    statement.execute("drop table if  exists tt_test;")
     statement.execute(
-      "create table if not exists t_test (idx Integer, ride_id string, start_point point);"
+      "create table if not exists tt_test (idx Integer, ride_id string, start_point point);"
     )
     statement.execute(
-      "Insert into t_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
+      "Insert into tt_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
     )
-    executeQueryCheck("select count(1) from t_test", List(1))
+    executeQueryCheck("select count(1) from tt_test", List(1))
   }
 
   /**
@@ -64,17 +64,17 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("multiple data insert") {
     val statement = connect.createStatement()
-    statement.execute("drop table if  exists t_test;")
+    statement.execute("drop table if  exists tt_test;")
     statement.execute(
-      "create table if not exists t_test (idx Integer, ride_id string, start_point point);"
+      "create table if not exists tt_test (idx Integer, ride_id string, start_point point);"
     )
     statement.execute(
-      "Insert into t_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+      "Insert into tt_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
     )
     statement.execute(
-      "Insert into t_test (idx, ride_id, start_point) values (172, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+      "Insert into tt_test (idx, ride_id, start_point) values (172, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
     )
-    executeQueryCheck("select count(1) from t_test", List(4))
+    executeQueryCheck("select count(1) from tt_test", List(4))
   }
 
   /**
