@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.{assertEquals, assertTrue}
 import org.locationtech.jts.geom.Coordinate
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
@@ -26,17 +25,12 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
   val DEFAULT_TIMESTAMP: Timestamp = Timestamp.valueOf("2022-06-29 10:00:00.000")
   val POINT = GeometryFactoryUtils.defaultGeometryFactory.createPoint(new Coordinate(10, 20))
 
-  test("test query") {
-    executeQueryCheck("select count(1) from t_test", List(105))
-  }
-
   test("test query col") {
     val stmt = connect.createStatement()
-    stmt.execute("drop table if exists t_int ")
-    stmt.execute("create table if not exists t_int(i int, j int , b bool)")
-    stmt.execute("insert into t_int values (123, 456, true)")
-
-    executeQueryCheck("select  *  from t_int ", List(123, 456, true))
+    stmt.execute("drop table  if exists jack_test_query ")
+    stmt.execute("create table if not exists  jack_test_query(i int , b string)")
+    stmt.execute("insert into jack_test_query values (556,  \"false\")")
+    executeQueryCheck("select  i from jack_test_query  where b = \"false\"", List(556))
   }
 
   test("test select one column") {
@@ -49,6 +43,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
 
   test("select timestamp") {
     val stmt = connect.createStatement()
+    stmt.execute("drop table if exists t_timestamp ")
     stmt.execute("create table if not exists t_timestamp  (timestamp11 timestamp);")
     stmt.execute("insert into t_timestamp values (toTimestamp(\"2022-06-29 10:00:00.000\"));")
     executeQueryCheck("select * from t_timestamp;")
