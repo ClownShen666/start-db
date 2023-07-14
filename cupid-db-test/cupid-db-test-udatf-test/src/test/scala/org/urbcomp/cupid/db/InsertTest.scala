@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 
@@ -44,7 +43,6 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
       "Insert into t_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
     )
     executeQueryCheck("select count(1) from t_test", List(1))
-
   }
 
   /**
@@ -86,13 +84,10 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     val statement = connect.createStatement()
     statement.execute("drop table if  exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
-
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
     executeQueryCheck("select count(1) from t_road_segment_test", List(1))
-
   }
 
   /**
