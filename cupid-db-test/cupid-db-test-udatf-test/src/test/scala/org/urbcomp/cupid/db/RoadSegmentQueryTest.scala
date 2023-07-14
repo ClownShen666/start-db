@@ -32,31 +32,23 @@ class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
   val rsGeoJson: String = rs.toGeoJSON
 
   test("basic roadSegment query") {
-    val stmt = connect.createStatement()
-    statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val rs = stmt.executeQuery("select count(1) from t_road_segment_test")
-    assertTrue(rs.next())
+    statement.execute("drop table if exists t_basic_road_segment_query_test")
+    statement.execute("create table if not exists t_basic_road_segment_query_test (rs RoadSegment)")
+    executeQueryCheck("select count(1) from t_basic_road_segment_query_test", List(0))
   }
 
-  /**
-    * test for roadSegment type
-    */
   test("roadSegment query") {
-    val statement = connect.createStatement()
-    statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val set = statement.executeQuery("select count(1) from t_road_segment_test")
-    set.next()
-    val count = set.getObject(1)
-    if (count == 0) {
-      statement.execute(
-        "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
+    statement.execute("drop table if exists t_road_segment_query_test")
+    statement.execute("create table if not exists t_road_segment_query_test (rs RoadSegment)")
+    statement.execute(
+      s"insert into t_road_segment_query_test values (st_rs_fromGeoJSON(\'$rsGeoJson\'))"
+    )
+    executeQueryCheck(
+      "select rs from t_road_segment_query_test",
+      List(
+        "{\"type\":\"Feature\",\"properties\":{\"endId\":2,\"level\":6,\"startId\":1,\"rsId\":1,\"speedLimit\":30.0,\"lengthInMeter\":120.0,\"direction\":1},\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[111.37939453125,54.00776876193478],[116.3671875,53.05442186546102]]}}"
       )
-    }
-    val rs = statement.executeQuery("select * from t_road_segment_test")
-    while (rs.next()) {
-      assertEquals(classOf[RoadSegment], rs.getObject(2).getClass)
-    }
+    )
   }
 
-  test("0626Test") {}
 }
