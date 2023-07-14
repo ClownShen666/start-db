@@ -39,6 +39,9 @@ class CollectListTest extends AbstractCalciteSparkFunctionTest {
     resultSet.next()
     assertNull(resultSet.getObject(1))
     assertTrue(!resultSet.next())
+
+    val df = SparkExecuteWrapper.getSparkExecute.executeSql("select collect_list(points) from list_test1")
+    assertTrue(df.collectAsList().get(0).getList(0).size == 0)
   }
 
   test("collect list test2") {
@@ -54,5 +57,8 @@ class CollectListTest extends AbstractCalciteSparkFunctionTest {
     val collectListResult =
       resultSet.getObject(1).asInstanceOf[org.apache.calcite.avatica.util.ArrayImpl]
     assertTrue(collectListResult.getArray.asInstanceOf[Array[Object]].length == 3)
+
+    val df = SparkExecuteWrapper.getSparkExecute.executeSql("select collect_list(points) from list_test2")
+    assertTrue(df.collectAsList().get(0).getList(0).size() == 3)
   }
 }
