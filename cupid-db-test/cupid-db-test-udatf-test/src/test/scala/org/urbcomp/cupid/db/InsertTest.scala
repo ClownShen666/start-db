@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db
 
-import org.junit.Assert.assertEquals
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.sample.ModelGenerator
 
@@ -35,16 +34,15 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("testInsert") {
     val statement = connect.createStatement()
-    val set = statement.executeQuery("select count(1) from t_test")
-    set.next()
-    val valueBefore: Long = set.getObject(1).asInstanceOf[Long]
+
+    statement.execute("drop table if  exists tt_test_demo;")
     statement.execute(
-      "Insert into t_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
+      "create table if not exists tt_test_demo (idx Integer, ride_id string, start_point point);"
     )
-    val set1 = statement.executeQuery("select count(1) from t_test")
-    set1.next()
-    val valueAfter: Long = set1.getObject(1).asInstanceOf[Long]
-    assertEquals(1, valueAfter - valueBefore)
+    statement.execute(
+      "Insert into tt_test_demo (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
+    )
+    executeQueryCheck("select count(1) from tt_test_demo", List(1))
   }
 
   /**
@@ -52,17 +50,13 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("roadsegment insert") {
     val statement = connect.createStatement()
+    statement.execute("drop table if  exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsBefore.next()
-    val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+
+    statement.execute(
       "insert into t_road_segment_test (a, b) values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsAfter.next()
-    val afterValue = rsAfter.getObject(1).asInstanceOf[Long]
-    assertEquals(1, afterValue - beforeValue)
+    executeQueryCheck("select count(1) from t_road_segment_test", List(1))
   }
 
   /**
@@ -70,16 +64,17 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("multiple data insert") {
     val statement = connect.createStatement()
-    val set = statement.executeQuery("select count(1) from t_test")
-    set.next()
-    val valueBefore: Long = set.getObject(1).asInstanceOf[Long]
+    statement.execute("drop table if  exists t1_test;")
     statement.execute(
-      "Insert into t_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+      "create table if not exists t1_test (idx Integer, ride_id string, start_point point);"
     )
-    val set1 = statement.executeQuery("select count(1) from t_test")
-    set1.next()
-    val valueAfter: Long = set1.getObject(1).asInstanceOf[Long]
-    assertEquals(2, valueAfter - valueBefore)
+    statement.execute(
+      "Insert into t1_test (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+    )
+    statement.execute(
+      "Insert into t1_test (idx, ride_id, start_point) values (172, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+    )
+    executeQueryCheck("select count(1) from t1_test", List(4))
   }
 
   /**
@@ -87,17 +82,12 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("insert test (without target column)") {
     val statement = connect.createStatement()
+    statement.execute("drop table if  exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsBefore.next()
-    val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsAfter.next()
-    val afterValue = rsAfter.getObject(1).asInstanceOf[Long]
-    assertEquals(1, afterValue - beforeValue)
+    executeQueryCheck("select count(1) from t_road_segment_test", List(1))
   }
 
   /**
@@ -105,17 +95,12 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("multiple data insert test (without target column)") {
     val statement = connect.createStatement()
+    statement.execute("drop table if  exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
-    val rsBefore = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsBefore.next()
-    val beforeValue = rsBefore.getObject(1).asInstanceOf[Long]
-    val set = statement.execute(
+    statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\')), (3, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    val rsAfter = statement.executeQuery("select count(1) from t_road_segment_test")
-    rsAfter.next()
-    val afterValue = rsAfter.getObject(1).asInstanceOf[Long]
-    assertEquals(2, afterValue - beforeValue)
+    executeQueryCheck("select count(1) from t_road_segment_test", List(2))
   }
 
 }
