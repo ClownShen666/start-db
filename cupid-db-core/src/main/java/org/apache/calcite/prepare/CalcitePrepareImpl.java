@@ -707,7 +707,6 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
                 }
 
-                // TODO DO NOT run into spark when run select sql for insert
                 if (sqlNode instanceof SqlSelect) {
                     sqlParam.setSql(query.sql);
                     return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
