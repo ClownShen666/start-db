@@ -26,12 +26,13 @@ import org.apache.calcite.sql.{
 }
 import org.geotools.data.{DataStoreFinder, Transaction}
 import org.locationtech.geomesa.utils.io.WithClose
+import org.urbcomp.cupid.db.config.ExecuteEngine
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.{CalciteHelper, MetadataAccessUtil}
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.util.MetadataUtil
+import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 import org.urbcomp.cupid.db.utils.SqlLiteralHandler
 
 import java.sql.ResultSet
@@ -128,6 +129,13 @@ case class InsertExecutor(n: SqlInsert) extends BaseExecutor {
   def executeQuery[R](querySql: String): ResultSet = {
     val connection = CalciteHelper.createConnection()
     val statement = connection.createStatement()
-    statement.executeQuery(querySql)
+    val prevEngine = SqlParam.CACHE.get().getExecuteEngine
+    // force use calcite engine when run select for insert
+    try {
+      SqlParam.CACHE.get().setExecuteEngine(ExecuteEngine.CALCITE)
+      statement.executeQuery(querySql)
+    } finally {
+      SqlParam.CACHE.get().setExecuteEngine(prevEngine)
+    }
   }
 }
