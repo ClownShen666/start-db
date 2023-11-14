@@ -33,12 +33,12 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_GeometryFromWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "POINT (90 90)",
-                "LINESTRING (0 0, 1 1, 1 2)",
-                "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))",
-                "MULTIPOINT ((3.5 5.6), (4.8 10.5))",
-                "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))",
-                "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+            "POINT (90 90)",
+            "LINESTRING (0 0, 1 1, 1 2)",
+            "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))",
+            "MULTIPOINT ((3.5 5.6), (4.8 10.5))",
+            "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))",
+            "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
@@ -50,9 +50,7 @@ public class geometricTypeConversionUdfTest {
 
     @Test
     public void st_pointFromWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "POINT (90 90)"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("POINT (90 90)");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_pointFromWKT", st_pointFromWKT.class);
@@ -63,9 +61,7 @@ public class geometricTypeConversionUdfTest {
 
     @Test
     public void st_lineStringFromWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "LINESTRING (0 0, 1 1, 1 2)"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("LINESTRING (0 0, 1 1, 1 2)");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_lineStringFromWKT", st_lineStringFromWKT.class);
@@ -77,7 +73,7 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_polygonFromWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))"
+            "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
@@ -89,9 +85,7 @@ public class geometricTypeConversionUdfTest {
 
     @Test
     public void st_multiPointFromWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTIPOINT ((3.5 5.6), (4.8 10.5))"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("MULTIPOINT ((3.5 5.6), (4.8 10.5))");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_multiPointFromWKT", st_multiPointFromWKT.class);
@@ -103,11 +97,14 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_multiLineStringFromWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))"
+            "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
-        tableEnv.createTemporaryFunction("st_multiLineStringFromWKT", st_multiLineStringFromWKT.class);
+        tableEnv.createTemporaryFunction(
+            "st_multiLineStringFromWKT",
+            st_multiLineStringFromWKT.class
+        );
         Table sink = tableEnv.sqlQuery("select st_multiLineStringFromWKT(f0), f0 from sensor;");
 
         checkF1EqualF2(tableEnv, sink);
@@ -116,7 +113,7 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_multiPolygonFromWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+            "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
@@ -129,12 +126,12 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_geometryAsWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "POINT (90 90)",
-                "LINESTRING (0 0, 1 1, 1 2)",
-                "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))",
-                "MULTIPOINT ((3.5 5.6), (4.8 10.5))",
-                "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))",
-                "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+            "POINT (90 90)",
+            "LINESTRING (0 0, 1 1, 1 2)",
+            "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))",
+            "MULTIPOINT ((3.5 5.6), (4.8 10.5))",
+            "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))",
+            "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
@@ -148,28 +145,28 @@ public class geometricTypeConversionUdfTest {
 
     @Test
     public void st_pointAsWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "POINT (90 90)"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("POINT (90 90)");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_pointAsWKT", st_pointAsWKT.class);
         tableEnv.createTemporaryFunction("st_pointFromWKT", st_pointFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_pointAsWKT(st_pointFromWKT(f0)), f0 from sensor;");
+        Table sink = tableEnv.sqlQuery(
+            "select st_pointAsWKT(st_pointFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
 
     @Test
     public void st_lineStringAsWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "LINESTRING (0 0, 1 1, 1 2)"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("LINESTRING (0 0, 1 1, 1 2)");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_lineStringAsWKT", st_lineStringAsWKT.class);
         tableEnv.createTemporaryFunction("st_lineStringFromWKT", st_lineStringFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_lineStringAsWKT(st_lineStringFromWKT(f0)), f0 from sensor;");
+        Table sink = tableEnv.sqlQuery(
+            "select st_lineStringAsWKT(st_lineStringFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
@@ -177,27 +174,29 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_polygonAsWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))"
+            "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_polygonAsWKT", st_polygonAsWKT.class);
         tableEnv.createTemporaryFunction("st_polygonFromWKT", st_polygonFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_polygonAsWKT(st_polygonFromWKT(f0)), f0 from sensor;");
+        Table sink = tableEnv.sqlQuery(
+            "select st_polygonAsWKT(st_polygonFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
 
     @Test
     public void st_multiPointAsWKT() throws Exception {
-        DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTIPOINT ((3.5 5.6), (4.8 10.5))"
-        );
+        DataStreamSource<String> sensorDS = env.fromElements("MULTIPOINT ((3.5 5.6), (4.8 10.5))");
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_multiPointAsWKT", st_multiPointAsWKT.class);
         tableEnv.createTemporaryFunction("st_multiPointFromWKT", st_multiPointFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_multiPointAsWKT(st_multiPointFromWKT(f0)), f0 from sensor;");
+        Table sink = tableEnv.sqlQuery(
+            "select st_multiPointAsWKT(st_multiPointFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
@@ -205,13 +204,18 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_multiLineStringAsWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))"
+            "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_multiLineStringAsWKT", st_multiLineStringAsWKT.class);
-        tableEnv.createTemporaryFunction("st_multiLineStringFromWKT", st_multiLineStringFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_multiLineStringAsWKT(st_multiLineStringFromWKT(f0)), f0 from sensor;");
+        tableEnv.createTemporaryFunction(
+            "st_multiLineStringFromWKT",
+            st_multiLineStringFromWKT.class
+        );
+        Table sink = tableEnv.sqlQuery(
+            "select st_multiLineStringAsWKT(st_multiLineStringFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
@@ -219,13 +223,15 @@ public class geometricTypeConversionUdfTest {
     @Test
     public void st_multiPolygonAsWKT() throws Exception {
         DataStreamSource<String> sensorDS = env.fromElements(
-                "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+            "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
 
         tableEnv.createTemporaryView("sensor", sensorDS);
         tableEnv.createTemporaryFunction("st_multiPolygonAsWKT", st_multiPolygonAsWKT.class);
         tableEnv.createTemporaryFunction("st_multiPolygonFromWKT", st_multiPolygonFromWKT.class);
-        Table sink = tableEnv.sqlQuery("select st_multiPolygonAsWKT(st_multiPolygonFromWKT(f0)), f0 from sensor;");
+        Table sink = tableEnv.sqlQuery(
+            "select st_multiPolygonAsWKT(st_multiPolygonFromWKT(f0)), f0 from sensor;"
+        );
 
         checkF1EqualF2(tableEnv, sink);
     }
