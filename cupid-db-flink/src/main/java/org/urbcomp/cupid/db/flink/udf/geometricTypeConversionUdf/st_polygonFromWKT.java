@@ -14,21 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.function;
+package org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf;
 
 import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.functions.ScalarFunction;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
-public class Functions {
-    public static class ST_Point extends ScalarFunction {
-        @DataTypeHint(value = "RAW", bridgedTo = Geometry.class)
-        public Geometry eval(@DataTypeHint("Double") Double x, @DataTypeHint("Double") Double y) {
-            Coordinate coordinates = new Coordinate(x, y);
-            GeometryFactory geometryFactory = new GeometryFactory();
-            return geometryFactory.createPoint(coordinates);
+public class st_polygonFromWKT extends ScalarFunction {
+    @DataTypeHint(value = "RAW", bridgedTo = Polygon.class)
+    public Polygon eval(@DataTypeHint("String") String wkt) throws ParseException {
+        if (wkt == null) {
+            return null;
+        } else {
+            WKTReader wktReader = new WKTReader();
+            return (Polygon) wktReader.read(wkt);
         }
     }
 }
