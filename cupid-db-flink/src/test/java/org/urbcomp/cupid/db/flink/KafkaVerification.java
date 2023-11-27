@@ -29,13 +29,13 @@ public class KafkaVerification {
 
     public static void main(String[] args) {
         String val = "record";
-        produceToKafka("test", val);
+        produceToKafka(val);
 
-        consumeFromKafka("test", val);
+        consumeFromKafka(val);
 
     }
 
-    private static void produceToKafka(String topic, String val) {
+    private static void produceToKafka(String val) {
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("key.serializer", StringSerializer.class.getName());
@@ -43,13 +43,13 @@ public class KafkaVerification {
 
         Producer<String, String> producer = new KafkaProducer<>(props);
 
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, val);
+        ProducerRecord<String, String> record = new ProducerRecord<>("test", val);
         producer.send(record);
 
         producer.close();
     }
 
-    private static void consumeFromKafka(String topic, String val) {
+    private static void consumeFromKafka(String val) {
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("group.id", "test-consumer-group");
@@ -57,7 +57,7 @@ public class KafkaVerification {
         props.put("value.deserializer", StringDeserializer.class.getName());
 
         Consumer<String, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(java.util.Collections.singletonList(topic));
+        consumer.subscribe(java.util.Collections.singletonList("test"));
 
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
