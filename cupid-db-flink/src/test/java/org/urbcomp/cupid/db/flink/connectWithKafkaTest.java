@@ -32,8 +32,10 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
+import org.urbcomp.cupid.db.flink.serialize.kafka.GeometryDeserializer;
 import org.urbcomp.cupid.db.flink.serialize.kafka.KafkaSerializer;
 import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_geometryAsWKT;
+import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_geometryFromWKT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,21 +64,22 @@ public class connectWithKafkaTest {
         );
         util.kafkaProducer("localhost:9092", "Source", recordList);
 
-        KafkaSource<String> source1 = KafkaSource.<String>builder()
+        KafkaSource<Geometry> source1 = KafkaSource.<Geometry>builder()
             .setBootstrapServers("localhost:9092")
             .setTopics("Source")
             .setStartingOffsets(OffsetsInitializer.earliest())
-            .setValueOnlyDeserializer(new SimpleStringSchema())
+            .setValueOnlyDeserializer(new GeometryDeserializer())
             .build();
-        DataStreamSource<String> ds1 = env.fromSource(
+        DataStreamSource<Geometry> ds1 = env.fromSource(
             source1,
             WatermarkStrategy.noWatermarks(),
             "kafkaSource1",
-            TypeInformation.of(String.class)
+            TypeInformation.of(Geometry.class)
         );
         tableEnv.createTemporaryView("kafkaSource1", tableEnv.fromDataStream(ds1));
         tableEnv.createTemporaryFunction("st_geometryAsWKT", st_geometryAsWKT.class);
-        Table res1 = tableEnv.sqlQuery("select f0, f0 from kafkaSource1;");
+        tableEnv.createTemporaryFunction("st_geometryFromWKT", st_geometryFromWKT.class);
+        Table res1 = tableEnv.sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(f0)), f0 from kafkaSource1;");
 
         checkF1EqualF2(tableEnv, res1, 6);
 
