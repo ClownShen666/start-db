@@ -32,16 +32,5 @@ object ConfigProvider {
       ConfigurationConstants.GEOMESA_HBASE_ZOOKEEPERS -> getHBaseZookeepers
     )
 
-  def getGeomesaHbaseJavaParam(catalog: String): java.util.Map[String, String] = {
-    val scalaConfig: Map[String, String] = getGeomesaHbaseParam(catalog)
-
-    val javaConfig: java.util.Map[String, String] = new java.util.HashMap[String, String]()
-    scalaConfig.foreach {
-      case (key, value) =>
-        javaConfig.put(key, value)
-    }
-    javaConfig
-  }
-
   def getHBaseZookeepers: String = DynamicConfig.getHBaseZookeepers
 }
