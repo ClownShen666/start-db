@@ -79,7 +79,9 @@ public class connectWithKafkaTest {
         tableEnv.createTemporaryView("kafkaSource1", tableEnv.fromDataStream(ds1));
         tableEnv.createTemporaryFunction("st_geometryAsWKT", st_geometryAsWKT.class);
         tableEnv.createTemporaryFunction("st_geometryFromWKT", st_geometryFromWKT.class);
-        Table res1 = tableEnv.sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(f0)), f0 from kafkaSource1;");
+        Table res1 = tableEnv.sqlQuery(
+            "select st_geometryFromWKT(st_geometryAsWKT(f0)), f0 from kafkaSource1;"
+        );
 
         checkF1EqualF2(tableEnv, res1, 6);
 
