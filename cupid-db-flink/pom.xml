@@ -90,6 +90,21 @@
             <artifactId>kryo-shaded</artifactId>
             <version>${kryo-shaded.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-cql</artifactId>
+            <version>23.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.urbcomp</groupId>
+            <artifactId>cupid-db-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>3.0.1-1.18</version>
+        </dependency>
     </dependencies>
 
     <repositories>
