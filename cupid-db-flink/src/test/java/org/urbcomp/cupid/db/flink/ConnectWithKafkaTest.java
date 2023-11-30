@@ -40,19 +40,19 @@ import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_geometryFrom
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.util.checkF1EqualF2;
-import static org.urbcomp.cupid.db.flink.util.checkTableNotNull;
+import static org.urbcomp.cupid.db.flink.TestUtil.checkF1EqualF2;
+import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
 
 // run the "docker/flink-kafka" before test
-public class connectWithKafkaTest {
+public class ConnectWithKafkaTest {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
     @Ignore
     @Test
     public void datastreamApiTest() throws Exception {
-        util.KafkaCreateTopic("Source");
-        util.KafkaCreateTopic("Sink");
+        TestUtil.KafkaCreateTopic("Source");
+        TestUtil.KafkaCreateTopic("Sink");
         List<String> recordList = new ArrayList<>();
         recordList.add("POINT (90 90)");
         recordList.add("LINESTRING (0 0, 1 1, 1 2)");
@@ -62,7 +62,7 @@ public class connectWithKafkaTest {
         recordList.add(
             "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        util.kafkaProducer("localhost:9092", "Source", recordList);
+        TestUtil.kafkaProducer("localhost:9092", "Source", recordList);
 
         KafkaSource<Geometry> source1 = KafkaSource.<Geometry>builder()
             .setBootstrapServers("localhost:9092")
@@ -116,7 +116,7 @@ public class connectWithKafkaTest {
 
         checkTableNotNull(tableEnv, res2);
 
-        util.KafkaDeleteTopic("Source");
-        util.KafkaDeleteTopic("Sink");
+        TestUtil.KafkaDeleteTopic("Source");
+        TestUtil.KafkaDeleteTopic("Sink");
     }
 }

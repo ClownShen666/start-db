@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-public class util {
+public class TestUtil {
     public static void checkTableNotNull(StreamTableEnvironment tableEnv, Table sink)
         throws Exception {
         DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
