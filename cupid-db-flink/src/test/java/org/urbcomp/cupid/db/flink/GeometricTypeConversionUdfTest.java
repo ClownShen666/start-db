@@ -23,9 +23,9 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.junit.Test;
 import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.*;
 
-import static org.urbcomp.cupid.db.flink.util.checkF1EqualF2;
+import static org.urbcomp.cupid.db.flink.TestUtil.checkF1EqualF2;
 
-public class geometricTypeConversionUdfTest {
+public class GeometricTypeConversionUdfTest {
 
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
