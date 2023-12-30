@@ -36,12 +36,19 @@ import org.urbcomp.cupid.db.flink.serialize.kafka.GeometryDeserializer;
 import org.urbcomp.cupid.db.flink.serialize.kafka.KafkaSerializer;
 import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_geometryAsWKT;
 import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_geometryFromWKT;
+import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.st_pointAsWKT;
+import org.urbcomp.cupid.db.flink.util.FlinkQueryExecutor;
+import org.urbcomp.cupid.db.flink.util.FlinkSqlParam;
+import org.urbcomp.cupid.db.metadata.CalciteHelper;
+import org.urbcomp.cupid.db.util.SqlParam;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.TestUtil.checkF1EqualF2;
-import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
+import static org.urbcomp.cupid.db.flink.TestUtil.*;
 
 // run the "docker/flink-kafka" before test
 public class ConnectWithKafkaTest {
@@ -51,8 +58,8 @@ public class ConnectWithKafkaTest {
     @Ignore
     @Test
     public void datastreamApiTest() throws Exception {
-        TestUtil.KafkaCreateTopic("Source");
-        TestUtil.KafkaCreateTopic("Sink");
+        TestUtil.KafkaCreateTopic("localhost:9092", "Source");
+        TestUtil.KafkaCreateTopic("localhost:9092", "Sink");
         List<String> recordList = new ArrayList<>();
         recordList.add("POINT (90 90)");
         recordList.add("LINESTRING (0 0, 1 1, 1 2)");
@@ -116,7 +123,105 @@ public class ConnectWithKafkaTest {
 
         checkTableNotNull(tableEnv, res2);
 
-        TestUtil.KafkaDeleteTopic("Source");
-        TestUtil.KafkaDeleteTopic("Sink");
+        TestUtil.KafkaDeleteTopic("localhost:9092", "Source");
+        TestUtil.KafkaDeleteTopic("localhost:9092", "Sink");
     }
+
+    @Test
+    @Ignore
+    public void loadTableTest() throws Exception {
+        // create table
+        SqlParam.CACHE.set(new SqlParam("root", "default"));
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate(
+                "create table if not exists table1(int1 int,"
+                    + "long1 Long,"
+                    + "float1 Float,"
+                    + "double1 Double,"
+                    + "string1 String,"
+                    + "bool1 bool,"
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString,"
+                    + "polygon1 Polygon,"
+                    + "multipoint1 MultiPoint,"
+                    + "multilinestring1 MultiLineString,"
+                    + "multipolygon1 MultiPolygon,"
+                    + "SPATIAL INDEX indexName(geometry1))"
+            );
+            stmt.executeUpdate("create table if not exists table2(idd int)");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // set param and get topic names
+        FlinkSqlParam param = new FlinkSqlParam();
+        param.setBootstrapServers("localhost:9092");
+        param.setSql("select * from table1 inner join table2;");
+        param.setUserName("root");
+        param.setDbName("default");
+        param.setEnv(env);
+        param.setTableEnv(tableEnv);
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        List<String> topicList = flink.getKafkaTopic(param);
+
+        // create topic and add message
+        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(0));
+        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(1));
+        List<String> recordList = new ArrayList<>();
+        recordList.add(
+            "1,,"
+                + "1,,"
+                + "1.0,,"
+                + "1.0,,"
+                + "cupid-db,,"
+                + "true,,"
+                + "POINT (90 90),,"
+                + "POINT (90 90),,"
+                + "LINESTRING (0 0, 1 1, 1 2),,"
+                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
+                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
+                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
+                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+        );
+        TestUtil.kafkaProducer("localhost:9092", topicList.get(0), recordList);
+        recordList.clear();
+        recordList.add("2");
+        TestUtil.kafkaProducer("localhost:9092", topicList.get(1), recordList);
+
+        // load table and test
+        List<Table> tableList = flink.loadTable(param);
+
+        checkTableNotNull(tableEnv, tableList.get(0));
+        checkTableNotNull(tableEnv, tableList.get(1));
+
+        tableEnv.createTemporaryView("table1", tableList.get(0));
+        tableEnv.createTemporaryFunction("st_pointAsWKT", st_pointAsWKT.class);
+        tableEnv.sqlQuery("select table1.point1, st_pointAsWKT(table1.point1) from table1;");
+
+        List<String> expected = new ArrayList<>();
+        expected.add(
+            "+I[1, "
+                + "1, "
+                + "1.0, "
+                + "1.0, "
+                + "cupid-db, "
+                + "true, "
+                + "POINT (90 90), "
+                + "POINT (90 90), "
+                + "LINESTRING (0 0, 1 1, 1 2), "
+                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)), "
+                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)), "
+                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)), "
+                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
+        );
+        checkTable(tableEnv, tableList.get(0), expected);
+
+        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(0));
+        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(1));
+    }
+
 }
