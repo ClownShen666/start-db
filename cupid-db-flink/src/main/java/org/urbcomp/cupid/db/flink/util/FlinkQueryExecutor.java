@@ -79,7 +79,7 @@ public class FlinkQueryExecutor {
             if (table == null) {
                 throw new IllegalArgumentException("Table Not Exists: " + dbTable);
             }
-            String sft = MetadataUtil.makeSchemaName(table.getId());
+            String topicName = MetadataUtil.makeSchemaName(table.getId());
             List<Field> fieldList;
             MetadataAccessorFromDb accessor = new MetadataAccessorFromDb();
             fieldList = accessor.getFields(userName, dbName, tableName);
@@ -95,7 +95,7 @@ public class FlinkQueryExecutor {
             // create kafkaSource
             KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
                 .setBootstrapServers(param.getBootstrapServers())
-                .setTopics(sft)
+                .setTopics(topicName)
                 .setGroupId(catalogName)
                 .setStartingOffsets(OffsetsInitializer.earliest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
