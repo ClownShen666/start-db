@@ -38,7 +38,22 @@ public class TestUtil {
         throws Exception {
         DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
         List<Row> resultList = resultStream.executeAndCollect(1);
+        System.out.println(resultList.get(0).getFieldNames(true));
         Assert.assertNotEquals("result has no record", 0, resultList.size());
+    }
+
+    public static void checkTable(StreamTableEnvironment tableEnv, Table sink, List<String> rows)
+        throws Exception {
+        DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
+        int num = rows.size();
+        List<Row> resultList = resultStream.executeAndCollect(num);
+        for (int i = 0; i < num; i++) {
+            Assert.assertEquals(
+                "result is not as expected",
+                rows.get(i),
+                resultList.get(i).toString()
+            );
+        }
     }
 
     public static void checkF1EqualF2(StreamTableEnvironment tableEnv, Table sink)
@@ -71,9 +86,9 @@ public class TestUtil {
         }
     }
 
-    public static void KafkaCreateTopic(String topicName) {
+    public static void KafkaCreateTopic(String ip, String topicName) {
         Properties props = new Properties();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ip);
 
         try (AdminClient adminClient = AdminClient.create(props)) {
             NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
@@ -83,9 +98,9 @@ public class TestUtil {
         }
     }
 
-    public static void KafkaDeleteTopic(String topicName) {
+    public static void KafkaDeleteTopic(String ip, String topicName) {
         Properties props = new Properties();
-        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ip);
 
         try (AdminClient adminClient = AdminClient.create(props)) {
             adminClient.deleteTopics(Collections.singleton(topicName));
