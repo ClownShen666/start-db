@@ -27,6 +27,8 @@ import org.locationtech.jts.io.WKTReader;
 
 import java.util.List;
 
+import static org.apache.flink.types.RowKind.*;
+
 public class StringToRow implements MapFunction<String, Row> {
     private final List<String> fieldNameList;
 
@@ -40,68 +42,67 @@ public class StringToRow implements MapFunction<String, Row> {
     @Override
     public Row map(String str) {
         try {
-            // kafka 字段分隔符
-            String[] columnList = str.split(",,");
-            int len = fieldNameList.size();
+            int len = fieldTypeList.size();
             Row row = new Row(len);
-            if (len > 0) {
-                WKTReader reader = new WKTReader();
-                for (int i = 0; i < len; i++) {
-                    // 将kafka消息的每个字段转成flink表格里一行的字段
-                    switch (fieldTypeList.get(i)) {
-                        case "int":
-                            row.setField(i, Integer.valueOf(columnList[i]));
-                            break;
-                        case "Long":
-                            row.setField(i, Long.valueOf(columnList[i]));
-                            break;
-                        case "Float":
-                            row.setField(i, Float.valueOf(columnList[i]));
-                            break;
-                        case "Double":
-                            row.setField(i, Double.valueOf(columnList[i]));
-                            break;
-                        case "String":
-                            row.setField(i, columnList[i]);
-                            break;
-                        case "Boolean":
-                        case "Bool":
-                            row.setField(i, Boolean.valueOf(columnList[i]));
-                            break;
-                        case "Geometry":
-                            Geometry geometry = reader.read(columnList[i]);
-                            row.setField(i, geometry);
-                            break;
-                        case "Point":
-                            Point point = (Point) reader.read(columnList[i]);
-                            row.setField(i, point);
-                            break;
-                        case "LineString":
-                            LineString lineString = (LineString) reader.read(columnList[i]);
-                            row.setField(i, lineString);
-                            break;
-                        case "Polygon":
-                            Polygon polygon = (Polygon) reader.read(columnList[i]);
-                            row.setField(i, polygon);
-                            break;
-                        case "MultiPoint":
-                            MultiPoint multiPoint = (MultiPoint) reader.read(columnList[i]);
-                            row.setField(i, multiPoint);
-                            break;
-                        case "MultiLineString":
-                            MultiLineString multiLineString = (MultiLineString) reader.read(
-                                columnList[i]
-                            );
-                            row.setField(i, multiLineString);
-                            break;
-                        case "MultiPolygon":
-                            MultiPolygon multiPolygon = (MultiPolygon) reader.read(columnList[i]);
-                            row.setField(i, multiPolygon);
-                            break;
-                        default:
-                            row.setField(i, columnList[i]);
-                            break;
-                    }
+            String rowStr = setRowKind(row, str);
+            // kafka 字段分隔符
+            String[] columnList = rowStr.split(",,");
+            WKTReader reader = new WKTReader();
+            for (int i = 0; i < len; i++) {
+                // 将kafka消息的每个字段转成flink表格里一行的字段
+                switch (fieldTypeList.get(i)) {
+                    case "int":
+                        row.setField(i, Integer.valueOf(columnList[i]));
+                        break;
+                    case "Long":
+                        row.setField(i, Long.valueOf(columnList[i]));
+                        break;
+                    case "Float":
+                        row.setField(i, Float.valueOf(columnList[i]));
+                        break;
+                    case "Double":
+                        row.setField(i, Double.valueOf(columnList[i]));
+                        break;
+                    case "String":
+                        row.setField(i, columnList[i]);
+                        break;
+                    case "Boolean":
+                    case "Bool":
+                        row.setField(i, Boolean.valueOf(columnList[i]));
+                        break;
+                    case "Geometry":
+                        Geometry geometry = reader.read(columnList[i]);
+                        row.setField(i, geometry);
+                        break;
+                    case "Point":
+                        Point point = (Point) reader.read(columnList[i]);
+                        row.setField(i, point);
+                        break;
+                    case "LineString":
+                        LineString lineString = (LineString) reader.read(columnList[i]);
+                        row.setField(i, lineString);
+                        break;
+                    case "Polygon":
+                        Polygon polygon = (Polygon) reader.read(columnList[i]);
+                        row.setField(i, polygon);
+                        break;
+                    case "MultiPoint":
+                        MultiPoint multiPoint = (MultiPoint) reader.read(columnList[i]);
+                        row.setField(i, multiPoint);
+                        break;
+                    case "MultiLineString":
+                        MultiLineString multiLineString = (MultiLineString) reader.read(
+                            columnList[i]
+                        );
+                        row.setField(i, multiLineString);
+                        break;
+                    case "MultiPolygon":
+                        MultiPolygon multiPolygon = (MultiPolygon) reader.read(columnList[i]);
+                        row.setField(i, multiPolygon);
+                        break;
+                    default:
+                        row.setField(i, columnList[i]);
+                        break;
                 }
             }
             return row;
@@ -109,6 +110,24 @@ public class StringToRow implements MapFunction<String, Row> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String setRowKind(Row row, String str) {
+        String rowStr = str;
+        if (str.startsWith("+I[") && str.endsWith("]")) {
+            row.setKind(INSERT);
+            rowStr = str.substring(3, str.length() - 1);
+        } else if (str.startsWith("-U[") && str.endsWith("]")) {
+            row.setKind(UPDATE_BEFORE);
+            rowStr = str.substring(3, str.length() - 1);
+        } else if (str.startsWith("+U[") && str.endsWith("]")) {
+            row.setKind(UPDATE_AFTER);
+            rowStr = str.substring(3, str.length() - 1);
+        } else if (str.startsWith("-D[") && str.endsWith("]")) {
+            row.setKind(DELETE);
+            rowStr = str.substring(3, str.length() - 1);
+        }
+        return rowStr;
     }
 
     public RowTypeInfo getRowTypeInfo() {

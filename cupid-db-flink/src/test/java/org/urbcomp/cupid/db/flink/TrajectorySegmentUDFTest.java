@@ -25,7 +25,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
 import org.urbcomp.cupid.db.flink.source.GPSSource;
-import org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf.TrajectorySegment;
+import org.urbcomp.cupid.db.flink.udf.TrajectorySegment;
 
 public class TrajectorySegmentUDFTest {
     @Test

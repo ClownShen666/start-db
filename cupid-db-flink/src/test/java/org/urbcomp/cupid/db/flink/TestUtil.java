@@ -38,7 +38,6 @@ public class TestUtil {
         throws Exception {
         DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
         List<Row> resultList = resultStream.executeAndCollect(1);
-        System.out.println(resultList.get(0).getFieldNames(true));
         Assert.assertNotEquals("result has no record", 0, resultList.size());
     }
 
