@@ -14,16 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf.geometricTypeConversionUdf;
+package org.urbcomp.cupid.db.flink.udf;
 
 import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.functions.ScalarFunction;
-import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 
-public class st_multiPolygonFromWKT extends ScalarFunction {
-    @DataTypeHint(value = "RAW", bridgedTo = MultiPolygon.class)
-    public MultiPolygon eval(@DataTypeHint("String") String wkt) throws ParseException {
-        return (MultiPolygon) util.fromWKT(wkt);
+public class st_polygonFromWKT extends ScalarFunction {
+    @DataTypeHint(value = "RAW", bridgedTo = Polygon.class)
+    public Polygon eval(@DataTypeHint("String") String wkt) throws ParseException {
+        return (Polygon) util.fromWKT(wkt);
     }
 }

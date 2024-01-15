@@ -28,13 +28,17 @@ public class CupidFlinkTableExtractVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private final List<String> tableList = new ArrayList<>();
 
+    private final List<String> dbTableList = new ArrayList<>();
+
     @Override
     public Void visitFromTableNameClause(CupidDBSqlParser.FromTableNameClauseContext ctx) {
         CupidDBSqlParser.IdentContext names = ctx.tableName().ident();
         if (names.identItem().size() == 1) {
-            tableList.add(FlinkSqlParam.CACHE.get().getDbName() + "." + names.getText());
+            tableList.add(names.getText());
+            dbTableList.add(FlinkSqlParam.CACHE.get().getDbName() + "." + names.getText());
         } else {
             tableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
+            dbTableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
         }
         return null;
     }
@@ -49,5 +53,17 @@ public class CupidFlinkTableExtractVisitor extends CupidDBSqlBaseVisitor<Void> {
         CupidFlinkTableExtractVisitor visitor = new CupidFlinkTableExtractVisitor();
         visitor.visitProgram(tree);
         return visitor.tableList;
+    }
+
+    public static List<String> getDbTableList(String sql) {
+        CharStream charStream = CharStreams.fromString(sql);
+        CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
+        lexer.removeErrorListeners();
+        CupidDBSqlParser parser = new CupidDBSqlParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        CupidDBSqlParser.ProgramContext tree = parser.program();
+        CupidFlinkTableExtractVisitor visitor = new CupidFlinkTableExtractVisitor();
+        visitor.visitProgram(tree);
+        return visitor.dbTableList;
     }
 }
