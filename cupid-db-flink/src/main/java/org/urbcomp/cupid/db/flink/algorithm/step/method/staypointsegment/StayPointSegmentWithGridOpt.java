@@ -26,13 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StayPointSegmentWithGridOpt {
-    public Grid grid;
+    private final Grid grid;
 
-    public PointList pointList;
-    public double maxD;
-    public long minT;
+    private final PointList pointList;
+    private final double maxD;
+    private final long minT;
 
-    public List<PointList> result;
+    private final List<PointList> result;
 
     public StayPointSegmentWithGridOpt(
         PointList pointList,
@@ -49,26 +49,27 @@ public class StayPointSegmentWithGridOpt {
     }
 
     public void stayPointDetection() {
-        GpsPoint latestGPSPoint = pointList.getPointList().get(pointList.pointList.size() - 1);
-        for (int i = pointList.pointList.size() - 2; i >= 0; i--) {
+        GpsPoint latestGPSPoint = pointList.getPointList().get(pointList.getPointList().size() - 1);
+        for (int i = pointList.getPointList().size() - 2; i >= 0; i--) {
             double distance;
             GpsPoint nowPoint = pointList.getPointList().get(i);
             AreaEnum area = grid.getArea(nowPoint, latestGPSPoint);
             if (area == AreaEnum.CHECK_AREA) {
                 distance = CalculateDistance.calDistance(latestGPSPoint, nowPoint);
                 if (distance > maxD) {
-                    long timeInterval = latestGPSPoint.ingestionTime - pointList.getPointList()
-                        .get(i + 1).ingestionTime;
+                    long timeInterval = latestGPSPoint.getIngestionTime() - pointList.getPointList()
+                        .get(i + 1)
+                        .getIngestionTime();
                     if (timeInterval > minT) {
                         // 找到了驻留点
-                        if (pointList.hasStayPoint) {
+                        if (pointList.isHasStayPoint()) {
                             processWithStayPoints(true, i, result);
                         } else {
                             processWithoutStayPoints(true, i, result);
                         }
                     } else {
                         // 没找到驻留点
-                        if (pointList.hasStayPoint) {
+                        if (pointList.isHasStayPoint()) {
                             processWithStayPoints(false, i, result);
                         } else {
                             processWithoutStayPoints(false, i, result);
@@ -77,11 +78,12 @@ public class StayPointSegmentWithGridOpt {
                     return;
                 }
             } else if (area == AreaEnum.PRUNED_AREA) {
-                long timeInterval = latestGPSPoint.ingestionTime - pointList.getPointList()
-                    .get(i + 1).ingestionTime;
+                long timeInterval = latestGPSPoint.getIngestionTime() - pointList.getPointList()
+                    .get(i + 1)
+                    .getIngestionTime();
                 if (timeInterval > minT) {
                     // 找到了驻留点
-                    if (pointList.hasStayPoint) {
+                    if (pointList.isHasStayPoint()) {
                         processWithStayPoints(true, i, result);
                     } else {
                         processWithoutStayPoints(true, i, result);
@@ -89,7 +91,7 @@ public class StayPointSegmentWithGridOpt {
                     return;
                 } else {
                     // 没找到驻留点
-                    if (pointList.hasStayPoint) {
+                    if (pointList.isHasStayPoint()) {
                         processWithStayPoints(false, i, result);
                     } else {
                         processWithoutStayPoints(false, i, result);
@@ -111,12 +113,12 @@ public class StayPointSegmentWithGridOpt {
 
     public void processWithStayPoints(boolean findOrNot, int index, List<PointList> result) {
         if (findOrNot) {
-            if (index <= pointList.stayPointEndLocalIndex) {
+            if (index <= pointList.getStayPointEndLocalIndex()) {
                 // Case 1.2 Two Stay Points Intersected
                 mergeStayPoint(pointList);
             } else {
                 // Case 1.1 Two Stay Points Separated
-                int sizeOfFirstStayPoint = pointList.stayPointEndLocalIndex;
+                int sizeOfFirstStayPoint = pointList.getStayPointEndLocalIndex();
                 breakStayPoint(pointList, result);
                 int startIndexOfSecondStayPoint = index - sizeOfFirstStayPoint;
                 if (startIndexOfSecondStayPoint >= 0) {
@@ -126,9 +128,10 @@ public class StayPointSegmentWithGridOpt {
             }
         } else {
             // Case 2.1 Far Away from the Stay Point
-            GpsPoint latestGPSPoint = pointList.getPointList().get(pointList.pointList.size() - 1);
+            GpsPoint latestGPSPoint = pointList.getPointList()
+                .get(pointList.getPointList().size() - 1);
             GpsPoint stayPointEnd = pointList.getPointList()
-                .get(pointList.stayPointEndLocalIndex - 1);
+                .get(pointList.getStayPointEndLocalIndex() - 1);
             AreaEnum area = grid.getArea(stayPointEnd, latestGPSPoint);
             if (area == AreaEnum.CHECK_AREA) {
                 double distance = CalculateDistance.calDistance(latestGPSPoint, stayPointEnd);
@@ -144,38 +147,49 @@ public class StayPointSegmentWithGridOpt {
 
     protected void breakStayPoint(PointList pointList, List<PointList> result) {
         PointList list1 = new PointList();
-        list1.pointList = new ArrayList<>(
-            pointList.getPointList().subList(0, pointList.stayPointEndLocalIndex)
+        list1.setPointList(
+            new ArrayList<>(
+                pointList.getPointList().subList(0, pointList.getStayPointEndLocalIndex())
+            )
         );
         result.add(list1);
         // System.out.println(list);
-        pointList.pointList = new ArrayList<>(
-            pointList.getPointList()
-                .subList(pointList.stayPointEndLocalIndex, pointList.pointList.size())
+        pointList.setPointList(
+            new ArrayList<>(
+                pointList.getPointList()
+                    .subList(pointList.getStayPointEndLocalIndex(), pointList.getPointList().size())
+            )
         );
-        pointList.hasStayPoint = false;
-        pointList.stayPointEndLocalIndex = -1;
+        pointList.setHasStayPoint(false);
+        pointList.setStayPointEndLocalIndex(-1);
 
     }
 
     protected void mergeStayPoint(PointList pointList) {
-        int mergeListSize = pointList.pointList.size() - pointList.stayPointEndLocalIndex;
-        pointList.stayPointEndGlobalIndex = pointList.stayPointEndGlobalIndex + mergeListSize;
-        pointList.stayPointEndLocalIndex = pointList.pointList.size();
+        int mergeListSize = pointList.getPointList().size() - pointList.getStayPointEndLocalIndex();
+        pointList.setStayPointEndGlobalIndex(
+            pointList.getStayPointEndGlobalIndex() + mergeListSize
+        );
+        pointList.setStayPointEndLocalIndex(pointList.getPointList().size());
     }
 
     protected void exactStayPoint(PointList pointList, int currentIndex, List<PointList> result) {
-        pointList.stayPointStartGlobalIndex += currentIndex + 2;
-        pointList.hasStayPoint = true;
-        PointList list1 = new PointList();
-        list1.pointList = new ArrayList<>(pointList.getPointList().subList(0, currentIndex + 1));
-        result.add(list1);
-        pointList.pointList = new ArrayList<>(
-            pointList.getPointList().subList(currentIndex + 1, pointList.pointList.size())
+        pointList.setStayPointStartGlobalIndex(
+            pointList.getStayPointStartGlobalIndex() + currentIndex + 2
         );
-        pointList.stayPointEndGlobalIndex = pointList.stayPointStartGlobalIndex
-            + pointList.pointList.size() - 1;
-        pointList.stayPointEndLocalIndex = pointList.pointList.size();
+        pointList.setHasStayPoint(true);
+        PointList list1 = new PointList();
+        list1.setPointList(new ArrayList<>(pointList.getPointList().subList(0, currentIndex + 1)));
+        result.add(list1);
+        pointList.setPointList(
+            new ArrayList<>(
+                pointList.getPointList().subList(currentIndex + 1, pointList.getPointList().size())
+            )
+        );
+        pointList.setStayPointEndGlobalIndex(
+            pointList.getStayPointStartGlobalIndex() + pointList.getPointList().size() - 1
+        );
+        pointList.setStayPointEndLocalIndex(pointList.getPointList().size());
     }
 
 }

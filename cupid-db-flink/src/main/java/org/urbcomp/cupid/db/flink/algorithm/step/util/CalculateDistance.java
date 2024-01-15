@@ -34,10 +34,10 @@ public class CalculateDistance {
         //System.out.println(Math.sqrt(addAll) * 6378.137 * 1000);
         return Math.sqrt(addAll) * 6378.137 * 1000 ;*/
 
-        double lat1 = p1.lat;
-        double lat2 = p2.lat;
-        double lng1 = p1.lng;
-        double lng2 = p2.lng;
+        double lat1 = p1.getLat();
+        double lat2 = p2.getLat();
+        double lng1 = p1.getLng();
+        double lng2 = p2.getLng();
         double radLat11 = calRad(lat1);
         double radLat21 = calRad(lat2);
         double a = radLat11 - radLat21;
