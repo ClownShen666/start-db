@@ -25,7 +25,7 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
-      - "2281:2281"
+      - "2281:2181"
     networks:
       - kafka-net
 
@@ -40,8 +40,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2281"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_DELETE_TOPIC_ENABLE: "true"
       KAFKA_LOG_DIRS: "/kafka/logs"
       KAFKA_NUM_PARTITIONS: 1
