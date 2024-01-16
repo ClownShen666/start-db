@@ -26,9 +26,33 @@ import java.util.List;
 
 public class LocalProcessFunctionGrid implements Serializable {
 
-    public double maxD;
-    public long minT;
-    public Grid grid;
+    private double maxD;
+    private long minT;
+    private Grid grid;
+
+    public double getMaxD() {
+        return maxD;
+    }
+
+    public void setMaxD(double maxD) {
+        this.maxD = maxD;
+    }
+
+    public long getMinT() {
+        return minT;
+    }
+
+    public void setMinT(long minT) {
+        this.minT = minT;
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
+    }
 
     public LocalProcessFunctionGrid(double maxD, long minT, int gridSize) {
         this.maxD = maxD;

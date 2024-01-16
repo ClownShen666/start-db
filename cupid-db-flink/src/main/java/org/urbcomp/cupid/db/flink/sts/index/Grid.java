@@ -142,13 +142,13 @@ public class Grid implements Serializable {
     }
 
     public void calGirdId(GpsPoint point) {
-        point.latCol = (int) ((point.lat - lat1) / deltaLat);
-        point.lonCol = (int) ((point.lng - lng1) / deltaLon);
+        point.setLatCol((int) ((point.getLat() - lat1) / deltaLat));
+        point.setLonCol((int) ((point.getLng() - lng1) / deltaLon));
     }
 
     public AreaEnum getArea(GpsPoint p0, GpsPoint p1) {
-        int diffLon = Math.abs(p1.lonCol - p0.lonCol);
-        int diffLat = Math.abs(p1.latCol - p0.latCol);
+        int diffLon = Math.abs(p1.getLonCol() - p0.getLonCol());
+        int diffLat = Math.abs(p1.getLatCol() - p0.getLatCol());
         int diffLonMinusOne = diffLon - 1;
         int diffLatMinusOne = diffLat - 1;
         int diffLonPlusOne = diffLon + 1;

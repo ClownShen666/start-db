@@ -26,9 +26,9 @@ import java.util.List;
 public class FindGPSPointsWithInT {
     public static int findIndex(List<GpsPoint> pointList, long t) {
         int size = pointList.size();
-        long maxT = pointList.get(size - 1).ingestionTime;
+        long maxT = pointList.get(size - 1).getIngestionTime();
         int i = 0;
-        while (i < size && maxT - pointList.get(i).ingestionTime >= t) {
+        while (i < size && maxT - pointList.get(i).getIngestionTime() >= t) {
             i++;
         }
         return i + 1;

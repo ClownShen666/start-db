@@ -35,7 +35,7 @@ public class GPSSource implements SourceFunction<Tuple2<String, GpsPoint>> {
             String line;
             while ((line = reader.readLine()) != null) {
                 GpsPoint gpsPoint = mapFunction(line);
-                sourceContext.collect(Tuple2.of(gpsPoint.tid, gpsPoint));
+                sourceContext.collect(Tuple2.of(gpsPoint.getTid(), gpsPoint));
             }
         }
     }

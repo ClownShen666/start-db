@@ -25,13 +25,51 @@ import java.util.List;
 public class PointList {
 
     // temporary gps point list
-    public List<GpsPoint> pointList = new ArrayList<>();
+    private List<GpsPoint> pointList = new ArrayList<>();
     // indicates the presence or absence of stay point
-    public boolean hasStayPoint = false;
+    private boolean hasStayPoint = false;
+
+    public void setPointList(List<GpsPoint> pointList) {
+        this.pointList = pointList;
+    }
+
     // the location of stay point(total), inclusive
-    public int stayPointStartGlobalIndex = -1;
-    public int stayPointEndGlobalIndex = -1;
-    public int stayPointEndLocalIndex = -1;
+    private int stayPointStartGlobalIndex = -1;
+
+    public boolean isHasStayPoint() {
+        return hasStayPoint;
+    }
+
+    public void setHasStayPoint(boolean hasStayPoint) {
+        this.hasStayPoint = hasStayPoint;
+    }
+
+    public int getStayPointStartGlobalIndex() {
+        return stayPointStartGlobalIndex;
+    }
+
+    public void setStayPointStartGlobalIndex(int stayPointStartGlobalIndex) {
+        this.stayPointStartGlobalIndex = stayPointStartGlobalIndex;
+    }
+
+    public int getStayPointEndGlobalIndex() {
+        return stayPointEndGlobalIndex;
+    }
+
+    public void setStayPointEndGlobalIndex(int stayPointEndGlobalIndex) {
+        this.stayPointEndGlobalIndex = stayPointEndGlobalIndex;
+    }
+
+    public int getStayPointEndLocalIndex() {
+        return stayPointEndLocalIndex;
+    }
+
+    public void setStayPointEndLocalIndex(int stayPointEndLocalIndex) {
+        this.stayPointEndLocalIndex = stayPointEndLocalIndex;
+    }
+
+    private int stayPointEndGlobalIndex = -1;
+    private int stayPointEndLocalIndex = -1;
 
     public PointList() {}
 

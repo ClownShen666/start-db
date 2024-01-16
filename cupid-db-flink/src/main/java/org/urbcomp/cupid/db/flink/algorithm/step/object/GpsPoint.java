@@ -26,21 +26,87 @@ import java.text.SimpleDateFormat;
 
 public class GpsPoint {
 
-    // 经度坐标(x)
-    public double lng;
-    // 纬度坐标(y)
-    public double lat;
-    public String tid;
-    // 时间戳
-    public long ingestionTime;
-    public int lonCol;
-    public int latCol;
-    public boolean gridFlag = false;
-    public long processTime;
+    // Longitude coordinate (x)
+    private double lng;
+    // Latitude coordinate (y)
+    private double lat;
+    private String tid;
+    // Timestamp
+    private long ingestionTime;
 
-    // 构造方法
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public String getTid() {
+        return tid;
+    }
+
+    public void setTid(String tid) {
+        this.tid = tid;
+    }
+
+    public long getIngestionTime() {
+        return ingestionTime;
+    }
+
+    public void setIngestionTime(long ingestionTime) {
+        this.ingestionTime = ingestionTime;
+    }
+
+    public int getLonCol() {
+        return lonCol;
+    }
+
+    public void setLonCol(int lonCol) {
+        this.lonCol = lonCol;
+    }
+
+    public int getLatCol() {
+        return latCol;
+    }
+
+    public void setLatCol(int latCol) {
+        this.latCol = latCol;
+    }
+
+    public boolean isGridFlag() {
+        return gridFlag;
+    }
+
+    public void setGridFlag(boolean gridFlag) {
+        this.gridFlag = gridFlag;
+    }
+
+    private int lonCol;
+    private int latCol;
+    private boolean gridFlag = false;
+
+    // Default constructor
     public GpsPoint() {}
 
+    /**
+     * Constructs a GpsPoint object with specified parameters.
+     *
+     * @param lng            Longitude coordinate
+     * @param lat            Latitude coordinate
+     * @param tid            Point identifier
+     * @param ingestionTime  Ingestion time as a string
+     * @param a              Additional time offset
+     * @throws ParseException If parsing the timestamp fails
+     */
     public GpsPoint(double lng, double lat, String tid, String ingestionTime, long a)
         throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -50,6 +116,16 @@ public class GpsPoint {
         this.lat = lat;
     }
 
+    /**
+     * Constructs a GpsPoint object with specified parameters.
+     *
+     * @param lng            Longitude coordinate
+     * @param lat            Latitude coordinate
+     * @param tid            Point identifier
+     * @param ingestionTime  Ingestion time as a timestamp
+     * @param a              Additional time offset
+     * @throws ParseException If parsing the timestamp fails
+     */
     public GpsPoint(double lng, double lat, String tid, long ingestionTime, long a)
         throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -59,9 +135,20 @@ public class GpsPoint {
         this.lat = lat;
     }
 
+    /**
+     * Returns a string representation of the GpsPoint object.
+     *
+     * @return String representation
+     */
     @Override
     public String toString() {
-        return "编号:" + tid + ",时间戳:" + new Timestamp(ingestionTime) + ",经度:" + lng + ",纬度:" + lat;
+        return "Point ID: "
+            + tid
+            + ", Timestamp: "
+            + new Timestamp(ingestionTime)
+            + ", Longitude: "
+            + lng
+            + ", Latitude: "
+            + lat;
     }
-
 }
