@@ -71,6 +71,7 @@ public class FlinkQueryExecutor {
             String dbTableName = insertVisitor.getDbTable();
             org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(dbTableName);
             loadTable(param, tableName, dbTableName, insertTable);
+            InsertIntoFieldVisitor visitor = new InsertIntoFieldVisitor(sql);
 
             // get select result
             sql = "select " + sql.split(" (?i)select ")[1];
@@ -78,7 +79,7 @@ public class FlinkQueryExecutor {
             DataStream<Row> resultStream = param.getTableEnv().toChangelogStream(resultTable);
 
             // write result to kafka
-            checkInsert(resultTable, insertTable);
+            checkInsert(resultTable, visitor.getFieldNameList(), insertTable);
             insertTable(param, resultStream, insertTable);
 
             // return select result
@@ -162,12 +163,23 @@ public class FlinkQueryExecutor {
 
     public void checkInsert(
         Table resultTable,
+        List<String> fieldNameList,
         org.urbcomp.cupid.db.metadata.entity.Table insertTable
     ) {
         ResolvedSchema schema = resultTable.getResolvedSchema();
         List<String> insertTableFieldTypeList = new ArrayList<>();
-        for (Field field : insertTable.getFieldList()) {
-            insertTableFieldTypeList.add(field.getType());
+        if (fieldNameList != null) {
+            for (String fieldName : fieldNameList) {
+                for (Field field : insertTable.getFieldList()) {
+                    if (fieldName.equals(field.getName())) {
+                        insertTableFieldTypeList.add(field.getType());
+                    }
+                }
+            }
+        } else {
+            for (Field field : insertTable.getFieldList()) {
+                insertTableFieldTypeList.add(field.getType());
+            }
         }
         List<DataType> resultTableFieldTypeList = new ArrayList<>(schema.getColumnDataTypes());
 
