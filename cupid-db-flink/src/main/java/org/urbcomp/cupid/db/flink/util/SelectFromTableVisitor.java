@@ -16,7 +16,9 @@
  */
 package org.urbcomp.cupid.db.flink.util;
 
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlLexer;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
@@ -24,11 +26,29 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CupidFlinkTableExtractVisitor extends CupidDBSqlBaseVisitor<Void> {
+public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private final List<String> tableList = new ArrayList<>();
 
     private final List<String> dbTableList = new ArrayList<>();
+
+    public List<String> getTableList() {
+        return tableList;
+    }
+
+    public List<String> getDbTableList() {
+        return dbTableList;
+    }
+
+    public SelectFromTableVisitor(String sql) {
+        CharStream charStream = CharStreams.fromString(sql);
+        CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
+        lexer.removeErrorListeners();
+        CupidDBSqlParser parser = new CupidDBSqlParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        CupidDBSqlParser.ProgramContext tree = parser.program();
+        this.visitProgram(tree);
+    }
 
     @Override
     public Void visitFromTableNameClause(CupidDBSqlParser.FromTableNameClauseContext ctx) {
@@ -43,27 +63,7 @@ public class CupidFlinkTableExtractVisitor extends CupidDBSqlBaseVisitor<Void> {
         return null;
     }
 
-    public static List<String> getTableList(String sql) {
-        CharStream charStream = CharStreams.fromString(sql);
-        CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
-        lexer.removeErrorListeners();
-        CupidDBSqlParser parser = new CupidDBSqlParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-        CupidDBSqlParser.ProgramContext tree = parser.program();
-        CupidFlinkTableExtractVisitor visitor = new CupidFlinkTableExtractVisitor();
-        visitor.visitProgram(tree);
-        return visitor.tableList;
-    }
-
-    public static List<String> getDbTableList(String sql) {
-        CharStream charStream = CharStreams.fromString(sql);
-        CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
-        lexer.removeErrorListeners();
-        CupidDBSqlParser parser = new CupidDBSqlParser(new CommonTokenStream(lexer));
-        parser.removeErrorListeners();
-        CupidDBSqlParser.ProgramContext tree = parser.program();
-        CupidFlinkTableExtractVisitor visitor = new CupidFlinkTableExtractVisitor();
-        visitor.visitProgram(tree);
-        return visitor.dbTableList;
+    public boolean haveSelect() {
+        return tableList.size() != 0;
     }
 }
