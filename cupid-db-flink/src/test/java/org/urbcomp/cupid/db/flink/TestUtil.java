@@ -49,7 +49,7 @@ public class TestUtil {
         for (int i = 0; i < num; i++) {
             Assert.assertEquals(
                 "result is not as expected",
-                rows.get(i),
+                "+I[" + rows.get(i) + "]",
                 resultList.get(i).toString()
             );
         }

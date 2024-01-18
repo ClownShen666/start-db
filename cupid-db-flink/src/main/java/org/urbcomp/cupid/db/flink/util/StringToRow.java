@@ -178,8 +178,9 @@ public class StringToRow implements MapFunction<String, Row> {
                         fieldTypes[i] = TypeExtractor.createTypeInfo(MultiPolygon.class);
                         break;
                     default:
-                        fieldTypes[i] = Types.STRING;
-                        break;
+                        throw new UnsupportedOperationException(
+                            "Unsupported field type: " + fieldTypeList.get(i)
+                        );
                 }
             }
         }

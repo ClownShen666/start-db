@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.metadata.entity;
 
+import java.util.List;
+
 /**
  * This class is used to encapsulate the basic information of table
  *
@@ -33,6 +35,8 @@ public class Table extends AbstractEntity {
      * StorageEngine
      */
     private String storageEngine;
+
+    private List<Field> fieldList;
 
     public Table(long id, long dbId, String name, String storageEngine) {
         super(id, name);
@@ -54,6 +58,14 @@ public class Table extends AbstractEntity {
 
     public void setStorageEngine(String storageEngine) {
         this.storageEngine = storageEngine;
+    }
+
+    public List<Field> getFieldList() {
+        return fieldList;
+    }
+
+    public void setFieldList(List<Field> fieldList) {
+        this.fieldList = fieldList;
     }
 
     @Override
