@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.flink.util;
 
+import org.apache.calcite.sql.SqlNode;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -32,6 +33,7 @@ import org.apache.flink.types.Row;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
+import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.MetadataUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 import java.io.File;
@@ -49,44 +51,62 @@ public class FlinkQueryExecutor {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
         String sql = param.getSql();
-        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
-        InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
+        SqlNode sqlNode = CupidDBParseDriver.parseSql(sql);
+        switch (sqlNode.getKind()) {
+            case SELECT:
+                SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
 
-        // so far only support dql like select ... or insert ... select ...
-        if (!selectVisitor.haveSelect()) {
-            throw new UnsupportedOperationException("Unsupported dql: " + sql);
+                // load select tables and register udf
+                List<String> tableNameList = selectVisitor.getTableList();
+                List<String> dbTableNameList = selectVisitor.getDbTableList();
+                List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                    dbTableNameList
+                );
+                loadTables(param, tableNameList, dbTableNameList, tableList);
+                registerUdf(param);
+
+                // return select result stream
+                return param.getTableEnv().toChangelogStream(param.getTableEnv().sqlQuery(sql));
+
+            case INSERT:
+                InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
+                SelectFromTableVisitor selectVisitor2 = new SelectFromTableVisitor(sql);
+                InsertIntoFieldVisitor fieldVisitor = new InsertIntoFieldVisitor(sql);
+
+                // only execute insert into table select ...
+                if (!insertVisitor.haveSelect()) {
+                    throw new UnsupportedOperationException("Unsupported sql: " + sql);
+                }
+
+                // get select sql
+                String selectSql = "select " + sql.split(" (?i)select ")[1];
+
+                // load select tables and register udf
+                List<String> tableNameList2 = selectVisitor2.getTableList();
+                List<String> dbTableNameList2 = selectVisitor2.getDbTableList();
+                List<org.urbcomp.cupid.db.metadata.entity.Table> tableList2 = getTables(
+                    dbTableNameList2
+                );
+                loadTables(param, tableNameList2, dbTableNameList2, tableList2);
+                registerUdf(param);
+
+                // get select result
+                Table resultTable = param.getTableEnv().sqlQuery(selectSql);
+                DataStream<Row> resultStream = param.getTableEnv().toChangelogStream(resultTable);
+
+                // write result to kafka
+                org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
+                    insertVisitor.getDbTable()
+                );
+                checkInsert(resultTable, fieldVisitor.getFieldNameList(), insertTable);
+                insertTable(param, resultStream, insertTable);
+
+                // return select result
+                return resultStream;
+
+            default:
+                throw new UnsupportedOperationException("Unsupported sql: " + sql);
         }
-
-        // load select tables and register udf
-        List<String> tableNameList = selectVisitor.getTableList();
-        List<String> dbTableNameList = selectVisitor.getDbTableList();
-        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(dbTableNameList);
-        loadTables(param, tableNameList, dbTableNameList, tableList);
-        registerUdf(param);
-
-        // sql has insert
-        if (insertVisitor.haveInsert()) {
-            // load insert table
-            String tableName = insertVisitor.getTable();
-            String dbTableName = insertVisitor.getDbTable();
-            org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(dbTableName);
-            loadTable(param, tableName, dbTableName, insertTable);
-            InsertIntoFieldVisitor visitor = new InsertIntoFieldVisitor(sql);
-
-            // get select result
-            sql = "select " + sql.split(" (?i)select ")[1];
-            Table resultTable = param.getTableEnv().sqlQuery(sql);
-            DataStream<Row> resultStream = param.getTableEnv().toChangelogStream(resultTable);
-
-            // write result to kafka
-            checkInsert(resultTable, visitor.getFieldNameList(), insertTable);
-            insertTable(param, resultStream, insertTable);
-
-            // return select result
-            return resultStream;
-        }
-
-        return param.getTableEnv().toChangelogStream(param.getTableEnv().sqlQuery(sql));
     }
 
     public void loadTable(

@@ -62,8 +62,4 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         }
         return null;
     }
-
-    public boolean haveSelect() {
-        return tableList.size() != 0;
-    }
 }
