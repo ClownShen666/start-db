@@ -338,12 +338,6 @@ public class FlinkQueryExecutor {
             .build();
 
         // convert row stream to formatted string stream
-        List<String> fieldTypeList = new ArrayList<>();
-        for (Field field : table.getFieldList()) {
-            fieldTypeList.add(field.getType());
-        }
-        ;
-
         DataStream<String> insertStream = resultStream.map(row -> {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < row.getArity(); i++) {
