@@ -30,12 +30,11 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
   val rsGeoJson: String = rs.toGeoJSON
 
   /**
-    * test for insert
+    * test for insert into table values ...
     */
-  test("testInsert") {
+  test("insert into table Values") {
     val statement = connect.createStatement()
-
-    statement.execute("drop table if  exists tt_test_demo;")
+    statement.execute("drop table if exists tt_test_demo;")
     statement.execute(
       "create table if not exists tt_test_demo (idx Integer, ride_id string, start_point point);"
     )
@@ -50,7 +49,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("roadsegment insert") {
     val statement = connect.createStatement()
-    statement.execute("drop table if  exists t_road_segment_test;")
+    statement.execute("drop table if exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
 
     statement.execute(
@@ -64,7 +63,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("multiple data insert") {
     val statement = connect.createStatement()
-    statement.execute("drop table if  exists t1_test;")
+    statement.execute("drop table if exists t1_test;")
     statement.execute(
       "create table if not exists t1_test (idx Integer, ride_id string, start_point point);"
     )
@@ -82,7 +81,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("insert test (without target column)") {
     val statement = connect.createStatement()
-    statement.execute("drop table if  exists t_road_segment_test;")
+    statement.execute("drop table if exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
@@ -95,7 +94,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     */
   test("multiple data insert test (without target column)") {
     val statement = connect.createStatement()
-    statement.execute("drop table if  exists t_road_segment_test;")
+    statement.execute("drop table if exists t_road_segment_test;")
     statement.execute("create table if not exists t_road_segment_test (a Integer, b RoadSegment);")
     statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\')), (3, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
@@ -103,4 +102,17 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     executeQueryCheck("select count(1) from t_road_segment_test", List(2))
   }
 
+  /**
+    * test for insert into table select ...
+    */
+  test("insert into table select") {
+    val statement = connect.createStatement()
+    statement.executeUpdate("drop table if exists table1")
+    statement.executeUpdate("drop table if exists table2")
+    statement.executeUpdate("create table if not exists table1(int1 int)")
+    statement.executeUpdate("create table if not exists table2(int2 int)")
+    statement.executeUpdate("insert into table2 values (1),(2),(3);")
+    statement.executeUpdate("insert into table1 select int2 from table2;")
+    executeQueryCheck("select count(1) from from table1;", List(3))
+  }
 }
