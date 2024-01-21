@@ -847,21 +847,30 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
   override def visitInsertStmt(ctx: InsertStmtContext): SqlInsert = {
     val keyWords = SqlNodeList.EMPTY
     val targetTable = visitIdent(ctx.tableName().ident())
-    val rows: Array[SqlNode] = ctx
-      .insertStmtRows()
-      .insertStmtRow()
-      .asScala
-      .map { i =>
-        val objs = i.expr().asScala.map(visitExpr).toArray
-        new SqlBasicCall(SqlStdOperatorTable.ROW, objs, pos)
-      }
-      .toArray
-    val source = new SqlBasicCall(SqlStdOperatorTable.VALUES, rows, pos)
     val columnList =
       if (ctx.insertStmtCols() != null)
         new SqlNodeList(ctx.insertStmtCols().ident().asScala.map(visitIdent).asJava, pos)
       else null
-    new SqlInsert(pos, keyWords, targetTable, source, columnList)
+    // insert into table values ...
+    if (ctx.insertStmtRows() != null) {
+      val rows: Array[SqlNode] = ctx
+        .insertStmtRows()
+        .insertStmtRow()
+        .asScala
+        .map { i =>
+          val objs = i.expr().asScala.map(visitExpr).toArray
+          new SqlBasicCall(SqlStdOperatorTable.ROW, objs, pos)
+        }
+        .toArray
+      val source = new SqlBasicCall(SqlStdOperatorTable.VALUES, rows, pos)
+      new SqlInsert(pos, keyWords, targetTable, source, columnList)
+    }
+    // insert into table select ...
+    else {
+      val sqlInsert = new SqlInsert(pos, keyWords, targetTable, null, columnList)
+      sqlInsert.setSource(visitSelectStmt(ctx.selectStmt()).asInstanceOf[SqlSelect])
+      sqlInsert
+    }
   }
 
   private def mkOriginSql(ctx: ParserRuleContext): String = {

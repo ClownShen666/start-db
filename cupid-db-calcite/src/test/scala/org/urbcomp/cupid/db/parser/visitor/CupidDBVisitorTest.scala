@@ -51,6 +51,13 @@ class CupidDBVisitorTest extends FunSuite with BeforeAndAfterEach {
     parser.parseStmt()
   }
 
+  test("convert insert into table select ... to SqlNode") {
+    val parsed = driver.parseSql("insert into table1 select * from table2")
+    assertTrue(parsed.isInstanceOf[SqlInsert])
+    val node = parsed.asInstanceOf[SqlInsert]
+    assertTrue(node.getSource.isInstanceOf[SqlSelect])
+  }
+
   test("convert show databases to SqlNode") {
     val parsed = driver.parseSql(CupidDBSQLSamples.SHOW_DATABASES)
     assertTrue(parsed.isInstanceOf[SqlShowDatabases])

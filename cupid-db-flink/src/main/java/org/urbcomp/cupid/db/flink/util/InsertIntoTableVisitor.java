@@ -29,6 +29,8 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private String dbTable = null;
 
+    private CupidDBSqlParser.SelectStmtContext selectStmtContext = null;
+
     public String getTable() {
         return table;
     }
@@ -40,6 +42,7 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
     @Override
     public Void visitInsertStmt(CupidDBSqlParser.InsertStmtContext ctx) {
         CupidDBSqlParser.IdentContext tableNameCtx = ctx.tableName().ident();
+        selectStmtContext = ctx.selectStmt();
         if (tableNameCtx.identItem().size() == 1) {
             table = tableNameCtx.getText();
             dbTable = FlinkSqlParam.CACHE.get().getDbName() + "." + tableNameCtx.getText();
@@ -62,7 +65,7 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         this.visitProgram(tree);
     }
 
-    public boolean haveInsert() {
-        return table != null;
+    public boolean haveSelect() {
+        return selectStmtContext != null;
     }
 }

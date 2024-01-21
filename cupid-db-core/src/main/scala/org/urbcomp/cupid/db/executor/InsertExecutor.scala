@@ -22,6 +22,7 @@ import org.apache.calcite.sql.{
   SqlIdentifier,
   SqlInsert,
   SqlNode,
+  SqlSelect,
   SqlUnresolvedFunction
 }
 import org.geotools.data.{DataStoreFinder, Transaction}
@@ -34,6 +35,7 @@ import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 import org.urbcomp.cupid.db.utils.SqlLiteralHandler
+import scala.collection.mutable.ArrayBuffer
 
 import java.sql.ResultSet
 import java.util
@@ -53,33 +55,50 @@ case class InsertExecutor(n: SqlInsert) extends BaseExecutor {
     val fields = MetadataAccessUtil.getFields(userName, dbName, tableName)
     if (fields == null) throw new RuntimeException("There is no corresponding fields!")
     // construct sql
-    val resultObjs: Array[util.ArrayList[AnyRef]] =
-      n.getSource
-        .asInstanceOf[SqlBasicCall] // Values level
+    val resultObjs: Array[util.ArrayList[AnyRef]] = n.getSource match {
+      // insert into table values ...
+      case values: SqlBasicCall =>
+        values // Values level
         .operands
-        .map { i => // Row level
-          val queryItem = i
-            .asInstanceOf[SqlBasicCall]
-            .operands
-            .map(SqlLiteralHandler.handleLiteral)
-            .mkString(" , ")
-          val originalQuerySql =
-            s"""
-               |SELECT $queryItem
-               |""".stripMargin
-          val querySql = originalQuerySql.replace("`", "")
-          WithClose(executeQuery(querySql)) { rs =>
-            {
-              val count = rs.getMetaData.getColumnCount
-              val result = new util.ArrayList[AnyRef](count)
-              rs.next()
-              for (x <- 1 to count) {
-                result.add(rs.getObject(x))
+          .map { i => // Row level
+            val queryItem = i
+              .asInstanceOf[SqlBasicCall]
+              .operands
+              .map(SqlLiteralHandler.handleLiteral)
+              .mkString(" , ")
+            val originalQuerySql =
+              s"""
+                   |SELECT $queryItem
+                   |""".stripMargin
+            val querySql = originalQuerySql.replace("`", "")
+            WithClose(executeQuery(querySql)) { rs =>
+              {
+                val count = rs.getMetaData.getColumnCount
+                val result = new util.ArrayList[AnyRef](count)
+                rs.next()
+                for (x <- 1 to count) {
+                  result.add(rs.getObject(x))
+                }
+                result
               }
-              result
             }
           }
+      // insert into table select ...
+      case select: SqlSelect =>
+        val querySql = select.toString.replace("`", "")
+        WithClose(executeQuery(querySql)) { rs =>
+          val columnCount = rs.getMetaData.getColumnCount
+          val resultList = new ArrayBuffer[util.ArrayList[AnyRef]]()
+          while (rs.next()) {
+            val row = new util.ArrayList[AnyRef](columnCount)
+            for (x <- 1 to columnCount) {
+              row.add(rs.getObject(x))
+            }
+            resultList += row
+          }
+          resultList.toArray
         }
+    }
 
     // insert data
     var affectRows = 0
