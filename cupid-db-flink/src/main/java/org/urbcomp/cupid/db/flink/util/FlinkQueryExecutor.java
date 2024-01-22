@@ -34,12 +34,14 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
-import org.urbcomp.cupid.db.util.MetadataUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.urbcomp.cupid.db.flink.util.kafkaConnector.getKafkaGroup;
+import static org.urbcomp.cupid.db.flink.util.kafkaConnector.getKafkaTopic;
 
 public class FlinkQueryExecutor {
 
@@ -406,16 +408,6 @@ public class FlinkQueryExecutor {
             tableList.add(table);
         }
         return tableList;
-    }
-
-    public String getKafkaTopic(org.urbcomp.cupid.db.metadata.entity.Table table) {
-        return MetadataUtil.makeSchemaName(table.getId());
-    }
-
-    public String getKafkaGroup(String dbTableName) {
-        String userName = FlinkSqlParam.CACHE.get().getUserName();
-        String dbName = dbTableName.split("\\.")[0];
-        return MetadataUtil.makeCatalog(userName, dbName);
     }
 
     public void registerUdf(FlinkSqlParam param) {

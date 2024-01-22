@@ -90,7 +90,16 @@ case class ShowCreateTableExecutor(n: SqlShowCreateTable) extends BaseExecutor {
     }
 
     val sqlNode =
-      new SqlCupidCreateTable(pos, false, false, sqlTableName, sqlColumnList, sqlIndexList, null)
+      new SqlCupidCreateTable(
+        pos,
+        false,
+        false,
+        false,
+        sqlTableName,
+        sqlColumnList,
+        sqlIndexList,
+        null
+      )
 
     MetadataResult
       .buildResult(

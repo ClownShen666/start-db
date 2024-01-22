@@ -30,6 +30,16 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     UUID.randomUUID().toString.replace("-", "_")
   }
 
+  test("test create stream table") {
+    val uniqueId = generateUniqueId()
+    val createTableSQL =
+      s"""CREATE STREAM TABLE start_db_table_test_%s (
+         |    idx Integer
+         |);""".format(uniqueId).stripMargin
+    val stmt = connect.createStatement()
+    stmt.executeUpdate(createTableSQL)
+  }
+
   test("test create table") {
     val uniqueId = generateUniqueId()
     val createTableSQL = s"""CREATE TABLE start_db_table_test_%s (

@@ -40,7 +40,7 @@ import org.urbcomp.cupid.db.flink.udf.st_geometryFromWKT;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.TestUtil.*;
+import static org.urbcomp.cupid.db.flink.util.kafkaConnector.*;
 
 // run the "docker/flink-kafka" before test
 public class ConnectWithKafkaTest {
@@ -50,8 +50,8 @@ public class ConnectWithKafkaTest {
     @Ignore
     @Test
     public void datastreamApiTest() throws Exception {
-        TestUtil.KafkaCreateTopic("localhost:9092", "Source");
-        TestUtil.KafkaCreateTopic("localhost:9092", "Sink");
+        KafkaCreateTopic("localhost:9092", "Source");
+        KafkaCreateTopic("localhost:9092", "Sink");
         List<String> recordList = new ArrayList<>();
         recordList.add("POINT (90 90)");
         recordList.add("LINESTRING (0 0, 1 1, 1 2)");
@@ -61,7 +61,7 @@ public class ConnectWithKafkaTest {
         recordList.add(
             "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        TestUtil.kafkaProducer("localhost:9092", "Source", recordList);
+        kafkaProducer("localhost:9092", "Source", recordList);
 
         KafkaSource<Geometry> source1 = KafkaSource.<Geometry>builder()
             .setBootstrapServers("localhost:9092")
@@ -82,7 +82,7 @@ public class ConnectWithKafkaTest {
             "select st_geometryFromWKT(st_geometryAsWKT(f0)), f0 from kafkaSource1;"
         );
 
-        checkF1EqualF2(tableEnv, res1, 6);
+        TestUtil.checkF1EqualF2(tableEnv, res1, 6);
 
         KafkaSink<Geometry> sink = KafkaSink.<Geometry>builder()
             .setBootstrapServers("localhost:9092")
@@ -113,10 +113,10 @@ public class ConnectWithKafkaTest {
         tableEnv.createTemporaryView("kafkaSource2", tableEnv.fromDataStream(ds2));
         Table res2 = tableEnv.fromDataStream(ds2);
 
-        checkTableNotNull(tableEnv, res2);
+        TestUtil.checkTableNotNull(tableEnv, res2);
 
-        TestUtil.KafkaDeleteTopic("localhost:9092", "Source");
-        TestUtil.KafkaDeleteTopic("localhost:9092", "Sink");
+        KafkaDeleteTopic("localhost:9092", "Source");
+        KafkaDeleteTopic("localhost:9092", "Sink");
     }
 
 }
