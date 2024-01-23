@@ -35,6 +35,7 @@ public class SqlCupidCreateTable extends SqlCreate {
     public final SqlNodeList columnList;
     public final SqlNode query;
     public final SqlNodeList indexList;
+    public final boolean stream;
 
     private static final SqlOperator OPERATOR = new SqlSpecialOperator(
         "CREATE TABLE",
@@ -46,12 +47,14 @@ public class SqlCupidCreateTable extends SqlCreate {
         SqlParserPos pos,
         boolean replace,
         boolean ifNotExists,
+        boolean stream,
         SqlIdentifier name,
         SqlNodeList columnList,
         SqlNodeList indexList,
         SqlNode query
     ) {
         super(OPERATOR, pos, replace, ifNotExists);
+        this.stream = stream;
         this.name = Objects.requireNonNull(name);
         this.columnList = columnList; // may be null
         this.indexList = indexList; // may be null

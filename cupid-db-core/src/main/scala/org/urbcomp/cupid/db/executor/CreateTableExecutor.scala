@@ -26,12 +26,12 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.metadata.entity.{Field, Index, Table}
 import org.urbcomp.cupid.db.parser.ddl.{SqlCupidCreateTable, SqlIndexDeclaration}
 import org.urbcomp.cupid.db.schema.IndexType
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.transformer.{
   RoadSegmentAndGeomesaTransformer,
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil}
+import org.urbcomp.cupid.db.kafkaConnector.{KafkaCreateTopic, getKafkaTopic}
 
 import scala.collection.JavaConverters._
 
@@ -54,8 +54,11 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     var affectedRows = 0L
     MetadataAccessUtil.withRollback(
       _ => {
-        affectedRows =
-          MetadataAccessUtil.insertTable(new Table(0L /* unused */, db.getId, tableName, "hbase"))
+        val storageEngine = if (n.stream) "kafka" else "hbase"
+        affectedRows = MetadataAccessUtil.insertTable(
+          new Table(0L /* unused */, db.getId, tableName, storageEngine)
+        )
+
         val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
 
@@ -83,35 +86,43 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         checkIndexNames(indexes)
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
-        val params = ExecutorUtil.getDataStoreParams(userName, dbName)
-        val dataStore = DataStoreFinder.getDataStore(params)
-        if (dataStore == null) {
-          throw new IllegalArgumentException("Cannot find data store!")
-        }
-        val schema = dataStore.getSchema(schemaName)
-        if (schema != null) {
-          throw new IllegalStateException("schema already exist " + schemaName)
+        // create stream table(topic) in kafka
+        // TODO: get ip from DynamicConfig
+        if (n.stream) {
+          KafkaCreateTopic("localhost:9092", getKafkaTopic(createdTable))
         }
 
-        var sft = sfb.buildFeatureType()
-        sft = new TrajectoryAndFeatureTransformer().getGeoMesaSFT(sft)
-        sft = new RoadSegmentAndGeomesaTransformer().getGeoMesaSFT(sft)
+        // create table in hbase
+        else {
+          val params = ExecutorUtil.getDataStoreParams(userName, dbName)
+          val dataStore = DataStoreFinder.getDataStore(params)
+          if (dataStore == null) {
+            throw new IllegalArgumentException("Cannot find data store!")
+          }
+          val schema = dataStore.getSchema(schemaName)
+          if (schema != null) {
+            throw new IllegalStateException("schema already exist " + schemaName)
+          }
 
-        // allow mixed geometry types for support cupid-db type `Geometry`
-        sft.getUserData.put("geomesa.mixed.geometries", java.lang.Boolean.TRUE)
+          var sft = sfb.buildFeatureType()
+          sft = new TrajectoryAndFeatureTransformer().getGeoMesaSFT(sft)
+          sft = new RoadSegmentAndGeomesaTransformer().getGeoMesaSFT(sft)
 
-        val geomesaIndexDecl = indexes
-          .map(idx => {
-            s"${idx.getIndexType}:${idx.getFieldsIdList.split(",").mkString(":")}"
-          })
-          .mkString(",")
-        sft.getUserData.put("geomesa.indices.enabled", geomesaIndexDecl)
+          // allow mixed geometry types for support cupid-db type `Geometry`
+          sft.getUserData.put("geomesa.mixed.geometries", java.lang.Boolean.TRUE)
 
-        dataStore.createSchema(sft)
+          val geomesaIndexDecl = indexes
+            .map(idx => {
+              s"${idx.getIndexType}:${idx.getFieldsIdList.split(",").mkString(":")}"
+            })
+            .mkString(",")
+          sft.getUserData.put("geomesa.indices.enabled", geomesaIndexDecl)
+
+          dataStore.createSchema(sft)
+        }
       },
       classOf[Exception]
     )
-
     MetadataResult.buildDDLResult(affectedRows.toInt)
   }
 

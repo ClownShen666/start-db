@@ -81,7 +81,7 @@ showIndexStmt :
      ;
 
 createTableStmt :
-       T_CREATE T_TABLE (T_IF T_NOT T_EXISTS)? table_name create_table_preoptions? create_table_definition
+       T_CREATE T_STREAM? T_TABLE (T_IF T_NOT T_EXISTS)? table_name create_table_preoptions? create_table_definition
      ;
 
 createUserStmt :
@@ -1020,6 +1020,7 @@ nonReservedWords :                      // Tokens that are not reserved words an
      | T_STORAGE
      | T_STORE
      | T_STORED
+     | T_STREAM
      | T_STRING
      | T_SUBDIR
      | T_SUBSTRING
@@ -1366,6 +1367,7 @@ T_STEP            : S T E P ;
 T_STORAGE         : S T O R A G E ;
 T_STORE           : S T O R E;
 T_STORED          : S T O R E D ;
+T_STREAM          : S T R E A M;
 T_STRING          : S T R I N G ;
 T_SUBDIR          : S U B D I R ;
 T_SUBSTRING       : S U B S T R I N G ;

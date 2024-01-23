@@ -666,6 +666,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
   override def visitCreateTableStmt(ctx: CreateTableStmtContext): SqlNode = {
     val tableName = visitIdent(ctx.table_name().qident().ident().get(0))
     val ifNotExists = null != ctx.T_EXISTS()
+    val stream = null != ctx.T_STREAM()
     val query = if (null != ctx.create_table_definition().selectStmt()) {
       visitSelectStmt(ctx.create_table_definition().selectStmt())
     } else null
@@ -736,6 +737,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       pos,
       false,
       ifNotExists,
+      stream,
       tableName,
       new SqlNodeList(columnList, pos),
       new SqlNodeList(indexList, pos),

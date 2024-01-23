@@ -43,6 +43,7 @@ import java.util.List;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
 import static org.urbcomp.cupid.db.flink.util.FlinkQueryExecutor.getTables;
+import static org.urbcomp.cupid.db.flink.util.kafkaConnector.*;
 
 // run the "docker/flink-kafka" before test
 public class FlinkQueryExecutorTest {
@@ -87,10 +88,10 @@ public class FlinkQueryExecutorTest {
             selectVisitor.getDbTableList()
         );
         List<String> topicList = new ArrayList<>();
-        topicList.add(flink.getKafkaTopic(tableList.get(0)));
+        topicList.add(getKafkaTopic(tableList.get(0)));
 
         // create topic and add message
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(0));
+        KafkaCreateTopic("localhost:9092", topicList.get(0));
         List<String> recordList = new ArrayList<>();
         recordList.add(
             "+I["
@@ -102,7 +103,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
         );
-        TestUtil.kafkaProducer("localhost:9092", topicList.get(0), recordList);
+        kafkaProducer("localhost:9092", topicList.get(0), recordList);
 
         // test select sql
         param.setSql(
@@ -129,7 +130,7 @@ public class FlinkQueryExecutorTest {
         );
         checkTable(tableEnv, tableEnv.fromDataStream(resultStream), expected);
 
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(0));
+        KafkaDeleteTopic("localhost:9092", topicList.get(0));
     }
 
     @Ignore
@@ -194,12 +195,12 @@ public class FlinkQueryExecutorTest {
             selectVisitor.getDbTableList()
         );
         List<String> topicList = new ArrayList<>();
-        topicList.add(flink.getKafkaTopic(tableList.get(0)));
-        topicList.add(flink.getKafkaTopic(tableList.get(1)));
+        topicList.add(getKafkaTopic(tableList.get(0)));
+        topicList.add(getKafkaTopic(tableList.get(1)));
 
         // create topic and add message
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(0));
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(1));
+        KafkaCreateTopic("localhost:9092", topicList.get(0));
+        KafkaCreateTopic("localhost:9092", topicList.get(1));
         List<String> recordList = new ArrayList<>();
         recordList.add(
             "+I["
@@ -217,7 +218,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
         );
-        TestUtil.kafkaProducer("localhost:9092", topicList.get(0), recordList);
+        kafkaProducer("localhost:9092", topicList.get(0), recordList);
 
         // test insert sql
         param.setSql(
@@ -269,8 +270,8 @@ public class FlinkQueryExecutorTest {
         );
         checkTable(tableEnv, tableEnv.fromDataStream(insertStream), expected);
 
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(0));
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(1));
+        KafkaDeleteTopic("localhost:9092", topicList.get(0));
+        KafkaDeleteTopic("localhost:9092", topicList.get(1));
     }
 
     @Ignore
@@ -319,12 +320,12 @@ public class FlinkQueryExecutorTest {
             visitor.getDbTableList()
         );
         List<String> topicList = new ArrayList<>();
-        topicList.add(flink.getKafkaTopic(tableList.get(0)));
-        topicList.add(flink.getKafkaTopic(tableList.get(1)));
+        topicList.add(getKafkaTopic(tableList.get(0)));
+        topicList.add(getKafkaTopic(tableList.get(1)));
 
         // create topic and add message
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(0));
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(1));
+        KafkaCreateTopic("localhost:9092", topicList.get(0));
+        KafkaCreateTopic("localhost:9092", topicList.get(1));
         List<String> recordList = new ArrayList<>();
         recordList.add(
             "+I["
@@ -342,10 +343,10 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
         );
-        TestUtil.kafkaProducer("localhost:9092", topicList.get(0), recordList);
+        kafkaProducer("localhost:9092", topicList.get(0), recordList);
         recordList.clear();
         recordList.add("2");
-        TestUtil.kafkaProducer("localhost:9092", topicList.get(1), recordList);
+        kafkaProducer("localhost:9092", topicList.get(1), recordList);
 
         // load table and test
         flink.loadTables(param, visitor.getTableList(), visitor.getDbTableList(), tableList);
@@ -372,8 +373,8 @@ public class FlinkQueryExecutorTest {
         );
         checkTable(tableEnv, table1, expected);
 
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(0));
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(1));
+        KafkaDeleteTopic("localhost:9092", topicList.get(0));
+        KafkaDeleteTopic("localhost:9092", topicList.get(1));
     }
 
     @Ignore
@@ -414,10 +415,10 @@ public class FlinkQueryExecutorTest {
             visitor.getDbTableList()
         );
         List<String> topicList = new ArrayList<>();
-        topicList.add(flink.getKafkaTopic(tableList.get(0)));
+        topicList.add(getKafkaTopic(tableList.get(0)));
 
         // create topic and add message
-        TestUtil.KafkaCreateTopic("localhost:9092", topicList.get(0));
+        KafkaCreateTopic("localhost:9092", topicList.get(0));
         List<String> recordList = new ArrayList<>();
         recordList.add(
             "POINT (90 90),,"
@@ -428,7 +429,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        TestUtil.kafkaProducer("localhost:9092", topicList.get(0), recordList);
+        kafkaProducer("localhost:9092", topicList.get(0), recordList);
 
         // load table
         flink.loadTable(
@@ -458,7 +459,7 @@ public class FlinkQueryExecutorTest {
             "select st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1)) from table1;"
         );
 
-        TestUtil.KafkaDeleteTopic("localhost:9092", topicList.get(0));
+        KafkaDeleteTopic("localhost:9092", topicList.get(0));
     }
 
 }
