@@ -101,7 +101,7 @@ import java.sql.Types;
 import java.util.*;
 
 import static org.apache.calcite.util.Static.RESOURCE;
-import static org.urbcomp.cupid.db.config.ExecuteEngine.FLINK_LOCAL;
+import static org.urbcomp.cupid.db.config.ExecuteEngine.*;
 
 /**
  * Shit just got real.
@@ -707,54 +707,31 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             Hook.PARSE_TREE.run(new Object[] { sql, sqlNode });
             final SqlParam sqlParam = SqlParam.CACHE.get();
 
-            // judge whether sql is executed by flink(stream)
-            // Currently flink engine only supports select & insert ... select...
-            List<String> tableNameList = new ArrayList<>();
-            if (sqlNode instanceof SqlSelect) {
-                tableNameList = new SelectFromTableVisitor(sql).getTableList();
-            }
-            if (sqlNode instanceof SqlInsert
-                && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
-                String selectSql = "select " + sql.split(" (?i)select ")[1];
-                tableNameList = new SelectFromTableVisitor(selectSql).getTableList();
-                tableNameList.add(new InsertIntoTableVisitor(sql).getTable());
-            }
-            if (tableNameList.size() > 0) {
-                int streamTableNum = 0;
-                for (String tableName : tableNameList) {
-                    if (MetadataAccessUtil.getTable(
-                        sqlParam.getUserName(),
-                        sqlParam.getDbName(),
-                        tableName
-                    ).getStorageEngine().equals("kafka")) {
-                        streamTableNum++;
-                    }
+            if (isStreamSql(sqlNode, sql)) {
+                // TODO: show stream query result
+                if (sqlParam.getExecuteEngine() == LOCAL) {
+                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                    flinkSqlParam.setSql(sql);
+                    new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
+                    return MetadataResult.buildDDLResult(0);
                 }
-                if (streamTableNum > 0) {
-                    // TODO: get host and port from config class to judge whether local or cluster
-                    if (streamTableNum == tableNameList.size()) {
-                        sqlParam.setExecuteEngine(FLINK_LOCAL);
-                    } else {
-                        throw new RuntimeException("stream sql has non stream table");
-                    }
+                // TODO: get host and port from config class and give to flink cluster to execute
+                else if (sqlParam.getExecuteEngine() == CLUSTER) {
+
+                } else {
+                    throw new RuntimeException(
+                        "Wrong ExecuteEngine:" + sqlParam.getExecuteEngine()
+                    );
                 }
             }
 
-            switch (sqlParam.getExecuteEngine()) {
-                case SPARK_LOCAL:
-                case SPARK_CLUSTER:
-                    // Currently spark engine only supports load & select
-                    if (sqlNode instanceof SqlLoadData || sqlNode instanceof SqlSelect) {
-                        sqlParam.setSql(sql);
-                        return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
-                    }
-                    break;
-                case FLINK_LOCAL:
-                case FLINK_CLUSTER:
-                    // TODO: show stream query result
+            if (sqlParam.getExecuteEngine() == SPARK_LOCAL
+                || sqlParam.getExecuteEngine() == SPARK_CLUSTER) {
+                // Currently spark engine only supports load & select
+                if (sqlNode instanceof SqlLoadData || sqlNode instanceof SqlSelect) {
                     sqlParam.setSql(sql);
-                    new FlinkQueryExecutor(sqlNode).execute(new FlinkSqlParam(sqlParam));
-                    return MetadataResult.buildDDLResult(0);
+                    return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+                }
             }
 
             CupidDBExecutorFactory startDBExecutorFactory = new CupidDBExecutorFactory();
@@ -882,6 +859,44 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             bindable,
             statementType
         );
+    }
+
+    // judge whether sql is executed by flink(stream)
+    private boolean isStreamSql(SqlNode sqlNode, String sql) {
+        // Currently flink engine only supports select & insert ... select...
+        List<String> tableNameList = new ArrayList<>();
+        if (sqlNode instanceof SqlSelect) {
+            tableNameList = new SelectFromTableVisitor(sql).getTableList();
+        }
+        if (sqlNode instanceof SqlInsert
+            && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
+            String selectSql = "select " + sql.split(" (?i)select ")[1];
+            tableNameList = new SelectFromTableVisitor(selectSql).getTableList();
+            tableNameList.add(new InsertIntoTableVisitor(sql).getTable());
+        }
+        if (tableNameList.size() > 0) {
+            SqlParam sqlParam = SqlParam.CACHE.get();
+            int streamTableNum = 0;
+            for (String tableName : tableNameList) {
+                if (MetadataAccessUtil.getTable(
+                    sqlParam.getUserName(),
+                    sqlParam.getDbName(),
+                    tableName
+                ).getStorageEngine().equals("kafka")) {
+                    streamTableNum++;
+                }
+            }
+            if (streamTableNum > 0) {
+                if (streamTableNum == tableNameList.size()) {
+                    return true;
+                } else {
+                    throw new RuntimeException("stream sql has non stream table");
+                }
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     private SqlValidator createSqlValidator(Context context, CalciteCatalogReader catalogReader) {

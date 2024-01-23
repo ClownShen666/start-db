@@ -30,13 +30,13 @@ public enum ExecuteEngine {
      */
     SPARK_CLUSTER("spark_cluster"),
     /**
-     * 表示在本地起一个local模式的flink执行，用于测试
+     * 表示在本地执行
      */
-    FLINK_LOCAL("flink_local"),
+    LOCAL("local"),
     /**
-     * 提交到远程flink执行
+     * 提交到远程集群执行
      */
-    FLINK_CLUSTER("flink_cluster");
+    CLUSTER("cluster");
 
     private String value;
 

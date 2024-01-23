@@ -28,6 +28,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -51,8 +52,11 @@ public class FlinkQueryExecutorTest {
     @Test
     public void streamSelectSqlTest() {
         SqlParam sqlParam = new SqlParam("root", "default");
-        sqlParam.setTestNum(1);
+        sqlParam.setExecuteEngine(ExecuteEngine.LOCAL);
         SqlParam.CACHE.set(sqlParam);
+        FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
+        flinkSqlParam.setTestNum(1);
+        FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -88,8 +92,10 @@ public class FlinkQueryExecutorTest {
     @Test
     public void streamInsertSqlTest() throws Exception {
         SqlParam sqlParam = new SqlParam("root", "default");
-        sqlParam.setTestNum(1);
+        sqlParam.setExecuteEngine(ExecuteEngine.LOCAL);
         SqlParam.CACHE.set(sqlParam);
+        FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
+        FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");

@@ -29,6 +29,8 @@ public class FlinkSqlParam extends SqlParam {
 
     private String bootstrapServers;
 
+    private int testNum;
+
     public FlinkSqlParam() {}
 
     public FlinkSqlParam(SqlParam sqlParam) {
@@ -36,7 +38,6 @@ public class FlinkSqlParam extends SqlParam {
         this.setDbName(sqlParam.getDbName());
         this.setExecuteEngine(sqlParam.getExecuteEngine());
         this.setSql(sqlParam.getSql());
-        this.setTestNum(sqlParam.getTestNum());
         this.bootstrapServers = "localhost:9092";
     }
 
@@ -62,5 +63,13 @@ public class FlinkSqlParam extends SqlParam {
 
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
+    }
+
+    public int getTestNum() {
+        return testNum;
+    }
+
+    public void setTestNum(int testNum) {
+        this.testNum = testNum;
     }
 }
