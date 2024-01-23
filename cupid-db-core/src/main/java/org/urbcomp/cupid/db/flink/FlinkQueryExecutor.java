@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.util;
+package org.urbcomp.cupid.db.flink;
 
 import org.apache.calcite.sql.SqlNode;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -36,14 +36,21 @@ import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.SqlParam;
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.util.kafkaConnector.getKafkaGroup;
-import static org.urbcomp.cupid.db.flink.util.kafkaConnector.getKafkaTopic;
+import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
+import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
 
 public class FlinkQueryExecutor {
+
+    private SqlNode sqlNode = null;
+
+    public FlinkQueryExecutor() {}
+
+    public FlinkQueryExecutor(SqlNode sqlNode) {
+        this.sqlNode = sqlNode;
+    }
 
     public DataStream<Row> execute(FlinkSqlParam param) {
         if (param != null) {
@@ -53,7 +60,9 @@ public class FlinkQueryExecutor {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
         String sql = param.getSql();
-        SqlNode sqlNode = CupidDBParseDriver.parseSql(sql);
+        if (sqlNode == null) {
+            sqlNode = CupidDBParseDriver.parseSql(sql);
+        }
         switch (sqlNode.getKind()) {
             case SELECT:
                 SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
@@ -67,8 +76,21 @@ public class FlinkQueryExecutor {
                 loadTables(param, tableNameList, dbTableNameList, tableList);
                 registerUdf(param);
 
-                // return select result stream
-                return param.getTableEnv().toChangelogStream(param.getTableEnv().sqlQuery(sql));
+                // execute and return select result stream
+                DataStream<Row> resultStream = param.getTableEnv()
+                    .toChangelogStream(param.getTableEnv().sqlQuery(sql));
+                try {
+                    if (param.getTestNum() == 0) {
+                        param.getEnv().execute();
+                    }
+                    // for test
+                    else {
+                        resultStream.executeAndCollect(param.getTestNum());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return resultStream;
 
             case INSERT:
                 InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
@@ -94,17 +116,28 @@ public class FlinkQueryExecutor {
 
                 // get select result
                 Table resultTable = param.getTableEnv().sqlQuery(selectSql);
-                DataStream<Row> resultStream = param.getTableEnv().toChangelogStream(resultTable);
+                DataStream<Row> resultStream2 = param.getTableEnv().toChangelogStream(resultTable);
 
                 // write result to kafka
                 org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
                     insertVisitor.getDbTable()
                 );
                 checkInsert(resultTable, fieldVisitor.getFieldNameList(), insertTable);
-                insertTable(param, resultStream, insertTable);
+                insertTable(param, resultStream2, insertTable);
 
-                // return select result
-                return resultStream;
+                // execute and return select result
+                try {
+                    if (param.getTestNum() == 0) {
+                        param.getEnv().execute();
+                    }
+                    // for test
+                    else {
+                        resultStream2.executeAndCollect(param.getTestNum());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return resultStream2;
 
             default:
                 throw new UnsupportedOperationException("Unsupported sql: " + sql);
@@ -177,7 +210,6 @@ public class FlinkQueryExecutor {
                 .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "source")
                 .map(stringToRow)
                 .returns(stringToRow.getRowTypeInfo());
-
             // create sourceTable in tableEnv
             param.getTableEnv().createTemporaryView(tableNameList.get(i), source);
         }
@@ -355,7 +387,7 @@ public class FlinkQueryExecutor {
 
     public static org.urbcomp.cupid.db.metadata.entity.Table getTable(String dbTable) {
         // read table metadata from mysql
-        String userName = FlinkSqlParam.CACHE.get().getUserName();
+        String userName = SqlParam.CACHE.get().getUserName();
         String[] dbTableName = dbTable.split("\\.");
         String dbName = dbTableName[0];
         String tableName = dbTableName[1];
@@ -385,7 +417,7 @@ public class FlinkQueryExecutor {
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = new ArrayList<>();
         for (String dbTable : dbTableList) {
             // read table metadata from mysql
-            String userName = FlinkSqlParam.CACHE.get().getUserName();
+            String userName = SqlParam.CACHE.get().getUserName();
             String[] dbTableName = dbTable.split("\\.");
             String dbName = dbTableName[0];
             String tableName = dbTableName[1];
@@ -422,7 +454,8 @@ public class FlinkQueryExecutor {
     }
 
     public List<Class<?>> loadUdfClasses(String path) {
-        String udfPath = (Paths.get(path).getParent().toString() + "/udf").substring(5);
+        String udfPath = (path.split("/target/")[0]
+            + "/target/classes/org/urbcomp/cupid/db/flink/udf").substring(5);
         List<Class<?>> udfClasses = new ArrayList<>();
         File folder = new File(udfPath);
         File[] files = folder.listFiles(

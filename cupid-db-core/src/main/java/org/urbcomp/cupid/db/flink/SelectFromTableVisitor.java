@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.util;
+package org.urbcomp.cupid.db.flink;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -22,40 +22,26 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlLexer;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
+import org.urbcomp.cupid.db.util.SqlParam;
 
-public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
+import java.util.ArrayList;
+import java.util.List;
 
-    private String table = null;
+public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
-    private String dbTable = null;
+    private final List<String> tableList = new ArrayList<>();
 
-    private CupidDBSqlParser.SelectStmtContext selectStmtContext = null;
+    private final List<String> dbTableList = new ArrayList<>();
 
-    public String getTable() {
-        return table;
+    public List<String> getTableList() {
+        return tableList;
     }
 
-    public String getDbTable() {
-        return dbTable;
+    public List<String> getDbTableList() {
+        return dbTableList;
     }
 
-    @Override
-    public Void visitInsertStmt(CupidDBSqlParser.InsertStmtContext ctx) {
-        CupidDBSqlParser.IdentContext tableNameCtx = ctx.tableName().ident();
-        selectStmtContext = ctx.selectStmt();
-        if (tableNameCtx.identItem().size() == 1) {
-            table = tableNameCtx.getText();
-            dbTable = FlinkSqlParam.CACHE.get().getDbName() + "." + tableNameCtx.getText();
-        } else {
-            table = tableNameCtx.identItem(0).getText() + "." + tableNameCtx.identItem(1).getText();
-            dbTable = tableNameCtx.identItem(0).getText()
-                + "."
-                + tableNameCtx.identItem(1).getText();
-        }
-        return null;
-    }
-
-    public InsertIntoTableVisitor(String sql) {
+    public SelectFromTableVisitor(String sql) {
         CharStream charStream = CharStreams.fromString(sql);
         CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
         lexer.removeErrorListeners();
@@ -65,7 +51,16 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         this.visitProgram(tree);
     }
 
-    public boolean haveSelect() {
-        return selectStmtContext != null;
+    @Override
+    public Void visitFromTableNameClause(CupidDBSqlParser.FromTableNameClauseContext ctx) {
+        CupidDBSqlParser.IdentContext names = ctx.tableName().ident();
+        if (names.identItem().size() == 1) {
+            tableList.add(names.getText());
+            dbTableList.add(SqlParam.CACHE.get().getDbName() + "." + names.getText());
+        } else {
+            tableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
+            dbTableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
+        }
+        return null;
     }
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.util;
+package org.urbcomp.cupid.db.flink;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -23,24 +23,24 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlLexer;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
+public class InsertIntoFieldVisitor extends CupidDBSqlBaseVisitor<Void> {
+    private List<String> fieldNameList = null;
 
-    private final List<String> tableList = new ArrayList<>();
-
-    private final List<String> dbTableList = new ArrayList<>();
-
-    public List<String> getTableList() {
-        return tableList;
+    public List<String> getFieldNameList() {
+        return fieldNameList;
     }
 
-    public List<String> getDbTableList() {
-        return dbTableList;
+    @Override
+    public Void visitInsertStmtCols(CupidDBSqlParser.InsertStmtColsContext ctx) {
+        String fieldStr = ctx.getText();
+        fieldNameList = Arrays.asList(fieldStr.substring(1, fieldStr.length() - 1).split(","));
+        return null;
     }
 
-    public SelectFromTableVisitor(String sql) {
+    public InsertIntoFieldVisitor(String sql) {
         CharStream charStream = CharStreams.fromString(sql);
         CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
         lexer.removeErrorListeners();
@@ -48,18 +48,5 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         parser.removeErrorListeners();
         CupidDBSqlParser.ProgramContext tree = parser.program();
         this.visitProgram(tree);
-    }
-
-    @Override
-    public Void visitFromTableNameClause(CupidDBSqlParser.FromTableNameClauseContext ctx) {
-        CupidDBSqlParser.IdentContext names = ctx.tableName().ident();
-        if (names.identItem().size() == 1) {
-            tableList.add(names.getText());
-            dbTableList.add(FlinkSqlParam.CACHE.get().getDbName() + "." + names.getText());
-        } else {
-            tableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
-            dbTableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
-        }
-        return null;
     }
 }

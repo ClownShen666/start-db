@@ -40,7 +40,7 @@ import org.urbcomp.cupid.db.flink.udf.st_geometryFromWKT;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.util.kafkaConnector.*;
+import static org.urbcomp.cupid.db.flink.kafkaConnector.*;
 
 // run the "docker/flink-kafka" before test
 public class ConnectWithKafkaTest {
@@ -50,8 +50,8 @@ public class ConnectWithKafkaTest {
     @Ignore
     @Test
     public void datastreamApiTest() throws Exception {
-        KafkaCreateTopic("localhost:9092", "Source");
-        KafkaCreateTopic("localhost:9092", "Sink");
+        createKafkaTopic("localhost:9092", "Source");
+        createKafkaTopic("localhost:9092", "Sink");
         List<String> recordList = new ArrayList<>();
         recordList.add("POINT (90 90)");
         recordList.add("LINESTRING (0 0, 1 1, 1 2)");
@@ -61,7 +61,7 @@ public class ConnectWithKafkaTest {
         recordList.add(
             "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        kafkaProducer("localhost:9092", "Source", recordList);
+        produceKafkaMessage("localhost:9092", "Source", recordList);
 
         KafkaSource<Geometry> source1 = KafkaSource.<Geometry>builder()
             .setBootstrapServers("localhost:9092")
@@ -115,8 +115,8 @@ public class ConnectWithKafkaTest {
 
         TestUtil.checkTableNotNull(tableEnv, res2);
 
-        KafkaDeleteTopic("localhost:9092", "Source");
-        KafkaDeleteTopic("localhost:9092", "Sink");
+        deleteKafkaTopic("localhost:9092", "Source");
+        deleteKafkaTopic("localhost:9092", "Sink");
     }
 
 }

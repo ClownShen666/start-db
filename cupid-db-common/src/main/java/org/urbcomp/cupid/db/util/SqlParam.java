@@ -50,6 +50,8 @@ public class SqlParam {
 
     private Map<String, String> options;
 
+    private int testNum = 0;
+
     public SqlParam() {}
 
     public SqlParam(String userName, String dbName) {
@@ -126,5 +128,13 @@ public class SqlParam {
 
     public void setOptions(Map<String, String> options) {
         this.options = options;
+    }
+
+    public int getTestNum() {
+        return testNum;
+    }
+
+    public void setTestNum(int testNum) {
+        this.testNum = testNum;
     }
 }
