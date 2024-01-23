@@ -80,6 +80,7 @@ import org.apache.calcite.tools.Frameworks;
 import org.apache.calcite.util.ImmutableIntList;
 import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
 import org.urbcomp.cupid.db.flink.FlinkQueryExecutor;
 import org.urbcomp.cupid.db.flink.FlinkSqlParam;
@@ -713,7 +714,10 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
                     flinkSqlParam.setSql(sql);
                     new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
-                    return MetadataResult.buildDDLResult(0);
+                    return (MetadataResult<T>) MetadataResult.buildResult(
+                        new String[0],
+                        new ArrayList<>()
+                    );
                 }
                 // TODO: get host and port from config class and give to flink cluster to execute
                 else if (sqlParam.getExecuteEngine() == CLUSTER) {
@@ -725,10 +729,13 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 }
             }
 
-            if (sqlParam.getExecuteEngine() == SPARK_LOCAL
-                || sqlParam.getExecuteEngine() == SPARK_CLUSTER) {
-                // Currently spark engine only supports load & select
-                if (sqlNode instanceof SqlLoadData || sqlNode instanceof SqlSelect) {
+            if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
+                if (sqlNode instanceof SqlLoadData) {
+                    sqlParam.setSql(sql);
+                    return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
+                }
+
+                if (sqlNode instanceof SqlSelect) {
                     sqlParam.setSql(sql);
                     return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
                 }
