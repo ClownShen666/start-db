@@ -57,9 +57,18 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         if (names.identItem().size() == 1) {
             tableList.add(names.getText());
             dbTableList.add(SqlParam.CACHE.get().getDbName() + "." + names.getText());
-        } else {
+        } else if (names.identItem().size() == 2) {
             tableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
             dbTableList.add(names.identItem(0).getText() + "." + names.identItem(1).getText());
+        } else {
+            tableList.add(
+                names.identItem(0).getText()
+                    + "."
+                    + names.identItem(1).getText()
+                    + "."
+                    + names.identItem(2).getText()
+            );
+            dbTableList.add(names.identItem(1).getText() + "." + names.identItem(2).getText());
         }
         return null;
     }

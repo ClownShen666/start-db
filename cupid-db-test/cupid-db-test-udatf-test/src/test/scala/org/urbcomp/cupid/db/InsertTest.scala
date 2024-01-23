@@ -113,6 +113,6 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.executeUpdate("create table if not exists table2(int2 int)")
     statement.executeUpdate("insert into table2 values (1),(2),(3);")
     statement.executeUpdate("insert into table1 select int2 from table2;")
-    executeQueryCheck("select count(1) from from table1;", List(3))
+    executeQueryCheck("select count(1) from table1;", List(3))
   }
 }

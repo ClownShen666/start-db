@@ -873,23 +873,30 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         // Currently flink engine only supports select & insert ... select...
         List<String> tableNameList = new ArrayList<>();
         if (sqlNode instanceof SqlSelect) {
-            tableNameList = new SelectFromTableVisitor(sql).getTableList();
+            List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
+            for (String dbTableName : dbTableNameList) {
+                tableNameList.add(dbTableName.split("\\.")[1]);
+            }
         }
         if (sqlNode instanceof SqlInsert
             && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
+            tableNameList.add(new InsertIntoTableVisitor(sql).getDbTable().split("\\.")[1]);
             String selectSql = "select " + sql.split(" (?i)select ")[1];
-            tableNameList = new SelectFromTableVisitor(selectSql).getTableList();
-            tableNameList.add(new InsertIntoTableVisitor(sql).getTable());
+            List<String> dbTableNameList = new SelectFromTableVisitor(selectSql).getDbTableList();
+            for (String dbTableName : dbTableNameList) {
+                tableNameList.add(dbTableName.split("\\.")[1]);
+            }
         }
         if (tableNameList.size() > 0) {
             SqlParam sqlParam = SqlParam.CACHE.get();
             int streamTableNum = 0;
             for (String tableName : tableNameList) {
-                if (MetadataAccessUtil.getTable(
+                org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
                     sqlParam.getUserName(),
                     sqlParam.getDbName(),
                     tableName
-                ).getStorageEngine().equals("kafka")) {
+                );
+                if (table.getStorageEngine().equals("kafka")) {
                     streamTableNum++;
                 }
             }

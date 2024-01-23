@@ -47,11 +47,20 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         if (tableNameCtx.identItem().size() == 1) {
             table = tableNameCtx.getText();
             dbTable = SqlParam.CACHE.get().getDbName() + "." + tableNameCtx.getText();
-        } else {
+        } else if (tableNameCtx.identItem().size() == 2) {
             table = tableNameCtx.identItem(0).getText() + "." + tableNameCtx.identItem(1).getText();
             dbTable = tableNameCtx.identItem(0).getText()
                 + "."
                 + tableNameCtx.identItem(1).getText();
+        } else {
+            table = tableNameCtx.identItem(0).getText()
+                + "."
+                + tableNameCtx.identItem(1).getText()
+                + "."
+                + tableNameCtx.identItem(2).getText();
+            dbTable = tableNameCtx.identItem(1).getText()
+                + "."
+                + tableNameCtx.identItem(2).getText();
         }
         return null;
     }
