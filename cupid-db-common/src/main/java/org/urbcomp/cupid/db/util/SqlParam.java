@@ -50,6 +50,8 @@ public class SqlParam {
 
     private Map<String, String> options;
 
+    private boolean isLocal = true;
+
     public SqlParam() {}
 
     public SqlParam(String userName, String dbName) {
@@ -118,6 +120,14 @@ public class SqlParam {
 
     public void setExecuteEngine(ExecuteEngine executeEngine) {
         this.executeEngine = executeEngine;
+    }
+
+    public boolean isLocal() {
+        return isLocal;
+    }
+
+    public void setLocal(boolean local) {
+        isLocal = local;
     }
 
     public Map<String, String> getOptions() {

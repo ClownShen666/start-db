@@ -82,6 +82,12 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
+import org.urbcomp.cupid.db.flink.FlinkQueryExecutor;
+import org.urbcomp.cupid.db.flink.FlinkSqlParam;
+import org.urbcomp.cupid.db.flink.InsertIntoTableVisitor;
+import org.urbcomp.cupid.db.flink.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.infra.MetadataResult;
+import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData;
 import org.urbcomp.cupid.db.parser.ddl.*;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
@@ -548,8 +554,9 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         Type elementType,
         long maxRowCount
     ) {
-        if (SIMPLE_SQLS.contains(query.sql)) {
-            return simplePrepare(context, query.sql);
+        String sql = query.sql;
+        if (SIMPLE_SQLS.contains(sql)) {
+            return simplePrepare(context, sql);
         }
         final JavaTypeFactory typeFactory = context.getTypeFactory();
         CalciteCatalogReader catalogReader = new CalciteCatalogReader(
@@ -647,6 +654,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         CalciteCatalogReader catalogReader,
         RelOptPlanner planner
     ) {
+        String sql = query.sql;
         final JavaTypeFactory typeFactory = context.getTypeFactory();
         final EnumerableRel.Prefer prefer;
         if (elementType == Object[].class) {
@@ -672,7 +680,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         final RelDataType x;
         final Prepare.PreparedResult preparedResult;
         final Meta.StatementType statementType;
-        if (query.sql != null) {
+        if (sql != null) {
             final CalciteConnectionConfig config = context.config();
             SqlParser.Config parserConfig = parserConfig().withQuotedCasing(config.quotedCasing())
                 .withUnquotedCasing(config.unquotedCasing())
@@ -689,26 +697,49 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             // modify start
             SqlNode sqlNode;
             try {
-                sqlNode = CupidDBParseDriver.parseSql(query.sql);
+                sqlNode = CupidDBParseDriver.parseSql(sql);
                 statementType = getStatementType(sqlNode.getKind());
             } catch (Exception e) {
                 throw new RuntimeException("parse failed: " + e.getMessage(), e);
             }
             // modify end
 
-            Hook.PARSE_TREE.run(new Object[] { query.sql, sqlNode });
-
-            // Currently spark engine only supports load & select
+            Hook.PARSE_TREE.run(new Object[] { sql, sqlNode });
             final SqlParam sqlParam = SqlParam.CACHE.get();
 
+            // execute stream sql
+            if (isStreamSql(sqlNode, sql)) {
+                // currently flink only execute select && insert ... select ...
+                if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())) {
+                    // TODO: show stream query result
+                    if (sqlParam.isLocal()) {
+                        FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                        flinkSqlParam.setSql(sql);
+                        new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
+                        return (MetadataResult<T>) MetadataResult.buildResult(
+                            new String[0],
+                            new ArrayList<>()
+                        );
+                    }
+                    // TODO: get host and port from config class and give to flink cluster to
+                    // execute
+                    else {}
+                } else {
+                    throw new RuntimeException(
+                        "Stream sql should set the execute engine to flink or auto:" + sql
+                    );
+                }
+            }
+
+            // currently spark only execute select && loadData
             if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
                 if (sqlNode instanceof SqlLoadData) {
-                    sqlParam.setSql(query.sql);
+                    sqlParam.setSql(sql);
                     return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
                 }
 
                 if (sqlNode instanceof SqlSelect) {
-                    sqlParam.setSql(query.sql);
+                    sqlParam.setSql(sql);
                     return new SparkExecutor().execute(new SparkSqlParam(sqlParam));
                 }
             }
@@ -730,7 +761,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
                 executeDdl(context, sqlNode);
                 return new CalciteSignature<>(
-                    query.sql,
+                    sql,
                     ImmutableList.of(),
                     ImmutableMap.of(),
                     null,
@@ -824,7 +855,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         // noinspection unchecked
         final Bindable<T> bindable = preparedResult.getBindable(cursorFactory);
         return new CalciteSignature<>(
-            query.sql,
+            sql,
             parameters,
             preparingStmt.internalParameters,
             jdbcType,
@@ -838,6 +869,50 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             bindable,
             statementType
         );
+    }
+
+    // judge whether sql is executed by flink(stream)
+    private boolean isStreamSql(SqlNode sqlNode, String sql) {
+        // Currently flink engine only supports select & insert ... select...
+        List<String> tableNameList = new ArrayList<>();
+        if (sqlNode instanceof SqlSelect) {
+            List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
+            for (String dbTableName : dbTableNameList) {
+                tableNameList.add(dbTableName.split("\\.")[1]);
+            }
+        }
+        if (sqlNode instanceof SqlInsert
+            && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
+            tableNameList.add(new InsertIntoTableVisitor(sql).getDbTable().split("\\.")[1]);
+            List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
+            for (String dbTableName : dbTableNameList) {
+                tableNameList.add(dbTableName.split("\\.")[1]);
+            }
+        }
+        if (tableNameList.size() > 0) {
+            SqlParam sqlParam = SqlParam.CACHE.get();
+            int streamTableNum = 0;
+            for (String tableName : tableNameList) {
+                org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
+                    sqlParam.getUserName(),
+                    sqlParam.getDbName(),
+                    tableName
+                );
+                if (table.getStorageEngine().equals("kafka")) {
+                    streamTableNum++;
+                }
+            }
+            if (streamTableNum > 0) {
+                if (streamTableNum == tableNameList.size()) {
+                    return true;
+                } else {
+                    throw new RuntimeException("stream sql has non stream table");
+                }
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     private SqlValidator createSqlValidator(Context context, CalciteCatalogReader catalogReader) {

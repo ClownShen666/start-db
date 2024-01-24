@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db;
+package org.urbcomp.cupid.db.flink;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
@@ -24,6 +24,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.urbcomp.cupid.db.util.MetadataUtil;
+import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,13 @@ public class kafkaConnector {
         return MetadataUtil.makeSchemaName(table.getId());
     }
 
-    public static void KafkaCreateTopic(String ip, String topicName) {
+    public static String getKafkaGroup(String dbTableName) {
+        String userName = SqlParam.CACHE.get().getUserName();
+        String dbName = dbTableName.split("\\.")[0];
+        return MetadataUtil.makeCatalog(userName, dbName);
+    }
+
+    public static void createKafkaTopic(String ip, String topicName) {
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ip);
 
@@ -46,7 +53,7 @@ public class kafkaConnector {
         }
     }
 
-    public static void KafkaDeleteTopic(String ip, String topicName) {
+    public static void deleteKafkaTopic(String ip, String topicName) {
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ip);
 
@@ -57,7 +64,7 @@ public class kafkaConnector {
         }
     }
 
-    public static void kafkaProducer(String ip, String topic, List<String> recordList) {
+    public static void produceKafkaMessage(String ip, String topic, List<String> recordList) {
         Properties properties = new Properties();
         properties.put("bootstrap.servers", ip);
         properties.put("key.serializer", StringSerializer.class.getName());

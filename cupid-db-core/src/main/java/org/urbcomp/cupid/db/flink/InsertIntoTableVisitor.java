@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.util;
+package org.urbcomp.cupid.db.flink;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlLexer;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
+import org.urbcomp.cupid.db.util.SqlParam;
 
 public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
@@ -45,12 +46,21 @@ public class InsertIntoTableVisitor extends CupidDBSqlBaseVisitor<Void> {
         selectStmtContext = ctx.selectStmt();
         if (tableNameCtx.identItem().size() == 1) {
             table = tableNameCtx.getText();
-            dbTable = FlinkSqlParam.CACHE.get().getDbName() + "." + tableNameCtx.getText();
-        } else {
+            dbTable = SqlParam.CACHE.get().getDbName() + "." + tableNameCtx.getText();
+        } else if (tableNameCtx.identItem().size() == 2) {
             table = tableNameCtx.identItem(0).getText() + "." + tableNameCtx.identItem(1).getText();
             dbTable = tableNameCtx.identItem(0).getText()
                 + "."
                 + tableNameCtx.identItem(1).getText();
+        } else {
+            table = tableNameCtx.identItem(0).getText()
+                + "."
+                + tableNameCtx.identItem(1).getText()
+                + "."
+                + tableNameCtx.identItem(2).getText();
+            dbTable = tableNameCtx.identItem(1).getText()
+                + "."
+                + tableNameCtx.identItem(2).getText();
         }
         return null;
     }

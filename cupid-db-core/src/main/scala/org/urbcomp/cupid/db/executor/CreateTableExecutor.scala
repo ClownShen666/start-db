@@ -31,7 +31,7 @@ import org.urbcomp.cupid.db.transformer.{
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil}
-import org.urbcomp.cupid.db.kafkaConnector.{KafkaCreateTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.flink.kafkaConnector.{createKafkaTopic, getKafkaTopic}
 
 import scala.collection.JavaConverters._
 
@@ -89,7 +89,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         // create stream table(topic) in kafka
         // TODO: get ip from DynamicConfig
         if (n.stream) {
-          KafkaCreateTopic("localhost:9092", getKafkaTopic(createdTable))
+          createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
         }
 
         // create table in hbase

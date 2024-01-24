@@ -45,7 +45,6 @@ public class SparkSqlParam extends SqlParam {
         this.setExecuteEngine(sqlParam.getExecuteEngine());
         this.setSql(sqlParam.getSql());
         final Map<String, String> options = sqlParam.getOptions();
-        this.isLocal = Boolean.parseBoolean(options.getOrDefault("spark.local", "true"));
         this.async = Boolean.parseBoolean(options.getOrDefault("spark.async", "false"));
         this.exportType = DataExportType.valueOf(
             options.getOrDefault("spark.exportType", "local").toUpperCase()
@@ -54,8 +53,6 @@ public class SparkSqlParam extends SqlParam {
         this.redisPort = Integer.parseInt(options.getOrDefault("spark.redis.port", "0"));
         this.redisAuth = options.getOrDefault("spark.redis.auth", null);
     }
-
-    private boolean isLocal;
 
     private String hbaseZookeepers;
     /**
@@ -71,14 +68,6 @@ public class SparkSqlParam extends SqlParam {
     private String redisHost = null;
     private int redisPort;
     private String redisAuth = null;
-
-    public boolean isLocal() {
-        return isLocal;
-    }
-
-    public void setLocal(boolean local) {
-        isLocal = local;
-    }
 
     public String getHbaseZookeepers() {
         return hbaseZookeepers;

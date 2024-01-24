@@ -166,7 +166,7 @@ public class DriverTest {
         final Properties conf = new Properties();
         conf.put("user", DEFAULT_USER);
         conf.put("password", DEFAULT_PASSWORD);
-        conf.put("engine", "spark_local");
+        conf.put("engine", "spark");
         conf.put("spark.local", "true");
         conf.put("spark.async", "false");
         conf.put("spark.exportType", "local");
@@ -189,7 +189,7 @@ public class DriverTest {
         final Properties conf = new Properties();
         conf.put("user", "cupid_db");
         conf.put("password", "cupid-db");
-        conf.put("engine", "spark_cluster");
+        conf.put("engine", "spark");
         conf.put("spark.local", "false");
         conf.put("spark.async", "false");
         conf.put("spark.exportType", "cache");
