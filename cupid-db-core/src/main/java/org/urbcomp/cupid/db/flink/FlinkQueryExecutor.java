@@ -25,7 +25,9 @@ import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
@@ -35,6 +37,7 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.SqlParam;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +46,27 @@ import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
 
 public class FlinkQueryExecutor {
+    private StreamExecutionEnvironment env;
+
+    private StreamTableEnvironment tableEnv;
 
     private SqlNode sqlNode = null;
+
+    public StreamExecutionEnvironment getEnv() {
+        return env;
+    }
+
+    public void setEnv(StreamExecutionEnvironment env) {
+        this.env = env;
+    }
+
+    public StreamTableEnvironment getTableEnv() {
+        return tableEnv;
+    }
+
+    public void setTableEnv(StreamTableEnvironment tableEnv) {
+        this.tableEnv = tableEnv;
+    }
 
     public FlinkQueryExecutor() {}
 
@@ -59,6 +81,15 @@ public class FlinkQueryExecutor {
         } else {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
+        if (param.isLocal()) setEnv(StreamExecutionEnvironment.getExecutionEnvironment());
+        setEnv(
+            StreamExecutionEnvironment.createRemoteEnvironment(
+                param.getHost(),
+                param.getPort(),
+                param.getJarFilesPath()
+            )
+        );
+        setTableEnv(StreamTableEnvironment.create(getEnv()));
         String sql = param.getSql();
         if (sqlNode == null) {
             sqlNode = CupidDBParseDriver.parseSql(sql);
@@ -77,11 +108,12 @@ public class FlinkQueryExecutor {
                 registerUdf(param);
 
                 // execute and return select result stream
-                DataStream<Row> resultStream = param.getTableEnv()
-                    .toChangelogStream(param.getTableEnv().sqlQuery(sql));
+                DataStream<Row> resultStream = getTableEnv().toChangelogStream(
+                    getTableEnv().sqlQuery(sql)
+                );
                 try {
                     if (param.getTestNum() == 0) {
-                        param.getEnv().execute();
+                        getEnv().execute();
                     } else {
                         resultStream.executeAndCollect(param.getTestNum());
                     }
@@ -113,8 +145,8 @@ public class FlinkQueryExecutor {
                 registerUdf(param);
 
                 // get select result
-                Table resultTable = param.getTableEnv().sqlQuery(selectSql);
-                DataStream<Row> resultStream2 = param.getTableEnv().toChangelogStream(resultTable);
+                Table resultTable = getTableEnv().sqlQuery(selectSql);
+                DataStream<Row> resultStream2 = getTableEnv().toChangelogStream(resultTable);
 
                 // write result to kafka
                 org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
@@ -126,7 +158,7 @@ public class FlinkQueryExecutor {
                 // execute and return select result
                 try {
                     if (param.getTestNum() == 0) {
-                        param.getEnv().execute();
+                        getEnv().execute();
                     } else {
                         resultStream2.executeAndCollect(param.getTestNum());
                     }
@@ -166,13 +198,14 @@ public class FlinkQueryExecutor {
             fieldNameList.add(field.getName());
         }
         StringToRow stringToRow = new StringToRow(fieldNameList, fieldTypeList);
-        DataStream<Row> source = param.getEnv()
-            .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "source")
-            .map(stringToRow)
-            .returns(stringToRow.getRowTypeInfo());
+        DataStream<Row> source = getEnv().fromSource(
+            kafkaSource,
+            WatermarkStrategy.noWatermarks(),
+            "source"
+        ).map(stringToRow).returns(stringToRow.getRowTypeInfo());
 
         // create sourceTable in tableEnv
-        param.getTableEnv().createTemporaryView(tableName, source);
+        getTableEnv().createTemporaryView(tableName, source);
     }
 
     public void loadTables(
@@ -202,12 +235,13 @@ public class FlinkQueryExecutor {
                 fieldNameList.add(field.getName());
             }
             StringToRow stringToRow = new StringToRow(fieldNameList, fieldTypeList);
-            DataStream<Row> source = param.getEnv()
-                .fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "source")
-                .map(stringToRow)
-                .returns(stringToRow.getRowTypeInfo());
+            DataStream<Row> source = getEnv().fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "source"
+            ).map(stringToRow).returns(stringToRow.getRowTypeInfo());
             // create sourceTable in tableEnv
-            param.getTableEnv().createTemporaryView(tableNameList.get(i), source);
+            getTableEnv().createTemporaryView(tableNameList.get(i), source);
         }
     }
 
@@ -441,11 +475,10 @@ public class FlinkQueryExecutor {
     public void registerUdf(FlinkSqlParam param) {
         List<Class<?>> udfClasses = loadUdfClasses(this.getClass().getResource("").toString());
         for (Class<?> udfClass : udfClasses) {
-            param.getTableEnv()
-                .createTemporaryFunction(
-                    udfClass.getName().replace("org.urbcomp.cupid.db.flink.udf.", ""),
-                    (Class<? extends UserDefinedFunction>) udfClass
-                );
+            getTableEnv().createTemporaryFunction(
+                udfClass.getName().replace("org.urbcomp.cupid.db.flink.udf.", ""),
+                (Class<? extends UserDefinedFunction>) udfClass
+            );
         }
     }
 
