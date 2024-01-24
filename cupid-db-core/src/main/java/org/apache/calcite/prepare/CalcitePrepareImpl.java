@@ -102,7 +102,6 @@ import java.sql.Types;
 import java.util.*;
 
 import static org.apache.calcite.util.Static.RESOURCE;
-import static org.urbcomp.cupid.db.config.ExecuteEngine.*;
 
 /**
  * Shit just got real.
@@ -708,27 +707,31 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             Hook.PARSE_TREE.run(new Object[] { sql, sqlNode });
             final SqlParam sqlParam = SqlParam.CACHE.get();
 
+            // execute stream sql
             if (isStreamSql(sqlNode, sql)) {
-                // TODO: show stream query result
-                if (sqlParam.getExecuteEngine() == LOCAL) {
-                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                    flinkSqlParam.setSql(sql);
-                    new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
-                    return (MetadataResult<T>) MetadataResult.buildResult(
-                        new String[0],
-                        new ArrayList<>()
-                    );
-                }
-                // TODO: get host and port from config class and give to flink cluster to execute
-                else if (sqlParam.getExecuteEngine() == CLUSTER) {
-
+                // currently flink only execute select && insert ... select ...
+                if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())) {
+                    // TODO: show stream query result
+                    if (sqlParam.isLocal()) {
+                        FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                        flinkSqlParam.setSql(sql);
+                        new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
+                        return (MetadataResult<T>) MetadataResult.buildResult(
+                            new String[0],
+                            new ArrayList<>()
+                        );
+                    }
+                    // TODO: get host and port from config class and give to flink cluster to
+                    // execute
+                    else {}
                 } else {
                     throw new RuntimeException(
-                        "Wrong ExecuteEngine:" + sqlParam.getExecuteEngine()
+                        "Stream sql should set the execute engine to flink or auto:" + sql
                     );
                 }
             }
 
+            // currently spark only execute select && loadData
             if (ExecuteEngine.isSpark(sqlParam.getExecuteEngine())) {
                 if (sqlNode instanceof SqlLoadData) {
                     sqlParam.setSql(sql);

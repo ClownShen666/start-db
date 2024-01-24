@@ -80,7 +80,11 @@ public class FlinkQueryExecutor {
                 DataStream<Row> resultStream = param.getTableEnv()
                     .toChangelogStream(param.getTableEnv().sqlQuery(sql));
                 try {
-                    resultStream.executeAndCollect();
+                    if (param.getTestNum() == 0) {
+                        param.getEnv().execute();
+                    } else {
+                        resultStream.executeAndCollect(param.getTestNum());
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -121,7 +125,11 @@ public class FlinkQueryExecutor {
 
                 // execute and return select result
                 try {
-                    resultStream2.executeAndCollect();
+                    if (param.getTestNum() == 0) {
+                        param.getEnv().execute();
+                    } else {
+                        resultStream2.executeAndCollect(param.getTestNum());
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

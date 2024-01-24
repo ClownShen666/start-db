@@ -47,7 +47,7 @@ public class SparkExecutorTest {
 
         final SparkSqlParam param = new SparkSqlParam();
         param.setLocal(false);
-        param.setExecuteEngine(ExecuteEngine.SPARK_CLUSTER);
+        param.setExecuteEngine(ExecuteEngine.SPARK);
         param.setExportType(DataExportType.PRINT);
         param.setSql("select 1+1");
         final MetadataResult<Object> res = executor.execute(param);
@@ -59,7 +59,7 @@ public class SparkExecutorTest {
         final SparkExecutor executor = new SparkExecutor();
         final SparkSqlParam param = new SparkSqlParam();
         param.setLocal(true);
-        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExecuteEngine(ExecuteEngine.SPARK);
         param.setExportType(DataExportType.LOCAL);
         param.setSql("select 1+1");
         final MetadataResult<Object> res = executor.execute(param);
@@ -84,7 +84,7 @@ public class SparkExecutorTest {
         final SparkExecutor executor = new SparkExecutor();
         final SparkSqlParam param = new SparkSqlParam();
         param.setLocal(true);
-        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExecuteEngine(ExecuteEngine.SPARK);
         param.setExportType(DataExportType.LOCAL);
         param.setSql(sql);
         param.setUserName(userName);
@@ -174,7 +174,7 @@ public class SparkExecutorTest {
         final SparkExecutor executor = new SparkExecutor();
         final SparkSqlParam param = new SparkSqlParam();
         param.setLocal(true);
-        param.setExecuteEngine(ExecuteEngine.SPARK_LOCAL);
+        param.setExecuteEngine(ExecuteEngine.SPARK);
         param.setExportType(DataExportType.LOCAL);
         System.out.println(sql);
         param.setSql(sql);

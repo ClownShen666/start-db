@@ -29,7 +29,7 @@ public class FlinkSqlParam extends SqlParam {
 
     private String bootstrapServers;
 
-    private int testNum;
+    private int testNum = 0;
 
     public FlinkSqlParam() {}
 

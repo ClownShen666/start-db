@@ -20,23 +20,22 @@ package org.urbcomp.cupid.db.config;
  * @author jimo
  **/
 public enum ExecuteEngine {
+    /**
+     * 默认执行引擎
+     */
     CALCITE("calcite"),
     /**
-     * 表示在本地起一个local模式的spark执行，用于测试
+     * 自动选择执行引擎
      */
-    SPARK_LOCAL("spark_local"),
+    AUTO("auto"),
     /**
-     * 提交到远程spark执行
+     * 提交给spark执行
      */
-    SPARK_CLUSTER("spark_cluster"),
+    SPARK("spark"),
     /**
-     * 表示在本地执行
+     * 提交给flink执行
      */
-    LOCAL("local"),
-    /**
-     * 提交到远程集群执行
-     */
-    CLUSTER("cluster");
+    FLINK("flink");
 
     private String value;
 
@@ -53,6 +52,10 @@ public enum ExecuteEngine {
     }
 
     public static boolean isSpark(ExecuteEngine engine) {
-        return (engine == SPARK_LOCAL || engine == SPARK_CLUSTER);
+        return (engine == SPARK || engine == AUTO);
+    }
+
+    public static boolean isFlink(ExecuteEngine engine) {
+        return (engine == FLINK || engine == AUTO);
     }
 }
