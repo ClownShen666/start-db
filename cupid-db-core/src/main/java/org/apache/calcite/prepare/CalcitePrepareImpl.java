@@ -884,8 +884,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         if (sqlNode instanceof SqlInsert
             && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
             tableNameList.add(new InsertIntoTableVisitor(sql).getDbTable().split("\\.")[1]);
-            String selectSql = "select " + sql.split(" (?i)select ")[1];
-            List<String> dbTableNameList = new SelectFromTableVisitor(selectSql).getDbTableList();
+            List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
             for (String dbTableName : dbTableNameList) {
                 tableNameList.add(dbTableName.split("\\.")[1]);
             }

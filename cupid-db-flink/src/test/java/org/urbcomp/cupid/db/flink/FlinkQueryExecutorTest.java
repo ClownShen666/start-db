@@ -55,7 +55,7 @@ public class FlinkQueryExecutorTest {
         sqlParam.setExecuteEngine(ExecuteEngine.FLINK);
         SqlParam.CACHE.set(sqlParam);
         FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
-        // flinkSqlParam.setTestNum(1);
+        flinkSqlParam.setTestNum(1);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
@@ -113,7 +113,7 @@ public class FlinkQueryExecutorTest {
         sqlParam.setExecuteEngine(ExecuteEngine.FLINK);
         SqlParam.CACHE.set(sqlParam);
         FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
-        // flinkSqlParam.setTestNum(1);
+        flinkSqlParam.setTestNum(1);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
