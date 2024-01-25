@@ -81,14 +81,19 @@ public class FlinkQueryExecutor {
         } else {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
-        if (param.isLocal()) setEnv(StreamExecutionEnvironment.getExecutionEnvironment());
-        setEnv(
-            StreamExecutionEnvironment.createRemoteEnvironment(
-                param.getHost(),
-                param.getPort(),
-                param.getJarFilesPath()
-            )
-        );
+
+        if (param.isLocal()) {
+            if (getEnv() == null) setEnv(StreamExecutionEnvironment.getExecutionEnvironment());
+        } else {
+            if (getEnv() == null) setEnv(
+                StreamExecutionEnvironment.createRemoteEnvironment(
+                    param.getHost(),
+                    param.getPort(),
+                    param.getJarFilesPath()
+                )
+            );
+
+        }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
         String sql = param.getSql();
         if (sqlNode == null) {
