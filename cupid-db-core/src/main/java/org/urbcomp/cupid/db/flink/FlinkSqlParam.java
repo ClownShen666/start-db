@@ -16,16 +16,38 @@
  */
 package org.urbcomp.cupid.db.flink;
 
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 public class FlinkSqlParam extends SqlParam {
     public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
-    private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    private String host;
+    private int port;
+    private String jarFilesPath;
 
-    private StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getJarFilesPath() {
+        return jarFilesPath;
+    }
+
+    public void setJarFilesPath(String jarFilesPath) {
+        this.jarFilesPath = jarFilesPath;
+    }
 
     private String bootstrapServers;
 
@@ -39,22 +61,6 @@ public class FlinkSqlParam extends SqlParam {
         this.setExecuteEngine(sqlParam.getExecuteEngine());
         this.setSql(sqlParam.getSql());
         this.bootstrapServers = "localhost:9092";
-    }
-
-    public StreamExecutionEnvironment getEnv() {
-        return env;
-    }
-
-    public void setEnv(StreamExecutionEnvironment env) {
-        this.env = env;
-    }
-
-    public StreamTableEnvironment getTableEnv() {
-        return tableEnv;
-    }
-
-    public void setTableEnv(StreamTableEnvironment tableEnv) {
-        this.tableEnv = tableEnv;
     }
 
     public String getBootstrapServers() {
