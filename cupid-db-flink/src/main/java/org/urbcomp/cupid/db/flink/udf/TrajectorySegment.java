@@ -20,15 +20,16 @@ import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.annotation.FunctionHint;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.urbcomp.cupid.db.flink.algorithm.step.local.LocalProcessFunctionGrid;
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.PointList;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.Result;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
+import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @FunctionHint(output = @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class))
-public class TrajectorySegment extends AggregateFunction<List<PointList>, Result> {
+public class TrajectorySegment extends AggregateFunction<List<Trajectory>, Result> {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,20 +41,28 @@ public class TrajectorySegment extends AggregateFunction<List<PointList>, Result
     }
 
     @Override
-    public List<PointList> getValue(
+    public List<Trajectory> getValue(
         @DataTypeHint(value = "RAW", bridgedTo = Result.class) Result pointLists
     ) {
         if (pointLists.pointLists != null) {
             List<PointList> result = new ArrayList<>(pointLists.pointLists);
+            List<Trajectory> res = new ArrayList<>();
+            result.forEach(pointList -> {
+                // * @param tid the id of Trajectory, should be unique in a trajectory database
+                // * @param oid the object id of a trajectory, such as plate number
+                Trajectory tmp = new Trajectory(pointList.getPointList().get(0).getTid(), "");
+                pointList.getPointList().forEach(tmp::addGPSPoint);
+                res.add(tmp);
+            });
             pointLists.pointLists.clear();
-            return result;
+            return res;
         }
         return null;
     }
 
     public void accumulate(
         @DataTypeHint(value = "RAW", bridgedTo = Result.class) Result acc,
-        GpsPoint point
+        @DataTypeHint(value = "RAW", bridgedTo = SegGpsPoint.class) SegGpsPoint point
     ) {
         STEP_GRID.process(point, acc.pointLists);
     }

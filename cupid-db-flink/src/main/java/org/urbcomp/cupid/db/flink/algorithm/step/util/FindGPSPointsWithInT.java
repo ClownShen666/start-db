@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db.flink.algorithm.step.util;
 
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 
 import java.util.List;
 
@@ -24,11 +24,11 @@ import java.util.List;
  * @author syy
  */
 public class FindGPSPointsWithInT {
-    public static int findIndex(List<GpsPoint> pointList, long t) {
+    public static int findIndex(List<SegGpsPoint> pointList, long t) {
         int size = pointList.size();
-        long maxT = pointList.get(size - 1).getIngestionTime();
+        long maxT = pointList.get(size - 1).getTime().getTime();
         int i = 0;
-        while (i < size && maxT - pointList.get(i).getIngestionTime() >= t) {
+        while (i < size && maxT - pointList.get(i).getTime().getTime() >= t) {
             i++;
         }
         return i + 1;

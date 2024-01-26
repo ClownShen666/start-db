@@ -18,8 +18,8 @@ package org.urbcomp.cupid.db.flink.algorithm.step.local;
 
 import org.urbcomp.cupid.db.flink.algorithm.step.index.Grid;
 import org.urbcomp.cupid.db.flink.algorithm.step.method.staypointsegment.StayPointSegmentWithGridOpt;
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.PointList;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 
 import java.io.Serializable;
 import java.util.List;
@@ -63,7 +63,7 @@ public class LocalProcessFunctionGrid implements Serializable {
         pointList = new PointList();
     }
 
-    public void process(GpsPoint point, List<PointList> result) {
+    public void process(SegGpsPoint point, List<PointList> result) {
         if (!result.isEmpty()) {
             result.clear();
         }

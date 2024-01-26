@@ -18,23 +18,24 @@ package org.urbcomp.cupid.db.flink.source;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.sql.Timestamp;
 import java.text.ParseException;
 
-public class GPSSource implements SourceFunction<Tuple2<String, GpsPoint>> {
+public class GPSSource implements SourceFunction<Tuple2<String, SegGpsPoint>> {
 
     @Override
-    public void run(SourceContext<Tuple2<String, GpsPoint>> sourceContext) throws Exception {
+    public void run(SourceContext<Tuple2<String, SegGpsPoint>> sourceContext) throws Exception {
         for (int i = 1; i <= 500; i++) {
             BufferedReader reader = new BufferedReader(
                 new FileReader("src/main/resources/batch-taxi-1000/taxi-1000-" + i + ".txt")
             );
             String line;
             while ((line = reader.readLine()) != null) {
-                GpsPoint gpsPoint = mapFunction(line);
+                SegGpsPoint gpsPoint = mapFunction(line);
                 sourceContext.collect(Tuple2.of(gpsPoint.getTid(), gpsPoint));
             }
         }
@@ -43,7 +44,7 @@ public class GPSSource implements SourceFunction<Tuple2<String, GpsPoint>> {
     @Override
     public void cancel() {}
 
-    private GpsPoint mapFunction(String line) throws ParseException {
+    private SegGpsPoint mapFunction(String line) throws ParseException {
         String[] result = line.replace("'", "")
             .replace("[", "")
             .replace("]", "")
@@ -66,7 +67,12 @@ public class GPSSource implements SourceFunction<Tuple2<String, GpsPoint>> {
             + t2.substring(2, 4)
             + ":"
             + t2.substring(4, 6);
-        return new GpsPoint(Double.parseDouble(lng), Double.parseDouble(lat), tid, time, 0);
+        return new SegGpsPoint(
+            Timestamp.valueOf(time),
+            Double.parseDouble(lng),
+            Double.parseDouble(lat),
+            tid
+        );
     }
 
 }

@@ -26,16 +26,16 @@ import java.util.List;
 public class PointList implements Serializable {
 
     // temporary gps point list
-    public List<GpsPoint> pointList = new ArrayList<>();
+    private List<SegGpsPoint> pointList = new ArrayList<>();
     // indicates the presence or absence of stay point
-    public boolean hasStayPoint = false;
+    private boolean hasStayPoint = false;
 
-    public void setPointList(List<GpsPoint> pointList) {
+    public void setPointList(List<SegGpsPoint> pointList) {
         this.pointList = pointList;
     }
 
     // the location of stay point(total), inclusive
-    public int stayPointStartGlobalIndex = -1;
+    private int stayPointStartGlobalIndex = -1;
 
     public boolean isHasStayPoint() {
         return hasStayPoint;
@@ -69,16 +69,16 @@ public class PointList implements Serializable {
         this.stayPointEndLocalIndex = stayPointEndLocalIndex;
     }
 
-    public int stayPointEndGlobalIndex = -1;
-    public int stayPointEndLocalIndex = -1;
+    private int stayPointEndGlobalIndex = -1;
+    private int stayPointEndLocalIndex = -1;
 
     public PointList() {}
 
-    public void add(GpsPoint p) {
+    public void add(SegGpsPoint p) {
         pointList.add(p);
     }
 
-    public List<GpsPoint> getPointList() {
+    public List<SegGpsPoint> getPointList() {
         return pointList;
     }
 
