@@ -16,25 +16,26 @@
  */
 package org.urbcomp.cupid.db.flink.algorithm.step.object;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author syy
  **/
-public class PointList {
+public class PointList implements Serializable {
 
     // temporary gps point list
-    private List<GpsPoint> pointList = new ArrayList<>();
+    public List<GpsPoint> pointList = new ArrayList<>();
     // indicates the presence or absence of stay point
-    private boolean hasStayPoint = false;
+    public boolean hasStayPoint = false;
 
     public void setPointList(List<GpsPoint> pointList) {
         this.pointList = pointList;
     }
 
     // the location of stay point(total), inclusive
-    private int stayPointStartGlobalIndex = -1;
+    public int stayPointStartGlobalIndex = -1;
 
     public boolean isHasStayPoint() {
         return hasStayPoint;
@@ -68,8 +69,8 @@ public class PointList {
         this.stayPointEndLocalIndex = stayPointEndLocalIndex;
     }
 
-    private int stayPointEndGlobalIndex = -1;
-    private int stayPointEndLocalIndex = -1;
+    public int stayPointEndGlobalIndex = -1;
+    public int stayPointEndLocalIndex = -1;
 
     public PointList() {}
 

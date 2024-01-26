@@ -30,6 +30,8 @@ public class LocalProcessFunctionGrid implements Serializable {
     private long minT;
     private Grid grid;
 
+    private PointList pointList;
+
     public double getMaxD() {
         return maxD;
     }
@@ -58,9 +60,13 @@ public class LocalProcessFunctionGrid implements Serializable {
         this.maxD = maxD;
         this.minT = minT;
         grid = new Grid(maxD, gridSize);
+        pointList = new PointList();
     }
 
-    public void process(PointList pointList, GpsPoint point, List<PointList> result) {
+    public void process(GpsPoint point, List<PointList> result) {
+        if (!result.isEmpty()){
+            result.clear();
+        }
         grid.calGirdId(point);
         pointList.add(point);
         StayPointSegmentWithGridOpt stayPointSegment = new StayPointSegmentWithGridOpt(
