@@ -64,7 +64,7 @@ public class LocalProcessFunctionGrid implements Serializable {
     }
 
     public void process(GpsPoint point, List<PointList> result) {
-        if (!result.isEmpty()){
+        if (!result.isEmpty()) {
             result.clear();
         }
         grid.calGirdId(point);
