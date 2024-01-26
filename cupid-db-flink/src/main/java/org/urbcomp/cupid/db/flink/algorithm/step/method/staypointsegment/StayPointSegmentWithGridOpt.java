@@ -18,8 +18,8 @@ package org.urbcomp.cupid.db.flink.algorithm.step.method.staypointsegment;
 
 import org.urbcomp.cupid.db.flink.algorithm.step.index.AreaEnum;
 import org.urbcomp.cupid.db.flink.algorithm.step.index.Grid;
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.PointList;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 import org.urbcomp.cupid.db.flink.algorithm.step.util.CalculateDistance;
 
 import java.util.ArrayList;
@@ -49,17 +49,20 @@ public class StayPointSegmentWithGridOpt {
     }
 
     public void stayPointDetection() {
-        GpsPoint latestGPSPoint = pointList.getPointList().get(pointList.getPointList().size() - 1);
+        SegGpsPoint latestGPSPoint = pointList.getPointList()
+            .get(pointList.getPointList().size() - 1);
         for (int i = pointList.getPointList().size() - 2; i >= 0; i--) {
             double distance;
-            GpsPoint nowPoint = pointList.getPointList().get(i);
+            SegGpsPoint nowPoint = pointList.getPointList().get(i);
             AreaEnum area = grid.getArea(nowPoint, latestGPSPoint);
             if (area == AreaEnum.CHECK_AREA) {
                 distance = CalculateDistance.calDistance(latestGPSPoint, nowPoint);
                 if (distance > maxD) {
-                    long timeInterval = latestGPSPoint.getIngestionTime() - pointList.getPointList()
+                    long timeInterval = latestGPSPoint.getTime().getTime() - pointList
+                        .getPointList()
                         .get(i + 1)
-                        .getIngestionTime();
+                        .getTime()
+                        .getTime();
                     if (timeInterval > minT) {
                         // 找到了驻留点
                         if (pointList.isHasStayPoint()) {
@@ -78,9 +81,10 @@ public class StayPointSegmentWithGridOpt {
                     return;
                 }
             } else if (area == AreaEnum.PRUNED_AREA) {
-                long timeInterval = latestGPSPoint.getIngestionTime() - pointList.getPointList()
+                long timeInterval = latestGPSPoint.getTime().getTime() - pointList.getPointList()
                     .get(i + 1)
-                    .getIngestionTime();
+                    .getTime()
+                    .getTime();
                 if (timeInterval > minT) {
                     // 找到了驻留点
                     if (pointList.isHasStayPoint()) {
@@ -128,9 +132,9 @@ public class StayPointSegmentWithGridOpt {
             }
         } else {
             // Case 2.1 Far Away from the Stay Point
-            GpsPoint latestGPSPoint = pointList.getPointList()
+            SegGpsPoint latestGPSPoint = pointList.getPointList()
                 .get(pointList.getPointList().size() - 1);
-            GpsPoint stayPointEnd = pointList.getPointList()
+            SegGpsPoint stayPointEnd = pointList.getPointList()
                 .get(pointList.getStayPointEndLocalIndex() - 1);
             AreaEnum area = grid.getArea(stayPointEnd, latestGPSPoint);
             if (area == AreaEnum.CHECK_AREA) {

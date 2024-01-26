@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Result {
-
     public @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class) List<PointList> pointLists =
         new ArrayList<>();
 

@@ -16,10 +16,10 @@
  */
 package org.urbcomp.cupid.db.flink.algorithm.step.util;
 
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 
 public class CalculateDistance {
-    public static double calDistance(GpsPoint p1, GpsPoint p2) {
+    public static double calDistance(SegGpsPoint p1, SegGpsPoint p2) {
 
         /*double radLat1 = calRad(p1.lat);
         double radLon1 = calRad(p1.lng);

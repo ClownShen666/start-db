@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db.flink.algorithm.step.index;
 
-import org.urbcomp.cupid.db.flink.algorithm.step.object.GpsPoint;
+import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 
 import java.io.Serializable;
 
@@ -46,12 +46,12 @@ public class Grid implements Serializable {
         this.squareArray = initializeSquareArray();
     }
 
-    public void calGirdId(GpsPoint point) {
+    public void calGirdId(SegGpsPoint point) {
         point.setLatCol((int) ((point.getLat() - LAT1) / deltaLat));
         point.setLonCol((int) ((point.getLng() - LNG1) / deltaLon));
     }
 
-    public AreaEnum getArea(GpsPoint p0, GpsPoint p1) {
+    public AreaEnum getArea(SegGpsPoint p0, SegGpsPoint p1) {
         int diffLon = Math.abs(p1.getLonCol() - p0.getLonCol());
         int diffLat = Math.abs(p1.getLatCol() - p0.getLatCol());
         int diffLonMinusOne = diffLon - 1;
