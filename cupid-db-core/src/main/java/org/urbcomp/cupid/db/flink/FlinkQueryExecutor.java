@@ -46,9 +46,9 @@ import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
 
 public class FlinkQueryExecutor {
-    private StreamExecutionEnvironment env;
+    private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-    private StreamTableEnvironment tableEnv;
+    private StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
 
     private SqlNode sqlNode = null;
 
@@ -82,17 +82,19 @@ public class FlinkQueryExecutor {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
 
-        if (param.isLocal()) {
-            if (getEnv() == null) setEnv(StreamExecutionEnvironment.getExecutionEnvironment());
-        } else {
-            if (getEnv() == null) setEnv(
+        if (!param.isLocal()) {
+            if (param.getHost() == null
+                || param.getPort() == null
+                || param.getJarFilesPath() == null) {
+                throw new IllegalArgumentException("Flink remote parameters are null.");
+            }
+            setEnv(
                 StreamExecutionEnvironment.createRemoteEnvironment(
                     param.getHost(),
                     param.getPort(),
                     param.getJarFilesPath()
                 )
             );
-
         }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
         String sql = param.getSql();

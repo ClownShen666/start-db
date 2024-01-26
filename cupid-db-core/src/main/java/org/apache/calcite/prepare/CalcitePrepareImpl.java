@@ -711,19 +711,14 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             if (isStreamSql(sqlNode, sql)) {
                 // currently flink only execute select && insert ... select ...
                 if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())) {
-                    // TODO: show stream query result
-                    if (sqlParam.isLocal()) {
-                        FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                        flinkSqlParam.setSql(sql);
-                        new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
-                        return (MetadataResult<T>) MetadataResult.buildResult(
-                            new String[0],
-                            new ArrayList<>()
-                        );
-                    }
-                    // TODO: get host and port from config class and give to flink cluster to
-                    // execute
-                    else {}
+                    // TODO: show stream query result, now return null result
+                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                    flinkSqlParam.setSql(sql);
+                    new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
+                    return (MetadataResult<T>) MetadataResult.buildResult(
+                        new String[0],
+                        new ArrayList<>()
+                    );
                 } else {
                     throw new RuntimeException(
                         "Stream sql should set the execute engine to flink or auto:" + sql
