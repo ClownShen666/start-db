@@ -55,8 +55,7 @@ public class TrajectorySegment extends AggregateFunction<List<PointList>, Result
         @DataTypeHint(value = "RAW", bridgedTo = Result.class) Result acc,
         GpsPoint point
     ) {
-        acc.pointList.add(point);
-        STEP_GRID.process(acc.pointList, point, acc.pointLists);
+        STEP_GRID.process(point, acc.pointLists);
     }
 
 }

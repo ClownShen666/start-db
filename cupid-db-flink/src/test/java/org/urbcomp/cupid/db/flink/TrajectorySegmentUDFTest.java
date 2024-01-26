@@ -30,7 +30,7 @@ import org.urbcomp.cupid.db.flink.udf.TrajectorySegment;
 public class TrajectorySegmentUDFTest {
     @Test
     @Ignore
-    public void main() throws Exception {
+    public void TrajectorySegment() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
         tableEnv.createTemporaryFunction("seg", TrajectorySegment.class);
