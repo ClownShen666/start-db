@@ -21,9 +21,9 @@ import org.urbcomp.cupid.db.util.SqlParam;
 public class FlinkSqlParam extends SqlParam {
     public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
-    private String host;
-    private int port;
-    private String jarFilesPath;
+    private String host = null;
+    private Integer port = null;
+    private String jarFilesPath = null;
 
     public String getHost() {
         return host;
@@ -33,7 +33,7 @@ public class FlinkSqlParam extends SqlParam {
         this.host = host;
     }
 
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
 
@@ -60,6 +60,7 @@ public class FlinkSqlParam extends SqlParam {
         this.setDbName(sqlParam.getDbName());
         this.setExecuteEngine(sqlParam.getExecuteEngine());
         this.setSql(sqlParam.getSql());
+        this.setLocal(sqlParam.isLocal());
         this.bootstrapServers = "localhost:9092";
     }
 

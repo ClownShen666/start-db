@@ -58,6 +58,13 @@ public class SqlParam {
         this(userName, dbName, ExecuteEngine.CALCITE, null);
     }
 
+    public SqlParam(String userName, String dbName, ExecuteEngine executeEngine, boolean isLocal) {
+        this.userName = userName;
+        this.dbName = dbName;
+        this.executeEngine = executeEngine;
+        this.isLocal = isLocal;
+    }
+
     public SqlParam(
         String userName,
         String dbName,

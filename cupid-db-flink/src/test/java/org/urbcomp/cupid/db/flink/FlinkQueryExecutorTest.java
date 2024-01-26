@@ -26,6 +26,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
@@ -43,20 +44,42 @@ import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.*;
 
-// run the "docker/flink-kafka" before test
+// run the "docker/flink-kafka", "docker/local" and package cupid-db before test
 public class FlinkQueryExecutorTest {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
+    static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
+    static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
+
+    @BeforeClass
+    public static void setParam() {
+        SqlParam.CACHE.set(sqlParam);
+        flinkSqlParam.setTestNum(1);
+        FlinkSqlParam.CACHE.set(flinkSqlParam);
+    }
+
+    @Ignore
+    @Test
+    public void localRemoteSqlTest() throws Exception {
+        boolean[] localRemote = { true, false };
+        for (boolean isLocal : localRemote) {
+            if (!isLocal) {
+                flinkSqlParam.setLocal(false);
+                flinkSqlParam.setHost("localhost");
+                flinkSqlParam.setPort(8081);
+                flinkSqlParam.setJarFilesPath(
+                    "target/cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
+                );
+                FlinkSqlParam.CACHE.set(flinkSqlParam);
+            }
+            streamSelectSqlTest();
+            streamInsertSqlTest();
+        }
+    }
 
     @Ignore
     @Test
     public void streamSelectSqlTest() {
-        SqlParam sqlParam = new SqlParam("root", "default");
-        sqlParam.setExecuteEngine(ExecuteEngine.FLINK);
-        SqlParam.CACHE.set(sqlParam);
-        FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
-        flinkSqlParam.setTestNum(1);
-        FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -99,8 +122,9 @@ public class FlinkQueryExecutorTest {
             // test
             stmt.executeQuery("select * from table1");
             produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+
             // delete topic
-            deleteKafkaTopic("localhost:9092", topicList.get(0));
+            stmt.executeUpdate("drop table if exists table1");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -109,12 +133,6 @@ public class FlinkQueryExecutorTest {
     @Ignore
     @Test
     public void streamInsertSqlTest() throws Exception {
-        SqlParam sqlParam = new SqlParam("root", "default");
-        sqlParam.setExecuteEngine(ExecuteEngine.FLINK);
-        SqlParam.CACHE.set(sqlParam);
-        FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
-        flinkSqlParam.setTestNum(1);
-        FlinkSqlParam.CACHE.set(flinkSqlParam);
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -239,8 +257,8 @@ public class FlinkQueryExecutorTest {
             checkTable(tableEnv, tableEnv.fromDataStream(insertStream), expected);
 
             // delete topic
-            deleteKafkaTopic("localhost:9092", topicList.get(0));
-            deleteKafkaTopic("localhost:9092", topicList.get(1));
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -250,7 +268,6 @@ public class FlinkQueryExecutorTest {
     @Test
     public void selectTest() throws Exception {
         // create table
-        SqlParam.CACHE.set(new SqlParam("root", "default"));
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -269,17 +286,8 @@ public class FlinkQueryExecutorTest {
             throw new RuntimeException(e);
         }
 
-        // set param and get topic names
-        FlinkSqlParam param = new FlinkSqlParam();
-        param.setBootstrapServers("localhost:9092");
-        param.setSql("select * from table1;");
-        param.setUserName("root");
-        param.setDbName("default");
-
-        param.setTestNum(1);
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-
-        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(param.getSql());
+        // get topic names
+        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor("select * from table1;");
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             selectVisitor.getDbTableList()
         );
@@ -302,7 +310,7 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
         // test select sql
-        param.setSql(
+        flinkSqlParam.setSql(
             "select "
                 + "st_geometryFromWKT(st_geometryAsWKT(geometry1)),"
                 + "st_pointFromWKT(st_pointAsWKT(point1)),"
@@ -313,7 +321,8 @@ public class FlinkQueryExecutorTest {
                 + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
                 + " from table1;"
         );
-        DataStream<Row> resultStream = flink.execute(param);
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        DataStream<Row> resultStream = flink.execute(flinkSqlParam);
         List<String> expected = new ArrayList<>();
         expected.add(
             "POINT (90 90), "
@@ -324,7 +333,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)), "
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        checkTable(tableEnv, tableEnv.fromDataStream(resultStream), expected);
+        checkTable(flink.getTableEnv(), flink.getTableEnv().fromDataStream(resultStream), expected);
 
         // delete topic
         deleteKafkaTopic("localhost:9092", topicList.get(0));
@@ -334,7 +343,6 @@ public class FlinkQueryExecutorTest {
     @Test
     public void insertTest() throws Exception {
         // create table
-        SqlParam.CACHE.set(new SqlParam("root", "default"));
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -377,16 +385,10 @@ public class FlinkQueryExecutorTest {
             throw new RuntimeException(e);
         }
 
-        // set param and get topic names
-        FlinkSqlParam param = new FlinkSqlParam();
-        param.setBootstrapServers("localhost:9092");
-        param.setSql("select * from table1 inner join table2;");
-        param.setUserName("root");
-        param.setDbName("default");
-
-        param.setTestNum(1);
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(param.getSql());
+        // get topic names
+        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+            "select * from table1 inner join table2;"
+        );
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             selectVisitor.getDbTableList()
         );
@@ -415,7 +417,7 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
         // test insert sql
-        param.setSql(
+        flinkSqlParam.setSql(
             "insert into table2 "
                 + "select "
                 + "int1,"
@@ -433,7 +435,8 @@ public class FlinkQueryExecutorTest {
                 + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
                 + " from table1;"
         );
-        flink.execute(param);
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        flink.execute(flinkSqlParam);
 
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
             .setBootstrapServers("localhost:9092")
@@ -441,12 +444,13 @@ public class FlinkQueryExecutorTest {
             .setStartingOffsets(OffsetsInitializer.earliest())
             .setValueOnlyDeserializer(new SimpleStringSchema())
             .build();
-        DataStream<String> insertStream = env.fromSource(
-            kafkaSource,
-            WatermarkStrategy.noWatermarks(),
-            "kafkaSource",
-            TypeInformation.of(String.class)
-        );
+        DataStream<String> insertStream = flink.getEnv()
+            .fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            );
         List<String> expected = new ArrayList<>();
         expected.add(
             "1,, "
@@ -463,7 +467,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),, "
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        checkTable(tableEnv, tableEnv.fromDataStream(insertStream), expected);
+        checkTable(flink.getTableEnv(), flink.getTableEnv().fromDataStream(insertStream), expected);
 
         // delete topic
         deleteKafkaTopic("localhost:9092", topicList.get(0));
@@ -474,7 +478,6 @@ public class FlinkQueryExecutorTest {
     @Test
     public void loadTableTest() throws Exception {
         // create table
-        SqlParam.CACHE.set(new SqlParam("root", "default"));
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -501,15 +504,10 @@ public class FlinkQueryExecutorTest {
             throw new RuntimeException(e);
         }
 
-        // set param and get topic names
-        FlinkSqlParam param = new FlinkSqlParam();
-        param.setBootstrapServers("localhost:9092");
-        param.setSql("select * from table1 inner join table2;");
-        param.setUserName("root");
-        param.setDbName("default");
-
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        SelectFromTableVisitor visitor = new SelectFromTableVisitor(param.getSql());
+        // get topic names
+        SelectFromTableVisitor visitor = new SelectFromTableVisitor(
+            "select * from table1 inner join table2;"
+        );
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             visitor.getDbTableList()
         );
@@ -543,11 +541,17 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(1), recordList);
 
         // load table and test
-        flink.loadTables(param, visitor.getTableList(), visitor.getDbTableList(), tableList);
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        flink.loadTables(
+            flinkSqlParam,
+            visitor.getTableList(),
+            visitor.getDbTableList(),
+            tableList
+        );
         Table table1 = flink.getTableEnv().sqlQuery("select * from table1;");
         Table table2 = flink.getTableEnv().sqlQuery("select * from table2;");
-        checkTableNotNull(tableEnv, table1);
-        checkTableNotNull(tableEnv, table2);
+        checkTableNotNull(flink.getTableEnv(), table1);
+        checkTableNotNull(flink.getTableEnv(), table2);
 
         List<String> expected = new ArrayList<>();
         expected.add(
@@ -565,7 +569,7 @@ public class FlinkQueryExecutorTest {
                 + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)), "
                 + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
         );
-        checkTable(tableEnv, table1, expected);
+        checkTable(flink.getTableEnv(), table1, expected);
 
         // delete topic
         deleteKafkaTopic("localhost:9092", topicList.get(0));
@@ -576,7 +580,6 @@ public class FlinkQueryExecutorTest {
     @Test
     public void registerUdfTest() throws Exception {
         // create table
-        SqlParam.CACHE.set(new SqlParam("root", "default"));
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -595,14 +598,8 @@ public class FlinkQueryExecutorTest {
             throw new RuntimeException(e);
         }
 
-        // set param and get topic names
-        FlinkSqlParam param = new FlinkSqlParam();
-        param.setBootstrapServers("localhost:9092");
-        param.setSql("select * from table1;");
-        param.setUserName("root");
-        param.setDbName("default");
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        SelectFromTableVisitor visitor = new SelectFromTableVisitor(param.getSql());
+        // get topic names
+        SelectFromTableVisitor visitor = new SelectFromTableVisitor("select * from table1");
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             visitor.getDbTableList()
         );
@@ -624,119 +621,35 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
         // load table
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
         flink.loadTable(
-            param,
+            flinkSqlParam,
             visitor.getTableList().get(0),
             visitor.getDbTableList().get(0),
             tableList.get(0)
         );
         Table table1 = flink.getTableEnv().sqlQuery("select * from table1;");
-        checkTableNotNull(tableEnv, table1);
+        checkTableNotNull(flink.getTableEnv(), table1);
 
         // register udf and test
-        flink.registerUdf(param);
-        tableEnv.sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(geometry1)) from table1;");
-        tableEnv.sqlQuery("select st_pointFromWKT(st_pointAsWKT(point1)) from table1;");
-        tableEnv.sqlQuery(
-            "select st_lineStringFromWKT(st_lineStringAsWKT(linestring1)) from table1;"
-        );
-        tableEnv.sqlQuery("select st_polygonFromWKT(st_polygonAsWKT(polygon1)) from table1;");
-        tableEnv.sqlQuery(
-            "select st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)) from table1;"
-        );
-        tableEnv.sqlQuery(
-            "select st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)) from table1;"
-        );
-        tableEnv.sqlQuery(
-            "select st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1)) from table1;"
-        );
-
-        // delete topic
-        deleteKafkaTopic("localhost:9092", topicList.get(0));
-    }
-
-    // run the "docker/flink-kafka" and "docker/local" before test and package cupid-db
-    @Ignore
-    @Test
-    public void remoteSelectTest() throws Exception {
-        SqlParam.CACHE.set(new SqlParam("root", "default"));
-        try (Connection connect = CalciteHelper.createConnection()) {
-            Statement stmt = connect.createStatement();
-            stmt.executeUpdate("drop table if exists table1");
-            stmt.executeUpdate(
-                "create table if not exists table1("
-                    + "geometry1 Geometry,"
-                    + "point1 Point,"
-                    + "linestring1 LineString,"
-                    + "polygon1 Polygon,"
-                    + "multipoint1 MultiPoint,"
-                    + "multilinestring1 MultiLineString,"
-                    + "multipolygon1 MultiPolygon,"
-                    + "SPATIAL INDEX indexName(geometry1))"
+        flink.registerUdf(flinkSqlParam);
+        flink.getTableEnv()
+            .sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(geometry1)) from table1;");
+        flink.getTableEnv().sqlQuery("select st_pointFromWKT(st_pointAsWKT(point1)) from table1;");
+        flink.getTableEnv()
+            .sqlQuery("select st_lineStringFromWKT(st_lineStringAsWKT(linestring1)) from table1;");
+        flink.getTableEnv()
+            .sqlQuery("select st_polygonFromWKT(st_polygonAsWKT(polygon1)) from table1;");
+        flink.getTableEnv()
+            .sqlQuery("select st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)) from table1;");
+        flink.getTableEnv()
+            .sqlQuery(
+                "select st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)) from table1;"
             );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        // set param and get topic names
-        FlinkSqlParam param = new FlinkSqlParam();
-        param.setBootstrapServers("localhost:9092");
-        param.setSql("select * from table1;");
-        param.setUserName("root");
-        param.setDbName("default");
-        param.setLocal(false);
-        param.setHost("localhost");
-        param.setPort(8081);
-        param.setJarFilesPath("target/cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar");
-        param.setTestNum(1);
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-
-        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(param.getSql());
-        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-            selectVisitor.getDbTableList()
-        );
-        List<String> topicList = new ArrayList<>();
-        topicList.add(getKafkaTopic(tableList.get(0)));
-
-        // create topic and add message
-        createKafkaTopic("localhost:9092", topicList.get(0));
-        List<String> recordList = new ArrayList<>();
-        recordList.add(
-            "+I["
-                + "POINT (90 90),,"
-                + "POINT (90 90),,"
-                + "LINESTRING (0 0, 1 1, 1 2),,"
-                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
-                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
-                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
-                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
-        );
-        produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-        // test select sql
-        param.setSql(
-            "select "
-                + "st_geometryFromWKT(st_geometryAsWKT(geometry1)),"
-                + "st_pointFromWKT(st_pointAsWKT(point1)),"
-                + "st_lineStringFromWKT(st_lineStringAsWKT(linestring1)),"
-                + "st_polygonFromWKT(st_polygonAsWKT(polygon1)),"
-                + "st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)),"
-                + "st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)),"
-                + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
-                + " from table1;"
-        );
-        DataStream<Row> resultStream = flink.execute(param);
-        List<String> expected = new ArrayList<>();
-        expected.add(
-            "POINT (90 90), "
-                + "POINT (90 90), "
-                + "LINESTRING (0 0, 1 1, 1 2), "
-                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)), "
-                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)), "
-                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)), "
-                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
-        );
-        checkTable(tableEnv, tableEnv.fromDataStream(resultStream), expected);
+        flink.getTableEnv()
+            .sqlQuery(
+                "select st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1)) from table1;"
+            );
 
         // delete topic
         deleteKafkaTopic("localhost:9092", topicList.get(0));
