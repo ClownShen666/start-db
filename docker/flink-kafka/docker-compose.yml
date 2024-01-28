@@ -8,7 +8,7 @@ services:
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
     networks:
-      - flink-net
+      - kafka-net
 
 
   taskmanager:
@@ -19,7 +19,7 @@ services:
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
     networks:
-      - flink-net
+      - kafka-net
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
