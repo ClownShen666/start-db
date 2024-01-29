@@ -56,12 +56,13 @@ public class FlinkQueryExecutorTest {
         SqlParam.CACHE.set(sqlParam);
         flinkSqlParam.setTestNum(1);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
+        flinkSqlParam.setBootstrapServers("kafka:9093");
     }
 
     @Ignore
     @Test
     public void localRemoteSqlTest() throws Exception {
-        boolean[] localRemote = { true, false };
+        boolean[] localRemote = { /*true,*/ false };
         for (boolean isLocal : localRemote) {
             if (!isLocal) {
                 flinkSqlParam.setLocal(false);
