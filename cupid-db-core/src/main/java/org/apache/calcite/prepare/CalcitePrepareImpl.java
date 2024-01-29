@@ -95,6 +95,7 @@ import org.urbcomp.cupid.db.spark.SparkExecutor;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.DatabaseMetaData;
@@ -579,6 +580,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 return prepare2_(context, query, elementType, maxRowCount, catalogReader, planner);
             } catch (RelOptPlanner.CannotPlanException e) {
                 exception = e;
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
         throw exception;
@@ -653,7 +656,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         long maxRowCount,
         CalciteCatalogReader catalogReader,
         RelOptPlanner planner
-    ) {
+    ) throws IOException, ClassNotFoundException {
         String sql = query.sql;
         final JavaTypeFactory typeFactory = context.getTypeFactory();
         final EnumerableRel.Prefer prefer;

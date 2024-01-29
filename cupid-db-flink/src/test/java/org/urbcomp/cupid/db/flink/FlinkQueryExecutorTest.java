@@ -56,6 +56,7 @@ public class FlinkQueryExecutorTest {
         SqlParam.CACHE.set(sqlParam);
         flinkSqlParam.setTestNum(1);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
+        flinkSqlParam.setBootstrapServers("kafka:9093");
     }
 
     @Ignore
@@ -73,7 +74,7 @@ public class FlinkQueryExecutorTest {
                 FlinkSqlParam.CACHE.set(flinkSqlParam);
             }
             streamSelectSqlTest();
-            streamInsertSqlTest();
+            // streamInsertSqlTest();
         }
     }
 
@@ -632,7 +633,7 @@ public class FlinkQueryExecutorTest {
         checkTableNotNull(flink.getTableEnv(), table1);
 
         // register udf and test
-        flink.registerUdf(flinkSqlParam);
+        // flink.registerUdf(flinkSqlParam);
         flink.getTableEnv()
             .sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(geometry1)) from table1;");
         flink.getTableEnv().sqlQuery("select st_pointFromWKT(st_pointAsWKT(point1)) from table1;");

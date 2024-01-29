@@ -96,4 +96,5 @@ public class MainTest {
             runSingleCase(sqlCaseXML);
         }
     }
+
 }

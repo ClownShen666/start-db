@@ -28,6 +28,8 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 import java.util.ArrayList;
 import java.util.List;
 
+@FlinkFunction
+
 @FunctionHint(output = @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class))
 public class TrajectorySegment extends AggregateFunction<List<Trajectory>, Result> {
 
