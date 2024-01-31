@@ -14,21 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf.geometrictypeconversionfunction;
+package org.urbcomp.cupid.db.flink.udf.udt;
 
 import org.apache.flink.table.annotation.DataTypeHint;
-import org.apache.flink.table.functions.ScalarFunction;
 import org.locationtech.jts.geom.Geometry;
-import org.urbcomp.cupid.db.flink.udf.FlinkFunction;
+import org.locationtech.jts.geom.LineString;
+import org.urbcomp.cupid.db.flink.udf.Udt;
 import org.urbcomp.cupid.db.flink.udf.util;
 
 import java.io.IOException;
 
-@FlinkFunction
-public class st_geometryAsWKT extends ScalarFunction {
+public class st_lineStringAsWKT extends Udt {
     @DataTypeHint("String")
-    public String eval(@DataTypeHint(value = "RAW", bridgedTo = Geometry.class) Geometry geometry)
+    public String eval(@DataTypeHint(value = "RAW", bridgedTo = LineString.class) Geometry geometry)
         throws IOException {
         return util.asWKT(geometry);
+    }
+
+    @Override
+    public String name() {
+        return "st_lineStringAsWKT";
     }
 }

@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf;
+package org.urbcomp.cupid.db.flink.algorithm.step.object;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.flink.table.annotation.DataTypeHint;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface FlinkFunction {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Result {
+    public @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class) List<PointList> pointLists =
+        new ArrayList<>();
+
 }

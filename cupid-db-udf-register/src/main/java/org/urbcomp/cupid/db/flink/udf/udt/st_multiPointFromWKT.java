@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf;
+package org.urbcomp.cupid.db.flink.udf.udt;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.flink.table.annotation.DataTypeHint;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.io.ParseException;
+import org.urbcomp.cupid.db.flink.udf.Udt;
+import org.urbcomp.cupid.db.flink.udf.util;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface FlinkFunction {
+public class st_multiPointFromWKT extends Udt {
+    @DataTypeHint(value = "RAW", bridgedTo = MultiPoint.class)
+    public MultiPoint eval(@DataTypeHint("String") String wkt) throws ParseException {
+        return (MultiPoint) util.fromWKT(wkt);
+    }
+
+    @Override
+    public String name() {
+        return "st_multiPointFromWKT";
+    }
 }

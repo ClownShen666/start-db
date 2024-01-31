@@ -21,7 +21,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.junit.Test;
-import org.urbcomp.cupid.db.flink.udf.geometrictypeconversionfunction.*;
+import org.urbcomp.cupid.db.flink.udf.udt.*;
 
 import static org.urbcomp.cupid.db.flink.TestUtil.checkF1EqualF2;
 

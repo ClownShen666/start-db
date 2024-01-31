@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf;
+package org.urbcomp.cupid.db.flink.udf.statefuludf;
 
 import org.apache.flink.table.annotation.DataTypeHint;
 import org.apache.flink.table.annotation.FunctionHint;
-import org.apache.flink.table.functions.AggregateFunction;
 import org.urbcomp.cupid.db.flink.algorithm.step.local.LocalProcessFunctionGrid;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.PointList;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.Result;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
+import org.urbcomp.cupid.db.flink.udf.StatefulUdf;
 import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @FunctionHint(output = @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class))
-public class TrajectorySegment extends AggregateFunction<List<Trajectory>, Result> {
+public class TrajectorySegment extends StatefulUdf<List<Trajectory>, Result> {
 
     private static final long serialVersionUID = 1L;
 
@@ -67,4 +67,8 @@ public class TrajectorySegment extends AggregateFunction<List<Trajectory>, Resul
         STEP_GRID.process(point, acc.pointLists);
     }
 
+    @Override
+    public String name() {
+        return "stream_st_traj_stayPointSegment";
+    }
 }

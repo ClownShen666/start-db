@@ -14,20 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.udf.geometrictypeconversionfunction;
+package org.urbcomp.cupid.db.flink.algorithm.step.index;
 
-import org.apache.flink.table.annotation.DataTypeHint;
-import org.apache.flink.table.functions.ScalarFunction;
-import org.locationtech.jts.geom.MultiPoint;
-import org.locationtech.jts.io.ParseException;
-import org.urbcomp.cupid.db.flink.udf.FlinkFunction;
-import org.urbcomp.cupid.db.flink.udf.util;
-
-@FlinkFunction
-
-public class st_multiPointFromWKT extends ScalarFunction {
-    @DataTypeHint(value = "RAW", bridgedTo = MultiPoint.class)
-    public MultiPoint eval(@DataTypeHint("String") String wkt) throws ParseException {
-        return (MultiPoint) util.fromWKT(wkt);
-    }
+public enum AreaEnum {
+    PRUNED_AREA,
+    CHECK_AREA,
+    CONFIRMED_AREA
 }

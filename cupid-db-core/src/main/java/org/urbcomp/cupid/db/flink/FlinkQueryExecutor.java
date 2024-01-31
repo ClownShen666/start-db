@@ -32,7 +32,8 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
-import org.urbcomp.cupid.db.flink.udf.UdfFactory;
+import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
+
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
@@ -46,7 +47,12 @@ import java.util.*;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
 
+import org.slf4j.Logger;
+import org.urbcomp.cupid.db.util.LogUtil;
+
 public class FlinkQueryExecutor {
+    private boolean isRegistered = false;
+    private final Logger logger = LogUtil.getLogger();
     private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
     private StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
@@ -83,6 +89,8 @@ public class FlinkQueryExecutor {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
 
+        StreamExecutionEnvironment preEnv = getEnv();
+
         if (!param.isLocal()) {
             if (param.getHost() == null
                 || param.getPort() == null
@@ -98,7 +106,12 @@ public class FlinkQueryExecutor {
             );
         }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
-        registerUdf(param);
+
+        if (preEnv != getEnv() || !isRegistered) {
+            registerUdf();
+            this.isRegistered = true;
+        }
+
         String sql = param.getSql();
         if (sqlNode == null) {
             sqlNode = CupidDBParseDriver.parseSql(sql);
@@ -114,7 +127,6 @@ public class FlinkQueryExecutor {
                     dbTableNameList
                 );
                 loadTables(param, tableNameList, dbTableNameList, tableList);
-                // registerUdf(param);
 
                 // execute and return select result stream
                 DataStream<Row> resultStream = getTableEnv().toChangelogStream(
@@ -151,7 +163,6 @@ public class FlinkQueryExecutor {
                     dbTableNameList2
                 );
                 loadTables(param, tableNameList2, dbTableNameList2, tableList2);
-                // registerUdf(param);
 
                 // get select result
                 Table resultTable = getTableEnv().sqlQuery(selectSql);
@@ -481,21 +492,15 @@ public class FlinkQueryExecutor {
         return tableList;
     }
 
-    public void registerUdf(FlinkSqlParam param) throws IOException, ClassNotFoundException {
-        List<Class<?>> functions = new UdfFactory().getFunctions();
-        functions.forEach(
-            f -> getTableEnv().createTemporarySystemFunction(
-                f.getSimpleName(),
-                (Class<? extends UserDefinedFunction>) f
-            )
-        );
-        // List<Class<?>> udfClasses = loadUdfClasses(this.getClass().getResource("").toString());
-        // for (Class<?> udfClass : udfClasses) {
-        // getTableEnv().createTemporaryFunction(
-        // udfClass.getName().replace("org.urbcomp.cupid.db.flink.udf.", ""),
-        // (Class<? extends UserDefinedFunction>) udfClass
-        // );
-        // }
+    public void registerUdf() {
+        new UdfRegistry().getUdfInfoList().forEach(udfInfo -> {
+            getTableEnv().createTemporaryFunction(
+                udfInfo.getName(),
+                (Class<? extends UserDefinedFunction>) udfInfo.getFunction()
+            );
+            logger.info("Flink registers " + udfInfo.getType() + " " + udfInfo.getName());
+        });
+
     }
 
     public List<Class<?>> loadUdfClasses(String path) {
