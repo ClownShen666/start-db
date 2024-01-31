@@ -40,7 +40,6 @@ import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.SqlParam;
 
-import java.io.File;
 import java.util.*;
 
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
@@ -500,30 +499,6 @@ public class FlinkQueryExecutor {
             logger.info("Flink registers " + udfInfo.getType() + " " + udfInfo.getName());
         });
 
-    }
-
-    public List<Class<?>> loadUdfClasses(String path) {
-        String udfPath = (path.split("/target/")[0]
-            + "/target/classes/org/urbcomp/cupid/db/flink/udf").substring(5);
-        List<Class<?>> udfClasses = new ArrayList<>();
-        File folder = new File(udfPath);
-        File[] files = folder.listFiles(
-            (dir, name) -> name.endsWith(".class") && !name.equals("util.class")
-        );
-
-        if (files != null) {
-            for (File file : files) {
-                try {
-                    String className = "org.urbcomp.cupid.db.flink.udf."
-                        + file.getName().replace(".class", "");
-                    Class<?> loadedClass = Class.forName(className);
-                    udfClasses.add(loadedClass);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return udfClasses;
     }
 
 }
