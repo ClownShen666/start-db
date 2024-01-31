@@ -41,7 +41,6 @@ import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
@@ -81,7 +80,7 @@ public class FlinkQueryExecutor {
         this.sqlNode = sqlNode;
     }
 
-    public DataStream<Row> execute(FlinkSqlParam param) throws IOException, ClassNotFoundException {
+    public DataStream<Row> execute(FlinkSqlParam param) {
         if (param != null) {
             FlinkSqlParam.CACHE.set(param);
             SqlParam.CACHE.set(param);
