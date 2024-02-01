@@ -633,7 +633,7 @@ public class FlinkQueryExecutorTest {
         checkTableNotNull(flink.getTableEnv(), table1);
 
         // register udf and test
-        flink.registerUdf(flinkSqlParam);
+        flink.registerUdf();
         flink.getTableEnv()
             .sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(geometry1)) from table1;");
         flink.getTableEnv().sqlQuery("select st_pointFromWKT(st_pointAsWKT(point1)) from table1;");

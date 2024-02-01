@@ -34,8 +34,8 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.urbcomp.cupid.db.flink.serialize.kafka.GeometryDeserializer;
 import org.urbcomp.cupid.db.flink.serialize.kafka.KafkaSerializer;
-import org.urbcomp.cupid.db.flink.udf.st_geometryAsWKT;
-import org.urbcomp.cupid.db.flink.udf.st_geometryFromWKT;
+import org.urbcomp.cupid.db.flink.udf.udt.st_geometryAsWKT;
+import org.urbcomp.cupid.db.flink.udf.udt.st_geometryFromWKT;
 
 import java.util.ArrayList;
 import java.util.List;

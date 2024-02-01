@@ -32,20 +32,25 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
+import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
+
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.util.SqlParam;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
 
+import org.slf4j.Logger;
+import org.urbcomp.cupid.db.util.LogUtil;
+
 public class FlinkQueryExecutor {
+    private boolean isRegistered = false;
+    private final Logger logger = LogUtil.getLogger();
     private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
     private StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
@@ -82,6 +87,8 @@ public class FlinkQueryExecutor {
             throw new IllegalArgumentException("FlinkSqlParam is null.");
         }
 
+        StreamExecutionEnvironment preEnv = getEnv();
+
         if (!param.isLocal()) {
             if (param.getHost() == null
                 || param.getPort() == null
@@ -97,6 +104,12 @@ public class FlinkQueryExecutor {
             );
         }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
+
+        if (preEnv != getEnv() || !isRegistered) {
+            registerUdf();
+            this.isRegistered = true;
+        }
+
         String sql = param.getSql();
         if (sqlNode == null) {
             sqlNode = CupidDBParseDriver.parseSql(sql);
@@ -112,7 +125,6 @@ public class FlinkQueryExecutor {
                     dbTableNameList
                 );
                 loadTables(param, tableNameList, dbTableNameList, tableList);
-                registerUdf(param);
 
                 // execute and return select result stream
                 DataStream<Row> resultStream = getTableEnv().toChangelogStream(
@@ -149,7 +161,6 @@ public class FlinkQueryExecutor {
                     dbTableNameList2
                 );
                 loadTables(param, tableNameList2, dbTableNameList2, tableList2);
-                registerUdf(param);
 
                 // get select result
                 Table resultTable = getTableEnv().sqlQuery(selectSql);
@@ -479,37 +490,15 @@ public class FlinkQueryExecutor {
         return tableList;
     }
 
-    public void registerUdf(FlinkSqlParam param) {
-        List<Class<?>> udfClasses = loadUdfClasses(this.getClass().getResource("").toString());
-        for (Class<?> udfClass : udfClasses) {
+    public void registerUdf() {
+        new UdfRegistry().getUdfInfoList().forEach(udfInfo -> {
             getTableEnv().createTemporaryFunction(
-                udfClass.getName().replace("org.urbcomp.cupid.db.flink.udf.", ""),
-                (Class<? extends UserDefinedFunction>) udfClass
+                udfInfo.getName(),
+                (Class<? extends UserDefinedFunction>) udfInfo.getFunction()
             );
-        }
+            logger.info("Flink registers " + udfInfo.getType() + " " + udfInfo.getName());
+        });
+
     }
 
-    public List<Class<?>> loadUdfClasses(String path) {
-        String udfPath = (path.split("/target/")[0]
-            + "/target/classes/org/urbcomp/cupid/db/flink/udf").substring(5);
-        List<Class<?>> udfClasses = new ArrayList<>();
-        File folder = new File(udfPath);
-        File[] files = folder.listFiles(
-            (dir, name) -> name.endsWith(".class") && !name.equals("util.class")
-        );
-
-        if (files != null) {
-            for (File file : files) {
-                try {
-                    String className = "org.urbcomp.cupid.db.flink.udf."
-                        + file.getName().replace(".class", "");
-                    Class<?> loadedClass = Class.forName(className);
-                    udfClasses.add(loadedClass);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return udfClasses;
-    }
 }
