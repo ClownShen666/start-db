@@ -38,7 +38,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
@@ -75,6 +77,48 @@ public class FlinkQueryExecutorTest {
             }
             streamSelectSqlTest();
             streamInsertSqlTest();
+        }
+    }
+
+    @Ignore
+    @Test
+    public void showTopicTests() {
+        System.out.println(showTopics("localhost:9092").size());
+    }
+
+    @Ignore
+    @Test
+    public void streamDropTableSqlTest() {
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            Set<String> topicsBefore = showTopics("localhost:9092");
+            stmt.executeUpdate(
+                "create stream table if not exists table1("
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString,"
+                    + "polygon1 Polygon,"
+                    + "multipoint1 MultiPoint,"
+                    + "multilinestring1 MultiLineString,"
+                    + "multipolygon1 MultiPolygon,"
+                    + "SPATIAL INDEX indexName(geometry1))"
+            );
+            stmt.executeUpdate(
+                "create stream table if not exists table2("
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "SPATIAL INDEX indexName(geometry1))"
+            );
+            stmt.executeUpdate("drop table table1");
+            stmt.executeUpdate("drop table table2");
+            Set<String> topicsAfter = showTopics("localhost:9092");
+
+            assertTrue(topicsBefore.equals(topicsAfter));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

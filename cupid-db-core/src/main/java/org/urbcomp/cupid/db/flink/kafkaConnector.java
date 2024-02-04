@@ -16,9 +16,7 @@
  */
 package org.urbcomp.cupid.db.flink;
 
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -29,8 +27,10 @@ import org.urbcomp.cupid.db.util.SqlParam;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public class kafkaConnector {
+
     public static String getKafkaTopic(org.urbcomp.cupid.db.metadata.entity.Table table) {
         return MetadataUtil.makeSchemaName(table.getId());
     }
@@ -83,6 +83,21 @@ public class kafkaConnector {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static Set<String> showTopics(String ip) {
+        Properties props = new Properties();
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, ip);
+
+        try (AdminClient adminClient = AdminClient.create(props)) {
+            ListTopicsResult topicsResult = adminClient.listTopics(
+                new ListTopicsOptions().listInternal(true)
+            );
+            return topicsResult.names().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptySet();
         }
     }
 }
