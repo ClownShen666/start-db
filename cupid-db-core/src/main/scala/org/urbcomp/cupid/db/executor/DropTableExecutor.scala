@@ -20,6 +20,7 @@ import org.apache.calcite.sql.ddl.SqlDropTable
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
+import org.urbcomp.cupid.db.flink.kafkaConnector.{deleteKafkaTopic, getKafkaTopic}
 
 case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
   override def execute[Int](): MetadataResult[Int] = {
@@ -35,6 +36,9 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
         throw new IllegalArgumentException("table does not exist " + tableName)
       }
     }
+
+    // TODO: get ip from DynamicConfig
+    deleteKafkaTopic("localhost:9092", getKafkaTopic(existedTable));
 
     val affectedRows = MetadataAccessUtil.dropTable(userName, dbName, tableName)
 
