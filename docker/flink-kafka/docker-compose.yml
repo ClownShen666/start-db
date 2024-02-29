@@ -54,5 +54,3 @@ services:
 networks:
   kafka-net:
     driver: bridge
-  flink-net:
-    driver: bridge

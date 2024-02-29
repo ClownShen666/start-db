@@ -87,7 +87,6 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
         // create stream table(topic) in kafka
-        // TODO: get ip from DynamicConfig
         if (n.stream) {
           createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
         }
