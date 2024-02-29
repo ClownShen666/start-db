@@ -63,18 +63,18 @@ public class FlinkQueryExecutorTest {
     @Ignore
     @Test
     public void remoteSqlTest() throws Exception {
-            flinkSqlParam.setLocal(false);
-            flinkSqlParam.setHost("localhost");
-            flinkSqlParam.setPort(8081);
-            flinkSqlParam.setJarFilesPath(
-                "target/cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
-            );
-            flinkSqlParam.setBootstrapServers("kafka:9093");
-            FlinkSqlParam.CACHE.set(flinkSqlParam);
-            streamSelectSqlTest();
-            streamInsertSqlTest();
-            streamDropTableSqlTest();
-        }
+        flinkSqlParam.setLocal(false);
+        flinkSqlParam.setHost("localhost");
+        flinkSqlParam.setPort(8081);
+        flinkSqlParam.setJarFilesPath(
+            "target/cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
+        );
+        flinkSqlParam.setBootstrapServers("kafka:9093");
+        FlinkSqlParam.CACHE.set(flinkSqlParam);
+        streamSelectSqlTest();
+        streamInsertSqlTest();
+        streamDropTableSqlTest();
+    }
 
     @Ignore
     @Test
