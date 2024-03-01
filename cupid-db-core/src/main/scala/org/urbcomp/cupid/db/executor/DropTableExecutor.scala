@@ -37,8 +37,10 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
       }
     }
 
-    // TODO: get ip from DynamicConfig
-    deleteKafkaTopic("localhost:9092", getKafkaTopic(existedTable));
+    // drop stream table
+    if (existedTable.getStorageEngine.equals("kafka")) {
+      deleteKafkaTopic("localhost:9092", getKafkaTopic(existedTable))
+    }
 
     val affectedRows = MetadataAccessUtil.dropTable(userName, dbName, tableName)
 
