@@ -78,7 +78,28 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
-    public void showTopicTests() {
+    public void parseSqlTest() {
+        // // create table
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("create table if not exists table1(id1 int);");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("create stream table if not exists table2(id2 int);");
+            stmt.executeUpdate("drop table if exists table3");
+            stmt.executeUpdate("create stream table if not exists table3(id3 int);");
+            stmt.executeQuery(
+                "select *, table1.id1 as t1 from table1 left join table2 on table1.id1 = table2.id2 right join table3 on table1.id1 = table3.id3 and table2.id2 = table3.id3 where table1.id1 < table2.id2 and table2.id2 > table3.id3;"
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Ignore
+    @Test
+    public void showTopicTest() {
         System.out.println(showTopics("localhost:9092").size());
     }
 

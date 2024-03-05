@@ -116,32 +116,55 @@ public class FlinkQueryExecutor {
         }
         switch (sqlNode.getKind()) {
             case SELECT:
-                SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
+                // stream join dimension table
+                if (param.getStreamJoinDimension()) {
+                    JoinVisitor joinVisitor = new JoinVisitor(sql);
 
-                // load select tables and register udf
-                List<String> tableNameList = selectVisitor.getTableList();
-                List<String> dbTableNameList = selectVisitor.getDbTableList();
-                List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                    dbTableNameList
-                );
-                loadTables(param, tableNameList, dbTableNameList, tableList);
-
-                // execute and return select result stream
-                DataStream<Row> resultStream = getTableEnv().toChangelogStream(
-                    getTableEnv().sqlQuery(sql)
-                );
-                try {
-                    if (param.getTestNum() == 0) {
-                        getEnv().execute();
-                    } else {
-                        resultStream.executeAndCollect(param.getTestNum());
+                    // load stream tables and register udf
+                    List<String> streamTableNameList = joinVisitor.getStreamTableList();
+                    List<String> streamDbTableNameList = new ArrayList<>();
+                    for (String streamTable : streamTableNameList) {
+                        streamDbTableNameList.add(param.getDbName() + "." + streamTable);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return resultStream;
 
+                    // List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                    // dbTableNameList
+                    // );
+                    // loadTables(param, tableNameList, dbTableNameList, tableList);
+                    //
+                    // // execute stream join and return result stream
+                    // DataStream<Row> streamJoinStream = getTableEnv().toChangelogStream(
+                    // getTableEnv().sqlQuery(sql)
+                    // );
+                    return null;
+                } else {
+                    SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
+
+                    // load select tables and register udf
+                    List<String> tableNameList = selectVisitor.getTableList();
+                    List<String> dbTableNameList = selectVisitor.getDbTableList();
+                    List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                        dbTableNameList
+                    );
+                    loadTables(param, tableNameList, dbTableNameList, tableList);
+
+                    // execute and return select result stream
+                    DataStream<Row> resultStream = getTableEnv().toChangelogStream(
+                        getTableEnv().sqlQuery(sql)
+                    );
+                    try {
+                        if (param.getTestNum() == 0) {
+                            getEnv().execute();
+                        } else {
+                            resultStream.executeAndCollect(param.getTestNum());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return resultStream;
+                }
             case INSERT:
+                System.out.println("sql kind: " + sqlNode.getKind());
                 InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
                 SelectFromTableVisitor selectVisitor2 = new SelectFromTableVisitor(sql);
                 InsertIntoFieldVisitor fieldVisitor = new InsertIntoFieldVisitor(sql);
