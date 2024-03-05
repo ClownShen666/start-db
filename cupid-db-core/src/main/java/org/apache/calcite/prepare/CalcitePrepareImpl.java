@@ -706,11 +706,12 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
             Hook.PARSE_TREE.run(new Object[] { sql, sqlNode });
             final SqlParam sqlParam = SqlParam.CACHE.get();
+            sqlParam.setSql(sql);
 
             // execute stream sql
-            FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-            flinkSqlParam.setSql(sql);
-            if (isStreamSql(sqlNode, flinkSqlParam)) {
+            if (isStreamSql(sqlNode, sqlParam)) {
+                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                flinkSqlParam.setSql(sql);
                 // currently flink only execute select && insert ... select ...
                 if (ExecuteEngine.isFlink(flinkSqlParam.getExecuteEngine())) {
                     // TODO: show stream query result, now return null result
@@ -867,10 +868,10 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     }
 
     // judge whether sql is executed by flink(stream)
-    private boolean isStreamSql(SqlNode sqlNode, FlinkSqlParam flinkSqlParam) {
+    private boolean isStreamSql(SqlNode sqlNode, SqlParam sqlParam) {
         // Currently flink engine only supports select & insert ... select...
+        String sql = sqlParam.getSql();
         List<String> tableNameList = new ArrayList<>();
-        String sql = flinkSqlParam.getSql();
         if (sqlNode instanceof SqlSelect) {
             List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
             for (String dbTableName : dbTableNameList) {
@@ -891,8 +892,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             List<String> dimensionTables = new ArrayList<>();
             for (String tableName : tableNameList) {
                 org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
-                    flinkSqlParam.getUserName(),
-                    flinkSqlParam.getDbName(),
+                    sqlParam.getUserName(),
+                    sqlParam.getDbName(),
                     tableName
                 );
                 if (table == null) {
@@ -908,9 +909,11 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             }
             if (streamTableNum > 0) {
                 if (streamTableNum < tableNameList.size()) {
+                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
                     flinkSqlParam.setStreamJoinDimension(true);
                     flinkSqlParam.setStreamTables(streamTables);
                     flinkSqlParam.setDimensionTables(dimensionTables);
+                    FlinkSqlParam.CACHE.set(flinkSqlParam);
                 }
                 return true;
             } else {
