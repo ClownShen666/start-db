@@ -706,14 +706,15 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
             Hook.PARSE_TREE.run(new Object[] { sql, sqlNode });
             final SqlParam sqlParam = SqlParam.CACHE.get();
+            sqlParam.setSql(sql);
 
             // execute stream sql
-            if (isStreamSql(sqlNode, sql)) {
+            if (isStreamSql(sqlNode, sqlParam)) {
+                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                flinkSqlParam.setSql(sql);
                 // currently flink only execute select && insert ... select ...
-                if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())) {
+                if (ExecuteEngine.isFlink(flinkSqlParam.getExecuteEngine())) {
                     // TODO: show stream query result, now return null result
-                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                    flinkSqlParam.setSql(sql);
                     new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
                     return (MetadataResult<T>) MetadataResult.buildResult(
                         new String[0],
@@ -867,8 +868,9 @@ public class CalcitePrepareImpl implements CalcitePrepare {
     }
 
     // judge whether sql is executed by flink(stream)
-    private boolean isStreamSql(SqlNode sqlNode, String sql) {
+    private boolean isStreamSql(SqlNode sqlNode, SqlParam sqlParam) {
         // Currently flink engine only supports select & insert ... select...
+        String sql = sqlParam.getSql();
         List<String> tableNameList = new ArrayList<>();
         if (sqlNode instanceof SqlSelect) {
             List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
@@ -885,24 +887,35 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             }
         }
         if (tableNameList.size() > 0) {
-            SqlParam sqlParam = SqlParam.CACHE.get();
             int streamTableNum = 0;
+            List<String> streamTables = new ArrayList<>();
+            List<String> dimensionTables = new ArrayList<>();
             for (String tableName : tableNameList) {
                 org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
                     sqlParam.getUserName(),
                     sqlParam.getDbName(),
                     tableName
                 );
-                if (table.getStorageEngine().equals("kafka")) {
-                    streamTableNum++;
+                if (table == null) {
+                    throw new IllegalArgumentException("table doesn't exist " + tableName);
+                } else {
+                    if (table.getStorageEngine().equals("kafka")) {
+                        streamTableNum++;
+                        streamTables.add(tableName);
+                    } else {
+                        dimensionTables.add(tableName);
+                    }
                 }
             }
             if (streamTableNum > 0) {
-                if (streamTableNum == tableNameList.size()) {
-                    return true;
-                } else {
-                    throw new RuntimeException("stream sql has non stream table");
+                if (streamTableNum < tableNameList.size()) {
+                    FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                    flinkSqlParam.setStreamJoinDimension(true);
+                    flinkSqlParam.setStreamTables(streamTables);
+                    flinkSqlParam.setDimensionTables(dimensionTables);
+                    FlinkSqlParam.CACHE.set(flinkSqlParam);
                 }
+                return true;
             } else {
                 return false;
             }

@@ -18,6 +18,8 @@ package org.urbcomp.cupid.db.flink;
 
 import org.urbcomp.cupid.db.util.SqlParam;
 
+import java.util.List;
+
 public class FlinkSqlParam extends SqlParam {
     public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
@@ -51,6 +53,12 @@ public class FlinkSqlParam extends SqlParam {
 
     private String bootstrapServers;
 
+    private boolean streamJoinDimension = false;
+
+    private List<String> streamTables;
+
+    private List<String> dimensionTables;
+
     private int testNum = 0;
 
     public FlinkSqlParam() {}
@@ -70,6 +78,30 @@ public class FlinkSqlParam extends SqlParam {
 
     public void setBootstrapServers(String bootstrapServers) {
         this.bootstrapServers = bootstrapServers;
+    }
+
+    public boolean getStreamJoinDimension() {
+        return streamJoinDimension;
+    }
+
+    public void setStreamJoinDimension(boolean streamJoinDimension) {
+        this.streamJoinDimension = streamJoinDimension;
+    }
+
+    public List<String> getStreamTables() {
+        return streamTables;
+    }
+
+    public void setStreamTables(List<String> streamTables) {
+        this.streamTables = streamTables;
+    }
+
+    public List<String> getDimensionTables() {
+        return dimensionTables;
+    }
+
+    public void setDimensionTables(List<String> dimensionTables) {
+        this.dimensionTables = dimensionTables;
     }
 
     public int getTestNum() {
