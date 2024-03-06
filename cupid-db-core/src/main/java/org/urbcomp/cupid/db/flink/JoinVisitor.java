@@ -75,8 +75,8 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             dimensionJoinList,
             dimensionOnList
         );
-//        System.out.println("stream join sql：" + streamJoinSql);
-//        System.out.println("dimension join sql：" + dimensionJoinSql);
+        // System.out.println("stream join sql：" + streamJoinSql);
+        // System.out.println("dimension join sql：" + dimensionJoinSql);
     }
 
     // visit sql
