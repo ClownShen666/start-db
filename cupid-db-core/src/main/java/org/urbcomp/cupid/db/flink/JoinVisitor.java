@@ -26,27 +26,26 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
 import java.util.*;
 
 public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
+    private String streamJoinSql;
+
+    private String dimensionJoinSql;
+
+    // record table is stream table or dimension table
+    private Map<String, String> tableType = new HashMap<>();
+
+    private String fromTable;
 
     private List<String> streamTableList;
 
     private List<String> dimensionTableList;
 
-    // record table is stream table or dimension table
-    private Map<String, String> tableType = new HashMap<>();
-
-    private String streamJoinSql;
-
-    private String fromTable;
-
-    private List<Field> fieldList = new ArrayList<>();
+    private List<Field> streamFieldList = new ArrayList<>();
 
     private List<Field> dimensionFieldList = new ArrayList<>();
 
-    private List<Join> joinList = new ArrayList<>();
+    private List<Join> streamJoinList = new ArrayList<>();
 
     private List<Join> dimensionJoinList = new ArrayList<>();
-
-    private List<On> onList = new ArrayList<>();
 
     private List<On> streamOnList = new ArrayList<>();
 
@@ -54,7 +53,13 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private String where = "";
 
+    // initialize parameters
     public JoinVisitor(String sql) {
+        FlinkSqlParam param = FlinkSqlParam.CACHE.get();
+        streamTableList = param.getStreamTables();
+        dimensionTableList = param.getDimensionTables();
+        getTableType();
+
         CharStream charStream = CharStreams.fromString(sql);
         CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
         lexer.removeErrorListeners();
@@ -63,19 +68,20 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         CupidDBSqlParser.ProgramContext tree = parser.program();
         this.visitProgram(tree);
 
-        FlinkSqlParam param = FlinkSqlParam.CACHE.get();
-        streamTableList = param.getStreamTables();
-        dimensionTableList = param.getDimensionTables();
-        getTableType();
-        if (streamTableList.size() > 1) {
-            getStreamSql();
-        }
-        System.out.println("stream join sql：" + streamJoinSql);
+        streamJoinSql = makeJoinSql(streamTableList, streamFieldList, streamJoinList, streamOnList);
+        dimensionJoinSql = makeJoinSql(
+            dimensionTableList,
+            dimensionFieldList,
+            dimensionJoinList,
+            dimensionOnList
+        );
+        // System.out.println("stream join sql：" + streamJoinSql);
+        // System.out.println("dimension join sql：" + dimensionJoinSql);
     }
 
+    // visit sql
     @Override
     public Void visitSubselectStmt(CupidDBSqlParser.SubselectStmtContext ctx) {
-        // todo: function
         // query field
         parseField(ctx.selectList().selectListItem());
 
@@ -98,15 +104,62 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         for (CupidDBSqlParser.SelectListItemContext selectListItem : selectList) {
             String fieldStr = selectListItem.getText();
             Field field = new Field();
-            if (selectListItem.selectListAlias() == null) {
+            // select *
+            if (fieldStr.equals("*")) {
+                field.table = "null";
                 field.field = "*";
-                fieldList.add(field);
-            } else {
-                String aliasStr = selectListItem.selectListAlias().getText();
+                streamFieldList.add(field);
+                dimensionFieldList.add(field);
+            }
+
+            // select function(field1, field2...)
+            else if (fieldStr.contains("(")) {
+                field.expression = fieldStr.replaceAll(",", ", ").replace("as", " as ");
+                String[] fields = fieldStr.split("\\(")[1].split("\\)")[0].split(",");
+                boolean allStream = true;
+                for (String fieldTable : fields) {
+                    if (tableType.get(fieldTable.split("\\.")[0]).equals("dimension")) {
+                        allStream = false;
+                    }
+                }
+                if (allStream) {
+                    streamFieldList.add(field);
+                } else {
+                    for (String fieldTable : fields) {
+                        addField(fieldTable);
+                    }
+                }
+            }
+
+            // select field
+            else {
                 field.table = fieldStr.split("\\.")[0];
-                field.field = fieldStr.split("\\.")[1].split(aliasStr)[0];
-                field.alias = aliasStr.substring(2);
-                fieldList.add(field);
+                field.field = fieldStr.split("\\.")[1];
+
+                // select field as alias
+                if (selectListItem.selectListAlias() != null) {
+                    String aliasStr = selectListItem.selectListAlias().getText();
+                    field.field = fieldStr.split("\\.")[1].split(aliasStr)[0];
+                    field.alias = aliasStr.substring(2);
+                }
+
+                if (tableType.get(field.table).equals("stream")) {
+                    for (Field streamField : streamFieldList) {
+                        if (field.table.equals(streamField.table)
+                            && field.field.equals(streamField.field)) {
+                            return;
+                        }
+                    }
+                    streamFieldList.add(field);
+                } else {
+                    for (Field dimensionField : dimensionFieldList) {
+                        if (field.table.equals(dimensionField.table)
+                            && field.field.equals(dimensionField.field)) {
+                            return;
+                        }
+                    }
+                    dimensionFieldList.add(field);
+                }
             }
         }
     }
@@ -114,28 +167,46 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
     private void parseJoin(List<CupidDBSqlParser.FromJoinClauseContext> joinClauseContexts) {
         for (CupidDBSqlParser.FromJoinClauseContext joinClauseContext : joinClauseContexts) {
             Join join = new Join();
+
             // join type
             if (joinClauseContext.fromJoinTypeClause() != null) {
-                if (!joinClauseContext.fromJoinTypeClause().getText().equals("join")) {
-                    join.type = joinClauseContext.fromJoinTypeClause().getText().split("join")[0]
-                        + " join";
+                String joinStr = joinClauseContext.fromJoinTypeClause().getText();
+                if (joinStr.equals("join")) {
+                    join.type = joinStr;
+                } else {
+                    join.type = joinStr.split("join")[0] + " join";
                 }
+
+                // on
+                if (joinClauseContext.boolExpr().boolExpr().isEmpty()) {
+                    parseOn(joinClauseContext.boolExpr());
+                } else {
+                    for (CupidDBSqlParser.BoolExprContext boolExprContext : joinClauseContext
+                        .boolExpr()
+                        .boolExpr()) {
+                        parseOn(boolExprContext);
+                    }
+                }
+            } else {
+                join.type = ",";
             }
+
             // join table
             join.table = joinClauseContext.fromTableClause().getText();
-            joinList.add(join);
-            // on
-            if (joinClauseContext.boolExpr().boolExpr().isEmpty()) {
-                parseOn(joinClauseContext.boolExpr());
-            } else {
-                for (CupidDBSqlParser.BoolExprContext boolExprContext : joinClauseContext.boolExpr()
-                    .boolExpr()) {
-                    parseOn(boolExprContext);
-                }
+
+            // classify stream join and dimension join
+            if (tableType.get(join.table).equals("dimension")) {
+                dimensionJoinList.add(join);
+            } else if (join.table.equals(streamTableList.get(0))) {
+                join.table = "streamResult";
+                dimensionJoinList.add(join);
+            } else if (streamTableList.size() > 1) {
+                streamJoinList.add(join);
             }
         }
     }
 
+    // currently only support binary boolExpr
     private void parseOn(CupidDBSqlParser.BoolExprContext boolExprContext) {
         if (boolExprContext.boolExprAtom().boolExprBinary() != null) {
             CupidDBSqlParser.BoolExprBinaryContext binaryContext = boolExprContext.boolExprAtom()
@@ -144,7 +215,20 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             on.left = binaryContext.expr(0).getText();
             on.right = binaryContext.expr(1).getText();
             on.type = binaryContext.boolExprBinaryOperator().getText();
-            onList.add(on);
+            if (tableType.get(on.left.split("\\.")[0]).equals("dimension")
+                || tableType.get(on.right.split("\\.")[0]).equals("dimension")) {
+                if (tableType.get(on.left.split("\\.")[0]).equals("stream")) {
+                    on.left = "streamResult." + on.left.split("\\.")[1];
+                }
+                if (tableType.get(on.right.split("\\.")[0]).equals("stream")) {
+                    on.right = "streamResult." + on.right.split("\\.")[1];
+                }
+                dimensionOnList.add(on);
+            } else {
+                streamOnList.add(on);
+            }
+            addField(on.left);
+            addField(on.right);
         } else {
             throw new UnsupportedOperationException("Unsupported stream join dimension sql.");
         }
@@ -180,24 +264,77 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
                 binaryContext.boolExprBinaryOperator().getText(),
                 binaryContext.expr(1).getText()
             );
+            addField(binaryContext.expr(0).getText());
+            addField(binaryContext.expr(1).getText());
         } else {
             throw new UnsupportedOperationException("Unsupported stream join dimension sql.");
         }
     }
 
-    private void getStreamSql() {
+    // classify stream field and dimension field
+    private void addField(String fieldStr) {
+        Field field = new Field();
+
+        // function(field1, field2...)
+        if (fieldStr.contains("(")) {
+            field.expression = fieldStr.replaceAll(",", ", ").replace("as", " as ");
+            String[] fields = fieldStr.split("\\(")[1].split("\\)")[0].split(",");
+            boolean allStream = true;
+            for (String fieldTable : fields) {
+                if (tableType.get(fieldTable.split("\\.")[0]).equals("dimension")) {
+                    allStream = false;
+                }
+            }
+            if (allStream) {
+                streamFieldList.add(field);
+            } else {
+                for (String fieldTable : fields) {
+                    addField(fieldTable);
+                }
+            }
+        }
+
+        // field
+        else {
+            field.table = fieldStr.split("\\.")[0];
+            field.field = fieldStr.split("\\.")[1];
+            if (tableType.get(field.table).equals("stream")) {
+                for (Field streamField : streamFieldList) {
+                    if (field.table.equals(streamField.table)
+                        && field.field.equals(streamField.field)) {
+                        return;
+                    }
+                }
+                streamFieldList.add(field);
+            } else {
+                for (Field dimensionField : dimensionFieldList) {
+                    if (field.table.equals(dimensionField.table)
+                        && field.field.equals(dimensionField.field)) {
+                        return;
+                    }
+                }
+                dimensionFieldList.add(field);
+            }
+        }
+    }
+
+    private String makeJoinSql(
+        List<String> tableList,
+        List<Field> fieldList,
+        List<Join> joinList,
+        List<On> onList
+    ) {
         StringBuilder stringBuilder = new StringBuilder("select ");
-        streamJoinSql = "select ";
+
         // query field
         for (Field field : fieldList) {
-            if (field.field == "*") {
-                stringBuilder.append("*");
+            if (field.expression != null) {
+                stringBuilder.append(field.expression);
             } else {
-                if (tableType.get(field.table).equals("stream")) {
-                    stringBuilder.append(field.table).append(".").append(field.field);
+                if (field.field.equals("*")) {
+                    stringBuilder.append("*");
                 } else {
-                    dimensionFieldList.add(field);
-                    continue;
+                    stringBuilder.append(field.table).append(".").append(field.field);
                 }
             }
             stringBuilder.append(", ");
@@ -205,52 +342,35 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
 
         // from table
-        if (tableType.get(fromTable).equals("dimension")) {
-            dimensionJoinList.add(joinList.get(0));
-        }
-        stringBuilder.append(" from ").append(streamTableList.get(0));
-
-        // split stream on and dimension on
-        for (On on : onList) {
-            if (tableType.get(on.left.split("\\.")[0]).equals("dimension")
-                || tableType.get(on.right.split("\\.")[0]).equals("dimension")) {
-                dimensionOnList.add(on);
-            } else {
-                streamOnList.add(on);
-            }
-        }
+        stringBuilder.append(" from ").append(tableList.get(0));
 
         // join
         List<String> leftTable = new ArrayList<>();
-        leftTable.add(streamTableList.get(0));
+        leftTable.add(tableList.get(0));
         for (Join join : joinList) {
-            if (tableType.get(join.table).equals("stream")
-                && !join.table.equals(streamTableList.get(0))) {
-                stringBuilder.append(" ").append(join.type).append(" ").append(join.table);
-                boolean first = true;
-                // on
-                for (On on : streamOnList) {
-                    if (leftTable.contains(on.left.split("\\.")[0])
-                        && on.right.split("\\.")[0].equals(join.table)) {
-                        if (first) {
-                            stringBuilder.append(" on ");
-                            first = false;
-                        } else {
-                            stringBuilder.append(" and ");
-                        }
-                        stringBuilder.append(on.left)
-                            .append(" ")
-                            .append(on.type)
-                            .append(" ")
-                            .append(on.right);
+            stringBuilder.append(" ").append(join.type).append(" ").append(join.table);
+            boolean first = true;
+
+            // on
+            for (On on : onList) {
+                if (leftTable.contains(on.left.split("\\.")[0])
+                    && on.right.split("\\.")[0].equals(join.table)) {
+                    if (first) {
+                        stringBuilder.append(" on ");
+                        first = false;
+                    } else {
+                        stringBuilder.append(" and ");
                     }
+                    stringBuilder.append(on.left)
+                        .append(" ")
+                        .append(on.type)
+                        .append(" ")
+                        .append(on.right);
                 }
-                leftTable.add(join.table);
-            } else if (tableType.get(join.table).equals("dimension")) {
-                dimensionJoinList.add(join);
             }
+            leftTable.add(join.table);
         }
-        streamJoinSql = stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     private void getTableType() {
@@ -260,12 +380,14 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         for (String dimensionTable : dimensionTableList) {
             tableType.put(dimensionTable, "dimension");
         }
+        tableType.put("streamResult", "dimension");
     }
 
     private class Field {
         public String table;
         public String field;
         public String alias;
+        public String expression;
     }
 
     private class Join {
@@ -279,6 +401,18 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         public String right;
     }
 
+    public String getStreamJoinSql() {
+        return streamJoinSql;
+    }
+
+    public String getDimensionJoinSql() {
+        return dimensionJoinSql;
+    }
+
+    public String getFromTable() {
+        return fromTable;
+    }
+
     public List<String> getStreamTableList() {
         return streamTableList;
     }
@@ -287,32 +421,20 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         return dimensionTableList;
     }
 
-    public String getStreamJoinSql() {
-        return streamJoinSql;
-    }
-
-    public String getFromTable() {
-        return fromTable;
-    }
-
-    public List<Field> getFieldList() {
-        return fieldList;
+    public List<Field> getStreamFieldList() {
+        return streamFieldList;
     }
 
     public List<Field> getDimensionFieldList() {
         return dimensionFieldList;
     }
 
-    public List<Join> getJoinList() {
-        return joinList;
+    public List<Join> getStreamJoinList() {
+        return streamJoinList;
     }
 
     public List<Join> getDimensionJoinList() {
         return dimensionJoinList;
-    }
-
-    public List<On> getOnList() {
-        return onList;
     }
 
     public List<On> getStreamOnList() {

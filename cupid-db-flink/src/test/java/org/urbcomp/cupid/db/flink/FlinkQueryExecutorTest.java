@@ -85,10 +85,13 @@ public class FlinkQueryExecutorTest {
             stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate("create table if not exists table1(id1 int);");
             stmt.executeUpdate("drop table if exists table2");
-            stmt.executeUpdate("create stream table if not exists table2(id2 int);");
+            stmt.executeUpdate("create table if not exists table2(id2 int);");
             stmt.executeUpdate("drop table if exists table3");
             stmt.executeUpdate("create stream table if not exists table3(id3 int);");
             stmt.executeQuery(
+                // "select table1.id1, table2.id2 as i2, log(table3.id3, table2.id2) as logid from
+                // table1, table2, table3, table4;"
+                // "select * from table3, table2 join table1 on table1.id1 = table3.id3;"
                 "select *, table1.id1 as t1 from table1 left join table2 on table1.id1 = table2.id2 right join table3 on table1.id1 = table3.id3 and table2.id2 = table3.id3 where table1.id1 < table2.id2 and table2.id2 > table3.id3;"
             );
         } catch (SQLException e) {
