@@ -22,7 +22,8 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.Assert;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestUtil {
     public static void checkTableNotNull(StreamTableEnvironment tableEnv, Table sink)
@@ -36,12 +37,18 @@ public class TestUtil {
         throws Exception {
         DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
         int num = rows.size();
-        List<Row> resultList = resultStream.executeAndCollect(num);
+        List<String> resultList = resultStream.executeAndCollect(num)
+            .stream()
+            .map(row -> row.toString())
+            .collect(Collectors.toList());
+
+        Collections.sort(rows);
+        Collections.sort(resultList);
         for (int i = 0; i < num; i++) {
             Assert.assertEquals(
                 "result is not as expected",
                 "+I[" + rows.get(i) + "]",
-                resultList.get(i).toString()
+                resultList.get(i)
             );
         }
     }

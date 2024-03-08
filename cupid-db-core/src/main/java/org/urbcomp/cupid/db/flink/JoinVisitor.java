@@ -104,6 +104,7 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         for (CupidDBSqlParser.SelectListItemContext selectListItem : selectList) {
             String fieldStr = selectListItem.getText();
             Field field = new Field();
+            field.isSelect = true;
             // select *
             if (fieldStr.equals("*")) {
                 field.table = "null";
@@ -324,6 +325,7 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
                         return;
                     }
                 }
+
                 dimensionFieldList.add(field);
             }
         }
@@ -394,19 +396,20 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         tableType.put("streamResult", "dimension");
     }
 
-    private class Field {
+    public class Field {
         public String table;
         public String field;
         public String alias;
         public String expression;
+        public boolean isSelect = false;
     }
 
-    private class Join {
+    public class Join {
         public String type;
         public String table;
     }
 
-    private class On {
+    public class On {
         public String type;
         public String left;
         public String right;
