@@ -74,9 +74,9 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             dimensionFieldList,
             dimensionJoinList,
             dimensionOnList
-        );
-        // System.out.println("stream join sql：" + streamJoinSql);
-        // System.out.println("dimension join sql：" + dimensionJoinSql);
+        ) + where;
+        System.out.println("stream join sql：" + streamJoinSql);
+        System.out.println("dimension join sql：" + dimensionJoinSql);
     }
 
     // visit sql
@@ -206,7 +206,7 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         }
     }
 
-    // currently only support binary boolExpr
+    // currently only support binary boolExpr, and assume no function
     private void parseOn(CupidDBSqlParser.BoolExprContext boolExprContext) {
         if (boolExprContext.boolExprAtom().boolExprBinary() != null) {
             CupidDBSqlParser.BoolExprBinaryContext binaryContext = boolExprContext.boolExprAtom()
@@ -235,6 +235,7 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
     }
 
     private void parseWhere(CupidDBSqlParser.WhereClauseContext whereClauseContext) {
+        where = " where";
         if (whereClauseContext.boolExpr().boolExpr().isEmpty()) {
             parseBoolExpr(whereClauseContext.boolExpr());
         } else {
@@ -252,17 +253,27 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         }
     }
 
-    // currently only support binary boolExpr
+    // currently only support binary boolExpr and assume no function
     private void parseBoolExpr(CupidDBSqlParser.BoolExprContext boolExprContext) {
         if (boolExprContext.boolExprAtom().boolExprBinary() != null) {
             CupidDBSqlParser.BoolExprBinaryContext binaryContext = boolExprContext.boolExprAtom()
                 .boolExprBinary();
+            String left = binaryContext.expr(0).getText();
+            String right = binaryContext.expr(1).getText();
+
+            // replace stream table name with streamResult
+            if (tableType.get(left.split("\\.")[0]).equals("stream")) {
+                left = String.join(".", "streamResult", left.split("\\.")[1]);
+            }
+            if (tableType.get(right.split("\\.")[0]).equals("stream")) {
+                right = String.join(".", "streamResult", right.split("\\.")[1]);
+            }
             where = String.join(
                 " ",
                 where,
-                binaryContext.expr(0).getText(),
+                left,
                 binaryContext.boolExprBinaryOperator().getText(),
-                binaryContext.expr(1).getText()
+                right
             );
             addField(binaryContext.expr(0).getText());
             addField(binaryContext.expr(1).getText());
