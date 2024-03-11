@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize;
+package org.urbcomp.cupid.db.flink.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.MultiPoint;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
@@ -28,23 +28,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class PointSerializer extends Serializer<Point> implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(Point.class);
+public class MultiPointSerializer extends Serializer<MultiPoint> implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(MultiPointSerializer.class);
 
     @Override
-    public Point read(Kryo kryo, Input input, Class aClass) {
+    public MultiPoint read(Kryo kryo, Input input, Class aClass) {
         String wkt = input.readString();
         WKTReader reader = new WKTReader();
         try {
-            return (Point) reader.read(wkt);
+            return (MultiPoint) reader.read(wkt);
         } catch (ParseException e) {
-            logger.error("Parse failed while serializing Point");
+            logger.error("Parse failed while serializing MultiPoint");
         }
         return null;
     }
 
     @Override
-    public void write(Kryo kryo, Output output, Point point) {
-        output.writeString(point.toString());
+    public void write(Kryo kryo, Output output, MultiPoint multiPoint) {
+        output.writeString(multiPoint.toString());
     }
 }

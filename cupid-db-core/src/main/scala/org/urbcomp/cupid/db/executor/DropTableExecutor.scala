@@ -20,7 +20,7 @@ import org.apache.calcite.sql.ddl.SqlDropTable
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
-import org.urbcomp.cupid.db.flink.kafkaConnector.{deleteKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{deleteKafkaTopic, getKafkaTopic}
 
 case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
   override def execute[Int](): MetadataResult[Int] = {

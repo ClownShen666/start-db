@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink;
-
-import org.urbcomp.cupid.db.util.SqlParam;
+package org.urbcomp.cupid.db.util;
 
 import java.util.List;
 

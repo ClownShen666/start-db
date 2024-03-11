@@ -14,38 +14,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize.kafka;
+package org.urbcomp.cupid.db.flink.serializer;
 
-import org.apache.flink.api.common.serialization.DeserializationSchema;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.locationtech.jts.geom.Polygon;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class PolygonDeserializer implements DeserializationSchema {
+import java.io.Serializable;
+
+public class LineStringSerializer extends Serializer<LineString> implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(LineStringSerializer.class);
+
     @Override
-    public Polygon deserialize(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
-            return null;
-        }
-
-        String wkt = new String(bytes);
+    public LineString read(Kryo kryo, Input input, Class aClass) {
+        String wkt = input.readString();
         WKTReader reader = new WKTReader();
         try {
-            return (Polygon) reader.read(wkt);
+            return (LineString) reader.read(wkt);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("Parse failed while serializing LineString");
         }
         return null;
     }
 
     @Override
-    public boolean isEndOfStream(Object o) {
-        return false;
-    }
-
-    @Override
-    public TypeInformation<Polygon> getProducedType() {
-        return TypeInformation.of(Polygon.class);
+    public void write(Kryo kryo, Output output, LineString lineString) {
+        output.writeString(lineString.toString());
     }
 }

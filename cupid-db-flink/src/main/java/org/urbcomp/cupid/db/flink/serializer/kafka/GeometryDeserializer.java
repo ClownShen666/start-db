@@ -14,37 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize;
+package org.urbcomp.cupid.db.flink.serializer.kafka;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import org.locationtech.jts.geom.MultiLineString;
+import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-
-public class MultiLineStringSerializer extends Serializer<MultiLineString> implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(MultiLineStringSerializer.class);
-
+public class GeometryDeserializer implements DeserializationSchema {
     @Override
-    public MultiLineString read(Kryo kryo, Input input, Class aClass) {
-        String wkt = input.readString();
+    public Geometry deserialize(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+
+        String wkt = new String(bytes);
         WKTReader reader = new WKTReader();
         try {
-            return (MultiLineString) reader.read(wkt);
+            return (Geometry) reader.read(wkt);
         } catch (ParseException e) {
-            logger.error("Parse failed while serializing MultiLineString");
+            e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    public void write(Kryo kryo, Output output, MultiLineString multiLineString) {
-        output.writeString(multiLineString.toString());
+    public boolean isEndOfStream(Object o) {
+        return false;
+    }
+
+    @Override
+    public TypeInformation<Geometry> getProducedType() {
+        return TypeInformation.of(Geometry.class);
     }
 }

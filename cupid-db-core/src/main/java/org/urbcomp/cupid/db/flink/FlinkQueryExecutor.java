@@ -32,18 +32,24 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
+import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.serializer.StringToRow;
 import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
 
+import org.urbcomp.cupid.db.flink.visitor.InsertIntoFieldVisitor;
+import org.urbcomp.cupid.db.flink.visitor.InsertIntoTableVisitor;
+import org.urbcomp.cupid.db.flink.visitor.JoinVisitor;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
+import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.util.*;
 
-import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaGroup;
-import static org.urbcomp.cupid.db.flink.kafkaConnector.getKafkaTopic;
+import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
+import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
 
 import org.slf4j.Logger;
 import org.urbcomp.cupid.db.util.LogUtil;
