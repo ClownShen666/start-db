@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize;
+package org.urbcomp.cupid.db.flink.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
@@ -28,23 +28,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class MultiPointSerializer extends Serializer<MultiPoint> implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(MultiPointSerializer.class);
+public class MultiPolygonSerializer extends Serializer<MultiPolygon> implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(MultiPolygonSerializer.class);
 
     @Override
-    public MultiPoint read(Kryo kryo, Input input, Class aClass) {
+    public MultiPolygon read(Kryo kryo, Input input, Class aClass) {
         String wkt = input.readString();
         WKTReader reader = new WKTReader();
         try {
-            return (MultiPoint) reader.read(wkt);
+            return (MultiPolygon) reader.read(wkt);
         } catch (ParseException e) {
-            logger.error("Parse failed while serializing MultiPoint");
+            logger.error("Parse failed while serializing MultiPolygon");
         }
         return null;
     }
 
     @Override
-    public void write(Kryo kryo, Output output, MultiPoint multiPoint) {
-        output.writeString(multiPoint.toString());
+    public void write(Kryo kryo, Output output, MultiPolygon multiPolygon) {
+        output.writeString(multiPolygon.toString());
     }
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize.kafka;
+package org.urbcomp.cupid.db.flink.serializer.kafka;
 
 import org.apache.flink.api.common.serialization.SerializationSchema;
 

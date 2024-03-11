@@ -25,7 +25,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.urbcomp.cupid.db.flink.algorithm.step.object.SegGpsPoint;
 import org.urbcomp.cupid.db.flink.source.GPSSource;
-import org.urbcomp.cupid.db.flink.udf.TrajectorySegment;
+import org.urbcomp.cupid.db.flink.udf.TrajectorySegmentUDF;
 
 public class TrajectorySegmentUDFTest {
     @Test
@@ -33,7 +33,7 @@ public class TrajectorySegmentUDFTest {
     public void TrajectorySegment() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-        tableEnv.createTemporaryFunction("seg", TrajectorySegment.class);
+        tableEnv.createTemporaryFunction("seg", TrajectorySegmentUDF.class);
 
         DataStream<Tuple2<String, SegGpsPoint>> gspPoints = env.addSource(new GPSSource())
             .name("gps");

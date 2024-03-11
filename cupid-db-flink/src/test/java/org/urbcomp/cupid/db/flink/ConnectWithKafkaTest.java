@@ -32,15 +32,15 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
-import org.urbcomp.cupid.db.flink.serialize.kafka.GeometryDeserializer;
-import org.urbcomp.cupid.db.flink.serialize.kafka.KafkaSerializer;
+import org.urbcomp.cupid.db.flink.serializer.kafka.GeometryDeserializer;
+import org.urbcomp.cupid.db.flink.serializer.kafka.KafkaSerializer;
 import org.urbcomp.cupid.db.flink.udf.udt.st_geometryAsWKT;
 import org.urbcomp.cupid.db.flink.udf.udt.st_geometryFromWKT;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.urbcomp.cupid.db.flink.kafkaConnector.*;
+import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 // run the "docker/flink-kafka" before test
 public class ConnectWithKafkaTest {

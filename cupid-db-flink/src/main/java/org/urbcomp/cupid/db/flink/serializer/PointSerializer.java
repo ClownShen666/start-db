@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize;
+package org.urbcomp.cupid.db.flink.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.slf4j.Logger;
@@ -28,23 +28,23 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class PolygonSerializer extends Serializer<Polygon> implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(Polygon.class);
+public class PointSerializer extends Serializer<Point> implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(Point.class);
 
     @Override
-    public Polygon read(Kryo kryo, Input input, Class aClass) {
+    public Point read(Kryo kryo, Input input, Class aClass) {
         String wkt = input.readString();
         WKTReader reader = new WKTReader();
         try {
-            return (Polygon) reader.read(wkt);
+            return (Point) reader.read(wkt);
         } catch (ParseException e) {
-            logger.error("Parse failed while serializing Polygon");
+            logger.error("Parse failed while serializing Point");
         }
         return null;
     }
 
     @Override
-    public void write(Kryo kryo, Output output, Polygon polygon) {
-        output.writeString(polygon.toString());
+    public void write(Kryo kryo, Output output, Point point) {
+        output.writeString(point.toString());
     }
 }

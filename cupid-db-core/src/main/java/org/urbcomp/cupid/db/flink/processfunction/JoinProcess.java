@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink;
+package org.urbcomp.cupid.db.flink.processfunction;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -22,9 +22,11 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
+import org.urbcomp.cupid.db.flink.visitor.JoinVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
+import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.Connection;

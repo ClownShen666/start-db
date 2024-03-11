@@ -31,7 +31,7 @@ import org.urbcomp.cupid.db.transformer.{
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil}
-import org.urbcomp.cupid.db.flink.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
 
 import scala.collection.JavaConverters._
 

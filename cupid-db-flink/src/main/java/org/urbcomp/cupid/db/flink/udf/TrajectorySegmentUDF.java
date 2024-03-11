@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @FunctionHint(output = @DataTypeHint(value = "RAW", bridgedTo = ArrayList.class))
-public class TrajectorySegment extends AggregateFunction<List<Trajectory>, Result> {
+public class TrajectorySegmentUDF extends AggregateFunction<List<Trajectory>, Result> {
 
     private static final long serialVersionUID = 1L;
 

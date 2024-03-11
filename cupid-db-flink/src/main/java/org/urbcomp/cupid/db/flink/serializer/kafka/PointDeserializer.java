@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize.kafka;
+package org.urbcomp.cupid.db.flink.serializer.kafka;
 
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
-public class GeometryDeserializer implements DeserializationSchema {
+public class PointDeserializer implements DeserializationSchema {
+
     @Override
-    public Geometry deserialize(byte[] bytes) {
+    public Point deserialize(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
             return null;
         }
@@ -32,7 +33,7 @@ public class GeometryDeserializer implements DeserializationSchema {
         String wkt = new String(bytes);
         WKTReader reader = new WKTReader();
         try {
-            return (Geometry) reader.read(wkt);
+            return (Point) reader.read(wkt);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -45,7 +46,7 @@ public class GeometryDeserializer implements DeserializationSchema {
     }
 
     @Override
-    public TypeInformation<Geometry> getProducedType() {
-        return TypeInformation.of(Geometry.class);
+    public TypeInformation<Point> getProducedType() {
+        return TypeInformation.of(Point.class);
     }
 }

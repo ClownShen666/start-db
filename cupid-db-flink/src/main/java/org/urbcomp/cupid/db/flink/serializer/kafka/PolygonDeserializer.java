@@ -14,37 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize;
+package org.urbcomp.cupid.db.flink.serializer.kafka;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import org.locationtech.jts.geom.LineString;
+import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-
-public class LineStringSerializer extends Serializer<LineString> implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(LineStringSerializer.class);
-
+public class PolygonDeserializer implements DeserializationSchema {
     @Override
-    public LineString read(Kryo kryo, Input input, Class aClass) {
-        String wkt = input.readString();
+    public Polygon deserialize(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+
+        String wkt = new String(bytes);
         WKTReader reader = new WKTReader();
         try {
-            return (LineString) reader.read(wkt);
+            return (Polygon) reader.read(wkt);
         } catch (ParseException e) {
-            logger.error("Parse failed while serializing LineString");
+            e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    public void write(Kryo kryo, Output output, LineString lineString) {
-        output.writeString(lineString.toString());
+    public boolean isEndOfStream(Object o) {
+        return false;
+    }
+
+    @Override
+    public TypeInformation<Polygon> getProducedType() {
+        return TypeInformation.of(Polygon.class);
     }
 }

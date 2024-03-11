@@ -14,39 +14,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.serialize.kafka;
+package org.urbcomp.cupid.db.flink.serializer;
 
-import org.apache.flink.api.common.serialization.DeserializationSchema;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.locationtech.jts.geom.MultiPolygon;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MultiPolygonDeserializer implements DeserializationSchema {
+import java.io.Serializable;
+
+public class PolygonSerializer extends Serializer<Polygon> implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(Polygon.class);
 
     @Override
-    public MultiPolygon deserialize(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
-            return null;
-        }
-
-        String wkt = new String(bytes);
+    public Polygon read(Kryo kryo, Input input, Class aClass) {
+        String wkt = input.readString();
         WKTReader reader = new WKTReader();
         try {
-            return (MultiPolygon) reader.read(wkt);
+            return (Polygon) reader.read(wkt);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("Parse failed while serializing Polygon");
         }
         return null;
     }
 
     @Override
-    public boolean isEndOfStream(Object o) {
-        return false;
-    }
-
-    @Override
-    public TypeInformation<MultiPolygon> getProducedType() {
-        return TypeInformation.of(MultiPolygon.class);
+    public void write(Kryo kryo, Output output, Polygon polygon) {
+        output.writeString(polygon.toString());
     }
 }

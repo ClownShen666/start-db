@@ -28,7 +28,10 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
+import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
+import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.Connection;
@@ -43,7 +46,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
-import static org.urbcomp.cupid.db.flink.kafkaConnector.*;
+import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 // run the "docker/flink-kafka", "docker/local" and package cupid-db before test
 public class FlinkQueryExecutorTest {
