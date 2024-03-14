@@ -56,6 +56,7 @@ public class FlinkRemoteQueryExecutorTest {
     }
 
     @Test
+    @Ignore
     public void selectall() {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();

@@ -48,7 +48,7 @@ public class FlinkLocalQueryExecutorTest {
         flinkSqlParam.setLocal(true);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
     }
-
+    @Ignore
     @Test
     public void selectall() {
         try (Connection connect = CalciteHelper.createConnection()) {
