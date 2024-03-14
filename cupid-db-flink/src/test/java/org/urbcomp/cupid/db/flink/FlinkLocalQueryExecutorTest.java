@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,29 +48,30 @@ public class FlinkLocalQueryExecutorTest {
         flinkSqlParam.setLocal(true);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
     }
+
     @Test
     public void selectall() {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate(
-                    "create stream table if not exists table1("
-                            + "geometry1 Geometry,"
-                            + "point1 Point,"
-                            + "linestring1 LineString,"
-                            + "polygon1 Polygon,"
-                            + "multipoint1 MultiPoint,"
-                            + "multilinestring1 MultiLineString,"
-                            + "multipolygon1 MultiPolygon,"
-                            + "SPATIAL INDEX indexName(geometry1))"
+                "create stream table if not exists table1("
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString,"
+                    + "polygon1 Polygon,"
+                    + "multipoint1 MultiPoint,"
+                    + "multilinestring1 MultiLineString,"
+                    + "multipolygon1 MultiPolygon,"
+                    + "SPATIAL INDEX indexName(geometry1))"
             );
 
             // get topic
             SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-                    "select * from table1;"
+                "select * from table1;"
             );
             List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                    selectVisitor.getDbTableList()
+                selectVisitor.getDbTableList()
             );
             List<String> topicList = new ArrayList<>();
             topicList.add(getKafkaTopic(tableList.get(0)));
@@ -78,14 +79,14 @@ public class FlinkLocalQueryExecutorTest {
             // produce message
             List<String> recordList = new ArrayList<>();
             recordList.add(
-                    "+I["
-                            + "POINT (90 90),,"
-                            + "POINT (90 90),,"
-                            + "LINESTRING (0 0, 1 1, 1 2),,"
-                            + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
-                            + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
-                            + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
-                            + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
+                "+I["
+                    + "POINT (90 90),,"
+                    + "POINT (90 90),,"
+                    + "LINESTRING (0 0, 1 1, 1 2),,"
+                    + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
+                    + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
+                    + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
+                    + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
             );
             produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
@@ -99,6 +100,5 @@ public class FlinkLocalQueryExecutorTest {
             throw new RuntimeException(e);
         }
     }
-
 
 }
