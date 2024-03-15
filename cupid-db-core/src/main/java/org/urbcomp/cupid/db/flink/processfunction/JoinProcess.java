@@ -43,12 +43,16 @@ public class JoinProcess extends ProcessFunction<String, String> {
         .build();
     private Map<String, Integer> streamFiledToIdx;
 
+    private Map<String, Integer> firstStreamFiledToIdx;
+    private final Map<String, Integer> selectStreamFiledToIdx = new HashMap<>();
+
     private final Map<String, Integer> dimensionFiledToIdx = new HashMap<>();
     private JoinVisitor joinVisitor;
 
-    private JoinVisitor.On on;
+    private List<JoinVisitor.On> onList;
     private final String sql;
     private List<String> selectFiledList;
+    private final static String STREAM_TABLE = "streamResult";
 
     @Override
     public void open(Configuration parameters) throws Exception {
@@ -70,55 +74,104 @@ public class JoinProcess extends ProcessFunction<String, String> {
         ProcessFunction<String, String>.Context context,
         Collector<String> collector
     ) {
-        String[] streamRow = recordToArr(s);
-        String leftTable = on.left.split("\\.")[0];
+        List<List<String>> streamRows = new ArrayList<>();
+        streamRows.add(recordToArr(s));
 
-        String dimensionTable = "streamResult".equals(leftTable)
-            ? on.right.split("\\.")[0]
-            : leftTable;
+        boolean isFirstLoop = true;
+        for (JoinVisitor.On on1 : onList) {
+            List<List<String>> temp = new ArrayList<>();
+            for (List<String> streamRow : streamRows) {
+                temp.addAll(compareOn(on1, streamRow, isFirstLoop));
+                isFirstLoop = false;
+            }
+            streamRows = temp;
+        }
+        for (List<String> streamRow : streamRows) {
+            collector.collect(arrToRecord(streamRow));
+        }
 
-        String streamTableAndFiled = "streamResult".equals(leftTable) ? on.left : on.right;
-        String dimensionTableAndFiled = "streamResult".equals(leftTable) ? on.right : on.left;
+    }
+
+    public String dimensionTableAndFiled(JoinVisitor.On on) {
+
+        return STREAM_TABLE.equals(leftTableFromOn(on)) ? on.right : on.left;
+
+    }
+
+    public String streamTableAndFiled(JoinVisitor.On on) {
+        return STREAM_TABLE.equals(leftTableFromOn(on)) ? on.left : on.right;
+
+    }
+
+    public List<List<String>> compareOn(
+        JoinVisitor.On on,
+        List<String> streamRow,
+        boolean isFirstInvoke
+    ) {
+
+        String dimensionTable = dimensionTableFromOn(on);
+
+        String streamTableAndFiled = streamTableAndFiled(on);
+        String dimensionTableAndFiled = dimensionTableAndFiled(on);
 
         boolean isMatch = false;
-        // todo: parse where
 
+        // todo: parse where
+        List<List<String>> rows = new ArrayList<>();
         for (String[] staticRow : Objects.requireNonNull(cache.getIfPresent(dimensionTable))) {
             List<String> res = new ArrayList<>();
-            for (String filed : selectFiledList) {
-                if (streamFiledToIdx.containsKey(filed)) {
-                    res.add(streamRow[streamFiledToIdx.get(filed)]);
-                }
-            }
 
-            if (streamRow[streamFiledToIdx.get(streamTableAndFiled)].equals(
-                staticRow[dimensionFiledToIdx.get(dimensionTableAndFiled)]
-            )) {
+            if (streamRow.get(streamFiledToIdx.get(streamTableAndFiled))
+                .equals(staticRow[dimensionFiledToIdx.get(dimensionTableAndFiled)])) {
                 for (String filed : selectFiledList) {
-                    if (dimensionFiledToIdx.containsKey(filed)) {
+                    if (dimensionFiledToIdx.containsKey(filed)
+                        && filed.split("\\.")[0].equals(dimensionTable)) {
                         res.add(staticRow[dimensionFiledToIdx.get(filed)]);
-                    }
+                    } else if (streamFiledToIdx.containsKey(filed)
+                        && filed.split("\\.")[0].equals(STREAM_TABLE)) {
+                            res.add(streamRow.get(streamFiledToIdx.get(filed)));
+                        } else res.add(null);
                 }
+                rows.add(res);
                 isMatch = true;
-                collector.collect(arrToRecord(res));
             }
         }
 
-        if (!isMatch) {
-            List<String> res = new ArrayList<>();
+        if (!isFirstInvoke) {
+            streamFiledToIdx = selectStreamFiledToIdx;
+        } else {
+            streamFiledToIdx = firstStreamFiledToIdx;
 
-            for (String filed : selectFiledList) {
-                if (streamFiledToIdx.containsKey(filed)) {
-                    res.add(streamRow[streamFiledToIdx.get(filed)]);
-                }
-            }
-            int count = selectFiledList.size() - res.size();
-            for (int i = 0; i < count; i++) {
+        }
+
+        if (isMatch) return rows;
+
+        List<String> res = new ArrayList<>();
+        for (String filed : selectFiledList) {
+            if (streamFiledToIdx.containsKey(filed)) {
+                res.add(streamRow.get(streamFiledToIdx.get(filed)));
+            } else {
                 res.add(null);
             }
-            collector.collect(arrToRecord(res));
         }
+        rows.add(res);
+        return rows;
 
+    }
+
+    public String leftTableFromOn(JoinVisitor.On on) {
+        return on.left.split("\\.")[0];
+    }
+
+    public String dimensionTableFromOn(JoinVisitor.On on) {
+        String leftTable = leftTableFromOn(on);
+        return STREAM_TABLE.equals(leftTable) ? on.right.split("\\.")[0] : leftTable;
+    }
+
+    private void initSelectStreamFiledToIdx() {
+        for (int i = 0; i < selectFiledList.size(); i++) {
+            selectStreamFiledToIdx.put(selectFiledList.get(i), i);
+        }
     }
 
     public void loadData() throws SQLException {
@@ -133,10 +186,11 @@ public class JoinProcess extends ProcessFunction<String, String> {
         statement.executeQuery(sql);
         this.joinVisitor = new JoinVisitor(sql);
         String streamTable = streamTable();
-        this.selectFiledList = getSelectFiledList();
-        this.on = getOn();
+        this.selectFiledList = joinVisitor.getSelectFiledList();
+        this.onList = joinVisitor.getMixOnList();
         this.streamFiledToIdx = getStreamFiledToIdx(sqlParam, streamTable);
-
+        this.firstStreamFiledToIdx = streamFiledToIdx;
+        initSelectStreamFiledToIdx();
         for (Map.Entry<String, String> entry : getDimensionTableToSql().entrySet()) {
             String table = entry.getKey();
             String sql = entry.getValue();
@@ -165,26 +219,6 @@ public class JoinProcess extends ProcessFunction<String, String> {
 
     }
 
-    public List<String> getSelectFiledList() {
-        Set<String> set = joinVisitor.getDimensionFieldList()
-            .stream()
-            .map(field -> field.table)
-            .collect(Collectors.toSet());
-        List<String> list = joinVisitor.getStreamFieldList()
-            .stream()
-            .filter(field -> field.isSelect && !set.contains(field.table))
-            .map(field -> "streamResult." + field.field)
-            .collect(Collectors.toList());
-        List<String> res = joinVisitor.getDimensionFieldList()
-            .stream()
-            .filter(field -> field.isSelect)
-            .map(field -> field.table + "." + field.field)
-            .collect(Collectors.toList());
-        res.addAll(list);
-        return res;
-
-    }
-
     public Map<String, Integer> getStreamFiledToIdx(SqlParam sqlParam, String tableName) {
 
         Map<String, Integer> filedIdx = new HashMap<>();
@@ -204,8 +238,10 @@ public class JoinProcess extends ProcessFunction<String, String> {
         return filedIdx;
     }
 
-    public String[] recordToArr(String record) {
-        return record.substring(3, record.length() - 1).split(",,");
+    public List<String> recordToArr(String record) {
+
+        return Arrays.stream(record.substring(3, record.length() - 1).split(",,"))
+            .collect(Collectors.toList());
     }
 
     public String arrToRecord(List<String> list) {

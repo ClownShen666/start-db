@@ -193,6 +193,111 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
+    public void join3TableSqlTest() {
+        env.setParallelism(1);
+
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("drop table if exists table3");
+
+            stmt.executeUpdate(
+                "create stream table if not exists table1("
+                    + "idx int,"
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString)"
+            );
+
+            stmt.executeUpdate(
+                "create table if not exists table2(idx int, ride_id string, start_point point);"
+            );
+            stmt.executeUpdate("create table if not exists table3(idx int, end_point point);");
+
+            stmt.execute(
+                "Insert into table2 (idx, ride_id, start_point) values (1, '05608CC867EBDF63'"
+                    + ", st_makePoint(2.1, 2)), (2, 'aaaaaaaaaaa', st_makePoint(4.1, 2))"
+                    + ", (2, '05608CC867EBDF63', st_makePoint(10.1, 10))"
+            );
+            stmt.execute(
+                "Insert into table2 (idx, ride_id, start_point) values (4, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (5, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+            );
+            stmt.execute("Insert into table3 (idx, end_point) values (3, st_makePoint(100, 50.1))");
+
+            String joinSql =
+                "select table1.idx, table2.ride_id, table2.start_point, table3.end_point from table1"
+                    + " left join table2 on table1.idx = table2.idx left join table3 on table1.idx = table3.idx";
+
+            // get topic names
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(joinSql);
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            List<String> topicList = new ArrayList<>();
+            topicList.add(getKafkaTopic(tableList.get(0)));
+            topicList.add(getKafkaTopic(tableList.get(1)));
+
+            // produce message
+            List<String> recordList = new ArrayList<>();
+            recordList.add(
+                "+I["
+                    + "1,,"
+                    + "POINT (90 90),,"
+                    + "POINT (90 90),,"
+                    + "LINESTRING (0 0, 1 1, 1 2)]"
+
+            );
+            recordList.add(
+                "+I["
+                    + "2,,"
+                    + "POINT (90 90),,"
+                    + "POINT (90 90),,"
+                    + "LINESTRING (0 0, 1 1, 1 2)]"
+
+            );
+            recordList.add(
+                "+I["
+                    + "3,,"
+                    + "POINT (90 90),,"
+                    + "POINT (90 90),,"
+                    + "LINESTRING (0 0, 1 1, 1 2)]"
+
+            );
+            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+            // read target table in kafka
+            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("localhost:9092")
+                .setTopics(topicList.get(0))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+            DataStream<String> joinStream = env.fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            ).process(new JoinProcess(joinSql));
+
+            List<String> expected = new ArrayList<>();
+            expected.add("1,,05608CC867EBDF63,,POINT (2.1 2),,null");
+            expected.add("2,,aaaaaaaaaaa,,POINT (4.1 2),,null");
+            expected.add("2,,05608CC867EBDF63,,POINT (10.1 10),,null");
+            expected.add("3,,null,,null,,POINT (100 50.1)");
+
+            checkTable(
+                tableEnv,
+                tableEnv.fromDataStream(joinStream),
+                expected.stream().sorted().collect(Collectors.toList())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Ignore
+    @Test
     public void joinSqlTest() {
         env.setParallelism(1);
 
@@ -200,6 +305,7 @@ public class FlinkQueryExecutorTest {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate("drop table if exists table2");
+
             stmt.executeUpdate(
                 "create stream table if not exists table1("
                     + "idx int,"
@@ -272,7 +378,7 @@ public class FlinkQueryExecutorTest {
                 "kafkaSource",
                 TypeInformation.of(String.class)
             ).process(new JoinProcess(joinSql));
-
+            //
             List<String> expected = new ArrayList<>();
             expected.add("1,," + "05608CC867EBDF63,," + "POINT (2.1 2)");
             expected.add("2,," + "aaaaaaaaaaa,," + "POINT (4.1 2)");

@@ -39,7 +39,7 @@ public class TestUtil {
         int num = rows.size();
         List<String> resultList = resultStream.executeAndCollect(num)
             .stream()
-            .map(row -> row.toString())
+            .map(Row::toString)
             .collect(Collectors.toList());
 
         Collections.sort(rows);
