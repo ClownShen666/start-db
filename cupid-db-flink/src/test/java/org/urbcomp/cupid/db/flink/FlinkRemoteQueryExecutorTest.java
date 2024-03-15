@@ -55,8 +55,8 @@ public class FlinkRemoteQueryExecutorTest {
         FlinkSqlParam.CACHE.set(flinkSqlParam);
     }
 
-    @Test
     @Ignore
+    @Test
     public void selectall() {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();

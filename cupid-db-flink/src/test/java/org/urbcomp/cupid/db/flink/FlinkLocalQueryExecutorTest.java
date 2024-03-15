@@ -16,8 +16,7 @@
  */
 package org.urbcomp.cupid.db.flink;
 
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.table.api.Table;
 import org.junit.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
@@ -32,12 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
+import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 // run the "docker/local" and package cupid-db before test
 public class FlinkLocalQueryExecutorTest {
-    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
     static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
     static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
 
@@ -51,7 +49,7 @@ public class FlinkLocalQueryExecutorTest {
 
     @Ignore
     @Test
-    public void selectall() {
+    public void selectall() throws Exception {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table1");
@@ -66,40 +64,52 @@ public class FlinkLocalQueryExecutorTest {
                     + "multipolygon1 MultiPolygon,"
                     + "SPATIAL INDEX indexName(geometry1))"
             );
-
-            // get topic
-            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-                "select * from table1;"
-            );
-            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                selectVisitor.getDbTableList()
-            );
-            List<String> topicList = new ArrayList<>();
-            topicList.add(getKafkaTopic(tableList.get(0)));
-
-            // produce message
-            List<String> recordList = new ArrayList<>();
-            recordList.add(
-                "+I["
-                    + "POINT (90 90),,"
-                    + "POINT (90 90),,"
-                    + "LINESTRING (0 0, 1 1, 1 2),,"
-                    + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
-                    + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
-                    + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
-                    + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
-            );
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-            // test
-            stmt.executeQuery("select * from table1");
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-            // delete topic
-            stmt.executeUpdate("drop table if exists table1");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor("select * from table1;");
+        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+            selectVisitor.getDbTableList()
+        );
+        List<String> topicList = new ArrayList<>();
+        topicList.add(getKafkaTopic(tableList.get(0)));
+
+        List<String> recordList = new ArrayList<>();
+        recordList.add(
+            "+I["
+                + "POINT (90 90),,"
+                + "POINT (90 90),,"
+                + "LINESTRING (0 0, 1 1, 1 2),,"
+                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
+                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
+                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
+                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
+        );
+
+        produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        flink.loadTables(
+            flinkSqlParam,
+            selectVisitor.getTableList(),
+            selectVisitor.getDbTableList(),
+            tableList
+        );
+        Table table1 = flink.getTableEnv().sqlQuery("select * from table1;");
+
+        List<String> expected = new ArrayList<>();
+        expected.add(
+            "POINT (90 90), "
+                + "POINT (90 90), "
+                + "LINESTRING (0 0, 1 1, 1 2), "
+                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)), "
+                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)), "
+                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)), "
+                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
+        );
+
+        // check table
+        checkTable(flink.getTableEnv(), table1, expected);
     }
 
 }
