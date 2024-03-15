@@ -288,7 +288,7 @@ public class FlinkQueryExecutorTest {
             checkTable(
                 tableEnv,
                 tableEnv.fromDataStream(joinStream),
-                expected.stream().sorted().collect(Collectors.toList())
+                expected
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -388,7 +388,7 @@ public class FlinkQueryExecutorTest {
             checkTable(
                 tableEnv,
                 tableEnv.fromDataStream(joinStream),
-                expected.stream().sorted().collect(Collectors.toList())
+                expected
             );
         } catch (Exception e) {
             throw new RuntimeException(e);
