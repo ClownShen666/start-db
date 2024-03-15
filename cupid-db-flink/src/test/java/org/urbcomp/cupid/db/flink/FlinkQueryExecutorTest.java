@@ -40,7 +40,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
@@ -285,11 +284,7 @@ public class FlinkQueryExecutorTest {
             expected.add("2,,05608CC867EBDF63,,POINT (10.1 10),,null");
             expected.add("3,,null,,null,,POINT (100 50.1)");
 
-            checkTable(
-                tableEnv,
-                tableEnv.fromDataStream(joinStream),
-                expected
-            );
+            checkTable(tableEnv, tableEnv.fromDataStream(joinStream), expected);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -385,11 +380,7 @@ public class FlinkQueryExecutorTest {
             expected.add("2,," + "05608CC867EBDF63,," + "POINT (10.1 10)");
             expected.add("3,," + "null,," + "null");
 
-            checkTable(
-                tableEnv,
-                tableEnv.fromDataStream(joinStream),
-                expected
-            );
+            checkTable(tableEnv, tableEnv.fromDataStream(joinStream), expected);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
