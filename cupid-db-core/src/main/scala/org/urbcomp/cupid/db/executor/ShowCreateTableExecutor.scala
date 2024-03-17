@@ -95,6 +95,7 @@ case class ShowCreateTableExecutor(n: SqlShowCreateTable) extends BaseExecutor {
         false,
         false,
         false,
+        false,
         sqlTableName,
         sqlColumnList,
         sqlIndexList,

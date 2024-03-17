@@ -37,8 +37,9 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
       }
     }
 
-    // drop stream table
-    if (existedTable.getStorageEngine.equals("kafka")) {
+    // drop stream table(topic) in kafka
+    val storageEngine = existedTable.getStorageEngine
+    if (storageEngine.equals("union") | storageEngine.equals("kafka")) {
       deleteKafkaTopic("localhost:9092", getKafkaTopic(existedTable))
     }
 
