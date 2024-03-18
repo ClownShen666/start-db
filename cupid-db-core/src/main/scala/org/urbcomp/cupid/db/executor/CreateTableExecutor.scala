@@ -54,11 +54,13 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     var affectedRows = 0L
     MetadataAccessUtil.withRollback(
       _ => {
-        val storageEngine = if (n.stream) "kafka" else "hbase"
+        // create metadata table
+        val storageEngine = if (n.union) "union" else if (n.stream) "kafka" else "hbase"
         affectedRows = MetadataAccessUtil.insertTable(
           new Table(0L /* unused */, db.getId, tableName, storageEngine)
         )
 
+        // set field and index
         val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
 
@@ -87,12 +89,12 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
         // create stream table(topic) in kafka
-        if (n.stream) {
+        if (n.union | n.stream) {
           createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
         }
 
         // create table in hbase
-        else {
+        if (n.union | !n.stream) {
           val params = ExecutorUtil.getDataStoreParams(userName, dbName)
           val dataStore = DataStoreFinder.getDataStore(params)
           if (dataStore == null) {

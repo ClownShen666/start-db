@@ -82,6 +82,7 @@ showIndexStmt :
 
 createTableStmt :
        T_CREATE T_STREAM? T_TABLE (T_IF T_NOT T_EXISTS)? table_name create_table_preoptions? create_table_definition
+       | T_CREATE T_UNION T_TABLE (T_IF T_NOT T_EXISTS)? table_name (create_table_definition | fromClause)
      ;
 
 createUserStmt :
