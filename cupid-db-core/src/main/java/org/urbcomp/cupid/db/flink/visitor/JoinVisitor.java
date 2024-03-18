@@ -25,6 +25,7 @@ import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
     private String streamJoinSql;
@@ -52,7 +53,21 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private List<On> dimensionOnList = new ArrayList<>();
 
+    private boolean isSplitOn = false;
+
     private String where = "";
+    private final List<String> selectFiledList = new ArrayList<>();
+    private final Set<String> selectBatchList;
+
+    public List<String> getSelectFiledList() {
+        List<String> res = new ArrayList<>();
+        for (String s : selectFiledList) {
+            if (selectBatchList.contains(s)) res.add(s);
+            else res.add("streamResult." + s.split("\\.")[1]);
+
+        }
+        return res;
+    }
 
     // initialize parameters
     public JoinVisitor(String sql) {
@@ -76,6 +91,8 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             dimensionJoinList,
             dimensionOnList
         ) + where;
+        selectBatchList = new HashSet<>(getBatchSelectFiledList());
+        this.isSplitOn = !getBatchSql().equals("");
         System.out.println("stream join sql：" + streamJoinSql);
         System.out.println("dimension join sql：" + dimensionJoinSql);
     }
@@ -137,7 +154,7 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             else {
                 field.table = fieldStr.split("\\.")[0];
                 field.field = fieldStr.split("\\.")[1];
-
+                selectFiledList.add(fieldStr);
                 // select field as alias
                 if (selectListItem.selectListAlias() != null) {
                     String aliasStr = selectListItem.selectListAlias().getText();
@@ -463,4 +480,65 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
     public String getWhere() {
         return where;
     }
+
+    public List<String> getBatchSelectFiledList() {
+        return getDimensionFieldList().stream()
+            .filter(s -> !"streamResult".equals(s.table))
+            .map(s -> s.table + "." + s.field)
+            .collect(Collectors.toList());
+    }
+
+    public List<On> getBatchOnList() {
+        return getDimensionOnList().stream()
+            .filter(
+                s -> !"streamResult".equals(s.left.split("\\.")[0])
+                    && !"streamResult".equals(s.right.split("\\.")[0])
+            )
+            .collect(Collectors.toList());
+    }
+
+    public List<On> getMixOnList() {
+        return getDimensionOnList().stream()
+            .filter(
+                s -> !"streamResult".equals(s.left.split("\\.")[0]) | !"streamResult".equals(
+                    s.right.split("\\.")[0]
+                )
+            )
+            .collect(Collectors.toList());
+    }
+
+    public List<String> getBatchjoinTypeList() {
+        return getDimensionJoinList().stream()
+            .filter(s -> !"streamResult".equals(s.table))
+            .map(s -> s.type)
+            .collect(Collectors.toList());
+    }
+
+    public String getBatchSql() {
+        StringBuilder batchSql = new StringBuilder("select ");
+        getBatchSelectFiledList().forEach(s -> batchSql.append(s).append(","));
+        batchSql.deleteCharAt(batchSql.length() - 1);
+        batchSql.append(" from ");
+        List<On> onList = getBatchOnList();
+        if (onList.size() == 0) return "";
+        List<String> joinTypeList = getBatchjoinTypeList();
+        batchSql.append(onList.get(0).left.split("\\.")[0]).append(" ");
+        for (int i = 0; i < onList.size(); i++) {
+            batchSql.append(joinTypeList.get(0)).append(" ");
+            JoinVisitor.On on = onList.get(0);
+            batchSql.append(on.left)
+                .append(" ")
+                .append(on.type)
+                .append(" ")
+                .append(on.right)
+                .append(" ");
+        }
+        return batchSql.toString();
+    }
+
+    // public String selectList(String sql) {
+    // // sql.split(",")
+    //
+    // }
+
 }
