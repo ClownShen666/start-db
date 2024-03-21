@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink.connector;
+package org.urbcomp.cupid.db.flink.visitor;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -53,6 +53,7 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     @Override
     public Void visitFromTableNameClause(CupidDBSqlParser.FromTableNameClauseContext ctx) {
+
         CupidDBSqlParser.IdentContext names = ctx.tableName().ident();
         if (names.identItem().size() == 1) {
             tableList.add(names.getText());

@@ -32,21 +32,23 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
-import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.serializer.SparkRowToFlinkRow;
+import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
 import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
 
-import org.urbcomp.cupid.db.flink.visitor.InsertIntoFieldVisitor;
-import org.urbcomp.cupid.db.flink.visitor.InsertIntoTableVisitor;
-import org.urbcomp.cupid.db.flink.visitor.JoinVisitor;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
+import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
+import org.urbcomp.cupid.db.spark.SparkQueryExecutor;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
+import org.urbcomp.cupid.db.util.SparkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
@@ -122,42 +124,100 @@ public class FlinkQueryExecutor {
         }
         switch (sqlNode.getKind()) {
             case SELECT:
+
                 // stream join dimension table
-                if (param.getStreamJoinDimension()) {
-                    JoinVisitor joinVisitor = new JoinVisitor(sql);
+                if (param.isStreamJoinDimension()) {
 
-                    // load stream tables and register udf
-                    List<String> streamTableNameList = joinVisitor.getStreamTableList();
-                    List<String> streamDbTableNameList = new ArrayList<>();
-                    for (String streamTable : streamTableNameList) {
-                        streamDbTableNameList.add(param.getDbName() + "." + streamTable);
+                    // has union table
+                    if (param.isHasUnion()) {
+                        List<String> unionTables = param.getUnionTables();
+
+                        // union table as stream table
+                        FlinkSqlParam param1 = new FlinkSqlParam();
+                        List<String> streamTables = param.getStreamTables();
+                        streamTables.addAll(unionTables);
+                        param1.setStreamTables(streamTables);
+                        param1.setDimensionTables(param.getDimensionTables());
+                        JoinVisitor joinVisitor1 = new JoinVisitor(sql, param1);
+
+                        // union table as dimension table
+                        FlinkSqlParam param2 = new FlinkSqlParam();
+                        List<String> dimensionTables = param.getDimensionTables();
+                        dimensionTables.addAll(unionTables);
+                        param2.setDimensionTables(dimensionTables);
+                        param1.setStreamTables(param.getStreamTables());
+                        JoinVisitor joinVisitor2 = new JoinVisitor(sql, param2);
+
+                        // todo: execute query twice and then union two result
+
+                    } else {
+                        // todo: execute query
+                        // JoinVisitor joinVisitor = new JoinVisitor(sql, param);
+                        // // get stream join result
+                        // DataStream<Row> streamJoin = getTableEnv().toChangelogStream(
+                        // getTableEnv().sqlQuery(joinVisitor.getStreamJoinSql()));
+                        // // get stream join dimension result
+                        // DataStream<Row> resultStream = streamJoin.process(new
+                        // JoinProcess(joinVisitor.getDimensionJoinSql()));
+
                     }
-
-                    // List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                    // dbTableNameList
-                    // );
-                    // loadTables(param, tableNameList, dbTableNameList, tableList);
-                    //
-                    // // execute stream join and return result stream
-                    // DataStream<Row> streamJoinStream = getTableEnv().toChangelogStream(
-                    // getTableEnv().sqlQuery(sql)
-                    // );
                     return null;
-                } else {
-                    SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
+                }
+
+                // query stream or union table
+                else {
 
                     // load select tables and register udf
+                    SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
                     List<String> tableNameList = selectVisitor.getTableList();
                     List<String> dbTableNameList = selectVisitor.getDbTableList();
                     List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
                         dbTableNameList
                     );
                     loadTables(param, tableNameList, dbTableNameList, tableList);
+                    DataStream<Row> resultStream;
 
-                    // execute and return select result stream
-                    DataStream<Row> resultStream = getTableEnv().toChangelogStream(
-                        getTableEnv().sqlQuery(sql)
-                    );
+                    // query union table
+                    if (param.isHasUnion()) {
+
+                        // get dimension query result
+                        SparkSqlParam sparkSqlParam = new SparkSqlParam(SqlParam.CACHE.get());
+                        sparkSqlParam.setExportType(DataExportType.PRINT);
+                        sparkSqlParam.setLocal(true);
+                        List<org.apache.spark.sql.Row> sparkRowResult = SparkQueryExecutor.execute(
+                            sparkSqlParam,
+                            SparkQueryExecutor.getSparkSession(true, null)
+                        ).collectAsList();
+
+                        // convert sparkRow to flinkRow
+                        SelectFieldVisitor selectFieldVisitor = new SelectFieldVisitor(sql);
+                        SparkRowToFlinkRow sparkRowToFlinkRow = new SparkRowToFlinkRow(
+                            selectFieldVisitor.getFieldNameList(),
+                            selectFieldVisitor.getFieldTypeList()
+                        );
+                        List<org.apache.flink.types.Row> flinkRowResult = sparkRowResult.stream()
+                            .map(sparkRowToFlinkRow)
+                            .collect(Collectors.toList());
+
+                        // get union query result stream
+                        getTableEnv().createTemporaryView(
+                            "dimensionResult",
+                            getEnv().fromCollection(flinkRowResult)
+                                .returns(sparkRowToFlinkRow.getRowTypeInfo())
+                        );
+                        resultStream = getTableEnv().toChangelogStream(
+                            getTableEnv().sqlQuery("select * from dimensionResult union " + sql)
+                        );
+                    }
+
+                    // query stream table
+                    else {
+
+                        // get stream query result
+                        resultStream = getTableEnv().toChangelogStream(getTableEnv().sqlQuery(sql));
+                    }
+
+                    // execute and return result stream
                     try {
                         if (param.getTestNum() == 0) {
                             getEnv().execute();
@@ -169,51 +229,94 @@ public class FlinkQueryExecutor {
                     }
                     return resultStream;
                 }
+
             case INSERT:
-                System.out.println("sql kind: " + sqlNode.getKind());
-                InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
-                SelectFromTableVisitor selectVisitor2 = new SelectFromTableVisitor(sql);
-                InsertIntoFieldVisitor fieldVisitor = new InsertIntoFieldVisitor(sql);
+                // todo: insert stream into dimension table
+                if (param.isInsertStreamIntoDimension()) {
 
-                // only execute insert into table select ...
-                if (!insertVisitor.haveSelect()) {
-                    throw new UnsupportedOperationException("Unsupported sql: " + sql);
-                }
+                } else {
+                    InsertIntoTableVisitor insertVisitor = new InsertIntoTableVisitor(sql);
+                    SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
+                    InsertIntoFieldVisitor fieldVisitor = new InsertIntoFieldVisitor(sql);
 
-                // get select sql
-                String selectSql = "select " + sql.split(" (?i)select ")[1];
-
-                // load select tables and register udf
-                List<String> tableNameList2 = selectVisitor2.getTableList();
-                List<String> dbTableNameList2 = selectVisitor2.getDbTableList();
-                List<org.urbcomp.cupid.db.metadata.entity.Table> tableList2 = getTables(
-                    dbTableNameList2
-                );
-                loadTables(param, tableNameList2, dbTableNameList2, tableList2);
-
-                // get select result
-                Table resultTable = getTableEnv().sqlQuery(selectSql);
-                DataStream<Row> resultStream2 = getTableEnv().toChangelogStream(resultTable);
-
-                // write result to kafka
-                org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
-                    insertVisitor.getDbTable()
-                );
-                checkInsert(resultTable, fieldVisitor.getFieldNameList(), insertTable);
-                insertTable(param, resultStream2, insertTable);
-
-                // execute and return select result
-                try {
-                    if (param.getTestNum() == 0) {
-                        getEnv().execute();
-                    } else {
-                        resultStream2.executeAndCollect(param.getTestNum());
+                    // only execute insert into table select ...
+                    if (!insertVisitor.haveSelect()) {
+                        throw new UnsupportedOperationException("Unsupported sql: " + sql);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return resultStream2;
 
+                    // get select sql
+                    String selectSql = "select " + sql.split(" (?i)select ")[1];
+
+                    // load select tables and register udf
+                    List<String> tableNameList2 = selectVisitor.getTableList();
+                    List<String> dbTableNameList2 = selectVisitor.getDbTableList();
+                    List<org.urbcomp.cupid.db.metadata.entity.Table> tableList2 = getTables(
+                        dbTableNameList2
+                    );
+                    loadTables(param, tableNameList2, dbTableNameList2, tableList2);
+                    Table resultTable;
+                    DataStream<Row> resultStream;
+
+                    // get union query result
+                    if (param.isHasUnion()) {
+
+                        // get dimension query result
+                        SparkSqlParam sparkSqlParam = new SparkSqlParam(SqlParam.CACHE.get());
+                        sparkSqlParam.setSql(selectSql);
+                        sparkSqlParam.setExportType(DataExportType.PRINT);
+                        sparkSqlParam.setLocal(true);
+                        List<org.apache.spark.sql.Row> sparkRowResult = SparkQueryExecutor.execute(
+                            sparkSqlParam,
+                            SparkQueryExecutor.getSparkSession(true, null)
+                        ).collectAsList();
+
+                        // convert sparkRow to flinkRow
+                        SelectFieldVisitor selectFieldVisitor = new SelectFieldVisitor(selectSql);
+                        SparkRowToFlinkRow sparkRowToFlinkRow = new SparkRowToFlinkRow(
+                            selectFieldVisitor.getFieldNameList(),
+                            selectFieldVisitor.getFieldTypeList()
+                        );
+                        List<org.apache.flink.types.Row> flinkRowResult = sparkRowResult.stream()
+                            .map(sparkRowToFlinkRow)
+                            .collect(Collectors.toList());
+
+                        // get union query result stream
+                        getTableEnv().createTemporaryView(
+                            "dimensionResult",
+                            getEnv().fromCollection(flinkRowResult)
+                                .returns(sparkRowToFlinkRow.getRowTypeInfo())
+                        );
+                        resultTable = getTableEnv().sqlQuery(
+                            "select * from dimensionResult union " + selectSql
+                        );
+                        resultStream = getTableEnv().toChangelogStream(resultTable);
+                    }
+
+                    // get query result
+                    else {
+                        resultTable = getTableEnv().sqlQuery(selectSql);
+                        resultStream = getTableEnv().toChangelogStream(resultTable);
+                    }
+
+                    // write result to kafka
+                    org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
+                        insertVisitor.getDbTable()
+                    );
+                    checkInsert(resultTable, fieldVisitor.getFieldNameList(), insertTable);
+                    insertTable(param, resultStream, insertTable);
+
+                    // execute and return query result
+                    try {
+                        if (param.getTestNum() == 0) {
+                            getEnv().execute();
+                        } else {
+                            resultStream.executeAndCollect(param.getTestNum());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return resultStream;
+                }
             default:
                 throw new UnsupportedOperationException("Unsupported sql: " + sql);
         }

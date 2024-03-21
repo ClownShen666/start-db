@@ -53,6 +53,12 @@ public class FlinkSqlParam extends SqlParam {
 
     private boolean streamJoinDimension = false;
 
+    private boolean insertStreamIntoDimension = false;
+
+    private boolean hasUnion = false;
+
+    private List<String> unionTables;
+
     private List<String> streamTables;
 
     private List<String> dimensionTables;
@@ -78,12 +84,36 @@ public class FlinkSqlParam extends SqlParam {
         this.bootstrapServers = bootstrapServers;
     }
 
-    public boolean getStreamJoinDimension() {
+    public boolean isStreamJoinDimension() {
         return streamJoinDimension;
     }
 
     public void setStreamJoinDimension(boolean streamJoinDimension) {
         this.streamJoinDimension = streamJoinDimension;
+    }
+
+    public boolean isInsertStreamIntoDimension() {
+        return insertStreamIntoDimension;
+    }
+
+    public void setInsertStreamIntoDimension(boolean insertStreamIntoDimension) {
+        this.insertStreamIntoDimension = insertStreamIntoDimension;
+    }
+
+    public boolean isHasUnion() {
+        return hasUnion;
+    }
+
+    public void setHasUnion(boolean hasUnion) {
+        this.hasUnion = hasUnion;
+    }
+
+    public List<String> getUnionTables() {
+        return unionTables;
+    }
+
+    public void setUnionTables(List<String> unionTables) {
+        this.unionTables = unionTables;
     }
 
     public List<String> getStreamTables() {

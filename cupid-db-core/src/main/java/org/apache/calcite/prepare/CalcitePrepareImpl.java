@@ -85,7 +85,7 @@ import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
 import org.urbcomp.cupid.db.flink.FlinkQueryExecutor;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.flink.visitor.InsertIntoTableVisitor;
-import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.infra.MetadataResult;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.parser.dcl.SqlLoadData;
@@ -872,22 +872,34 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         // Currently flink engine only supports select & insert ... select...
         String sql = sqlParam.getSql();
         List<String> tableNameList = new ArrayList<>();
-        if (sqlNode instanceof SqlSelect) {
-            List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
-            for (String dbTableName : dbTableNameList) {
-                tableNameList.add(dbTableName.split("\\.")[1]);
-            }
-        }
+
+        // judge if insert stream into dimension table
         if (sqlNode instanceof SqlInsert
             && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect) {
-            tableNameList.add(new InsertIntoTableVisitor(sql).getDbTable().split("\\.")[1]);
+            String insertTable = new InsertIntoTableVisitor(sql).getDbTable().split("\\.")[1];
+            org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
+                sqlParam.getUserName(),
+                sqlParam.getDbName(),
+                insertTable
+            );
+            if (!table.getStorageEngine().equals("kafka")) {
+                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                flinkSqlParam.setInsertStreamIntoDimension(true);
+                FlinkSqlParam.CACHE.set(flinkSqlParam);
+            }
+        }
+
+        // judge if select from stream and dimension(and union)
+        if ((sqlNode instanceof SqlInsert && ((SqlInsert) sqlNode).getSource() instanceof SqlSelect)
+            || sqlNode instanceof SqlSelect) {
             List<String> dbTableNameList = new SelectFromTableVisitor(sql).getDbTableList();
             for (String dbTableName : dbTableNameList) {
                 tableNameList.add(dbTableName.split("\\.")[1]);
             }
-        }
-        if (tableNameList.size() > 0) {
             int streamTableNum = 0;
+            int dimensionTableNum = 0;
+            boolean hasUnion = false;
+            List<String> unionTables = new ArrayList<>();
             List<String> streamTables = new ArrayList<>();
             List<String> dimensionTables = new ArrayList<>();
             for (String tableName : tableNameList) {
@@ -899,18 +911,27 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 if (table == null) {
                     throw new IllegalArgumentException("table doesn't exist " + tableName);
                 } else {
-                    if (table.getStorageEngine().equals("kafka")) {
+                    if (table.getStorageEngine().equals("union")) {
+                        streamTableNum++;
+                        dimensionTableNum++;
+                        unionTables.add(tableName);
+                        hasUnion = true;
+                    } else if (table.getStorageEngine().equals("kafka")) {
                         streamTableNum++;
                         streamTables.add(tableName);
                     } else {
+                        dimensionTableNum++;
                         dimensionTables.add(tableName);
                     }
                 }
             }
             if (streamTableNum > 0) {
-                if (streamTableNum < tableNameList.size()) {
+                if (dimensionTableNum > 0) {
                     FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                    flinkSqlParam.setStreamJoinDimension(true);
+                    if (tableNameList.size() > 1) {
+                        flinkSqlParam.setStreamJoinDimension(true);
+                    }
+                    flinkSqlParam.setHasUnion(hasUnion);
                     flinkSqlParam.setStreamTables(streamTables);
                     flinkSqlParam.setDimensionTables(dimensionTables);
                     FlinkSqlParam.CACHE.set(flinkSqlParam);
