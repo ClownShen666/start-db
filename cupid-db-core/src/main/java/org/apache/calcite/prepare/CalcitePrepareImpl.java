@@ -872,6 +872,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         // Currently flink engine only supports select & insert ... select...
         String sql = sqlParam.getSql();
         List<String> tableNameList = new ArrayList<>();
+        boolean insertIntoDimension = false;
 
         // judge if insert stream into dimension table
         if (sqlNode instanceof SqlInsert
@@ -883,9 +884,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 insertTable
             );
             if (!table.getStorageEngine().equals("kafka")) {
-                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                flinkSqlParam.setInsertStreamIntoDimension(true);
-                FlinkSqlParam.CACHE.set(flinkSqlParam);
+                insertIntoDimension = true;
             }
         }
 
@@ -930,6 +929,9 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                     FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
                     if (tableNameList.size() > 1) {
                         flinkSqlParam.setStreamJoinDimension(true);
+                    }
+                    if (insertIntoDimension) {
+                        flinkSqlParam.setInsertStreamIntoDimension(true);
                     }
                     flinkSqlParam.setHasUnion(hasUnion);
                     flinkSqlParam.setStreamTables(streamTables);
