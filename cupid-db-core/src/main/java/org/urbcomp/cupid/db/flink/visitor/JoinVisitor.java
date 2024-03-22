@@ -237,9 +237,11 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
             if (tableType.get(on.left.split("\\.")[0]).equals("dimension")
                 || tableType.get(on.right.split("\\.")[0]).equals("dimension")) {
                 if (tableType.get(on.left.split("\\.")[0]).equals("stream")) {
+                    addField(on.left);
                     on.left = "streamResult." + on.left.split("\\.")[1];
                 }
                 if (tableType.get(on.right.split("\\.")[0]).equals("stream")) {
+                    addField(on.right);
                     on.right = "streamResult." + on.right.split("\\.")[1];
                 }
                 dimensionOnList.add(on);
