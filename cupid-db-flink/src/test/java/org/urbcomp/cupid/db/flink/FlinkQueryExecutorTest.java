@@ -28,7 +28,7 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
-import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
@@ -93,7 +93,7 @@ public class FlinkQueryExecutorTest {
                 // "select table1.id1, table2.id2 as i2, log(table3.id3, table2.id2) as logid from
                 // table1, table2, table3, table4;"
                 // "select * from table3, table2 join table1 on table1.id1 = table3.id3;"
-                "select *, table1.id1 as t1 from table1 left join table2 on table1.id1 = table2.id2 right join table3 on table1.id1 = table3.id3 and table2.id2 = table3.id3 where table1.id1 < table2.id2 and table2.id2 > table3.id3;"
+                "insert into table1 select *, table1.id1 as t1 from table1 left join table2 on table1.id1 = table2.id2 right join table3 on table1.id1 = table3.id3 and table2.id2 = table3.id3 where table1.id1 < table2.id2 and table2.id2 > table3.id3;"
             );
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -134,59 +134,6 @@ public class FlinkQueryExecutorTest {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    @Ignore
-    @Test
-    public void streamSelectSqlTest() {
-        try (Connection connect = CalciteHelper.createConnection()) {
-            Statement stmt = connect.createStatement();
-            stmt.executeUpdate("drop table if exists table1");
-            stmt.executeUpdate(
-                "create stream table if not exists table1("
-                    + "geometry1 Geometry,"
-                    + "point1 Point,"
-                    + "linestring1 LineString,"
-                    + "polygon1 Polygon,"
-                    + "multipoint1 MultiPoint,"
-                    + "multilinestring1 MultiLineString,"
-                    + "multipolygon1 MultiPolygon,"
-                    + "SPATIAL INDEX indexName(geometry1))"
-            );
-
-            // get topic
-            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-                "select * from table1;"
-            );
-            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                selectVisitor.getDbTableList()
-            );
-            List<String> topicList = new ArrayList<>();
-            topicList.add(getKafkaTopic(tableList.get(0)));
-
-            // produce message
-            List<String> recordList = new ArrayList<>();
-            recordList.add(
-                "+I["
-                    + "POINT (90 90),,"
-                    + "POINT (90 90),,"
-                    + "LINESTRING (0 0, 1 1, 1 2),,"
-                    + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
-                    + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
-                    + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
-                    + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
-            );
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-            // test
-            stmt.executeQuery("select * from table1");
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-            // delete topic
-            stmt.executeUpdate("drop table if exists table1");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -385,6 +332,59 @@ public class FlinkQueryExecutorTest {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Ignore
+    @Test
+    public void streamSelectSqlTest() {
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate(
+                "create stream table if not exists table1("
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString,"
+                    + "polygon1 Polygon,"
+                    + "multipoint1 MultiPoint,"
+                    + "multilinestring1 MultiLineString,"
+                    + "multipolygon1 MultiPolygon,"
+                    + "SPATIAL INDEX indexName(geometry1))"
+            );
+
+            // get topic
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+                "select * from table1;"
+            );
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            List<String> topicList = new ArrayList<>();
+            topicList.add(getKafkaTopic(tableList.get(0)));
+
+            // produce message
+            List<String> recordList = new ArrayList<>();
+            recordList.add(
+                "+I["
+                    + "POINT (90 90),,"
+                    + "POINT (90 90),,"
+                    + "LINESTRING (0 0, 1 1, 1 2),,"
+                    + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
+                    + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
+                    + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
+                    + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))]"
+            );
+            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+
+            // test
+            stmt.executeQuery("select * from table1");
+            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+
+            // delete topic
+            stmt.executeUpdate("drop table if exists table1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Ignore

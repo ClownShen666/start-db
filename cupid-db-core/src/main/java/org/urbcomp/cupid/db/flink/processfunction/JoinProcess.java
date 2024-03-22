@@ -184,7 +184,8 @@ public class JoinProcess extends ProcessFunction<String, String> {
         Connection connection = CalciteHelper.createConnection();
         Statement statement = connection.createStatement();
         statement.executeQuery(sql);
-        this.joinVisitor = new JoinVisitor(sql);
+        // todo: use setJoinVisitor before loading rather than new during loading
+        this.joinVisitor = new JoinVisitor(sql, flinkSqlParam);
         String streamTable = streamTable();
         this.selectFiledList = joinVisitor.getSelectFiledList();
         this.onList = joinVisitor.getMixOnList();
