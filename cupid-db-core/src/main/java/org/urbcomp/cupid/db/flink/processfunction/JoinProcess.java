@@ -80,6 +80,8 @@ public class JoinProcess extends ProcessFunction<Row, Row> {
 
         boolean isFirstLoop = true;
         for (JoinVisitor.On on1 : onList) {
+            if (on1.left.split("\\.")[0].equals(STREAM_TABLE)
+                && on1.right.split("\\.")[0].equals(STREAM_TABLE)) continue;
             List<Row> temp = new ArrayList<>();
             for (Row streamRow : streamRows) {
                 temp.addAll(compareOn(on1, streamRow, isFirstLoop));
@@ -193,10 +195,9 @@ public class JoinProcess extends ProcessFunction<Row, Row> {
         statement.executeQuery(sql);
         // todo: use setJoinVisitor before loading rather than new during loading
         this.joinVisitor = new JoinVisitor(sql, flinkSqlParam);
-        String streamTable = streamTable();
         this.selectFiledList = joinVisitor.getSelectFiledList();
         this.onList = joinVisitor.getMixOnList();
-        this.streamFiledToIdx = getStreamFiledToIdx(streamTable);
+        this.streamFiledToIdx = getStreamFiledToIdx();
         this.firstStreamFiledToIdx = streamFiledToIdx;
         // initNameTypeList(sqlParam);
         initSelectStreamFiledToIdx();
@@ -224,7 +225,7 @@ public class JoinProcess extends ProcessFunction<Row, Row> {
         connection.close();
     }
 
-    public Map<String, Integer> getStreamFiledToIdx(String tableName) {
+    public Map<String, Integer> getStreamFiledToIdx() {
         Map<String, Integer> filedIdx = new HashMap<>();
 
         int i = 0;
@@ -286,10 +287,6 @@ public class JoinProcess extends ProcessFunction<Row, Row> {
                 tableSql.put(k, sql.toString());
             });
         return tableSql;
-    }
-
-    public String streamTable() {
-        return joinVisitor.getStreamTableList().get(0);
     }
 
 }

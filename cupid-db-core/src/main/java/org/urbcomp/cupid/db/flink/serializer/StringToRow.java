@@ -149,6 +149,7 @@ public class StringToRow implements MapFunction<String, Row> {
                     case "Double":
                         fieldTypes[i] = Types.DOUBLE;
                         break;
+                    case "string":
                     case "String":
                         fieldTypes[i] = Types.STRING;
                         break;
@@ -159,6 +160,7 @@ public class StringToRow implements MapFunction<String, Row> {
                     case "Geometry":
                         fieldTypes[i] = TypeExtractor.createTypeInfo(Geometry.class);
                         break;
+                    case "point":
                     case "Point":
                         fieldTypes[i] = TypeExtractor.createTypeInfo(Point.class);
                         break;

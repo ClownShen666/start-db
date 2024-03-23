@@ -69,6 +69,11 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         return res;
     }
 
+    // 未被替换streamResult
+    public List<String> getOldSelectFiledList() {
+        return selectFiledList;
+    }
+
     // initialize parameters
     public JoinVisitor(String sql, FlinkSqlParam param) {
         streamTableList = param.getStreamTables();
@@ -537,8 +542,23 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         return batchSql.toString();
     }
 
-    // public String selectList(String sql) {
-    // // sql.split(",")
+    // public String getMixSql() {
+    // StringBuilder mixSql = new StringBuilder("select ");
+    // getOldSelectFiledList().forEach(s -> mixSql.append(s).append(","));
+    // mixSql.deleteCharAt(mixSql.length() - 1);
+    // mixSql.append(" from ");
+    // List<On> onList = getBatchOnList();
+    // if (onList.size() == 0) return "";
+    // List<String> joinTypeList = getBatchjoinTypeList();
+    // batchSql.append(onList.get(0).left.split("\\.")[0]).append(" ");
+    // for (int i = 0; i < onList.size(); i++) {
+    // batchSql.append(joinTypeList.get(0)).append(" ");
+    // JoinVisitor.On on = onList.get(0);
+    // batchSql.append(on.left)
+    // .append(on.type)
+    // .append(on.right);
+    // }
+    // return batchSql.toString();
     //
     // }
 
