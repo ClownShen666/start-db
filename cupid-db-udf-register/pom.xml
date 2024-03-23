@@ -20,17 +20,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-            <version>1.11.7</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.27.0-GA</version> <!-- 这里可以替换为最新版本 -->
-        </dependency>
 
 
         <!--    flink core    -->
