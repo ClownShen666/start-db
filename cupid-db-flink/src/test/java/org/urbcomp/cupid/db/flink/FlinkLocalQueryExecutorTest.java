@@ -19,7 +19,7 @@ package org.urbcomp.cupid.db.flink;
 import org.apache.flink.table.api.Table;
 import org.junit.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
-import org.urbcomp.cupid.db.flink.connector.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
