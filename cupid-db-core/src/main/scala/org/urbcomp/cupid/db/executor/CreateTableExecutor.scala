@@ -89,12 +89,12 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
 
         // create stream table(topic) in kafka
-        if (n.union | n.stream) {
+        if (n.union || n.stream) {
           createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
         }
 
         // create table in hbase
-        if (n.union | !n.stream) {
+        if (n.union || !n.stream) {
           val params = ExecutorUtil.getDataStoreParams(userName, dbName)
           val dataStore = DataStoreFinder.getDataStore(params)
           if (dataStore == null) {
