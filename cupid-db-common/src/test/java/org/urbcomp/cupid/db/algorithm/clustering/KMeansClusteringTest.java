@@ -41,9 +41,6 @@ public class KMeansClusteringTest {
     @Test
     public void kMeansTest() {
         List<MultiPoint> list = kMeansClustering.cluster();
-        for (MultiPoint multiPoint : list) {
-            System.out.println(multiPoint.toString());
-        }
         assertEquals(list.size(), 4);
         assertEquals(
             list.get(0).toString(),

@@ -69,6 +69,11 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         return res;
     }
 
+    // 未被替换streamResult
+    public List<String> getOldSelectFiledList() {
+        return selectFiledList;
+    }
+
     // initialize parameters
     public JoinVisitor(String sql, FlinkSqlParam param) {
         streamTableList = param.getStreamTables();
@@ -536,10 +541,5 @@ public class JoinVisitor extends CupidDBSqlBaseVisitor<Void> {
         }
         return batchSql.toString();
     }
-
-    // public String selectList(String sql) {
-    // // sql.split(",")
-    //
-    // }
 
 }

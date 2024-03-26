@@ -30,6 +30,7 @@ import org.junit.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
+import org.urbcomp.cupid.db.flink.serializer.StringToRow;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
@@ -41,10 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertEquals;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
-import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
-import static org.urbcomp.cupid.db.flink.TestUtil.checkTableNotNull;
+import static org.urbcomp.cupid.db.flink.TestUtil.*;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 // run the "docker/flink-kafka", "docker/local" and package cupid-db before test
@@ -130,10 +130,55 @@ public class FlinkQueryExecutorTest {
             stmt.executeUpdate("drop table table2");
             Set<String> topicsAfter = showTopics("localhost:9092");
 
-            assertTrue(topicsBefore.equals(topicsAfter));
+            assertEquals(topicsBefore, topicsAfter);
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Ignore
+    @Test
+    public void joinSqlExecutorTest() {
+
+        env.setParallelism(1);
+
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("drop table if exists table3");
+
+            stmt.executeUpdate(
+                "create stream table if not exists table1("
+                    + "idx int,"
+                    + "geometry1 Geometry,"
+                    + "point1 Point,"
+                    + "linestring1 LineString)"
+            );
+
+            stmt.executeUpdate(
+                "create table if not exists table2(idx int, ride_id string, start_point point);"
+            );
+            stmt.executeUpdate("create table if not exists table3(idx int, end_point point);");
+
+            stmt.execute(
+                "Insert into table2 (idx, ride_id, start_point) values (1, '05608CC867EBDF63'"
+                    + ", st_makePoint(2.1, 2)), (2, 'aaaaaaaaaaa', st_makePoint(4.1, 2))"
+                    + ", (2, '05608CC867EBDF63', st_makePoint(10.1, 10))"
+            );
+            stmt.execute(
+                "Insert into table2 (idx, ride_id, start_point) values (4, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (5, '05608CC867EBDF63', st_makePoint(4.1, 2))"
+            );
+            stmt.execute("Insert into table3 (idx, end_point) values (3, st_makePoint(100, 50.1))");
+
+            String joinSql =
+                "select table1.idx, table2.ride_id, table2.start_point, table3.end_point from table1"
+                    + " left join table2 on table1.idx = table2.idx left join table3 on table1.idx = table3.idx";
+            stmt.executeQuery(joinSql);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -180,6 +225,7 @@ public class FlinkQueryExecutorTest {
             List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
                 selectVisitor.getDbTableList()
             );
+
             List<String> topicList = new ArrayList<>();
             topicList.add(getKafkaTopic(tableList.get(0)));
             topicList.add(getKafkaTopic(tableList.get(1)));
@@ -218,20 +264,28 @@ public class FlinkQueryExecutorTest {
                 .setStartingOffsets(OffsetsInitializer.earliest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
-            DataStream<String> joinStream = env.fromSource(
+
+            DataStream<Row> joinStream = env.fromSource(
                 kafkaSource,
                 WatermarkStrategy.noWatermarks(),
                 "kafkaSource",
                 TypeInformation.of(String.class)
-            ).process(new JoinProcess(joinSql));
+            )
+                .map(
+                    new StringToRow(
+                        getNameList("table1", sqlParam),
+                        getTypeList("table1", sqlParam)
+                    )
+                )
+                .process(new JoinProcess(joinSql));
 
             List<String> expected = new ArrayList<>();
-            expected.add("1,,05608CC867EBDF63,,POINT (2.1 2),,null");
-            expected.add("2,,aaaaaaaaaaa,,POINT (4.1 2),,null");
-            expected.add("2,,05608CC867EBDF63,,POINT (10.1 10),,null");
-            expected.add("3,,null,,null,,POINT (100 50.1)");
+            expected.add("1, 05608CC867EBDF63, POINT (2.1 2), null");
+            expected.add("2, aaaaaaaaaaa, POINT (4.1 2), null");
+            expected.add("2, 05608CC867EBDF63, POINT (10.1 10), null");
+            expected.add("3, null, null, POINT (100 50.1)");
 
-            checkTable(tableEnv, tableEnv.fromDataStream(joinStream), expected);
+            checkTable2(tableEnv, joinStream, expected);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -314,20 +368,27 @@ public class FlinkQueryExecutorTest {
                 .setStartingOffsets(OffsetsInitializer.earliest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
-            DataStream<String> joinStream = env.fromSource(
+            DataStream<Row> joinStream = env.fromSource(
                 kafkaSource,
                 WatermarkStrategy.noWatermarks(),
                 "kafkaSource",
                 TypeInformation.of(String.class)
-            ).process(new JoinProcess(joinSql));
-            //
-            List<String> expected = new ArrayList<>();
-            expected.add("1,," + "05608CC867EBDF63,," + "POINT (2.1 2)");
-            expected.add("2,," + "aaaaaaaaaaa,," + "POINT (4.1 2)");
-            expected.add("2,," + "05608CC867EBDF63,," + "POINT (10.1 10)");
-            expected.add("3,," + "null,," + "null");
+            )
+                .map(
+                    new StringToRow(
+                        getNameList("table1", sqlParam),
+                        getTypeList("table1", sqlParam)
+                    )
+                )
+                .process(new JoinProcess(joinSql));
 
-            checkTable(tableEnv, tableEnv.fromDataStream(joinStream), expected);
+            List<String> expected = new ArrayList<>();
+            expected.add("1, " + "05608CC867EBDF63, " + "POINT (2.1 2)");
+            expected.add("2, " + "aaaaaaaaaaa, " + "POINT (4.1 2)");
+            expected.add("2, " + "05608CC867EBDF63, " + "POINT (10.1 10)");
+            expected.add("3, " + "null, " + "null");
+
+            checkTable2(tableEnv, joinStream, expected);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

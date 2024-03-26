@@ -32,6 +32,7 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
+import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.SparkRowToFlinkRow;
 import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
@@ -151,14 +152,21 @@ public class FlinkQueryExecutor {
                         // todo: execute query twice and then union two result
 
                     } else {
+                        SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(sql);
+                        List<String> tableNameList = selectVisitor.getTableList();
+                        List<String> dbTableNameList = selectVisitor.getDbTableList();
+                        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                            dbTableNameList
+                        );
+                        loadTables(param, tableNameList, dbTableNameList, tableList);
                         // todo: execute query
-                        // JoinVisitor joinVisitor = new JoinVisitor(sql, param);
-                        // // get stream join result
-                        // DataStream<Row> streamJoin = getTableEnv().toChangelogStream(
-                        // getTableEnv().sqlQuery(joinVisitor.getStreamJoinSql()));
-                        // // get stream join dimension result
-                        // DataStream<Row> resultStream = streamJoin.process(new
-                        // JoinProcess(joinVisitor.getDimensionJoinSql()));
+                        JoinVisitor joinVisitor = new JoinVisitor(sql, param);
+                        // get stream join result
+                        DataStream<Row> streamJoin = getTableEnv().toChangelogStream(
+                            getTableEnv().sqlQuery(joinVisitor.getStreamJoinSql())
+                        );
+                        // get stream join dimension result, parse mix sql in JoinProcess
+                        return streamJoin.process(new JoinProcess(sql));
 
                     }
                     return null;
