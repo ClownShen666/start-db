@@ -96,7 +96,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_BD09ToWGS84(Geometry)") {
     executeQueryCheck(
-      "select st_BD09ToWGS84(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_BD09ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534)," +
           " (2.9934995619203466 3.993975880501857))"
@@ -106,7 +106,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_BD09ToWGS84(GeometryCollection)") {
     executeQueryCheck(
-      "select st_BD09ToWGS84(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_BD09ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
       )
@@ -185,7 +185,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_WGS84ToBD09(Geometry)") {
     executeQueryCheck(
-      "select st_WGS84ToBD09(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_WGS84ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
       )
@@ -194,7 +194,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_WGS84ToBD09(GeometryCollection)") {
     executeQueryCheck(
-      "select st_WGS84ToBD09(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_WGS84ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
       )
@@ -272,7 +272,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_GCJ02ToBD09(Geometry)") {
     executeQueryCheck(
-      "select st_GCJ02ToBD09(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_GCJ02ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
       )
@@ -281,7 +281,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_GCJ02ToBD09(GeometryCollection)") {
     executeQueryCheck(
-      "select st_GCJ02ToBD09(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_GCJ02ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
       )
@@ -359,7 +359,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_BD09ToGCJ02(Geometry)") {
     executeQueryCheck(
-      "select st_BD09ToGCJ02(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_BD09ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
       )
@@ -368,7 +368,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_BD09ToGCJ02(GeometryCollection)") {
     executeQueryCheck(
-      "select st_BD09ToGCJ02(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_BD09ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
       )
@@ -423,14 +423,14 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_WGS84ToGCJ02(Geometry)") {
     executeQueryCheck(
-      "select st_WGS84ToGCJ02(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_WGS84ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_WGS84ToGCJ02(GeometryCollection)") {
     executeQueryCheck(
-      "select st_WGS84ToGCJ02(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_WGS84ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
@@ -483,14 +483,14 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_GCJ02ToWGS84(Geometry)") {
     executeQueryCheck(
-      "select st_GCJ02ToWGS84(st_geomFromWKT('MULTIPOINT((1 2),(3 4))'))",
+      "select st_GCJ02ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_GCJ02ToWGS84(GeometryCollection)") {
     executeQueryCheck(
-      "select st_GCJ02ToWGS84(st_geomFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
+      "select st_GCJ02ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
