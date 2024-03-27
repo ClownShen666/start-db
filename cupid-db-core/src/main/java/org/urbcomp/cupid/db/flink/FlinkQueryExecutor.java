@@ -19,6 +19,10 @@ package org.urbcomp.cupid.db.flink;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -32,12 +36,15 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
+import org.locationtech.jts.geom.*;
+import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.SparkRowToFlinkRow;
 import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
 import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
 
+import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
@@ -48,6 +55,7 @@ import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -187,35 +195,75 @@ public class FlinkQueryExecutor {
 
                     // query union table
                     if (param.isHasUnion()) {
-
-                        // get dimension query result
-                        SparkSqlParam sparkSqlParam = new SparkSqlParam(SqlParam.CACHE.get());
-                        sparkSqlParam.setExportType(DataExportType.PRINT);
-                        sparkSqlParam.setLocal(true);
-                        List<org.apache.spark.sql.Row> sparkRowResult = SparkQueryExecutor.execute(
-                            sparkSqlParam,
-                            SparkQueryExecutor.getSparkSession(true, null)
-                        ).collectAsList();
-
-                        // convert sparkRow to flinkRow
                         SelectFieldVisitor selectFieldVisitor = new SelectFieldVisitor(sql);
-                        SparkRowToFlinkRow sparkRowToFlinkRow = new SparkRowToFlinkRow(
-                            selectFieldVisitor.getFieldNameList(),
-                            selectFieldVisitor.getFieldTypeList()
-                        );
-                        List<org.apache.flink.types.Row> flinkRowResult = sparkRowResult.stream()
-                            .map(sparkRowToFlinkRow)
-                            .collect(Collectors.toList());
+                        // calicite
+                        // get dimension query result
+                        try (Connection connect = CalciteHelper.createConnection()) {
+                            Statement stmt = connect.createStatement();
+                            SqlParam.CACHE.get().setExecuteEngine(ExecuteEngine.CALCITE);
+                            ResultSet resultSet = stmt.executeQuery(sql);
+                            List<org.apache.flink.types.Row> flinkRowResult = new ArrayList<>();
+                            ResultSetMetaData metaData = resultSet.getMetaData();
+                            int columnCount = metaData.getColumnCount();
 
-                        // get union query result stream
-                        getTableEnv().createTemporaryView(
-                            "dimensionResult",
-                            getEnv().fromCollection(flinkRowResult)
-                                .returns(sparkRowToFlinkRow.getRowTypeInfo())
-                        );
-                        resultStream = getTableEnv().toChangelogStream(
-                            getTableEnv().sqlQuery("select * from dimensionResult union " + sql)
-                        );
+                            while (resultSet.next()) {
+                                Row row = new Row(columnCount);
+                                for (int i = 1; i <= columnCount; i++) {
+                                    Object value = resultSet.getObject(i);
+                                    row.setField(i - 1, value);
+                                }
+                                flinkRowResult.add(row);
+                            }
+
+                            // get union query result stream
+                            getTableEnv().createTemporaryView(
+                                "dimensionResult",
+                                getEnv().fromCollection(flinkRowResult)
+                                    .returns(
+                                        getRowTypeInfo(
+                                            selectFieldVisitor.getFieldNameList(),
+                                            selectFieldVisitor.getFieldTypeList()
+                                        )
+                                    )
+                            );
+                            resultStream = getTableEnv().toChangelogStream(
+                                getTableEnv().sqlQuery("select * from dimensionResult union " + sql)
+                            );
+
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        // // spark
+                        // // get dimension query result
+                        // SparkSqlParam sparkSqlParam = new SparkSqlParam(SqlParam.CACHE.get());
+                        // sparkSqlParam.setExportType(DataExportType.PRINT);
+                        // sparkSqlParam.setLocal(true);
+                        // List<org.apache.spark.sql.Row> sparkRowResult =
+                        // SparkQueryExecutor.execute(
+                        // sparkSqlParam,
+                        // SparkQueryExecutor.getSparkSession(true, null)
+                        // ).collectAsList();
+                        //
+                        // // convert sparkRow to flinkRow
+                        // SparkRowToFlinkRow sparkRowToFlinkRow = new SparkRowToFlinkRow(
+                        // selectFieldVisitor.getFieldNameList(),
+                        // selectFieldVisitor.getFieldTypeList()
+                        // );
+                        // List<org.apache.flink.types.Row> flinkRowResult = sparkRowResult.stream()
+                        // .map(sparkRowToFlinkRow)
+                        // .collect(Collectors.toList());
+                        //
+                        // // get union query result stream
+                        // getTableEnv().createTemporaryView(
+                        // "dimensionResult",
+                        // getEnv().fromCollection(flinkRowResult)
+                        // .returns(getRowTypeInfo(selectFieldVisitor.getFieldNameList(),
+                        // selectFieldVisitor.getFieldTypeList()))
+                        // );
+                        // resultStream = getTableEnv().toChangelogStream(
+                        // getTableEnv().sqlQuery("select * from dimensionResult union " + sql)
+                        // );
                     }
 
                     // query stream table
@@ -235,6 +283,7 @@ public class FlinkQueryExecutor {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
                     return resultStream;
                 }
 
@@ -292,7 +341,12 @@ public class FlinkQueryExecutor {
                         getTableEnv().createTemporaryView(
                             "dimensionResult",
                             getEnv().fromCollection(flinkRowResult)
-                                .returns(sparkRowToFlinkRow.getRowTypeInfo())
+                                .returns(
+                                    getRowTypeInfo(
+                                        selectFieldVisitor.getFieldNameList(),
+                                        selectFieldVisitor.getFieldTypeList()
+                                    )
+                                )
                         );
                         resultTable = getTableEnv().sqlQuery(
                             "select * from dimensionResult union " + selectSql
@@ -360,7 +414,7 @@ public class FlinkQueryExecutor {
             kafkaSource,
             WatermarkStrategy.noWatermarks(),
             "source"
-        ).map(stringToRow).returns(stringToRow.getRowTypeInfo());
+        ).map(stringToRow).returns(getRowTypeInfo(fieldNameList, fieldTypeList));
 
         // create sourceTable in tableEnv
         getTableEnv().createTemporaryView(tableName, source);
@@ -397,7 +451,7 @@ public class FlinkQueryExecutor {
                 kafkaSource,
                 WatermarkStrategy.noWatermarks(),
                 "source"
-            ).map(stringToRow).returns(stringToRow.getRowTypeInfo());
+            ).map(stringToRow).returns(getRowTypeInfo(fieldNameList, fieldTypeList));
             // create sourceTable in tableEnv
             getTableEnv().createTemporaryView(tableNameList.get(i), source);
         }
@@ -628,6 +682,66 @@ public class FlinkQueryExecutor {
             tableList.add(table);
         }
         return tableList;
+    }
+
+    public RowTypeInfo getRowTypeInfo(List<String> fieldNameList, List<String> fieldTypeList) {
+        TypeInformation<?>[] fieldTypes = new TypeInformation<?>[fieldTypeList.size()];
+        int len = fieldTypeList.size();
+        if (len > 0) {
+            for (int i = 0; i < len; i++) {
+                switch (fieldTypeList.get(i)) {
+                    case "Integer":
+                    case "int":
+                        fieldTypes[i] = Types.INT;
+                        break;
+                    case "Long":
+                        fieldTypes[i] = Types.LONG;
+                        break;
+                    case "Float":
+                        fieldTypes[i] = Types.FLOAT;
+                        break;
+                    case "Double":
+                        fieldTypes[i] = Types.DOUBLE;
+                        break;
+                    case "string":
+                    case "String":
+                        fieldTypes[i] = Types.STRING;
+                        break;
+                    case "Boolean":
+                    case "Bool":
+                        fieldTypes[i] = Types.BOOLEAN;
+                        break;
+                    case "Geometry":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(Geometry.class);
+                        break;
+                    case "point":
+                    case "Point":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(Point.class);
+                        break;
+                    case "LineString":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(LineString.class);
+                        break;
+                    case "Polygon":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(Polygon.class);
+                        break;
+                    case "MultiPoint":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiPoint.class);
+                        break;
+                    case "MultiLineString":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiLineString.class);
+                        break;
+                    case "MultiPolygon":
+                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiPolygon.class);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException(
+                            "Unsupported field type: " + fieldTypeList.get(i)
+                        );
+                }
+            }
+        }
+        String[] fieldNames = fieldNameList.toArray(new String[0]);
+        return new RowTypeInfo(fieldTypes, fieldNames);
     }
 
     public void registerUdf() {

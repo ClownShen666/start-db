@@ -17,10 +17,6 @@
 package org.urbcomp.cupid.db.flink.serializer;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.types.Row;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.WKTReader;
@@ -130,64 +126,4 @@ public class StringToRow implements MapFunction<String, Row> {
         return rowStr;
     }
 
-    public RowTypeInfo getRowTypeInfo() {
-        TypeInformation<?>[] fieldTypes = new TypeInformation<?>[fieldTypeList.size()];
-        int len = fieldTypeList.size();
-        if (len > 0) {
-            for (int i = 0; i < len; i++) {
-                switch (fieldTypeList.get(i)) {
-                    case "Integer":
-                    case "int":
-                        fieldTypes[i] = Types.INT;
-                        break;
-                    case "Long":
-                        fieldTypes[i] = Types.LONG;
-                        break;
-                    case "Float":
-                        fieldTypes[i] = Types.FLOAT;
-                        break;
-                    case "Double":
-                        fieldTypes[i] = Types.DOUBLE;
-                        break;
-                    case "string":
-                    case "String":
-                        fieldTypes[i] = Types.STRING;
-                        break;
-                    case "Boolean":
-                    case "Bool":
-                        fieldTypes[i] = Types.BOOLEAN;
-                        break;
-                    case "Geometry":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(Geometry.class);
-                        break;
-                    case "point":
-                    case "Point":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(Point.class);
-                        break;
-                    case "LineString":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(LineString.class);
-                        break;
-                    case "Polygon":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(Polygon.class);
-                        break;
-                    case "MultiPoint":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiPoint.class);
-                        break;
-                    case "MultiLineString":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiLineString.class);
-                        break;
-                    case "MultiPolygon":
-                        fieldTypes[i] = TypeExtractor.createTypeInfo(MultiPolygon.class);
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(
-                            "Unsupported field type: " + fieldTypeList.get(i)
-                        );
-                }
-            }
-        }
-        String[] fieldNames = fieldNameList.toArray(new String[0]);
-        RowTypeInfo rowTypeInfo = new RowTypeInfo(fieldTypes, fieldNames);
-        return rowTypeInfo;
-    }
 }
