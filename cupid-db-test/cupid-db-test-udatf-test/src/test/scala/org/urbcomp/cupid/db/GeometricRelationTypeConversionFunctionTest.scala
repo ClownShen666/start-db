@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -256,7 +256,10 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
   }
 
   test("st_geometryFromWKB(WKB)&st_asWKB(geom)") {
-    executeQueryCheck("select st_geometryFromWKB(st_asWKB(st_makePoint(1, 2)))", List("POINT (1 2)"))
+    executeQueryCheck(
+      "select st_geometryFromWKB(st_asWKB(st_makePoint(1, 2)))",
+      List("POINT (1 2)")
+    )
   }
 
   test("st_pointFromGeoHash(str, precision)") {
