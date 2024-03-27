@@ -16,26 +16,28 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
-import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.io.ParseException
+import org.locationtech.jts.io.geojson.GeoJsonReader
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-class st_geomFromGeoHashUdf extends AbstractUdf {
+class st_geometryFromGeoJSONUdf extends AbstractUdf {
 
-  override def name(): String = "st_geomFromGeoHash"
+  override def name(): String = "st_geometryFromGeoJSON"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-
-  def evaluate(geoHashStr: String, precision: Int): Geometry = {
-    if (geoHashStr == null) null
+  @throws[ParseException]
+  def evaluate(geoJson: String): Geometry = {
+    if (geoJson == null) null
     else {
-      GeoHashUtils.decode(geoHashStr, precision)
+      val geoJsonReader = new GeoJsonReader
+      geoJsonReader.read(geoJson)
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String, Int) => Geometry = evaluate
+  def udfWrapper: String => Geometry = evaluate
 
 }

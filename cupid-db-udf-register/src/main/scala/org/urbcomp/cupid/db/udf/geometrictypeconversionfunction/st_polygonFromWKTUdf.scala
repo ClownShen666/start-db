@@ -16,18 +16,21 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Polygon
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_polygonFromWKTUdf extends AbstractUdf {
+class st_polygonFromWKTUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_polygonFromWKT"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wktString: String): Polygon = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(wktString: String): Polygon = {
     if (wktString == null) null
     else {
       castToPolygon(geomFromWKT(wktString))
@@ -36,6 +39,6 @@ class st_polygonFromWKTUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Polygon = evaluate
+  def udfWrapper: String => Polygon = eval
 
 }

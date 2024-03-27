@@ -896,6 +896,13 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
+    public void registerTest() throws Exception {
+        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        flink.registerUdf();
+    }
+
+    @Ignore
+    @Test
     public void registerUdfTest() throws Exception {
         // create table
         try (Connection connect = CalciteHelper.createConnection()) {
@@ -959,14 +966,14 @@ public class FlinkQueryExecutorTest {
         flink.getTableEnv()
             .sqlQuery("select st_polygonFromWKT(st_polygonAsWKT(polygon1)) from table1;");
         flink.getTableEnv()
-            .sqlQuery("select st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)) from table1;");
+            .sqlQuery("select st_mPointFromWKT(st_mPointAsWKT(multipoint1)) from table1;");
         flink.getTableEnv()
             .sqlQuery(
-                "select st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)) from table1;"
+                "select st_mLineStringFromWKT(st_mLineStringAsWKT(multilinestring1)) from table1;"
             );
         flink.getTableEnv()
             .sqlQuery(
-                "select st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1)) from table1;"
+                "select st_mPolygonFromWKT(st_mPolygonAsWKT(multipolygon1)) from table1;"
             );
 
         // delete topic

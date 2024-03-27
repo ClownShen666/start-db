@@ -16,28 +16,33 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.io.ParseException
-import org.locationtech.jts.io.geojson.GeoJsonReader
+import org.locationtech.jts.io.WKTWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 
-class st_geomFromGeoJSONUdf extends AbstractUdf {
+import java.io.{IOException, StringWriter}
 
-  override def name(): String = "st_geomFromGeoJSON"
+class st_geometryAsWKTUdf extends ScalarFunction with AbstractUdf {
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  @throws[ParseException]
-  def evaluate(geoJson: String): Geometry = {
-    if (geoJson == null) null
+  override def name(): String = "st_geometryAsWKT"
+
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  @throws[IOException]
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): java.lang.String = {
+    if (geom == null) null
     else {
-      val geoJsonReader = new GeoJsonReader
-      geoJsonReader.read(geoJson)
+      val wktWriter = new WKTWriter
+      val writer = new StringWriter
+      wktWriter.write(geom, writer)
+      writer.toString
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Geometry = evaluate
+  def udfWrapper: Geometry => java.lang.String = eval
 
 }

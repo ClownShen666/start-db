@@ -59,7 +59,7 @@ class GeomesaSchemaFactory extends SchemaFactory {
   private def initUdf(schemaPlus: SchemaPlus): Unit = {
     new UdfFactory().getUdfMap(Calcite).foreach {
       case (name, clazz) =>
-        getAllMethods(clazz, "evaluate").foreach {
+        getAllMethods(clazz, "eval").foreach {
           case method: Method =>
             val function: Function = ScalarFunctionImpl.create(method)
             if (function != null) {

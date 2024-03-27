@@ -17,30 +17,26 @@
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.io.WKTWriter
+import org.locationtech.jts.io.{ParseException, WKBReader}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
 
-import java.io.{IOException, StringWriter}
+class st_geometryFromWKBUdf extends AbstractUdf {
 
-class st_asWKTUdf extends AbstractUdf {
-
-  override def name(): String = "st_asWKT"
+  override def name(): String = "st_geometryFromWKB"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  @throws[IOException]
-  def evaluate(geom: Geometry): java.lang.String = {
-    if (geom == null) null
+  @throws[ParseException]
+  def evaluate(wkb: Array[Byte]): Geometry = {
+    if (wkb == null) null
     else {
-      val wktWriter = new WKTWriter
-      val writer = new StringWriter
-      wktWriter.write(geom, writer)
-      writer.toString
+      val wkbReader = new WKBReader
+      wkbReader.read(wkb)
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.String = evaluate
+  def udfWrapper: Array[Byte] => Geometry = evaluate
 
 }

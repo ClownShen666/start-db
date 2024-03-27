@@ -16,27 +16,31 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.io.{ParseException, WKBReader}
+import org.locationtech.jts.io.{ParseException, WKTReader}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 
-class st_geomFromWKBUdf extends AbstractUdf {
+class st_geometryFromWKTUdf extends ScalarFunction with AbstractUdf {
 
-  override def name(): String = "st_geomFromWKB"
+  override def name(): String = "st_geometryFromWKT"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wkb: Array[Byte]): Geometry = {
-    if (wkb == null) null
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(wktString: String): Geometry = {
+    if (wktString == null) null
     else {
-      val wkbReader = new WKBReader
-      wkbReader.read(wkb)
+      val wktReader = new WKTReader
+      val geom: Geometry = wktReader.read(wktString)
+      geom
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Array[Byte] => Geometry = evaluate
+  def udfWrapper: String => Geometry = eval
 
 }

@@ -16,24 +16,27 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Point
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_pointFromWKTUdf extends AbstractUdf {
+class st_pointFromWKTUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_pointFromWKT"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wktString: String): Point = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
+  def eval(wktString: String): Point = {
     if (wktString == null) null
     else castToPoint(geomFromWKT(wktString))
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Point = evaluate
+  def udfWrapper: String => Point = eval
 
 }

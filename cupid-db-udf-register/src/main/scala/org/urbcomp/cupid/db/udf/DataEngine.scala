@@ -21,4 +21,5 @@ object DataEngine extends Enumeration {
 
   val Calcite: DataEngine.Value = Value("Calcite")
   val Spark: DataEngine.Value = Value("Spark")
+  val Flink: DataEngine.Value = Value("Flink")
 }

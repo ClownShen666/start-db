@@ -42,7 +42,6 @@ import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.SparkRowToFlinkRow;
 import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
-import org.urbcomp.cupid.db.flink.udf.UdfRegistry;
 
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
@@ -51,6 +50,9 @@ import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.spark.SparkQueryExecutor;
+import org.urbcomp.cupid.db.udf.AbstractUdf;
+import org.urbcomp.cupid.db.udf.DataEngine$;
+import org.urbcomp.cupid.db.udf.UdfFactory;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SparkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
@@ -64,6 +66,7 @@ import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
 
 import org.slf4j.Logger;
 import org.urbcomp.cupid.db.util.LogUtil;
+import scala.collection.JavaConverters;
 
 public class FlinkQueryExecutor {
     private boolean isRegistered = false;
@@ -745,14 +748,14 @@ public class FlinkQueryExecutor {
     }
 
     public void registerUdf() {
-        new UdfRegistry().getUdfInfoList().forEach(udfInfo -> {
+        java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters.mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink())).asJava();
+        for (Map.Entry<String, Class<? extends AbstractUdf>> udf : udfMap.entrySet()) {
             getTableEnv().createTemporaryFunction(
-                udfInfo.getName(),
-                (Class<? extends UserDefinedFunction>) udfInfo.getFunction()
+                    udf.getKey(),
+                    (Class<? extends UserDefinedFunction>) udf.getValue()
             );
-            logger.info("Flink registers " + udfInfo.getType() + " " + udfInfo.getName());
-        });
-
+            logger.info("Flink registers udf: " + udf.getKey());
+        }
     }
 
 }
