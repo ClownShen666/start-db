@@ -31,7 +31,9 @@ class st_geometryAsWKTUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[IOException]
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.String = {
     if (geom == null) null
     else {
       val wktWriter = new WKTWriter

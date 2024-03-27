@@ -748,11 +748,13 @@ public class FlinkQueryExecutor {
     }
 
     public void registerUdf() {
-        java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters.mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink())).asJava();
+        java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters
+            .mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink()))
+            .asJava();
         for (Map.Entry<String, Class<? extends AbstractUdf>> udf : udfMap.entrySet()) {
             getTableEnv().createTemporaryFunction(
-                    udf.getKey(),
-                    (Class<? extends UserDefinedFunction>) udf.getValue()
+                udf.getKey(),
+                (Class<? extends UserDefinedFunction>) udf.getValue()
             );
             logger.info("Flink registers udf: " + udf.getKey());
         }

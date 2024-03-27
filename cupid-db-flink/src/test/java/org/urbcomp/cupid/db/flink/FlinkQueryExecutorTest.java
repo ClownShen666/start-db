@@ -972,9 +972,7 @@ public class FlinkQueryExecutorTest {
                 "select st_mLineStringFromWKT(st_mLineStringAsWKT(multilinestring1)) from table1;"
             );
         flink.getTableEnv()
-            .sqlQuery(
-                "select st_mPolygonFromWKT(st_mPolygonAsWKT(multipolygon1)) from table1;"
-            );
+            .sqlQuery("select st_mPolygonFromWKT(st_mPolygonAsWKT(multipolygon1)) from table1;");
 
         // delete topic
         deleteKafkaTopic("localhost:9092", topicList.get(0));
