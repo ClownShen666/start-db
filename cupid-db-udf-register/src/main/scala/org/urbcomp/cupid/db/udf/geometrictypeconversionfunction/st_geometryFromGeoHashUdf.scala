@@ -19,15 +19,16 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_geometryFromGeoHashUdf extends AbstractUdf {
+class st_geometryFromGeoHashUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_geometryFromGeoHash"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geoHashStr: String, precision: Int): Geometry = {
+  def eval(geoHashStr: String, precision: Int): Geometry = {
     if (geoHashStr == null) null
     else {
       GeoHashUtils.decode(geoHashStr, precision)
@@ -36,6 +37,6 @@ class st_geometryFromGeoHashUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String, Int) => Geometry = evaluate
+  def udfWrapper: (String, Int) => Geometry = eval
 
 }

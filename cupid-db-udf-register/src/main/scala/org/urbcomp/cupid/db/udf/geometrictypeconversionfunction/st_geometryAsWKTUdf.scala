@@ -22,6 +22,7 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.io.WKTWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.io.{IOException, StringWriter}
 

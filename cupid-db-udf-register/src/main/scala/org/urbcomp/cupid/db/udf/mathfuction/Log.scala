@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.math.BigDecimal
 
-class Log extends AbstractUdf {
+class Log extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "log"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Returns the (base) logarithm of a double value (num).
@@ -34,7 +35,7 @@ class Log extends AbstractUdf {
     * @param num  double
     * @return log result
     */
-  def evaluate(base: BigDecimal, num: BigDecimal): BigDecimal = {
+  def eval(base: BigDecimal, num: BigDecimal): BigDecimal = {
     if (base == null || num == null || base.doubleValue <= 0 || base.doubleValue == 1 || num.doubleValue == 0)
       return null
     val res = Math.log(num.doubleValue) / Math.log(base.doubleValue)
@@ -43,5 +44,5 @@ class Log extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = evaluate
+  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = eval
 }

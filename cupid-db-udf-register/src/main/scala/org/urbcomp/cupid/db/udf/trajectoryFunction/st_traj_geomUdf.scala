@@ -18,21 +18,22 @@ package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import org.locationtech.jts.geom.LineString
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_traj_geomUdf extends AbstractUdf {
+class st_traj_geomUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_traj_geom"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(trajectory: Trajectory): LineString = {
+  def eval(trajectory: Trajectory): LineString = {
     if (trajectory == null) null
     else trajectory.getLineString
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: Trajectory => LineString = evaluate
+  def udfWrapper1: Trajectory => LineString = eval
 }

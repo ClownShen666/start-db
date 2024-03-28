@@ -17,21 +17,22 @@
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
 import org.locationtech.jts.geom.{Point, Polygon}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.math.BigDecimal
 import java.util
 import scala.collection.JavaConverters.asScalaBufferConverter
 
-class st_makeBBoxUdf extends AbstractUdf {
+class st_makeBBoxUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_makeBBox"
 
   override def registerEngines(): scala.collection.immutable.List[DataEngine.Value] =
-    scala.collection.immutable.List(Calcite, Spark)
+    scala.collection.immutable.List(Calcite, Spark, Flink)
 
-  def evaluate(
+  def eval(
       lowerX: BigDecimal,
       lowerY: BigDecimal,
       upperX: BigDecimal,
@@ -50,7 +51,7 @@ class st_makeBBoxUdf extends AbstractUdf {
     }
   }
 
-  def evaluate(point1: Point, point2: Point): Polygon = {
+  def eval(point1: Point, point2: Point): Polygon = {
     if (point1 == null || point2 == null) null
     else {
       makeBBox(
@@ -65,7 +66,7 @@ class st_makeBBoxUdf extends AbstractUdf {
   def udfSparkEntries: scala.collection.immutable.List[String] =
     scala.collection.immutable.List("udfWrapper", "udfWrapper1")
 
-  def udfWrapper: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) => Polygon = evaluate
+  def udfWrapper: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) => Polygon = eval
 
-  def udfWrapper1: (Point, Point) => Polygon = evaluate
+  def udfWrapper1: (Point, Point) => Polygon = eval
 }

@@ -18,16 +18,17 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.MultiPolygon
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_mPolygonFromGeoJSONUdf extends AbstractUdf {
+class st_mPolygonFromGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_mPolygonFromGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(geoJson: String): MultiPolygon = {
+  def eval(geoJson: String): MultiPolygon = {
     if (geoJson == null) null
     else {
       castToMPolygon(geomFromGeoJSON(geoJson))
@@ -36,6 +37,6 @@ class st_mPolygonFromGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => MultiPolygon = evaluate
+  def udfWrapper: String => MultiPolygon = eval
 
 }

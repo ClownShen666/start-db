@@ -56,19 +56,19 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   }
 
   protected def executeQueryCheck(sql: String, expectsList: List[Any]*): Unit = {
-//    val rs = connect.createStatement().executeQuery(sql)
-//    val rsBuf = rsBuffer(rs)
+    val rs = connect.createStatement().executeQuery(sql)
+    val rsBuf = rsBuffer(rs)
     val df = SparkExecuteWrapper.getSparkExecute.executeSql(sql)
-//    assertTrue(isEqualCalciteAndSpark(rsBuf, df))
-//    var i: Int = 0
-//    for (expects <- expectsList) {
-//      var j: Int = 0
-//      for (expect <- expects) {
-//        assertTrue(isEqual(expect, rsBuf(i)(j)))
-//        j = j + 1
-//      }
-//      i = i + 1
-//    }
+    assertTrue(isEqualCalciteAndSpark(rsBuf, df))
+    var i: Int = 0
+    for (expects <- expectsList) {
+      var j: Int = 0
+      for (expect <- expects) {
+        assertTrue(isEqual(expect, rsBuf(i)(j)))
+        j = j + 1
+      }
+      i = i + 1
+    }
   }
 
   /**

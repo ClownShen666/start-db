@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.math.BigDecimal
 
-class Log1p extends AbstractUdf {
+class Log1p extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "log1p"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Returns the natural logarithm of a double value (num) + 1.
@@ -33,7 +34,7 @@ class Log1p extends AbstractUdf {
     * @param num double
     * @return double
     */
-  def evaluate(num: BigDecimal): BigDecimal = {
+  def eval(num: BigDecimal): BigDecimal = {
     if (num == null || num.doubleValue <= -1) return null
     val res = Math.log1p(num.doubleValue)
     BigDecimal.valueOf(res)
@@ -41,5 +42,5 @@ class Log1p extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: BigDecimal => BigDecimal = evaluate
+  def udfWrapper: BigDecimal => BigDecimal = eval
 }

@@ -18,20 +18,21 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_numPointsUdf extends AbstractUdf {
+class st_numPointsUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_numPoints"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): java.lang.Integer = Some(geom).map(_.getNumPoints) match {
+  def eval(geom: Geometry): java.lang.Integer = Some(geom).map(_.getNumPoints) match {
     case Some(s) => s
     case None    => null
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.Integer = evaluate
+  def udfWrapper: Geometry => java.lang.Integer = eval
 }

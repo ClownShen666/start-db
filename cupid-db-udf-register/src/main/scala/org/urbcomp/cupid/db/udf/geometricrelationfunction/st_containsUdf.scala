@@ -17,13 +17,14 @@
 package org.urbcomp.cupid.db.udf.geometricrelationfunction
 
 import org.locationtech.jts.geom.Geometry
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_containsUdf extends AbstractUdf {
+class st_containsUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_contains"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Geometry A contains Geometry B if no points of B lie in the exterior of A,
@@ -31,7 +32,7 @@ class st_containsUdf extends AbstractUdf {
     * The difference between contain and cover, e.g., when a line is
     * on the edge of a polygon, contain return false but cover return true
     */
-  def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
+  def eval(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
@@ -44,6 +45,6 @@ class st_containsUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Geometry, Geometry) => java.lang.Boolean = evaluate
+  def udfWrapper: (Geometry, Geometry) => java.lang.Boolean = eval
 
 }

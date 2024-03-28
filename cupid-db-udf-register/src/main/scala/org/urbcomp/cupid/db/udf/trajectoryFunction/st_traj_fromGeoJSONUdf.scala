@@ -17,23 +17,24 @@
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.io.IOException
 
-class st_traj_fromGeoJSONUdf extends AbstractUdf {
+class st_traj_fromGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_traj_fromGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[IOException]
-  def evaluate(str: String): Trajectory = {
+  def eval(str: String): Trajectory = {
     if (str == null) null
     else Trajectory.fromGeoJSON(str)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: String => Trajectory = evaluate
+  def udfWrapper1: String => Trajectory = eval
 }

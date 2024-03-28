@@ -18,20 +18,21 @@ package org.urbcomp.cupid.db.udf.timefunction
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-class now extends AbstractUdf {
+class now extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "now"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
-  def evaluate(): String = {
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  def eval(): String = {
     val formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMATS(1))
     LocalDateTime.now.format(formatter)
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: () => String = evaluate
+  def udfWrapper: () => String = eval
 
 }

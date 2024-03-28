@@ -17,13 +17,14 @@
 package org.urbcomp.cupid.db.udf.timefunction
 
 import java.sql.Timestamp
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-class longToTimestamp extends AbstractUdf {
+class longToTimestamp extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "longToTimestamp"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Converts a long instance to a timestamp
@@ -31,9 +32,9 @@ class longToTimestamp extends AbstractUdf {
     * @param num one long instance
     * @return timestamp instance
     */
-  def evaluate(num: Long): Timestamp = new Timestamp(num)
+  def eval(num: Long): Timestamp = new Timestamp(num)
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Long => Timestamp = evaluate
+  def udfWrapper: Long => Timestamp = eval
 
 }

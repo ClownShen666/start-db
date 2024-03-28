@@ -18,15 +18,16 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_areaUdf extends AbstractUdf {
+class st_areaUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_area"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): java.lang.Double = {
+  def eval(geom: Geometry): java.lang.Double = {
     Some(geom) match {
       case Some(geo) => geo.getArea
       case _         => null
@@ -35,5 +36,5 @@ class st_areaUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.Double = evaluate
+  def udfWrapper: Geometry => java.lang.Double = eval
 }

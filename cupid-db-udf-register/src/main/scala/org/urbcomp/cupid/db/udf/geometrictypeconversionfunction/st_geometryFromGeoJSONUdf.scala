@@ -20,15 +20,16 @@ import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.io.ParseException
 import org.locationtech.jts.io.geojson.GeoJsonReader
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_geometryFromGeoJSONUdf extends AbstractUdf {
+class st_geometryFromGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_geometryFromGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(geoJson: String): Geometry = {
+  def eval(geoJson: String): Geometry = {
     if (geoJson == null) null
     else {
       val geoJsonReader = new GeoJsonReader
@@ -38,6 +39,6 @@ class st_geometryFromGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Geometry = evaluate
+  def udfWrapper: String => Geometry = eval
 
 }

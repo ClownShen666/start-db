@@ -27,12 +27,12 @@ class st_rn_makeRoadNetworkUdf_jType extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite)
   @throws[JsonProcessingException]
-  def evaluate(rsList: java.util.List[RoadSegment]): RoadNetwork = {
+  def eval(rsList: java.util.List[RoadSegment]): RoadNetwork = {
     if (rsList == null) null
     else new RoadNetwork(rsList)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: java.util.List[RoadSegment] => RoadNetwork = evaluate
+  def udfWrapper: java.util.List[RoadSegment] => RoadNetwork = eval
 }

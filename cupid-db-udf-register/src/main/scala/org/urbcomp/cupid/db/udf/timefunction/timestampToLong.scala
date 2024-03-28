@@ -18,14 +18,15 @@ package org.urbcomp.cupid.db.udf.timefunction
 
 import java.sql.Timestamp
 import java.text.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class timestampToLong extends AbstractUdf {
+class timestampToLong extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "timestampToLong"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Convert the timestamp to a Long instance
@@ -33,7 +34,7 @@ class timestampToLong extends AbstractUdf {
     * @param ts timestamp
     * @return long instance
     */
-  def evaluate(ts: Timestamp): java.lang.Long = {
+  def eval(ts: Timestamp): java.lang.Long = {
     Option(ts) match {
       case Some(s) => s.getTime
       case _       => null
@@ -47,16 +48,16 @@ class timestampToLong extends AbstractUdf {
     * @return long instance
     */
   @throws[ParseException]
-  def evaluate(tsStr: String): java.lang.Long = {
+  def eval(tsStr: String): java.lang.Long = {
     Option(tsStr) match {
-      case Some(s) => (new toTimestamp).evaluate(tsStr).getTime
+      case Some(s) => (new toTimestamp).eval(tsStr).getTime
       case _       => null
     }
 
   }
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: Timestamp => java.lang.Long = evaluate
+  def udfWrapper: Timestamp => java.lang.Long = eval
 
-  def udfWrapper2: String => java.lang.Long = evaluate
+  def udfWrapper2: String => java.lang.Long = eval
 }

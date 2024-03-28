@@ -18,15 +18,16 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.locationtech.jts.geom.{Geometry, Point}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_centroidUdf extends AbstractUdf {
+class st_centroidUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_centroid"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): Point = {
+  def eval(geom: Geometry): Point = {
     Some(geom) match {
       case Some(value) => value.getCentroid
       case _           => null
@@ -35,5 +36,5 @@ class st_centroidUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => Point = evaluate
+  def udfWrapper: Geometry => Point = eval
 }

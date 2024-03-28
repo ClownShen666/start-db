@@ -17,16 +17,17 @@
 package org.urbcomp.cupid.db.udf.roadfunction
 
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_rs_levelUdf extends AbstractUdf {
+class st_rs_levelUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_rs_level"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(rs: RoadSegment): java.lang.Integer = {
+  def eval(rs: RoadSegment): java.lang.Integer = {
     if (rs == null) null
     else {
       rs.getLevel.value
@@ -35,6 +36,6 @@ class st_rs_levelUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: RoadSegment => java.lang.Integer = evaluate
+  def udfWrapper: RoadSegment => java.lang.Integer = eval
 
 }

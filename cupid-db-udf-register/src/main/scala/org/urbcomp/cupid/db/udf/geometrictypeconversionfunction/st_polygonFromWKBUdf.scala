@@ -18,16 +18,17 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.Polygon
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_polygonFromWKBUdf extends AbstractUdf {
+class st_polygonFromWKBUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_polygonFromWKB"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wkb: Array[Byte]): Polygon = {
+  def eval(wkb: Array[Byte]): Polygon = {
     if (wkb == null) null
     else {
       castToPolygon(geomFromWKB(wkb))
@@ -36,6 +37,6 @@ class st_polygonFromWKBUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Array[Byte] => Polygon = evaluate
+  def udfWrapper: Array[Byte] => Polygon = eval
 
 }

@@ -17,14 +17,15 @@
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
-class CastToBooleanUdf extends AbstractUdf {
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
+class CastToBooleanUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "castToBoolean"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String): java.lang.Boolean = {
+  def eval(str: String): java.lang.Boolean = {
 
     Option(str) match {
       case Some(s) if s.equalsIgnoreCase("false") => false
@@ -36,5 +37,5 @@ class CastToBooleanUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => java.lang.Boolean = evaluate
+  def udfWrapper: String => java.lang.Boolean = eval
 }

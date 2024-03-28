@@ -20,17 +20,18 @@ import org.locationtech.jts.geom._
 import org.locationtech.jts.util.GeometricShapeFactory
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext
 import org.locationtech.spatial4j.shape.jts.JtsPoint
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.{GeoFunctions, GeometryFactoryUtils}
 
-class st_bufferPointUdf extends AbstractUdf {
+class st_bufferPointUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_bufferPoint"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(point: Point, distanceInM: Double): Geometry = {
+  def eval(point: Point, distanceInM: Double): Geometry = {
     if (point == null) null
     else {
       val degrees = GeoFunctions.getDegreeFromM(distanceInM)
@@ -68,5 +69,5 @@ class st_bufferPointUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Point, Double) => Geometry = evaluate
+  def udfWrapper: (Point, Double) => Geometry = eval
 }

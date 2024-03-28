@@ -17,26 +17,27 @@
 package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.math.BigDecimal
 
-class Pi extends AbstractUdf {
+class Pi extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "pi"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * The double value that is closer than any other to pi
     *
     * @return PI double.
     */
-  def evaluate(): BigDecimal = {
+  def eval(): BigDecimal = {
     BigDecimal.valueOf(Math.PI)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: () => BigDecimal = evaluate
+  def udfWrapper: () => BigDecimal = eval
 }

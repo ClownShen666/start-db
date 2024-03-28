@@ -19,15 +19,16 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.io.{ParseException, WKBReader}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_geometryFromWKBUdf extends AbstractUdf {
+class st_geometryFromWKBUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_geometryFromWKB"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wkb: Array[Byte]): Geometry = {
+  def eval(wkb: Array[Byte]): Geometry = {
     if (wkb == null) null
     else {
       val wkbReader = new WKBReader
@@ -37,6 +38,6 @@ class st_geometryFromWKBUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Array[Byte] => Geometry = evaluate
+  def udfWrapper: Array[Byte] => Geometry = eval
 
 }

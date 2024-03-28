@@ -21,6 +21,7 @@ import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.MultiPoint
 import org.locationtech.jts.io.ParseException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 class st_mPointFromWKTUdf extends ScalarFunction with AbstractUdf {

@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
@@ -23,11 +24,11 @@ import java.sql.Timestamp
 import java.text.{ParseException, SimpleDateFormat}
 import scala.util.control.Breaks.{break, breakable}
 
-class toTimestamp extends AbstractUdf {
+class toTimestamp extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "toTimestamp"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Converts a date string to a timestamp
@@ -38,7 +39,7 @@ class toTimestamp extends AbstractUdf {
     * @throws ParseException parse exception
     */
   @throws[ParseException]
-  def evaluate(dateString: String, format: String): Timestamp = {
+  def eval(dateString: String, format: String): Timestamp = {
     if (dateString == null || format == null) return null
     val simpleDateFormat = new SimpleDateFormat(format.trim)
     val date = simpleDateFormat.parse(dateString)
@@ -54,7 +55,7 @@ class toTimestamp extends AbstractUdf {
     * @throws ParseException parse exception
     */
   @throws[ParseException]
-  def evaluate(dateString: String): Timestamp = {
+  def eval(dateString: String): Timestamp = {
     var time = 0L
     var isCorrect = false
     var pe: ParseException = null
@@ -84,8 +85,8 @@ class toTimestamp extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: (String, String) => Timestamp = evaluate
+  def udfWrapper: (String, String) => Timestamp = eval
 
-  def udfWrapper2: String => Timestamp = evaluate
+  def udfWrapper2: String => Timestamp = eval
 
 }

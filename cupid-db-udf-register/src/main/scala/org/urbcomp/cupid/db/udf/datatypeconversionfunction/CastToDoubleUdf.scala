@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import scala.util.matching.Regex
-class CastToDoubleUdf extends AbstractUdf {
+class CastToDoubleUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "castToDouble"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String): java.lang.Double = {
+  def eval(str: String): java.lang.Double = {
     if (str == null) null
     else {
       try {
@@ -38,5 +39,5 @@ class CastToDoubleUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => java.lang.Double = evaluate
+  def udfWrapper: String => java.lang.Double = eval
 }

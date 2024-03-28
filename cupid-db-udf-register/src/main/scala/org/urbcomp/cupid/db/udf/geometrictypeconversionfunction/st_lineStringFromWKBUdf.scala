@@ -18,16 +18,17 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.LineString
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_lineStringFromWKBUdf extends AbstractUdf {
+class st_lineStringFromWKBUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_lineStringFromWKB"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wkb: Array[Byte]): LineString = {
+  def eval(wkb: Array[Byte]): LineString = {
     if (wkb == null) null
     else {
       castToLineString(geomFromWKB(wkb))
@@ -36,6 +37,6 @@ class st_lineStringFromWKBUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Array[Byte] => LineString = evaluate
+  def udfWrapper: Array[Byte] => LineString = eval
 
 }
