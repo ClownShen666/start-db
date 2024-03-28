@@ -20,35 +20,36 @@ import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
   GCJ02ToWGS84Transformer,
   MatchUtil
 }
 
-class st_GCJ02ToWGS84 extends AbstractUdf {
+class st_GCJ02ToWGS84 extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_GCJ02ToWGS84"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   lazy val transformer = new GCJ02ToWGS84Transformer
 
-  def evaluate(st: Geometry): Geometry = {
+  def eval(st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new GCJ02ToWGS84Transformer, st)
   }
 
-  def evaluate(st: Trajectory): Trajectory = {
+  def eval(st: Trajectory): Trajectory = {
     if (st == null) return null
     transformer.trajectoryTransform(st)
   }
 
-  def evaluate(st: RoadNetwork): RoadNetwork = {
+  def eval(st: RoadNetwork): RoadNetwork = {
     if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
 
-  def evaluate(st: RoadSegment): RoadSegment = {
+  def eval(st: RoadSegment): RoadSegment = {
     if (st == null) return null
     transformer.roadSegmentTransform(st)
   }
@@ -56,8 +57,8 @@ class st_GCJ02ToWGS84 extends AbstractUdf {
   def udfSparkEntries: List[String] =
     List("udfWrapper", "udfWrapper2", "udfWrapper3", "udfWrapper4")
 
-  def udfWrapper: Geometry => Geometry = evaluate
-  def udfWrapper2: Trajectory => Trajectory = evaluate
-  def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
-  def udfWrapper4: RoadSegment => RoadSegment = evaluate
+  def udfWrapper: Geometry => Geometry = eval
+  def udfWrapper2: Trajectory => Trajectory = eval
+  def udfWrapper3: RoadNetwork => RoadNetwork = eval
+  def udfWrapper4: RoadSegment => RoadSegment = eval
 }

@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.math.BigDecimal
 
-class Pow extends AbstractUdf {
+class Pow extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "pow"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Returns the value of the first argument raised to the power of the second argument.
@@ -34,7 +35,7 @@ class Pow extends AbstractUdf {
     * @param b double
     * @return double
     */
-  def evaluate(a: BigDecimal, b: BigDecimal): BigDecimal = {
+  def eval(a: BigDecimal, b: BigDecimal): BigDecimal = {
     if (a == null || b == null) return null
     val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)
@@ -42,5 +43,5 @@ class Pow extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = evaluate
+  def udfWrapper: (BigDecimal, BigDecimal) => BigDecimal = eval
 }

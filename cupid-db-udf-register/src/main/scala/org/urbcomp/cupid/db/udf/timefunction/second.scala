@@ -17,13 +17,14 @@
 package org.urbcomp.cupid.db.udf.timefunction
 
 import java.time.DateTimeException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-class second extends AbstractUdf {
+class second extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "second"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * get second value of datetime
@@ -33,12 +34,12 @@ class second extends AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dtString: String): Int = {
+  def eval(dtString: String): Int = {
     val to = new toDatetime
-    to.evaluate(dtString).getSecond
+    to.eval(dtString).getSecond
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Int = evaluate
+  def udfWrapper: String => Int = eval
 
 }

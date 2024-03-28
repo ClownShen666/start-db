@@ -15,17 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.time.temporal.WeekFields
 import java.time.DateTimeException
 
-class week extends AbstractUdf {
+class week extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "week"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * get week value of the year
@@ -35,15 +36,15 @@ class week extends AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dtString: String): java.lang.Integer = {
+  def eval(dtString: String): java.lang.Integer = {
     Option(dtString) match {
-      case Some(s) => (new toDatetime).evaluate(s).get(WeekFields.ISO.weekOfYear())
+      case Some(s) => (new toDatetime).eval(s).get(WeekFields.ISO.weekOfYear())
       case _       => null
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => java.lang.Integer = evaluate
+  def udfWrapper: String => java.lang.Integer = eval
 
 }

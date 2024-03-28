@@ -17,22 +17,23 @@
 package org.urbcomp.cupid.db.udf.roadfunction
 
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_rs_speedLimitInKMPerHourUdf extends AbstractUdf {
+class st_rs_speedLimitInKMPerHourUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_rs_speedLimitInKMPerHour"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(rs: RoadSegment): java.lang.Double = {
+  def eval(rs: RoadSegment): java.lang.Double = {
     if (rs == null) null
     else rs.getSpeedLimit
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: RoadSegment => java.lang.Double = evaluate
+  def udfWrapper: RoadSegment => java.lang.Double = eval
 
 }

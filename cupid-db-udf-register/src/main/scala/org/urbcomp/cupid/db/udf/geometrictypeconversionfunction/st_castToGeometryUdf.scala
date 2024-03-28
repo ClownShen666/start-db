@@ -18,18 +18,19 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_castToGeometryUdf extends AbstractUdf {
+class st_castToGeometryUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_castToGeometry"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): Geometry = geom
+  def eval(geom: Geometry): Geometry = geom
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => Geometry = evaluate
+  def udfWrapper: Geometry => Geometry = eval
 
 }

@@ -21,21 +21,31 @@ import scala.collection.convert.ImplicitConversions._
 import scala.collection.mutable
 
 class UdfFactory extends Serializable {
+
+  // map the Engine and it's registered udfs
   private val engineUdfMap =
     mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]]()
 
   {
+
+    // scan the package and get the udf which extends the AbstractUdf
     val reflections = new Reflections("org.urbcomp.cupid.db.udf")
     val udfClasses =
       reflections.getSubTypesOf(classOf[AbstractUdf]).toSet[Class[_ <: AbstractUdf]].toList
     udfClasses.forEach(clazz => {
       val instance = clazz.newInstance()
+
+      // get udf's name
       val name: String = clazz.getDeclaredMethod("name").invoke(instance).asInstanceOf[String]
+
+      // get udf's registerEngines
       val registerEngines: List[DataEngine.Value] =
         clazz
           .getDeclaredMethod("registerEngines")
           .invoke(instance)
           .asInstanceOf[List[DataEngine.Value]]
+
+      // add engineUdfMap
       registerEngines.foreach { engine =>
         if (!engineUdfMap.contains(engine))
           engineUdfMap += (engine -> mutable.Map[String, Class[_ <: AbstractUdf]]())

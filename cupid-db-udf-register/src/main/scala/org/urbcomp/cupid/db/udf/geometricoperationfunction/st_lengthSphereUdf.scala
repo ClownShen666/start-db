@@ -19,16 +19,17 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 import org.locationtech.jts.geom.LineString
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext
 import org.locationtech.spatial4j.distance.DistanceUtils
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_lengthSphereUdf extends AbstractUdf {
+class st_lengthSphereUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_lengthSphere"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: LineString): java.lang.Double = {
+  def eval(geom: LineString): java.lang.Double = {
     if (geom == null) null
     else {
       var sum = 0.0
@@ -44,5 +45,5 @@ class st_lengthSphereUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: LineString => java.lang.Double = evaluate
+  def udfWrapper: LineString => java.lang.Double = eval
 }

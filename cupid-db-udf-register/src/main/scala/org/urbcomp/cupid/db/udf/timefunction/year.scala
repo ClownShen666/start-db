@@ -15,16 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.time.DateTimeException
 
-class year extends AbstractUdf {
+class year extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "year"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * get year value
@@ -34,14 +35,14 @@ class year extends AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dtString: String): java.lang.Integer = {
+  def eval(dtString: String): java.lang.Integer = {
     Option(dtString) match {
-      case Some(s) => (new toDatetime).evaluate(s).getYear
+      case Some(s) => (new toDatetime).eval(s).getYear
       case _       => null
     }
   }
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => java.lang.Integer = evaluate
+  def udfWrapper: String => java.lang.Integer = eval
 
 }

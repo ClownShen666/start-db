@@ -18,15 +18,16 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_differenceUdf extends AbstractUdf {
+class st_differenceUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_difference"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom1: Geometry, geom2: Geometry): Geometry = {
+  def eval(geom1: Geometry, geom2: Geometry): Geometry = {
     if (geom1 == null || geom2 == null) null
     else {
       geom1.difference(geom2)
@@ -35,5 +36,5 @@ class st_differenceUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Geometry, Geometry) => Geometry = evaluate
+  def udfWrapper: (Geometry, Geometry) => Geometry = eval
 }

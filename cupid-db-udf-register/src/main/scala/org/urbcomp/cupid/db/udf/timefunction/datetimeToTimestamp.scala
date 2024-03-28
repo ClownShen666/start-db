@@ -16,17 +16,18 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.sql.Timestamp
 import java.text.ParseException
 
-class datetimeToTimestamp extends AbstractUdf {
+class datetimeToTimestamp extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "datetimeToTimestamp"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Converts a Datetime string to timestamp(with TimeZone)
@@ -35,13 +36,13 @@ class datetimeToTimestamp extends AbstractUdf {
     * @return timestamp timestamp instance
     */
   @throws[ParseException]
-  def evaluate(dtString: String): Timestamp = {
+  def eval(dtString: String): Timestamp = {
     val toTimestamp = new toTimestamp
-    toTimestamp.evaluate(dtString)
+    toTimestamp.eval(dtString)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Timestamp = evaluate
+  def udfWrapper: String => Timestamp = eval
 
 }

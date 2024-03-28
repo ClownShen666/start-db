@@ -18,16 +18,17 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.locationtech.jts.geom.{Geometry, GeometryFactory, Point}
 import org.locationtech.jts.operation.distance.DistanceOp
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_closestPointUdf extends AbstractUdf {
+class st_closestPointUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_closestPoint"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom1: Geometry, geom2: Geometry): Point = {
+  def eval(geom1: Geometry, geom2: Geometry): Point = {
     if (geom1 == null || geom2 == null) null
     else {
       val op = new DistanceOp(geom1, geom2)
@@ -38,5 +39,5 @@ class st_closestPointUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Geometry, Geometry) => Point = evaluate
+  def udfWrapper: (Geometry, Geometry) => Point = eval
 }

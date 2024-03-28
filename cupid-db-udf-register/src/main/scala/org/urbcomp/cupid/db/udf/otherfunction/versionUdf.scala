@@ -16,18 +16,19 @@
  */
 package org.urbcomp.cupid.db.udf.otherfunction
 
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import scala.io.Source
 
-class versionUdf extends AbstractUdf {
+class versionUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "version"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(): String = {
+  def eval(): String = {
 
     Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString
 
@@ -35,5 +36,5 @@ class versionUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: () => String = evaluate
+  def udfWrapper: () => String = eval
 }

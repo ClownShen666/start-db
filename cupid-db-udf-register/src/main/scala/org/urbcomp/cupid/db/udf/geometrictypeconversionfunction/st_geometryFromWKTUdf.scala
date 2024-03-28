@@ -14,25 +14,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.geometricoperationfunction
+package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.io.{ParseException, WKTReader}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 
-class st_numPointsUdf extends ScalarFunction with AbstractUdf {
+class st_geometryFromWKTUdf extends ScalarFunction with AbstractUdf {
 
-  override def name(): String = "st_numPoints"
+  override def name(): String = "st_geometryFromWKT"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
-
-  def eval(geom: Geometry): java.lang.Integer = Some(geom).map(_.getNumPoints) match {
-    case Some(s) => s
-    case None    => null
+  @throws[ParseException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(wktString: String): Geometry = {
+    if (wktString == null) null
+    else {
+      val wktReader = new WKTReader
+      val geom: Geometry = wktReader.read(wktString)
+      geom
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.Integer = eval
+  def udfWrapper: String => Geometry = eval
+
 }

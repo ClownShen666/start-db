@@ -17,17 +17,18 @@
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
 import org.locationtech.jts.geom.{Point, Polygon}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeoFunctions
 
-class st_makeCircleUdf extends AbstractUdf {
+class st_makeCircleUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_makeCircle"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(center: Point, radiusInM: Double): Polygon = {
+  def eval(center: Point, radiusInM: Double): Polygon = {
     if (center == null) null
     else {
       center.buffer(GeoFunctions.getDegreeFromM(radiusInM)).asInstanceOf[Polygon]
@@ -36,5 +37,5 @@ class st_makeCircleUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Point, Double) => Polygon = evaluate
+  def udfWrapper: (Point, Double) => Polygon = eval
 }

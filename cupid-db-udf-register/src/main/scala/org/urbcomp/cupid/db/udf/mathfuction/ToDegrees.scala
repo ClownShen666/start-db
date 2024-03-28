@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.mathfuction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.math.BigDecimal
 
-class ToDegrees extends AbstractUdf {
+class ToDegrees extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "toDegrees"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Converts an angle measured in radians to an approximately equivalent angle measured in degrees.
@@ -35,7 +36,7 @@ class ToDegrees extends AbstractUdf {
     * @param angRad double
     * @return double
     */
-  def evaluate(angRad: BigDecimal): BigDecimal = {
+  def eval(angRad: BigDecimal): BigDecimal = {
     if (angRad == null) return null
     val res = Math.toDegrees(angRad.doubleValue)
     BigDecimal.valueOf(res)
@@ -43,5 +44,5 @@ class ToDegrees extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: BigDecimal => BigDecimal = evaluate
+  def udfWrapper: BigDecimal => BigDecimal = eval
 }

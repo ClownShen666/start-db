@@ -16,39 +16,51 @@
  */
 package org.urbcomp.cupid.db.udf.coordtransformfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
   BD09ToGCJ02Transformer,
   MatchUtil
 }
 
-class st_BD09ToGCJ02 extends AbstractUdf {
+class st_BD09ToGCJ02 extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_BD09ToGCJ02"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   lazy val transformer = new BD09ToGCJ02Transformer
 
-  def evaluate(st: Geometry): Geometry = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new BD09ToGCJ02Transformer, st)
   }
 
-  def evaluate(st: Trajectory): Trajectory = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) st: Trajectory
+  ): Trajectory = {
     if (st == null) return null
     transformer.trajectoryTransform(st)
   }
 
-  def evaluate(st: RoadNetwork): RoadNetwork = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) st: RoadNetwork
+  ): RoadNetwork = {
     if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
 
-  def evaluate(st: RoadSegment): RoadSegment = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) st: RoadSegment
+  ): RoadSegment = {
     if (st == null) return null
     transformer.roadSegmentTransform(st)
   }
@@ -56,8 +68,8 @@ class st_BD09ToGCJ02 extends AbstractUdf {
   def udfSparkEntries: List[String] =
     List("udfWrapper", "udfWrapper2", "udfWrapper3", "udfWrapper4")
 
-  def udfWrapper: Geometry => Geometry = evaluate
-  def udfWrapper2: Trajectory => Trajectory = evaluate
-  def udfWrapper3: RoadNetwork => RoadNetwork = evaluate
-  def udfWrapper4: RoadSegment => RoadSegment = evaluate
+  def udfWrapper: Geometry => Geometry = eval
+  def udfWrapper2: Trajectory => Trajectory = eval
+  def udfWrapper3: RoadNetwork => RoadNetwork = eval
+  def udfWrapper4: RoadSegment => RoadSegment = eval
 }

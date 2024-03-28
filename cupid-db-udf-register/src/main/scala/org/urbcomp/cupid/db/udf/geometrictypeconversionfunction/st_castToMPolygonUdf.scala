@@ -18,15 +18,16 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.{Geometry, MultiPolygon}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_castToMPolygonUdf extends AbstractUdf {
+class st_castToMPolygonUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_castToMPolygon"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): MultiPolygon = {
+  def eval(geom: Geometry): MultiPolygon = {
     if (geom == null) null
     else
       geom match {
@@ -37,5 +38,5 @@ class st_castToMPolygonUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => MultiPolygon = evaluate
+  def udfWrapper: Geometry => MultiPolygon = eval
 }

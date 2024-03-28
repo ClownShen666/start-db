@@ -17,16 +17,17 @@
 package org.urbcomp.cupid.db.udf.stringfunction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.security.MessageDigest
 
-class Md5Udf extends AbstractUdf {
+class Md5Udf extends ScalarFunction with AbstractUdf {
   override def name(): String = "md5"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String): String = {
+  def eval(str: String): String = {
     if (str == null) return null
     val hexDigits =
       Array[Char]('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
@@ -48,5 +49,5 @@ class Md5Udf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => String = evaluate
+  def udfWrapper: String => String = eval
 }

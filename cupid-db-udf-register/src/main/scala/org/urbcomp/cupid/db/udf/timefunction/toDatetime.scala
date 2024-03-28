@@ -33,7 +33,7 @@ class toDatetime {
     * @throws ParseException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dateString: String, format: String): LocalDateTime = {
+  def eval(dateString: String, format: String): LocalDateTime = {
     if (dateString == null || format == null) {
       return null
     }
@@ -55,7 +55,7 @@ class toDatetime {
     * @throws DateTimeParseException parse exception
     */
   @throws[DateTimeParseException]
-  def evaluate(dateString: String): LocalDateTime = {
+  def eval(dateString: String): LocalDateTime = {
     if (dateString == null) return null
     var localDateTime = LocalDateTime.MIN
     var isCorrect = false
@@ -84,8 +84,8 @@ class toDatetime {
 
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: (String, String) => LocalDateTime = evaluate
+  def udfWrapper: (String, String) => LocalDateTime = eval
 
-  def udfWrapper2: String => LocalDateTime = evaluate
+  def udfWrapper2: String => LocalDateTime = eval
 
 }

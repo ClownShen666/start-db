@@ -22,7 +22,7 @@ public class UdfFactoryTest {
     @Test
     public void testUdfFactory() {
         UdfFactory factory = new UdfFactory();
-        assert (factory.getEngineUdfMap().size() == 2);
+        assert (factory.getEngineUdfMap().size() == 3);
     }
 
 }

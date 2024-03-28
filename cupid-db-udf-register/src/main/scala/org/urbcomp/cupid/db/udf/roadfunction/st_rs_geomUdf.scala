@@ -18,18 +18,19 @@ package org.urbcomp.cupid.db.udf.roadfunction
 
 import org.locationtech.jts.geom.LineString
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
-class st_rs_geomUdf extends AbstractUdf {
+class st_rs_geomUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_rs_geom"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(rs: RoadSegment): LineString = {
+  def eval(rs: RoadSegment): LineString = {
     if (rs == null) null
     else {
       val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
@@ -39,6 +40,6 @@ class st_rs_geomUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: RoadSegment => LineString = evaluate
+  def udfWrapper: RoadSegment => LineString = eval
 
 }

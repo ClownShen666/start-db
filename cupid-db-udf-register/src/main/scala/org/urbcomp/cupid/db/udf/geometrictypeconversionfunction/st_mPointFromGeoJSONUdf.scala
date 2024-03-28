@@ -18,16 +18,17 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.MultiPoint
 import org.locationtech.jts.io.ParseException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_mPointFromGeoJSONUdf extends AbstractUdf {
+class st_mPointFromGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_mPointFromGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(geoJson: String): MultiPoint = {
+  def eval(geoJson: String): MultiPoint = {
     if (geoJson == null) null
     else {
       castToMPoint(geomFromGeoJSON(geoJson))
@@ -36,5 +37,5 @@ class st_mPointFromGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => MultiPoint = evaluate
+  def udfWrapper: String => MultiPoint = eval
 }

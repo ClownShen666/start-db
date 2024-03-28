@@ -18,22 +18,23 @@ package org.urbcomp.cupid.db.udf.roadfunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_rn_fromGeoJsonUdf extends AbstractUdf {
+class st_rn_fromGeoJsonUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_rn_fromGeoJson"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[JsonProcessingException]
-  def evaluate(geoJson: String): RoadNetwork = {
+  def eval(geoJson: String): RoadNetwork = {
     if (geoJson == null) null
     else RoadNetwork.fromGeoJSON(geoJson)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => RoadNetwork = evaluate
+  def udfWrapper: String => RoadNetwork = eval
 
 }

@@ -69,9 +69,9 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  test("st_geomFromGeoJSON(String)") {
+  test("st_geometryFromGeoJSON(String)") {
     executeQueryCheck(
-      "select st_geomFromGeoJSON(st_asGeoJSON(st_makePoint(1, 2)))",
+      "select st_geometryFromGeoJSON(st_asGeoJSON(st_makePoint(1, 2)))",
       List("POINT (1 2)")
     )
   }
@@ -136,15 +136,15 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  test("st_geomFromWKT(WKT)") {
+  test("st_geometryFromWKT(WKT)") {
     executeQueryCheck(
-      "select st_geomFromWKT('GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))')",
+      "select st_geometryFromWKT('GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))')",
       List("GEOMETRYCOLLECTION (POINT (4 6), LINESTRING (4 6, 7 10))")
     )
   }
 
-  test("st_asWKT(geom)") {
-    executeQueryCheck("select st_asWKT(st_makePoint(1, 2))", List("POINT (1 2)"))
+  test("st_geometryAsWKT(geom)") {
+    executeQueryCheck("select st_geometryAsWKT(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
 
   test("st_castToPoint(geom)") {
@@ -157,7 +157,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
 
   test("st_castToLineString(geom)") {
     executeQueryCheck(
-      "select st_castToLineString(st_geomFromWKT('LINESTRING(0 0,1 1,1 2)'))," +
+      "select st_castToLineString(st_geometryFromWKT('LINESTRING(0 0,1 1,1 2)'))," +
         " st_castToLineString(st_makeBBox(1, 2, 3, 4))",
       List("LINESTRING (0 0, 1 1, 1 2)", null)
     )
@@ -165,7 +165,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
 
   test("st_castToPolygon(geom)") {
     executeQueryCheck(
-      "select st_castToPolygon(st_geomFromWKT('POLYGON((10 11,12 12,13 14,15 16,10 11))'))" +
+      "select st_castToPolygon(st_geometryFromWKT('POLYGON((10 11,12 12,13 14,15 16,10 11))'))" +
         ", st_castToPolygon(st_makePoint(1, 2))",
       List("POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11))", null)
     )
@@ -173,7 +173,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
 
   test("st_castToMPoint(geom)") {
     executeQueryCheck(
-      "select st_castToMPoint(st_geomFromWKT('MULTIPOINT(3.5 5.6, 4.8 10.5)'))" +
+      "select st_castToMPoint(st_geometryFromWKT('MULTIPOINT(3.5 5.6, 4.8 10.5)'))" +
         ", st_castToMPoint(st_makeBBox(1, 2, 3, 4))",
       List("MULTIPOINT ((3.5 5.6), (4.8 10.5))", null)
     )
@@ -181,7 +181,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
 
   test("st_castToMLineString(geom)") {
     executeQueryCheck(
-      "select st_castToMLineString(st_geomFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))" +
+      "select st_castToMLineString(st_geometryFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))" +
         ", st_castToMLineString(st_makeBBox(1, 2, 3, 4))",
       List("MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))", null)
     )
@@ -189,7 +189,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
 
   test("st_castToMPolygon(geom)") {
     executeQueryCheck(
-      "select st_castToMPolygon(st_geomFromWKT" +
+      "select st_castToMPolygon(st_geometryFromWKT" +
         "('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))')), " +
         "st_castToMPolygon(st_makeBBox(1, 2, 3, 4))",
       List(
@@ -255,24 +255,27 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
     )
   }
 
-  test("st_geomFromWKB(WKB)&st_asWKB(geom)") {
-    executeQueryCheck("select st_geomFromWKB(st_asWKB(st_makePoint(1, 2)))", List("POINT (1 2)"))
+  test("st_geometryFromWKB(WKB)&st_asWKB(geom)") {
+    executeQueryCheck(
+      "select st_geometryFromWKB(st_asWKB(st_makePoint(1, 2)))",
+      List("POINT (1 2)")
+    )
   }
 
   test("st_pointFromGeoHash(str, precision)") {
     executeQueryCheck("select st_pointFromGeoHash('s10', 12)", List("POINT (2.8125 7.03125)"))
   }
 
-  test("st_geomFromGeoHash(str, precision)") {
+  test("st_geometryFromGeoHash(str, precision)") {
     executeQueryCheck(
-      "select st_geomFromGeoHash('s10', 12)",
+      "select st_geometryFromGeoHash('s10', 12)",
       List("POLYGON ((0 5.625, 0 8.4375, 5.625 8.4375, 5.625 5.625, 0 5.625))")
     )
   }
 
   test("st_asGeoHash(geom, precision)") {
     executeQueryCheck(
-      "select st_asGeoHash(st_geomFromWKT('MULTIPOINT(3.5 5.6, 4.8 10.5)'), 12)",
+      "select st_asGeoHash(st_geometryFromWKT('MULTIPOINT(3.5 5.6, 4.8 10.5)'), 12)",
       List("s10")
     )
   }

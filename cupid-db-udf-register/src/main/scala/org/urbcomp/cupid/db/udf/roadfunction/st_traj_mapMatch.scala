@@ -21,14 +21,15 @@ import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_traj_mapMatch extends AbstractUdf {
+class st_traj_mapMatch extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_traj_mapMatch"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(roadNetwork: RoadNetwork, trajectory: Trajectory): String = {
+  def eval(roadNetwork: RoadNetwork, trajectory: Trajectory): String = {
     if (roadNetwork == null || trajectory == null) return null
     val mapMatcher = new TiHmmMapMatcher(roadNetwork, new ManyToManyShortestPath(roadNetwork))
     val matchedTraj = mapMatcher.mapMatch(trajectory)
@@ -37,5 +38,5 @@ class st_traj_mapMatch extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadNetwork, Trajectory) => String = evaluate
+  def udfWrapper: (RoadNetwork, Trajectory) => String = eval
 }

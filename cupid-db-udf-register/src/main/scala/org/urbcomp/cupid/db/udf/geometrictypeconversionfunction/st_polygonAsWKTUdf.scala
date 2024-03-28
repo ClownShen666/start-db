@@ -14,25 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.geometricoperationfunction
+package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
-import org.locationtech.jts.geom.Geometry
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
+import org.locationtech.jts.geom.Polygon
+import org.locationtech.jts.io.WKTWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 
-class st_numPointsUdf extends ScalarFunction with AbstractUdf {
+import java.io.{IOException, StringWriter}
 
-  override def name(): String = "st_numPoints"
+class st_polygonAsWKTUdf extends ScalarFunction with AbstractUdf {
+
+  override def name(): String = "st_polygonAsWKT"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
-
-  def eval(geom: Geometry): java.lang.Integer = Some(geom).map(_.getNumPoints) match {
-    case Some(s) => s
-    case None    => null
+  @throws[IOException]
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon]) polygon: Polygon
+  ): java.lang.String = {
+    if (polygon == null) null
+    else {
+      val wktWriter = new WKTWriter
+      val writer = new StringWriter
+      wktWriter.write(polygon, writer)
+      writer.toString
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.Integer = eval
+  def udfWrapper: Polygon => java.lang.String = eval
+
 }

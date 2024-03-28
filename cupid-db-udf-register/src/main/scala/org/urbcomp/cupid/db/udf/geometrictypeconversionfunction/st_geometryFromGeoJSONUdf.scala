@@ -17,26 +17,28 @@
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.io.{ParseException, WKBReader}
+import org.locationtech.jts.io.ParseException
+import org.locationtech.jts.io.geojson.GeoJsonReader
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_geomFromWKBUdf extends AbstractUdf {
+class st_geometryFromGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
-  override def name(): String = "st_geomFromWKB"
+  override def name(): String = "st_geometryFromGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
-  def evaluate(wkb: Array[Byte]): Geometry = {
-    if (wkb == null) null
+  def eval(geoJson: String): Geometry = {
+    if (geoJson == null) null
     else {
-      val wkbReader = new WKBReader
-      wkbReader.read(wkb)
+      val geoJsonReader = new GeoJsonReader
+      geoJsonReader.read(geoJson)
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Array[Byte] => Geometry = evaluate
+  def udfWrapper: String => Geometry = eval
 
 }

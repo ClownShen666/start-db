@@ -14,25 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.udf.geometricoperationfunction
+package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 
-class st_numPointsUdf extends ScalarFunction with AbstractUdf {
+class st_geometryFromGeoHashUdf extends ScalarFunction with AbstractUdf {
 
-  override def name(): String = "st_numPoints"
+  override def name(): String = "st_geometryFromGeoHash"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom: Geometry): java.lang.Integer = Some(geom).map(_.getNumPoints) match {
-    case Some(s) => s
-    case None    => null
+  def eval(geoHashStr: String, precision: Int): Geometry = {
+    if (geoHashStr == null) null
+    else {
+      GeoHashUtils.decode(geoHashStr, precision)
+    }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.Integer = eval
+  def udfWrapper: (String, Int) => Geometry = eval
+
 }

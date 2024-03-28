@@ -19,15 +19,16 @@ package org.urbcomp.cupid.db.udf.geometricoperationfunction
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.operation.distance.DistanceOp
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_distanceUdf extends AbstractUdf {
+class st_distanceUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_distance"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom1: Geometry, geom2: Geometry): java.lang.Double = {
+  def eval(geom1: Geometry, geom2: Geometry): java.lang.Double = {
     if (geom1 == null || geom2 == null) null
     else {
       val op = new DistanceOp(geom1, geom2)
@@ -37,5 +38,5 @@ class st_distanceUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (Geometry, Geometry) => java.lang.Double = evaluate
+  def udfWrapper: (Geometry, Geometry) => java.lang.Double = eval
 }

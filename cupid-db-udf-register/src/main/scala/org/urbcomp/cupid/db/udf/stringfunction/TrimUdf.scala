@@ -16,18 +16,19 @@
  */
 package org.urbcomp.cupid.db.udf.stringfunction
 
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class TrimUdf extends AbstractUdf {
+class TrimUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "trim"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String): String =
+  def eval(str: String): String =
     if (str == null) null else str.trim
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => String = evaluate
+  def udfWrapper: String => String = eval
 }

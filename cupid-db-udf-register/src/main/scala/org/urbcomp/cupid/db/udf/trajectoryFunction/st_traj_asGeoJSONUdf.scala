@@ -18,21 +18,22 @@ package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_traj_asGeoJSONUdf extends AbstractUdf {
+class st_traj_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_traj_asGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[JsonProcessingException]
-  def evaluate(trajectory: Trajectory): java.lang.String = {
+  def eval(trajectory: Trajectory): java.lang.String = {
     if (trajectory == null) null
     else trajectory.toGeoJSON
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper1")
 
-  def udfWrapper1: Trajectory => java.lang.String = evaluate
+  def udfWrapper1: Trajectory => java.lang.String = eval
 }

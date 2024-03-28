@@ -19,15 +19,16 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.io.geojson.GeoJsonWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_asGeoJSONUdf extends AbstractUdf {
+class st_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_asGeoJSON"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(geom: Geometry): java.lang.String = {
+  def eval(geom: Geometry): java.lang.String = {
     if (geom == null) null
     else {
       val geoJsonWriter = new GeoJsonWriter
@@ -38,6 +39,6 @@ class st_asGeoJSONUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.String = evaluate
+  def udfWrapper: Geometry => java.lang.String = eval
 
 }

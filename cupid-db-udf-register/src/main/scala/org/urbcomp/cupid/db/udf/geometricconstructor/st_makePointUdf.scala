@@ -18,18 +18,19 @@ package org.urbcomp.cupid.db.udf.geometricconstructor
 
 import org.locationtech.jts.geom.{Coordinate, Point}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
 
 import java.math.BigDecimal
 
-class st_makePointUdf extends AbstractUdf {
+class st_makePointUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_makePoint"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(x: BigDecimal, y: BigDecimal): Point = {
+  def eval(x: BigDecimal, y: BigDecimal): Point = {
     if (x == null || y == null) return null
     val X = x.doubleValue()
     val Y = y.doubleValue()
@@ -42,5 +43,5 @@ class st_makePointUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (BigDecimal, BigDecimal) => Point = evaluate
+  def udfWrapper: (BigDecimal, BigDecimal) => Point = eval
 }

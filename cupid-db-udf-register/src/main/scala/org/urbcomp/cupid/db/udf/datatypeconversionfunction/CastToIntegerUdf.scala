@@ -17,15 +17,16 @@
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class CastToIntegerUdf extends AbstractUdf {
+class CastToIntegerUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "castToInteger"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String): java.lang.Integer = {
+  def eval(str: String): java.lang.Integer = {
     if (str == null) null
     else {
       try {
@@ -38,5 +39,5 @@ class CastToIntegerUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => java.lang.Integer = evaluate
+  def udfWrapper: String => java.lang.Integer = eval
 }

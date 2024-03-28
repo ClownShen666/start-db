@@ -22,17 +22,18 @@ import org.urbcomp.cupid.db.algorithm.shortestpath.BiDijkstraShortestPath
 import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
 import org.urbcomp.cupid.db.model.point.SpatialPoint
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
-class st_rn_shortestPathUdf extends AbstractUdf {
+class st_rn_shortestPathUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "st_rn_shortestPath"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
-  def evaluate(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
+  def eval(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
     if (roadNetwork == null || startPoint == null || endPoint == null) null
     else {
       val biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork)
@@ -47,6 +48,6 @@ class st_rn_shortestPathUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (RoadNetwork, Point, Point) => java.lang.String = evaluate
+  def udfWrapper: (RoadNetwork, Point, Point) => java.lang.String = eval
 
 }

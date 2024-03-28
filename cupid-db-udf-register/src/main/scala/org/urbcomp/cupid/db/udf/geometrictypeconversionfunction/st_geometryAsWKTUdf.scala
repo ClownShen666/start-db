@@ -16,26 +16,36 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
-import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
 import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.io.WKTWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
-class st_geomFromGeoHashUdf extends AbstractUdf {
+import java.io.{IOException, StringWriter}
 
-  override def name(): String = "st_geomFromGeoHash"
+class st_geometryAsWKTUdf extends ScalarFunction with AbstractUdf {
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def name(): String = "st_geometryAsWKT"
 
-  def evaluate(geoHashStr: String, precision: Int): Geometry = {
-    if (geoHashStr == null) null
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  @throws[IOException]
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.String = {
+    if (geom == null) null
     else {
-      GeoHashUtils.decode(geoHashStr, precision)
+      val wktWriter = new WKTWriter
+      val writer = new StringWriter
+      wktWriter.write(geom, writer)
+      writer.toString
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String, Int) => Geometry = evaluate
+  def udfWrapper: Geometry => java.lang.String = eval
 
 }

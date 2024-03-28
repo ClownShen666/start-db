@@ -17,16 +17,17 @@
 package org.urbcomp.cupid.db.udf.stringfunction
 
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import scala.collection.mutable
 
-class RpadUdf extends AbstractUdf {
+class RpadUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "rpad"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def evaluate(str: String, len: Int): String = {
+  def eval(str: String, len: Int): String = {
     if (str == null) null
     else {
       val sb = new mutable.StringBuilder()
@@ -39,7 +40,7 @@ class RpadUdf extends AbstractUdf {
     }
   }
 
-  def evaluate(str: String, len: Int, pad: String): String = {
+  def eval(str: String, len: Int, pad: String): String = {
     val res = Util.pad(str, len, pad)
     if (res == null) return null
     if (res.length == len) return res
@@ -48,6 +49,6 @@ class RpadUdf extends AbstractUdf {
 
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
-  def udfWrapper: (String, Int) => String = evaluate
-  def udfWrapper2: (String, Int, String) => String = evaluate
+  def udfWrapper: (String, Int) => String = eval
+  def udfWrapper2: (String, Int, String) => String = eval
 }

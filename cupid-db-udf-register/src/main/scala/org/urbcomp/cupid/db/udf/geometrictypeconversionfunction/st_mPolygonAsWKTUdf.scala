@@ -16,31 +16,36 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
-import org.locationtech.jts.geom.Geometry
+import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.functions.ScalarFunction
+import org.locationtech.jts.geom.MultiPolygon
 import org.locationtech.jts.io.WKTWriter
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 
 import java.io.{IOException, StringWriter}
 
-class st_asWKTUdf extends AbstractUdf {
+class st_mPolygonAsWKTUdf extends ScalarFunction with AbstractUdf {
 
-  override def name(): String = "st_asWKT"
+  override def name(): String = "st_mPolygonAsWKT"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[IOException]
-  def evaluate(geom: Geometry): java.lang.String = {
-    if (geom == null) null
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon]) mPolygon: MultiPolygon
+  ): java.lang.String = {
+    if (mPolygon == null) null
     else {
       val wktWriter = new WKTWriter
       val writer = new StringWriter
-      wktWriter.write(geom, writer)
+      wktWriter.write(mPolygon, writer)
       writer.toString
     }
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: Geometry => java.lang.String = evaluate
+  def udfWrapper: MultiPolygon => java.lang.String = eval
 
 }

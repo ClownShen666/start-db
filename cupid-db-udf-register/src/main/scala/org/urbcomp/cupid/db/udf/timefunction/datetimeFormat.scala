@@ -16,17 +16,18 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.time.format.DateTimeFormatter
 import java.time.DateTimeException
 
-class datetimeFormat extends AbstractUdf {
+class datetimeFormat extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "datetimeFormat"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * Formats one datetime string into the specified format
@@ -36,15 +37,15 @@ class datetimeFormat extends AbstractUdf {
     * @return datetime string
     */
   @throws[DateTimeException]
-  def evaluate(dtStr: String, format: String): String = {
+  def eval(dtStr: String, format: String): String = {
     val to = new toDatetime
-    val DateTime = to.evaluate(dtStr)
+    val DateTime = to.eval(dtStr)
     val dateTimeFormatter = DateTimeFormatter.ofPattern(format.trim)
     dateTimeFormatter.format(DateTime)
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: (String, String) => String = evaluate
+  def udfWrapper: (String, String) => String = eval
 
 }

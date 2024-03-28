@@ -17,13 +17,14 @@
 package org.urbcomp.cupid.db.udf.timefunction
 
 import java.time.DateTimeException
-import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Spark}
+import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
+import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
-class dayOfWeek extends AbstractUdf {
+class dayOfWeek extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "dayOfWeek"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   /**
     * get day of week
@@ -33,13 +34,13 @@ class dayOfWeek extends AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  def evaluate(dtString: String): Int = {
+  def eval(dtString: String): Int = {
     val to = new toDatetime
-    to.evaluate(dtString).getDayOfWeek.getValue
+    to.eval(dtString).getDayOfWeek.getValue
   }
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 
-  def udfWrapper: String => Int = evaluate
+  def udfWrapper: String => Int = eval
 
 }
