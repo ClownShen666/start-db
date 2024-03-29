@@ -16,10 +16,12 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
-import org.locationtech.jts.geom.Geometry
+import org.apache.flink.table.annotation.DataTypeHint
+import org.locationtech.jts.geom.{Geometry, MultiPoint}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+import org.locationtech.jts.io.ParseException
 
 class st_castToGeometryUdf extends ScalarFunction with AbstractUdf {
 
@@ -27,6 +29,8 @@ class st_castToGeometryUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @throws[ParseException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
   def eval(geom: Geometry): Geometry = geom
 
   def udfSparkEntries: List[String] = List("udfWrapper")
