@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.stringfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -25,6 +26,7 @@ class ConcatUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)
 
