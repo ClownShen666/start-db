@@ -17,7 +17,7 @@
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
-import org.locationtech.jts.geom.{Geometry, MultiPoint}
+import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.io.{ParseException, WKBWriter}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}

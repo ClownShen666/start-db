@@ -17,7 +17,7 @@
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
-import org.locationtech.jts.geom.{Geometry, Point}
+import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.util.AffineTransformation
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
