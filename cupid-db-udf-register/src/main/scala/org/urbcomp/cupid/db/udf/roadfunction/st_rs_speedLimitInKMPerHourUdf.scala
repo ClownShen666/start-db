@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.roadfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -27,6 +28,7 @@ class st_rs_speedLimitInKMPerHourUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
   def eval(rs: RoadSegment): java.lang.Double = {
     if (rs == null) null
     else rs.getSpeedLimit

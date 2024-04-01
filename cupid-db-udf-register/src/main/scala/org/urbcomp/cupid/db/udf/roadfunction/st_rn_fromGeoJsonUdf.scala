@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.udf.roadfunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.roadnetwork.RoadNetwork
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -28,6 +29,7 @@ class st_rn_fromGeoJsonUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[JsonProcessingException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
   def eval(geoJson: String): RoadNetwork = {
     if (geoJson == null) null
     else RoadNetwork.fromGeoJSON(geoJson)

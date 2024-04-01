@@ -17,9 +17,11 @@
 package org.urbcomp.cupid.db.udf.roadfunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
+
 import scala.collection.JavaConverters.seqAsJavaListConverter
 
 class st_rn_makeRoadNetworkUdf extends AbstractUdf {
@@ -28,6 +30,7 @@ class st_rn_makeRoadNetworkUdf extends AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Spark)
   @throws[JsonProcessingException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
   def eval(rsList: Seq[RoadSegment]): RoadNetwork = {
     if (rsList == null) null
     else new RoadNetwork(rsList.toList.asJava)

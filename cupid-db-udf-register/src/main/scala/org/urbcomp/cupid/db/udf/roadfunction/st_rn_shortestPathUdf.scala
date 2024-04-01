@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.udf.roadfunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Point
 import org.urbcomp.cupid.db.algorithm.shortestpath.BiDijkstraShortestPath
 import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
@@ -33,6 +34,7 @@ class st_rn_shortestPathUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
     if (roadNetwork == null || startPoint == null || endPoint == null) null
     else {
