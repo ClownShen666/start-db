@@ -16,9 +16,11 @@
  */
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+import org.locationtech.jts.geom.Point
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 class st_traj_speedInKMPerHourUdf extends ScalarFunction with AbstractUdf {
@@ -27,6 +29,7 @@ class st_traj_speedInKMPerHourUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
   def eval(trajectory: Trajectory): java.lang.Double = {
     if (trajectory == null) null
     else trajectory.getSpeedInKMPerHour
