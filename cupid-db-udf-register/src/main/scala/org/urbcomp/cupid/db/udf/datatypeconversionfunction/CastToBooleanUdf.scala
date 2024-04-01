@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -25,6 +26,7 @@ class CastToBooleanUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Boolean])
   def eval(str: String): java.lang.Boolean = {
 
     Option(str) match {

@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.{Geometry, GeometryFactory, Point}
 import org.locationtech.jts.operation.distance.DistanceOp
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -28,6 +29,7 @@ class st_closestPointUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
   def eval(geom1: Geometry, geom2: Geometry): Point = {
     if (geom1 == null || geom2 == null) null
     else {

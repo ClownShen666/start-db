@@ -16,9 +16,11 @@
  */
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+
 import scala.util.matching.Regex
 class CastToDoubleUdf extends ScalarFunction with AbstractUdf {
 
@@ -26,6 +28,7 @@ class CastToDoubleUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
   def eval(str: String): java.lang.Double = {
     if (str == null) null
     else {

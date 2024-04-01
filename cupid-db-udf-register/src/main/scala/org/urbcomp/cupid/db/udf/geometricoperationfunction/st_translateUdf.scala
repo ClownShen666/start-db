@@ -16,7 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
-import org.locationtech.jts.geom.Geometry
+import org.apache.flink.table.annotation.DataTypeHint
+import org.locationtech.jts.geom.{Geometry, Point}
 import org.locationtech.jts.geom.util.AffineTransformation
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -28,6 +29,7 @@ class st_translateUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
   def eval(geom: Geometry, deltaX: Double, deltaY: Double): Geometry = {
     if (geom == null) null
     else {

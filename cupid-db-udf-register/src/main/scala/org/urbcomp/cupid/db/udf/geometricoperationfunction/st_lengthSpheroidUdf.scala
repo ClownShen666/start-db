@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.geotools.referencing.GeodeticCalculator
 import org.locationtech.jts.geom.LineString
 import org.locationtech.spatial4j.distance.DistanceUtils
@@ -29,6 +30,7 @@ class st_lengthSpheroidUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
   def eval(geom: LineString): java.lang.Double = {
     if (geom == null) null
     else {

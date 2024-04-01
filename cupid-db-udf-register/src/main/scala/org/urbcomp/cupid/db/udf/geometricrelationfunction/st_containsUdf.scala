@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricrelationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -32,6 +33,7 @@ class st_containsUdf extends ScalarFunction with AbstractUdf {
     * The difference between contain and cover, e.g., when a line is
     * on the edge of a polygon, contain return false but cover return true
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Boolean])
   def eval(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
     if (geom1 == null || geom2 == null) null
     else {
