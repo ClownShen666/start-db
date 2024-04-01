@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.otherfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -28,6 +29,7 @@ class versionUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(): String = {
 
     Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString

@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.mathfuction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -35,6 +36,7 @@ class Pow extends ScalarFunction with AbstractUdf {
     * @param b double
     * @return double
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(a: BigDecimal, b: BigDecimal): BigDecimal = {
     if (a == null || b == null) return null
     val res = Math.pow(a.doubleValue, b.doubleValue)

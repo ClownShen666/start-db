@@ -16,9 +16,11 @@
  */
 package org.urbcomp.cupid.db.udf.mathfuction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+
 import java.math.BigDecimal
 
 class ToRadians extends ScalarFunction with AbstractUdf {
@@ -34,6 +36,7 @@ class ToRadians extends ScalarFunction with AbstractUdf {
     * @param angDeg double
     * @return double
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(angDeg: BigDecimal): BigDecimal = {
     if (angDeg == null) return null
     val res = Math.toRadians(angDeg.doubleValue)

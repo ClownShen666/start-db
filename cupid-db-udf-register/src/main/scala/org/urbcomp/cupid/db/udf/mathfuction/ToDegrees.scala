@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.mathfuction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -36,6 +37,7 @@ class ToDegrees extends ScalarFunction with AbstractUdf {
     * @param angRad double
     * @return double
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(angRad: BigDecimal): BigDecimal = {
     if (angRad == null) return null
     val res = Math.toDegrees(angRad.doubleValue)
