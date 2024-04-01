@@ -23,7 +23,10 @@ import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
-import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{MatchUtil, WGS84ToBD09Transformer}
+import org.urbcomp.cupid.db.udf.coordtransformfunction.coordtransform.{
+  MatchUtil,
+  WGS84ToBD09Transformer
+}
 
 class st_WGS84ToBD09 extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_WGS84ToBD09"

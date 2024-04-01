@@ -33,7 +33,7 @@ class st_lineStringAsWKTUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[IOException]
   def eval(
-      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) lineString: LineString
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String]) lineString: LineString
   ): java.lang.String = {
     if (lineString == null) null
     else {
