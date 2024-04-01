@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -35,6 +36,7 @@ class year extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
   def eval(dtString: String): java.lang.Integer = {
     Option(dtString) match {
       case Some(s) => (new toDatetime).eval(s).getYear

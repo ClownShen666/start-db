@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -27,6 +28,7 @@ class currentTimestamp extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(): Timestamp = new Timestamp(System.currentTimeMillis)
 
   def udfSparkEntries: List[String] = List("udfWrapper")

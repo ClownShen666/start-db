@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -27,6 +29,7 @@ class now extends ScalarFunction with AbstractUdf {
   override def name(): String = "now"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[String])
   def eval(): String = {
     val formatter = DateTimeFormatter.ofPattern(DEFAULT_FORMATS(1))
     LocalDateTime.now.format(formatter)

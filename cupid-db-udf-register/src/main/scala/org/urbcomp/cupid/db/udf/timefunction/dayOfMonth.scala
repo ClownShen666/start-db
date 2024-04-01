@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
+import org.apache.flink.table.annotation.DataTypeHint
 import org.joda.time.DateTime
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -36,6 +37,7 @@ class dayOfMonth extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Int])
   def eval(dtString: String): Int = {
     val to = new toDatetime
     to.eval(dtString).getDayOfMonth

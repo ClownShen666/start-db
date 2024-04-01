@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+
 import java.time.DateTimeException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -34,6 +36,7 @@ class month extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Int])
   def eval(dtString: String): Int = {
     val to = new toDatetime
     to.eval(dtString).getMonth.getValue

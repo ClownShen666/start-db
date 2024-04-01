@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+
 import java.sql.Timestamp
 import java.text.ParseException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -34,6 +36,7 @@ class timestampToLong extends ScalarFunction with AbstractUdf {
     * @param ts timestamp
     * @return long instance
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Long])
   def eval(ts: Timestamp): java.lang.Long = {
     Option(ts) match {
       case Some(s) => s.getTime

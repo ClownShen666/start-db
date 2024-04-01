@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -36,6 +37,7 @@ class datetimeToTimestamp extends ScalarFunction with AbstractUdf {
     * @return timestamp timestamp instance
     */
   @throws[ParseException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(dtString: String): Timestamp = {
     val toTimestamp = new toTimestamp
     toTimestamp.eval(dtString)

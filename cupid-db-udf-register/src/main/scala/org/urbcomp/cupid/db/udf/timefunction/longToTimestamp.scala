@@ -16,6 +16,8 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
+import org.apache.flink.table.annotation.DataTypeHint
+
 import java.sql.Timestamp
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -32,6 +34,7 @@ class longToTimestamp extends ScalarFunction with AbstractUdf {
     * @param num one long instance
     * @return timestamp instance
     */
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(num: Long): Timestamp = new Timestamp(num)
   def udfSparkEntries: List[String] = List("udfWrapper")
 
