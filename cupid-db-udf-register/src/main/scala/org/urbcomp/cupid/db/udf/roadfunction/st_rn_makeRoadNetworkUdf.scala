@@ -31,7 +31,7 @@ class st_rn_makeRoadNetworkUdf extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Spark)
   @throws[JsonProcessingException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
-  def eval(rsList: Seq[RoadSegment]): RoadNetwork = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Seq[RoadSegment]]) rsList: Seq[RoadSegment]): RoadNetwork = {
     if (rsList == null) null
     else new RoadNetwork(rsList.toList.asJava)
   }

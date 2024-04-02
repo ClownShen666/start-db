@@ -33,7 +33,7 @@ class st_rs_geomUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString])
-  def eval(rs: RoadSegment): LineString = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment): LineString = {
     if (rs == null) null
     else {
       val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory

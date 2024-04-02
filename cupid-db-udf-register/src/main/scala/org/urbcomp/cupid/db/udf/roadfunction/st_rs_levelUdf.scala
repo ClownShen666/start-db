@@ -28,8 +28,7 @@ class st_rs_levelUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
-  def eval(rs: RoadSegment): java.lang.Integer = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment): java.lang.Integer = {
     if (rs == null) null
     else {
       rs.getLevel.value

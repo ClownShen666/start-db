@@ -28,8 +28,7 @@ class st_rs_rsidUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
-  def eval(rs: RoadSegment): java.lang.String = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment): java.lang.String = {
     if (rs == null) null
     else String.valueOf(rs.getRoadSegmentId)
   }

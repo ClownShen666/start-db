@@ -34,8 +34,7 @@ class st_rn_shortestPathUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
-  def eval(roadNetwork: RoadNetwork, startPoint: Point, endPoint: Point): java.lang.String = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork, @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) startPoint: Point, @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) endPoint: Point): java.lang.String = {
     if (roadNetwork == null || startPoint == null || endPoint == null) null
     else {
       val biDijkstraShortestPath = new BiDijkstraShortestPath(roadNetwork)
