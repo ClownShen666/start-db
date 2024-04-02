@@ -30,7 +30,9 @@ class st_traj_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @throws[JsonProcessingException]
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory
+  ): java.lang.String = {
     if (trajectory == null) null
     else trajectory.toGeoJSON
   }

@@ -30,7 +30,10 @@ class st_traj_timeNUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory, n: Int): Timestamp = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory,
+      n: Int
+  ): Timestamp = {
     if (trajectory == null) null
     else trajectory.getGPSPointList.get(n).getTime
   }
