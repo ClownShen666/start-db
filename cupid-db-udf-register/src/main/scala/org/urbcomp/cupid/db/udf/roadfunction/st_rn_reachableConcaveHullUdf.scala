@@ -35,7 +35,7 @@ class st_rn_reachableConcaveHullUdf extends ScalarFunction with AbstractUdf {
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
   def eval(
-            @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork,
       @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) startPt: Point,
       timeInSec: BigDecimal,
       travelMode: String

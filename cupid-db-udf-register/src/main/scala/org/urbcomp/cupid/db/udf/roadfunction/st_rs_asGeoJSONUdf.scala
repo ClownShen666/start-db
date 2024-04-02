@@ -29,7 +29,9 @@ class st_rs_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[JsonProcessingException]
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment
+  ): java.lang.String = {
     if (rs == null) null
     else rs.toGeoJSON
   }

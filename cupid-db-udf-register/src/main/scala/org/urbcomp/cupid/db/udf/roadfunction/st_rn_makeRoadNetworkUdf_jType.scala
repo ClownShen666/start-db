@@ -29,7 +29,11 @@ class st_rn_makeRoadNetworkUdf_jType extends AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite)
   @throws[JsonProcessingException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[java.util.List[RoadSegment]]) rsList: java.util.List[RoadSegment]): RoadNetwork = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[java.util.List[RoadSegment]]) rsList: java.util.List[
+        RoadSegment
+      ]
+  ): RoadNetwork = {
     if (rsList == null) null
     else new RoadNetwork(rsList)
   }

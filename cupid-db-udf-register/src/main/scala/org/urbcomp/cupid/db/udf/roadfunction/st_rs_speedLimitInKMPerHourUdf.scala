@@ -28,7 +28,9 @@ class st_rs_speedLimitInKMPerHourUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment): java.lang.Double = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) rs: RoadSegment
+  ): java.lang.Double = {
     if (rs == null) null
     else rs.getSpeedLimit
   }
