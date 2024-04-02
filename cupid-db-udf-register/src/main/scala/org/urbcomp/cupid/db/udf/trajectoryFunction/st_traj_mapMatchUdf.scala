@@ -34,8 +34,7 @@ class st_traj_mapMatchUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
-  def eval(roadNetwork: RoadNetwork, trajectory: Trajectory): String = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork, @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): String = {
     if (roadNetwork == null || trajectory == null) null
     else {
       val mapMatcher = new TiHmmMapMatcher(roadNetwork, new ManyToManyShortestPath(roadNetwork))

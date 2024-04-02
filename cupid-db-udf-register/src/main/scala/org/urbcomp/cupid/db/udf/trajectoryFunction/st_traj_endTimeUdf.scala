@@ -20,6 +20,7 @@ import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+import org.locationtech.jts.geom.Point
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 import java.sql.Timestamp
@@ -30,8 +31,7 @@ class st_traj_endTimeUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
-  def eval(trajectory: Trajectory): Timestamp = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): Timestamp = {
     if (trajectory == null) null
     else trajectory.getEndTime
   }

@@ -30,7 +30,7 @@ class st_traj_startPointUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(trajectory: Trajectory): Point = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): Point = {
     if (trajectory == null) null
     else trajectory.getStartPoint
   }

@@ -28,8 +28,7 @@ class st_traj_numOfPointsUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
-  def eval(trajectory: Trajectory): java.lang.Integer = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): java.lang.Integer = {
     if (trajectory == null) null
     else trajectory.getGPSPointList.size
   }

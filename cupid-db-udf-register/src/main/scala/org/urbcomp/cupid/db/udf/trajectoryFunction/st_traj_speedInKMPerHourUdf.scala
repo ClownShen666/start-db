@@ -29,8 +29,7 @@ class st_traj_speedInKMPerHourUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
-  def eval(trajectory: Trajectory): java.lang.Double = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory): java.lang.Double = {
     if (trajectory == null) null
     else trajectory.getSpeedInKMPerHour
   }
