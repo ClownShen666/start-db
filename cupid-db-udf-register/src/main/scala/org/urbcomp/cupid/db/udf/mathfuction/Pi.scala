@@ -34,7 +34,6 @@ class Pi extends ScalarFunction with AbstractUdf {
     *
     * @return PI double.
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(): BigDecimal = {
     BigDecimal.valueOf(Math.PI)
   }

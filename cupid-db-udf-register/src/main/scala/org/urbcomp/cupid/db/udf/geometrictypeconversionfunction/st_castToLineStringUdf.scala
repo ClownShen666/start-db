@@ -31,7 +31,9 @@ class st_castToLineStringUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString])
-  def eval(geom: Geometry): LineString = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): LineString = {
     if (geom == null) null
     else
       geom match {

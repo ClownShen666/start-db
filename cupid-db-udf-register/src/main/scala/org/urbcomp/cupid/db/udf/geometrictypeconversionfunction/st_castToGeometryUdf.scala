@@ -31,7 +31,8 @@ class st_castToGeometryUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
-  def eval(geom: Geometry): Geometry = geom
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Geometry =
+    geom
 
   def udfSparkEntries: List[String] = List("udfWrapper")
 

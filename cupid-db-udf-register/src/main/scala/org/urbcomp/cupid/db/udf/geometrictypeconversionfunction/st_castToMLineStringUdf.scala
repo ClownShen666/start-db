@@ -31,7 +31,9 @@ class st_castToMLineStringUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString])
-  def eval(geom: Geometry): MultiLineString = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): MultiLineString = {
     if (geom == null) null
     else
       geom match {

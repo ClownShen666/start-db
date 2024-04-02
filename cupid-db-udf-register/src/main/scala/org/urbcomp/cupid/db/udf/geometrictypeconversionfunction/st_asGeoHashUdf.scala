@@ -31,8 +31,10 @@ class st_asGeoHashUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @throws[ParseException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
-  def eval(geom: Geometry, precision: Int): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
+      precision: Int
+  ): java.lang.String = {
     if (geom == null) null
     else {
       GeoHashUtils.encode(geom, precision)

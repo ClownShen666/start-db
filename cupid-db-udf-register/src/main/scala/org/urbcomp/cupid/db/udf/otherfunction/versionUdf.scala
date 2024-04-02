@@ -29,7 +29,6 @@ class versionUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(): String = {
 
     Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString

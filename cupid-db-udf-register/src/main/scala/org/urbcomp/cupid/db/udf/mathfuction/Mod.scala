@@ -29,7 +29,6 @@ class Mod extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(a: BigDecimal, b: BigDecimal): BigDecimal = {
     if (a == null || b == null) null
     else {

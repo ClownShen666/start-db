@@ -31,7 +31,9 @@ class st_castToMPolygonUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon])
-  def eval(geom: Geometry): MultiPolygon = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): MultiPolygon = {
     if (geom == null) null
     else
       geom match {

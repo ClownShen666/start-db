@@ -31,7 +31,7 @@ class st_castToPointUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(geom: Geometry): Point = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Point = {
     if (geom == null) null
     else
       geom match {

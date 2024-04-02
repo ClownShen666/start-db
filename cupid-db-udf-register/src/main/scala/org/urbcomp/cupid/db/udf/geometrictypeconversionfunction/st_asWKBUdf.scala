@@ -32,8 +32,9 @@ class st_asWKBUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[IOException]
   @throws[ParseException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Array[Byte]])
-  def eval(geom: Geometry): Array[Byte] = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): Array[Byte] = {
     if (geom == null) null
     else {
       val wkbWriter = new WKBWriter

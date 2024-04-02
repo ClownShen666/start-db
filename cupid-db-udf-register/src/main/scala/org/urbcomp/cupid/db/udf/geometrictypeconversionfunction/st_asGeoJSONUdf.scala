@@ -31,8 +31,9 @@ class st_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @throws[ParseException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
-  def eval(geom: Geometry): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.String = {
     if (geom == null) null
     else {
       val geoJsonWriter = new GeoJsonWriter

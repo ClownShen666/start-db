@@ -35,7 +35,6 @@ class Log2 extends ScalarFunction with AbstractUdf {
     * @param num double
     * @return double
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(num: BigDecimal): BigDecimal = {
     if (num == null || num.doubleValue <= 0) return null
     val res = Math.log(num.doubleValue) / Math.log(2.0d)

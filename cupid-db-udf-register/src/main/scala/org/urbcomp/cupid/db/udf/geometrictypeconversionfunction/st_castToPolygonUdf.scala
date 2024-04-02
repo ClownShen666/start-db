@@ -31,7 +31,7 @@ class st_castToPolygonUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
-  def eval(geom: Geometry): Polygon = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Polygon = {
     if (geom == null) null
     else
       geom match {

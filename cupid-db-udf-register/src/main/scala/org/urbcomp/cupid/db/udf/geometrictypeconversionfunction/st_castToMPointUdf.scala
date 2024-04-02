@@ -31,7 +31,9 @@ class st_castToMPointUdf extends ScalarFunction with AbstractUdf {
 
   @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint])
-  def eval(geom: Geometry): MultiPoint = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): MultiPoint = {
     if (geom == null) null
     else
       geom match {
