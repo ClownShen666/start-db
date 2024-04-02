@@ -37,7 +37,6 @@ class datetimeToTimestamp extends ScalarFunction with AbstractUdf {
     * @return timestamp timestamp instance
     */
   @throws[ParseException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(dtString: String): Timestamp = {
     val toTimestamp = new toTimestamp
     toTimestamp.eval(dtString)

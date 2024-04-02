@@ -34,7 +34,6 @@ class toDatetime {
     * @throws ParseException parse exception
     */
   @throws[DateTimeException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[LocalDateTime])
   def eval(dateString: String, format: String): LocalDateTime = {
     if (dateString == null || format == null) {
       return null

@@ -38,7 +38,6 @@ class timestampFormat extends ScalarFunction with AbstractUdf {
     * @param string time format
     * @return the specified format instance
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[String])
   def eval(ts: Any, string: String): String = {
     if (ts == null || string == null) return null // deal with the null input
 

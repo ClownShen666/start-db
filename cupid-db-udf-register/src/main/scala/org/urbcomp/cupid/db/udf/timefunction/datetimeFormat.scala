@@ -38,7 +38,6 @@ class datetimeFormat extends ScalarFunction with AbstractUdf {
     * @return datetime string
     */
   @throws[DateTimeException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[String])
   def eval(dtStr: String, format: String): String = {
     val to = new toDatetime
     val DateTime = to.eval(dtStr)

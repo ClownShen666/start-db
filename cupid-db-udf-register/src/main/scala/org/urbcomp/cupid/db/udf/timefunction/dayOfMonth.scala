@@ -37,7 +37,6 @@ class dayOfMonth extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Int])
   def eval(dtString: String): Int = {
     val to = new toDatetime
     to.eval(dtString).getDayOfMonth

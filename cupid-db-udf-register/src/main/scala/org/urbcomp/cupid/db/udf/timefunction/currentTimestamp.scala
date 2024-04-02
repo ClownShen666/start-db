@@ -28,7 +28,6 @@ class currentTimestamp extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(): Timestamp = new Timestamp(System.currentTimeMillis)
 
   def udfSparkEntries: List[String] = List("udfWrapper")

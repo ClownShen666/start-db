@@ -40,7 +40,6 @@ class toTimestamp extends ScalarFunction with AbstractUdf {
     * @throws ParseException parse exception
     */
   @throws[ParseException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(dateString: String, format: String): Timestamp = {
     if (dateString == null || format == null) return null
     val simpleDateFormat = new SimpleDateFormat(format.trim)

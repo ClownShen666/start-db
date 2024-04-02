@@ -36,7 +36,6 @@ class timestampToLong extends ScalarFunction with AbstractUdf {
     * @param ts timestamp
     * @return long instance
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Long])
   def eval(ts: Timestamp): java.lang.Long = {
     Option(ts) match {
       case Some(s) => s.getTime

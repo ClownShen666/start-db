@@ -37,7 +37,6 @@ class week extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse exception
     */
   @throws[DateTimeException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
   def eval(dtString: String): java.lang.Integer = {
     Option(dtString) match {
       case Some(s) => (new toDatetime).eval(s).get(WeekFields.ISO.weekOfYear())

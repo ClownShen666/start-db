@@ -34,7 +34,6 @@ class longToTimestamp extends ScalarFunction with AbstractUdf {
     * @param num one long instance
     * @return timestamp instance
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Timestamp])
   def eval(num: Long): Timestamp = new Timestamp(num)
   def udfSparkEntries: List[String] = List("udfWrapper")
 

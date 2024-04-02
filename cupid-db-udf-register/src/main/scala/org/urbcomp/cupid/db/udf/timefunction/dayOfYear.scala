@@ -36,7 +36,6 @@ class dayOfYear extends ScalarFunction with AbstractUdf {
     * @throws DateTimeException parse Exception
     */
   @throws[DateTimeException]
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[Int])
   def eval(dtString: String): Int = {
     val to = new toDatetime
     to.eval(dtString).getDayOfYear
