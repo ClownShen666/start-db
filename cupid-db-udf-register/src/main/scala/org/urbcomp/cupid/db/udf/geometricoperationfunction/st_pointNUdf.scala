@@ -29,7 +29,10 @@ class st_pointNUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(geom: Geometry, n: Int): Point = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
+      n: Int
+  ): Point = {
     if (geom == null) null
     else
       geom match {

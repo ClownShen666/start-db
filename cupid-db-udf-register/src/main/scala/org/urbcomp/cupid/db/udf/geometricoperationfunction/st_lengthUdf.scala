@@ -28,8 +28,9 @@ class st_lengthUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
-  def eval(geom: Geometry): java.lang.Double = Some(geom).map(_.getLength) match {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.Double = Some(geom).map(_.getLength) match {
     case Some(s) => s
     case _       => null
   }

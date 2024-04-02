@@ -28,8 +28,9 @@ class st_xUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
-  def eval(geom: Geometry): java.lang.Double = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.Double = {
     geom match {
       case point: Point => point.getX
       case _            => null

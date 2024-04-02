@@ -29,7 +29,7 @@ class st_BBoxUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
-  def eval(geom: Geometry): Geometry = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Geometry = {
     Some(geom) match {
       case Some(geo) => geo.getEnvelope
       case _         => null

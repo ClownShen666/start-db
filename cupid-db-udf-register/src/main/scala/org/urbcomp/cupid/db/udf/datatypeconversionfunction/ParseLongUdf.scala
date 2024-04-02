@@ -27,7 +27,6 @@ class ParseLongUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Long])
   def eval(num: AnyRef): java.lang.Long = {
     if (num == null) null
     else {

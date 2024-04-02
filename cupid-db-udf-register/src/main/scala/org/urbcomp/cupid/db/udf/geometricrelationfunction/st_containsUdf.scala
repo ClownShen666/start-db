@@ -33,8 +33,10 @@ class st_containsUdf extends ScalarFunction with AbstractUdf {
     * The difference between contain and cover, e.g., when a line is
     * on the edge of a polygon, contain return false but cover return true
     */
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Boolean])
-  def eval(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom1: Geometry,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom2: Geometry
+  ): java.lang.Boolean = {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)

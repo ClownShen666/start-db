@@ -29,7 +29,7 @@ class st_centroidUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(geom: Geometry): Point = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Point = {
     Some(geom) match {
       case Some(value) => value.getCentroid
       case _           => null

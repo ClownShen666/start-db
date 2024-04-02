@@ -28,8 +28,9 @@ class st_isValidUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Boolean])
-  def eval(geom: Geometry): java.lang.Boolean = Some(geom).map(_.isValid) match {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.Boolean = Some(geom).map(_.isValid) match {
     case Some(s) => s
     case _       => null
   }

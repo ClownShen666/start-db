@@ -30,7 +30,11 @@ class st_translateUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
-  def eval(geom: Geometry, deltaX: Double, deltaY: Double): Geometry = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = {
     if (geom == null) null
     else {
       val at = new AffineTransformation

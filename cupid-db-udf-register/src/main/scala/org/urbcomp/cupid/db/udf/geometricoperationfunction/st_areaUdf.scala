@@ -28,8 +28,9 @@ class st_areaUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
-  def eval(geom: Geometry): java.lang.Double = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry
+  ): java.lang.Double = {
     Some(geom) match {
       case Some(geo) => geo.getArea
       case _         => null

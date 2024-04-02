@@ -27,8 +27,10 @@ class st_relateUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
-  def eval(geom1: Geometry, geom2: Geometry): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom1: Geometry,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom2: Geometry
+  ): java.lang.String = {
     if (geom1 == null || geom2 == null) null
     else geom1.relate(geom2).toString
 

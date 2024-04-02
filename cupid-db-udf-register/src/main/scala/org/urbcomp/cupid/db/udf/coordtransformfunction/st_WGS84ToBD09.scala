@@ -36,25 +36,31 @@ class st_WGS84ToBD09 extends ScalarFunction with AbstractUdf {
   lazy val transformer = new WGS84ToBD09Transformer
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
-  def eval(st: Geometry): Geometry = {
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new WGS84ToBD09Transformer, st)
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
-  def eval(st: Trajectory): Trajectory = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) st: Trajectory
+  ): Trajectory = {
     if (st == null) return null
     transformer.trajectoryTransform(st)
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
-  def eval(st: RoadNetwork): RoadNetwork = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) st: RoadNetwork
+  ): RoadNetwork = {
     if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment])
-  def eval(st: RoadSegment): RoadSegment = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) st: RoadSegment
+  ): RoadSegment = {
     if (st == null) return null
     transformer.roadSegmentTransform(st)
   }

@@ -26,7 +26,6 @@ class CastToBooleanUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Boolean])
   def eval(str: String): java.lang.Boolean = {
 
     Option(str) match {

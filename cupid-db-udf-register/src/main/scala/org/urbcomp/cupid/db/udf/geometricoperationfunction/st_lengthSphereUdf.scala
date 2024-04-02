@@ -30,8 +30,9 @@ class st_lengthSphereUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Double])
-  def eval(geom: LineString): java.lang.Double = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) geom: LineString
+  ): java.lang.Double = {
     if (geom == null) null
     else {
       var sum = 0.0

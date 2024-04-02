@@ -30,7 +30,10 @@ class st_closestPointUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(geom1: Geometry, geom2: Geometry): Point = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom1: Geometry,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom2: Geometry
+  ): Point = {
     if (geom1 == null || geom2 == null) null
     else {
       val op = new DistanceOp(geom1, geom2)

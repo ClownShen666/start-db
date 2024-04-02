@@ -27,7 +27,6 @@ class CastToLongUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Long])
   def eval(str: String): java.lang.Long = {
     if (str == null) null
     else {

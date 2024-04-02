@@ -27,7 +27,6 @@ class CastToStringUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(any: AnyRef): String = {
     if (any == null) null
     else {

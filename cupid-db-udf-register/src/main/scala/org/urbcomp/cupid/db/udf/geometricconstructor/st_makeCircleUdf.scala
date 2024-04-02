@@ -30,7 +30,10 @@ class st_makeCircleUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
-  def eval(center: Point, radiusInM: Double): Polygon = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) center: Point,
+      radiusInM: Double
+  ): Polygon = {
     if (center == null) null
     else {
       center.buffer(GeoFunctions.getDegreeFromM(radiusInM)).asInstanceOf[Polygon]

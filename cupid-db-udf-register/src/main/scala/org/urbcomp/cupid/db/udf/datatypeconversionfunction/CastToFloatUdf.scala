@@ -27,7 +27,6 @@ class CastToFloatUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Float])
   def eval(str: String): java.lang.Float = {
     if (str == null) null
     else {
