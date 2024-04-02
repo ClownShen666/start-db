@@ -26,7 +26,6 @@ class LengthUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
   def eval(str: String): Integer =
     if (str == null) null
     else {

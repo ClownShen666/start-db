@@ -26,7 +26,6 @@ class LocateUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.Integer])
   def eval(subStr: String, str: String): Integer =
     if (subStr == null || str == null) null
     else str.indexOf(subStr) + 1

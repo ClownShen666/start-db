@@ -26,7 +26,6 @@ class ReverseUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(str: String): String =
     if (str == null) null
     else {

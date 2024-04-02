@@ -26,7 +26,6 @@ class ConcatUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @DataTypeHint(value = "RAW", bridgedTo = classOf[java.lang.String])
   def eval(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)
 
