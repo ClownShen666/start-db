@@ -23,7 +23,6 @@ import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeometryFactoryUtils
-
 import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 
 class st_rs_geomUdf extends ScalarFunction with AbstractUdf {
