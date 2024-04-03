@@ -22,7 +22,6 @@ import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
-import org.locationtech.jts.io.ParseException
 
 class st_geometryFromGeoHashUdf extends ScalarFunction with AbstractUdf {
 
@@ -30,7 +29,6 @@ class st_geometryFromGeoHashUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  @throws[ParseException]
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
   def eval(geoHashStr: String, precision: Int): Geometry = {
     if (geoHashStr == null) null
