@@ -21,7 +21,6 @@ import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.Spark
-
 import scala.collection.JavaConverters.seqAsJavaListConverter
 
 class st_rn_makeRoadNetworkUdf extends AbstractUdf {
