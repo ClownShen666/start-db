@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.udf.timefunction
-import org.apache.flink.table.annotation.DataTypeHint
+
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
 import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS

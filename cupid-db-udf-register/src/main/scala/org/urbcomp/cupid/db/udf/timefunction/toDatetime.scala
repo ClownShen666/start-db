@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.timefunction.DefaultConstant.DEFAULT_FORMATS
 
 import java.text.ParseException

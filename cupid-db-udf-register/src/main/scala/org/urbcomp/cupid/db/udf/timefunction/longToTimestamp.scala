@@ -16,8 +16,6 @@
  */
 package org.urbcomp.cupid.db.udf.timefunction
 
-import org.apache.flink.table.annotation.DataTypeHint
-
 import java.sql.Timestamp
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
