@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.algorithm.mapmatch.tihmm.TiHmmMapMatcher
 import org.urbcomp.cupid.db.algorithm.shortestpath.ManyToManyShortestPath
 import org.urbcomp.cupid.db.exception.AlgorithmExecuteException
@@ -33,7 +34,10 @@ class st_traj_mapMatchUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[AlgorithmExecuteException]
   @throws[JsonProcessingException]
-  def eval(roadNetwork: RoadNetwork, trajectory: Trajectory): String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory
+  ): String = {
     if (roadNetwork == null || trajectory == null) null
     else {
       val mapMatcher = new TiHmmMapMatcher(roadNetwork, new ManyToManyShortestPath(roadNetwork))

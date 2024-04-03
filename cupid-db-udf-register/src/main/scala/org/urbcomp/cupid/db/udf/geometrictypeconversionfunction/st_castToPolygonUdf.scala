@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.{Geometry, Polygon}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -27,7 +28,8 @@ class st_castToPolygonUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom: Geometry): Polygon = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Polygon = {
     if (geom == null) null
     else
       geom match {

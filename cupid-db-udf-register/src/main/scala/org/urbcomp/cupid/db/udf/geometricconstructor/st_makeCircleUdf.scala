@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.{Point, Polygon}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -28,7 +29,11 @@ class st_makeCircleUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(center: Point, radiusInM: Double): Polygon = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) center: Point,
+      radiusInM: Double
+  ): Polygon = {
     if (center == null) null
     else {
       center.buffer(GeoFunctions.getDegreeFromM(radiusInM)).asInstanceOf[Polygon]

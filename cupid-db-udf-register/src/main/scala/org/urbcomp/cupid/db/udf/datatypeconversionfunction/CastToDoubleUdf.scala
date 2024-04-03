@@ -19,6 +19,7 @@ package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
+
 import scala.util.matching.Regex
 class CastToDoubleUdf extends ScalarFunction with AbstractUdf {
 

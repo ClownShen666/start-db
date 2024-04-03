@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.coordtransformfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -34,22 +35,32 @@ class st_WGS84ToGCJ02 extends ScalarFunction with AbstractUdf {
 
   lazy val transformer = new WGS84ToGCJ02Transformer
 
-  def eval(st: Geometry): Geometry = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new WGS84ToGCJ02Transformer, st)
   }
 
-  def eval(st: Trajectory): Trajectory = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) st: Trajectory
+  ): Trajectory = {
     if (st == null) return null
     transformer.trajectoryTransform(st)
   }
 
-  def eval(st: RoadNetwork): RoadNetwork = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) st: RoadNetwork
+  ): RoadNetwork = {
     if (st == null) return null
     transformer.roadNetworkTransform(st)
   }
 
-  def eval(st: RoadSegment): RoadSegment = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadSegment]) st: RoadSegment
+  ): RoadSegment = {
     if (st == null) return null
     transformer.roadSegmentTransform(st)
   }

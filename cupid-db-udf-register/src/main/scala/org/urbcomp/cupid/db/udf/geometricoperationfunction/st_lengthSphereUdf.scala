@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.LineString
 import org.locationtech.spatial4j.context.jts.JtsSpatialContext
 import org.locationtech.spatial4j.distance.DistanceUtils
@@ -29,7 +30,9 @@ class st_lengthSphereUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom: LineString): java.lang.Double = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) geom: LineString
+  ): java.lang.Double = {
     if (geom == null) null
     else {
       var sum = 0.0

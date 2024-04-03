@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
@@ -28,7 +29,10 @@ class st_asGeoHashUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom: Geometry, precision: Int): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
+      precision: Int
+  ): java.lang.String = {
     if (geom == null) null
     else {
       GeoHashUtils.encode(geom, precision)

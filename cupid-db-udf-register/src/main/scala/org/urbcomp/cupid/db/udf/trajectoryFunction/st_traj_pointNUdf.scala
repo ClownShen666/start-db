@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Point
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -28,7 +29,11 @@ class st_traj_pointNUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(trajectory: Trajectory, n: Int): Point = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory,
+      n: Int
+  ): Point = {
     if (trajectory == null) null
     else trajectory.getGPSPointList.get(n)
   }

@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.point.GPSPoint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -34,7 +35,11 @@ class st_traj_noiseFilterUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(trajectory: Trajectory, speedLimitInMPerS: BigDecimal): Trajectory = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory,
+      speedLimitInMPerS: BigDecimal
+  ): Trajectory = {
     if (trajectory == null || speedLimitInMPerS == null) return null
     val gpsPoints = trajectory.getGPSPointList
     if (gpsPoints.length <= 1) {

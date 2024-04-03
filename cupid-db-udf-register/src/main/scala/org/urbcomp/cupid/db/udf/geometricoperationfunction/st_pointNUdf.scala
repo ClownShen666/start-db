@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.{Geometry, LineString, Point}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -27,7 +28,11 @@ class st_pointNUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom: Geometry, n: Int): Point = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
+      n: Int
+  ): Point = {
     if (geom == null) null
     else
       geom match {

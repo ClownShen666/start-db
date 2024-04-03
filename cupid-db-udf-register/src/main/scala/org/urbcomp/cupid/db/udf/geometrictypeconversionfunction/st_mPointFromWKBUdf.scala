@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.MultiPoint
 import org.locationtech.jts.io.ParseException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -28,6 +29,7 @@ class st_mPointFromWKBUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint])
   def eval(wkb: Array[Byte]): MultiPoint = {
     if (wkb == null) null
     else {

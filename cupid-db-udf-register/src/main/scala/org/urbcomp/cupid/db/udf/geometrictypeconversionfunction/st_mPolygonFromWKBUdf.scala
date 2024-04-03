@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.MultiPolygon
 import org.locationtech.jts.io.ParseException
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -28,6 +29,7 @@ class st_mPolygonFromWKBUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
   @throws[ParseException]
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon])
   def eval(wkb: Array[Byte]): MultiPolygon = {
     if (wkb == null) null
     else {

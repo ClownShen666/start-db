@@ -17,6 +17,7 @@
 package org.urbcomp.cupid.db.udf.trajectoryFunction
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -27,8 +28,11 @@ class st_traj_asGeoJSONUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "st_traj_asGeoJSON"
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+
   @throws[JsonProcessingException]
-  def eval(trajectory: Trajectory): java.lang.String = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory
+  ): java.lang.String = {
     if (trajectory == null) null
     else trajectory.toGeoJSON
   }

@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricrelationfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.jts.geom.Geometry
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -26,7 +27,10 @@ class st_disjointUdf extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(geom1: Geometry, geom2: Geometry): java.lang.Boolean = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom1: Geometry,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom2: Geometry
+  ): java.lang.Boolean = {
     if (geom1 == null || geom2 == null) null
     else {
       val preparedGeom1 = prepareGeometry(geom1)
