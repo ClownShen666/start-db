@@ -20,7 +20,6 @@ import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
-import org.locationtech.jts.geom.Point
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 
 class st_traj_speedInKMPerHourUdf extends ScalarFunction with AbstractUdf {
