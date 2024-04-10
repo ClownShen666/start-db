@@ -35,10 +35,10 @@ class st_makeBBoxUdf extends ScalarFunction with AbstractUdf {
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
   def eval(
-      lowerX: BigDecimal,
-      lowerY: BigDecimal,
-      upperX: BigDecimal,
-      upperY: BigDecimal
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) lowerX: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) lowerY: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) upperX: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) upperY: BigDecimal
   ): Polygon = {
     if (lowerX == null || lowerY == null || upperX == null || upperY == null) null
     else {
@@ -53,7 +53,26 @@ class st_makeBBoxUdf extends ScalarFunction with AbstractUdf {
     }
   }
 
-  def eval(point1: Point, point2: Point): Polygon = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(lowerX: Double, lowerY: Double, upperX: Double, upperY: Double): Polygon = {
+    if (lowerX == null || lowerY == null || upperX == null || upperY == null) null
+    else {
+      val points: util.List[Point] = new util.ArrayList[Point](5)
+      points.add(makePoint(lowerX, lowerY))
+      points.add(makePoint(lowerX, upperY))
+      points.add(makePoint(upperX, upperY))
+      points.add(makePoint(upperX, lowerY))
+      points.add(makePoint(lowerX, lowerY))
+      val pointss = points.asScala.toList
+      makePolygon(makeLineString(pointss))
+    }
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) point1: Point,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) point2: Point
+  ): Polygon = {
     if (point1 == null || point2 == null) null
     else {
       makeBBox(
@@ -65,10 +84,8 @@ class st_makeBBoxUdf extends ScalarFunction with AbstractUdf {
     }
   }
 
-  def udfSparkEntries: scala.collection.immutable.List[String] =
-    scala.collection.immutable.List("udfWrapper", "udfWrapper1")
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
   def udfWrapper: (BigDecimal, BigDecimal, BigDecimal, BigDecimal) => Polygon = eval
-
-  def udfWrapper1: (Point, Point) => Polygon = eval
+  def udfWrapper2: (Point, Point) => Polygon = eval
 }

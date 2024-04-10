@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.mathfuction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -28,7 +29,20 @@ class Mod extends ScalarFunction with AbstractUdf {
 
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(a: BigDecimal, b: BigDecimal): BigDecimal = {
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) a: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) b: BigDecimal
+  ): BigDecimal = {
+    if (a == null || b == null) null
+    else {
+      val res = a.doubleValue % b.doubleValue
+      BigDecimal.valueOf(res)
+    }
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
+  def eval(a: Double, b: Double): BigDecimal = {
     if (a == null || b == null) null
     else {
       val res = a.doubleValue % b.doubleValue

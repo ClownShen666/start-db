@@ -49,7 +49,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
 
-    executeQueryCheck(querySql, List(10))
+    checkCalciteSpark(querySql, List(10))
   }
 
   test("test load - multiple columns - no udf") {
@@ -67,7 +67,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike"))
+    checkCalciteSpark(querySql, List("8B88A6F8158F650D", "electric_bike"))
   }
 
   test("test load -traj -road  - with udf") {
@@ -89,7 +89,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
+    checkCalciteSpark(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
   }
 
   test("test load - multiple columns - with udf") {
@@ -108,7 +108,7 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     val stmt = connect.createStatement()
     stmt.execute(createTableSql)
     stmt.execute(loadSql)
-    executeQueryCheck(querySql, List("POINT (40.646475 -74.026081)"))
+    checkCalciteSpark(querySql, List("POINT (40.646475 -74.026081)"))
   }
 
   test("test load -traj   - with udf in spark") {
@@ -132,6 +132,6 @@ class LoadTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute(createTableSql)
     SparkExecuteWrapper.getSparkExecute.executeSql(loadSql)
     SparkExecuteWrapper.getSparkExecute.executeSql(querySql)
-    executeQueryCheck(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
+    checkCalciteSpark(querySql, List("8B88A6F8158F650D", "electric_bike", tGeo, rsGeoJson))
   }
 }

@@ -30,7 +30,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute("drop table  if exists jack_test_query ")
     stmt.execute("create table if not exists  jack_test_query(i int , b string)")
     stmt.execute("insert into jack_test_query values (556,  \"false\")")
-    executeQueryCheck("select  i from jack_test_query  where b = \"false\"", List(556))
+    checkCalciteSpark("select  i from jack_test_query  where b = \"false\"", List(556))
   }
 
   test("test select one column") {
@@ -38,7 +38,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute("drop table if exists t_int ")
     stmt.execute("create table if not exists t_int(i int)")
     stmt.execute("insert into t_int values (123)")
-    executeQueryCheck("select  *  from t_int ", List(123))
+    checkCalciteSpark("select  *  from t_int ", List(123))
   }
 
   test("select timestamp") {
@@ -46,7 +46,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute("drop table if exists t_timestamp ")
     stmt.execute("create table if not exists t_timestamp  (timestamp11 timestamp);")
     stmt.execute("insert into t_timestamp values (toTimestamp(\"2022-06-29 10:00:00.000\"));")
-    executeQueryCheck("select * from t_timestamp;")
+    checkCalciteSpark("select * from t_timestamp;")
   }
 
   test("bool equal test") {
@@ -54,7 +54,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute("drop table if exists t_bool ")
     stmt.execute("create table if not exists t_bool (bool7 bool);")
     stmt.execute("insert into t_bool values (true);")
-    executeQueryCheck("select * from t_bool where bool7 = true;")
+    checkCalciteSpark("select * from t_bool where bool7 = true;")
   }
 
   test("chinese string insert test") {
@@ -67,7 +67,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
     stmt.execute("""
                        |insert into t_string10 values ('字符串')
                        |""".stripMargin)
-    executeQueryCheck("select * from t_string10", List("字符串"))
+    checkCalciteSpark("select * from t_string10", List("字符串"))
   }
 
   test("geometry equal test") {
@@ -78,7 +78,7 @@ class QueryTest extends AbstractCalciteSparkFunctionTest {
                    |insert into t_point values (st_PointFromWkt("Point(10 20)"))
                    |""".stripMargin)
 
-    executeQueryCheck("""
+    checkCalciteSpark("""
         |select * from t_point where point13 = st_PointFromWkt("Point(10 20)")
         |""".stripMargin, List(POINT))
   }

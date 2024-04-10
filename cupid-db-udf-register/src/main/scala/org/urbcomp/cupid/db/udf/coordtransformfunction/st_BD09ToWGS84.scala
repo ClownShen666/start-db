@@ -18,7 +18,15 @@ package org.urbcomp.cupid.db.udf.coordtransformfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
 import org.apache.flink.table.functions.ScalarFunction
-import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.{
+  Geometry,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon
+}
 import org.urbcomp.cupid.db.model.roadnetwork.{RoadNetwork, RoadSegment}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -39,6 +47,50 @@ class st_BD09ToWGS84 extends ScalarFunction with AbstractUdf {
   def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) st: Geometry): Geometry = {
     if (st == null) return null
     MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st)
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) st: Point): Point = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[Point]
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) st: LineString
+  ): LineString = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[LineString]
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon]) st: Polygon): Polygon = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[Polygon]
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint]) st: MultiPoint
+  ): MultiPoint = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[MultiPoint]
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString]) st: MultiLineString
+  ): MultiLineString = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[MultiLineString]
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon]) st: MultiPolygon
+  ): MultiPolygon = {
+    if (st == null) return null
+    MatchUtil.MatchCoordinate(new BD09ToWGS84Transformer, st).asInstanceOf[MultiPolygon]
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
@@ -72,5 +124,4 @@ class st_BD09ToWGS84 extends ScalarFunction with AbstractUdf {
   def udfWrapper2: Trajectory => Trajectory = eval
   def udfWrapper3: RoadNetwork => RoadNetwork = eval
   def udfWrapper4: RoadSegment => RoadSegment = eval
-
 }

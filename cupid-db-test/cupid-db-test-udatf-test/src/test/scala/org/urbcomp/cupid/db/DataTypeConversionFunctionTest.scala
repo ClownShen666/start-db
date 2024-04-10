@@ -19,51 +19,55 @@ package org.urbcomp.cupid.db
 class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
-    executeQueryCheck("select castToInteger('1234')", List(1234))
-    executeQueryCheck("select castToInteger(null)", List(null))
+    checkCalciteSparkFlink("select castToInteger('1234')", List(1234))
+    checkCalciteSparkFlink("select castToInteger(null)", List(null))
   }
 
   test("castToLong") {
-    executeQueryCheck("select castToLong('12344')", List(12344L))
-    executeQueryCheck("select castToLong(null)", List(null))
+    checkCalciteSparkFlink("select castToLong('12344')", List(12344L))
+    checkCalciteSparkFlink("select castToLong(null)", List(null))
   }
 
   test("castToFloat") {
-    executeQueryCheck("select castToFloat('123.1')", List(123.1f))
-    executeQueryCheck("select castToFloat(null)", List(null))
+    checkCalciteSparkFlink("select castToFloat('123.1')", List(123.1f))
+    checkCalciteSparkFlink("select castToFloat(null)", List(null))
   }
 
   test("castToDouble") {
-    executeQueryCheck("select castToDouble('123444555.3')", List(123444555.3d))
-    executeQueryCheck("select castToDouble(null)", List(null))
+    checkCalciteSparkFlink("select castToDouble('123444555.3')", List(123444555.3d))
+    checkCalciteSparkFlink("select castToDouble(null)", List(null))
   }
 
   test("castToBoolean") {
-    executeQueryCheck("select castToBoolean('true')", List(true))
-    executeQueryCheck("select castToBoolean('TRUE')", List(true))
-    executeQueryCheck("select castToBoolean('false')", List(false))
-    executeQueryCheck("select castToBoolean('FALSE')", List(false))
-    executeQueryCheck("select castToBoolean(null)", List(null))
-    executeQueryCheck("select castToBoolean('notaboolean')", List(null))
+    checkCalciteSparkFlink("select castToBoolean('true')", List(true))
+    checkCalciteSparkFlink("select castToBoolean('TRUE')", List(true))
+    checkCalciteSparkFlink("select castToBoolean('false')", List(false))
+    checkCalciteSparkFlink("select castToBoolean('FALSE')", List(false))
+    checkCalciteSparkFlink("select castToBoolean(null)", List(null))
+    checkCalciteSparkFlink("select castToBoolean('notaboolean')", List(null))
   }
 
+  // FIXME flink the input parameter is AnyRef
   test("castToString") {
-    executeQueryCheck("select castToString('1234')", List("1234"))
-    executeQueryCheck("select castToString(null)", List(null))
+    checkCalciteSpark("select castToString(1234)", List("1234"))
+    checkCalciteSpark("select castToString(null)", List(null))
   }
 
+  // FIXME flink the input parameter is AnyRef
   test("parseInteger") {
-    executeQueryCheck("select parseInteger('1234')", List(1234))
-    executeQueryCheck("select parseInteger(null)", List(null))
+    checkCalciteSpark("select parseInteger('1234')", List(1234))
+    checkCalciteSpark("select parseInteger(null)", List(null))
   }
 
+  // FIXME flink the input parameter is AnyRef
   test("parseLong") {
-    executeQueryCheck("select parseLong('1234')", List(1234L))
-    executeQueryCheck("select parseLong(null)", List(null))
+    checkCalciteSpark("select parseLong('1234')", List(1234L))
+    checkCalciteSpark("select parseLong(null)", List(null))
   }
 
+  // FIXME flink the input parameter is AnyRef
   test("parseDouble") {
-    executeQueryCheck("select parseDouble('12345678901234567890')", List(12345678901234567890d))
-    executeQueryCheck("select parseDouble(null)", List(null))
+    checkCalciteSpark("select parseDouble('12345678901234567890')", List(12345678901234567890d))
+    checkCalciteSpark("select parseDouble(null)", List(null))
   }
 }

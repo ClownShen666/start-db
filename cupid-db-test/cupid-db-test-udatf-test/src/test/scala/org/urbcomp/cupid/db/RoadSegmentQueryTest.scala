@@ -34,7 +34,7 @@ class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
   test("basic roadSegment query") {
     statement.execute("drop table if exists t_basic_road_segment_query_test")
     statement.execute("create table if not exists t_basic_road_segment_query_test (rs RoadSegment)")
-    executeQueryCheck("select count(1) from t_basic_road_segment_query_test", List(0))
+    checkCalciteSpark("select count(1) from t_basic_road_segment_query_test", List(0))
   }
 
   test("roadSegment query") {
@@ -43,7 +43,7 @@ class RoadSegmentQueryTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       s"insert into t_road_segment_query_test values (st_rs_fromGeoJSON(\'$rsGeoJson\'))"
     )
-    executeQueryCheck(
+    checkCalciteSpark(
       "select rs from t_road_segment_query_test",
       List(
         "{\"type\":\"Feature\",\"properties\":{\"endId\":2,\"level\":6,\"startId\":1,\"rsId\":1,\"speedLimit\":30.0,\"lengthInMeter\":120.0,\"direction\":1},\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[111.37939453125,54.00776876193478],[116.3671875,53.05442186546102]]}}"

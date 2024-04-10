@@ -24,6 +24,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.*;
@@ -31,6 +32,7 @@ import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
+import org.urbcomp.cupid.db.flink.visitor.UdfVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
@@ -75,6 +77,17 @@ public class FlinkQueryExecutorTest {
         streamSelectSqlTest();
         streamInsertSqlTest();
         streamDropTableSqlTest();
+    }
+
+    @Ignore
+    @Test
+    public void pTest() throws SQLException {
+        FlinkQueryExecutor flinkQueryExecutor = new FlinkQueryExecutor();
+        flinkQueryExecutor.registerUdf();
+        String sql = "select st_y(st_makePoint(1, 2))";
+        UdfVisitor udfVisitor = new UdfVisitor(sql);
+        System.out.println("-----------" + udfVisitor.getProcessedSql());
+        flinkQueryExecutor.getTableEnv().sqlQuery(udfVisitor.getProcessedSql());
     }
 
     @Ignore
@@ -898,7 +911,9 @@ public class FlinkQueryExecutorTest {
     @Test
     public void registerTest() throws Exception {
         FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        flink.registerUdf();
+        TableResult result = flink.getTableEnv()
+            .executeSql("select st_pointFromGeoJSON(st_asGeoJSON(st_makePoint(1, 2)))");
+        result.print();
     }
 
     @Ignore

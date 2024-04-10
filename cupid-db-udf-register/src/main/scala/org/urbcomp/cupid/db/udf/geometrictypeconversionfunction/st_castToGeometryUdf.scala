@@ -17,7 +17,15 @@
 package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
-import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.{
+  Geometry,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon
+}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -32,8 +40,39 @@ class st_castToGeometryUdf extends ScalarFunction with AbstractUdf {
   def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry): Geometry =
     geom
 
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) geom: Point): Geometry =
+    geom.asInstanceOf[Geometry]
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) geom: LineString
+  ): Geometry =
+    geom.asInstanceOf[Geometry]
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(@DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon]) geom: Polygon): Geometry =
+    geom.asInstanceOf[Geometry]
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint]) geom: MultiPoint
+  ): Geometry =
+    geom.asInstanceOf[Geometry]
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString]) geom: MultiLineString
+  ): Geometry =
+    geom.asInstanceOf[Geometry]
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon]) geom: MultiPolygon
+  ): Geometry =
+    geom.asInstanceOf[Geometry]
+
   def udfSparkEntries: List[String] = List("udfWrapper")
 
   def udfWrapper: Geometry => Geometry = eval
-
 }

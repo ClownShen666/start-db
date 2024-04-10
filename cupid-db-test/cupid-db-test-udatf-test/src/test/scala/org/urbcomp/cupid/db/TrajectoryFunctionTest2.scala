@@ -26,7 +26,7 @@ class TrajectoryFunctionTest2 extends AbstractCalciteSparkFunctionTest {
   val tGeoStp: String = trajectoryStp.toGeoJSON
 
   test("st_traj_stayPointDetect") {
-    executeQueryCheck(
+    checkCalciteSpark(
       "select st_traj_stayPointDetect(st_traj_fromGeoJSON(\'" + tGeoStp + "\'),10,10)",
       List(
         "2018-10-09 07:28:24.0",
