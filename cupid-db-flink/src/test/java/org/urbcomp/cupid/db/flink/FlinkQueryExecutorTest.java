@@ -81,17 +81,6 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
-    public void pTest() throws SQLException {
-        FlinkQueryExecutor flinkQueryExecutor = new FlinkQueryExecutor();
-        flinkQueryExecutor.registerUdf();
-        String sql = "select st_y(st_makePoint(1, 2))";
-        UdfVisitor udfVisitor = new UdfVisitor(sql);
-        System.out.println("-----------" + udfVisitor.getProcessedSql());
-        flinkQueryExecutor.getTableEnv().sqlQuery(udfVisitor.getProcessedSql());
-    }
-
-    @Ignore
-    @Test
     public void parseSqlTest() throws SQLException {
         // // create table
         try (Connection connect = CalciteHelper.createConnection()) {

@@ -155,7 +155,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
         "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
       )
     }
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_traj_mapMatch(st_rn_makeRoadNetwork(collect_list(b)), " +
         "st_traj_fromGeoJSON(\'" + tGeo + "\')) from t_road_segment_test",
       List(

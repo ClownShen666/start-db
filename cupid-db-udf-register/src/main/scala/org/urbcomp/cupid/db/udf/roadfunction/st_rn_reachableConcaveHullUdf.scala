@@ -37,9 +37,29 @@ class st_rn_reachableConcaveHullUdf extends ScalarFunction with AbstractUdf {
   def eval(
       @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork,
       @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) startPt: Point,
-      timeInSec: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) timeInSec: BigDecimal,
       travelMode: String
   ): Polygon = {
+    if (roadNetwork == null || startPt == null || timeInSec == null || travelMode == null) null
+    else {
+      val startSpatialPoint = new SpatialPoint(startPt.getCoordinate)
+      val reachable = new ReachableAreaConcaveHull(
+        roadNetwork,
+        startSpatialPoint,
+        timeInSec.doubleValue,
+        travelMode
+      )
+      reachable.getHull
+    }
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon])
+  def eval(
+            @DataTypeHint(value = "RAW", bridgedTo = classOf[RoadNetwork]) roadNetwork: RoadNetwork,
+            @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) startPt: Point,
+            timeInSec: Double,
+            travelMode: String
+          ): Polygon = {
     if (roadNetwork == null || startPt == null || timeInSec == null || travelMode == null) null
     else {
       val startSpatialPoint = new SpatialPoint(startPt.getCoordinate)

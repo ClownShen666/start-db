@@ -34,7 +34,7 @@ class RoadFunctionTest2 extends AbstractCalciteSparkFunctionTest {
     SparkExecuteWrapper.getSparkExecute.renewSparkSession()
     checkCalciteSparkFlink(
       "select st_rn_reachableConvexHull(st_rn_fromGeoJson(\'"
-        + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \"Drive\")",
+        + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \'Drive\')",
       List(
         "POLYGON ((34.2577994791667 108.984770236545, 34.2577338324653 108.984903971354, " +
           "34.2575575086806 108.985347222222, 34.2575290256076 108.98542453342, 34.2575168185764 108.985468207465, " +

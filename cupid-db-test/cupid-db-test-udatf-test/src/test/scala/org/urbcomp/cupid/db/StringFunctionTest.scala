@@ -68,7 +68,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   //FIXME flink Invalid number of arguments to function 'LPAD'. Was expecting 3 arguments
   test("lpad1") {
-    checkCalciteSparkFlink("select lpad('abcde', 2)", List("  abcde"))
+    checkCalciteSpark("select lpad('abcde', 2)", List("  abcde"))
     checkCalciteSpark("select lpad(null, 2)", List(null))
   }
 
