@@ -73,10 +73,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("lpad2") {
-    checkCalciteSpark(
-      "select lpad('abcde', 2, 'a'), lpad('abcde', 6, 'a')",
-      List("ab", "aabcde")
-    )
+    checkCalciteSpark("select lpad('abcde', 2, 'a'), lpad('abcde', 6, 'a')", List("ab", "aabcde"))
     checkCalciteSpark("select lpad(null, 5, 'a')", List(null))
   }
 
@@ -87,10 +84,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("rpad2") {
-    checkCalciteSpark(
-      "select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e')",
-      List("a", "abcdee")
-    )
+    checkCalciteSpark("select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e')", List("a", "abcdee"))
     checkCalciteSpark("select rpad('abcde', 6, null)", List(null))
   }
 

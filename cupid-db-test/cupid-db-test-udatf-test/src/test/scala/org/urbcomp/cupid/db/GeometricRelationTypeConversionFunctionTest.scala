@@ -207,10 +207,7 @@ class GeometricRelationTypeConversionFunctionTest extends AbstractCalciteSparkFu
   }
 
   test("st_pointFromWKB(WKB)") {
-    checkCalciteSpark(
-      "select st_pointFromWKB(st_asWKB(st_makePoint(1, 2)))",
-      List("POINT (1 2)")
-    )
+    checkCalciteSpark("select st_pointFromWKB(st_asWKB(st_makePoint(1, 2)))", List("POINT (1 2)"))
   }
 
   test("st_lineStringFromWKB(WKB)") {

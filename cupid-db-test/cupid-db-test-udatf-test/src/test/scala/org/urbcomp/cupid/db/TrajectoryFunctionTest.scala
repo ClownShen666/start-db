@@ -32,10 +32,7 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
   test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
-    checkCalciteSpark(
-      "select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
-      List(tGeo)
-    )
+    checkCalciteSpark("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
   }
 
   test("st_traj_fromGeoJSON(str)") {
