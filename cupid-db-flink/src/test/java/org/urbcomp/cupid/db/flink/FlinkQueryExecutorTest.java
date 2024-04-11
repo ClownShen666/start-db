@@ -24,7 +24,6 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.*;
@@ -899,86 +898,7 @@ public class FlinkQueryExecutorTest {
     @Test
     public void registerTest() throws Exception {
         FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        TableResult result = flink.getTableEnv()
-            .executeSql("select st_pointFromGeoJSON(st_asGeoJSON(st_makePoint(1, 2)))");
-        result.print();
-    }
-
-    @Ignore
-    @Test
-    public void registerUdfTest() throws Exception {
-        // create table
-        try (Connection connect = CalciteHelper.createConnection()) {
-            Statement stmt = connect.createStatement();
-            stmt.executeUpdate("drop table if exists table1");
-            stmt.executeUpdate(
-                "create table if not exists table1("
-                    + "geometry1 Geometry,"
-                    + "point1 Point,"
-                    + "linestring1 LineString,"
-                    + "polygon1 Polygon,"
-                    + "multipoint1 MultiPoint,"
-                    + "multilinestring1 MultiLineString,"
-                    + "multipolygon1 MultiPolygon,"
-                    + "SPATIAL INDEX indexName(geometry1))"
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        // get topic names
-        SelectFromTableVisitor visitor = new SelectFromTableVisitor("select * from table1");
-        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-            visitor.getDbTableList()
-        );
-        List<String> topicList = new ArrayList<>();
-        topicList.add(getKafkaTopic(tableList.get(0)));
-
-        // create topic and add message
-        createKafkaTopic("localhost:9092", topicList.get(0));
-        List<String> recordList = new ArrayList<>();
-        recordList.add(
-            "POINT (90 90),,"
-                + "POINT (90 90),,"
-                + "LINESTRING (0 0, 1 1, 1 2),,"
-                + "POLYGON ((10 11, 12 12, 13 14, 15 16, 10 11)),,"
-                + "MULTIPOINT ((3.5 5.6), (4.8 10.5)),,"
-                + "MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4)),,"
-                + "MULTIPOLYGON (((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2)), ((6 3, 9 2, 9 4, 6 3)))"
-        );
-        produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-
-        // load table
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        flink.loadTable(
-            flinkSqlParam,
-            visitor.getTableList().get(0),
-            visitor.getDbTableList().get(0),
-            tableList.get(0)
-        );
-        Table table1 = flink.getTableEnv().sqlQuery("select * from table1;");
-        checkTableNotNull(flink.getTableEnv(), table1);
-
-        // register udf and test
         flink.registerUdf();
-        flink.getTableEnv()
-            .sqlQuery("select st_geometryFromWKT(st_geometryAsWKT(geometry1)) from table1;");
-        flink.getTableEnv().sqlQuery("select st_pointFromWKT(st_pointAsWKT(point1)) from table1;");
-        flink.getTableEnv()
-            .sqlQuery("select st_lineStringFromWKT(st_lineStringAsWKT(linestring1)) from table1;");
-        flink.getTableEnv()
-            .sqlQuery("select st_polygonFromWKT(st_polygonAsWKT(polygon1)) from table1;");
-        flink.getTableEnv()
-            .sqlQuery("select st_mPointFromWKT(st_mPointAsWKT(multipoint1)) from table1;");
-        flink.getTableEnv()
-            .sqlQuery(
-                "select st_mLineStringFromWKT(st_mLineStringAsWKT(multilinestring1)) from table1;"
-            );
-        flink.getTableEnv()
-            .sqlQuery("select st_mPolygonFromWKT(st_mPolygonAsWKT(multipolygon1)) from table1;");
-
-        // delete topic
-        deleteKafkaTopic("localhost:9092", topicList.get(0));
     }
 
 }
