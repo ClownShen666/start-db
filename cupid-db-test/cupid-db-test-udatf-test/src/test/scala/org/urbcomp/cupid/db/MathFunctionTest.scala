@@ -19,58 +19,58 @@ package org.urbcomp.cupid.db
 import java.math.BigDecimal
 class MathFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("log") {
-    checkCalciteSpark("select log(3.4,9.6)", List(BigDecimal.valueOf(1.848184756802823800)))
+    checkCalciteSparkFlink("select log(3.4,9.6)", List(BigDecimal.valueOf(1.848184756802823800)))
     checkCalciteSpark("select log(null,null)", List(null))
   }
 
   test("pi") {
-    checkCalciteSpark("select pi()", List(BigDecimal.valueOf(Math.PI)))
+    checkCalciteSparkFlink("select pi()", List(BigDecimal.valueOf(Math.PI)))
   }
 
   test("log1p") {
-    checkCalciteSpark("select log1p(1.5)", List(BigDecimal.valueOf(0.9162907318741551)))
+    checkCalciteSparkFlink("select log1p(1.5)", List(BigDecimal.valueOf(0.9162907318741551)))
     checkCalciteSpark("select log1p(null)", List(null))
   }
 
   test("log2") {
-    checkCalciteSpark("select log2(8.6)", List(BigDecimal.valueOf(3.1043366598147353)))
+    checkCalciteSparkFlink("select log2(8.6)", List(BigDecimal.valueOf(3.1043366598147353)))
     checkCalciteSpark("select log2(null)", List(null))
   }
 
   test("pow") {
-    checkCalciteSpark("select pow(0.5,3)", List(BigDecimal.valueOf(0.125)))
+    checkCalciteSparkFlink("select pow(0.5,3)", List(BigDecimal.valueOf(0.125)))
     checkCalciteSpark("select pow(null,null)", List(null))
   }
 
   test("toRadians") {
-    checkCalciteSpark("select toRadians(90)", List(BigDecimal.valueOf(1.5707963267948966)))
+    checkCalciteSparkFlink("select toRadians(90)", List(BigDecimal.valueOf(1.5707963267948966)))
     checkCalciteSpark("select toRadians(null)", List(null))
   }
 
   test("toDegrees") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select toDegrees(1), toDegrees(null)",
       List(BigDecimal.valueOf(57.29577951308232), null)
     )
   }
 
   test("abs") {
-    checkCalciteSpark("select abs(-1.9)", List(BigDecimal.valueOf(1.9)))
+    checkCalciteSparkFlink("select abs(-1.9)", List(BigDecimal.valueOf(1.9)))
     checkCalciteSpark("select abs(null)", List(null))
   }
 
   test("floor") {
-    checkCalciteSpark("select floor(1.9)", List(BigDecimal.valueOf(1.0)))
+    checkCalciteSparkFlink("select floor(1.9)", List(BigDecimal.valueOf(1.0)))
     checkCalciteSpark("select floor(null)", List(null))
   }
 
   test("ceil") {
-    checkCalciteSpark("select ceil(1.9)", List(BigDecimal.valueOf(2.0)))
+    checkCalciteSparkFlink("select ceil(1.9)", List(BigDecimal.valueOf(2.0)))
     checkCalciteSpark("select ceil(null)", List(null))
   }
 
   test("mod") {
-    checkCalciteSpark("select mod(2.4,5)", List(BigDecimal.valueOf(2.4)))
+    checkCalciteSparkFlink("select mod(2.4,5)", List(BigDecimal.valueOf(2.4)))
     checkCalciteSpark("select mod(null,null)", List(null))
   }
 }

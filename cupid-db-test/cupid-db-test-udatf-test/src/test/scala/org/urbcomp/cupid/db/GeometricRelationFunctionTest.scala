@@ -35,7 +35,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
     ModelGenerator.generateTrajectory(seqAsJavaList(nameArray), seqAsJavaList(typeArray))
   val tGeo: String = trajectory.toGeoJSON
   test("st_equals") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_equals(st_makePoint(1, 2), st_makePoint(2, 3)), " +
         "st_equals(st_makePoint(1, 2), st_makeBBox(1, 2, 3, 4))," +
         "st_equals(st_makeBBox(1, 2, 3, 4), st_makeBBox(1, 2, 3, 4))",
@@ -44,7 +44,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_contains") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_contains(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_contains(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_contains(st_makeBBox(0, 0, 2, 2), st_makePoint(2, 2))," +
@@ -54,7 +54,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_covers") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_covers(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_covers(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_covers(st_makeBBox(0, 0, 2, 2), st_makePoint(2, 2))," +
@@ -64,7 +64,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_crosses") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_crosses(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_crosses(st_makeBBox(1, 1, 3, 2), st_makeBBox(2, 1, 4, 2))",
       List(false, false)
@@ -72,7 +72,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_disjoint") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_disjoint(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_disjoint(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_disjoint(st_makeBBox(0, 0, 2, 2), st_makePoint(3, 3))," +
@@ -82,7 +82,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_intersects") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_intersects(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_intersects(st_makeBBox(1, 1, 2, 2), st_makeBBox(0, 0, 2, 2))," +
         "st_intersects(st_makeBBox(0, 0, 2, 2), st_makePoint(3, 3))," +
@@ -92,7 +92,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_touches") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_touches(st_makeBBox(0, 0, 4, 4), st_makePoint(1, 2))," +
         "st_touches(st_makeBBox(1, 1, 2, 2), st_makeBBox(2, 1, 3, 2))," +
         "st_touches(st_makeBBox(0, 0, 2, 2), st_makePoint(3, 3))," +
@@ -102,7 +102,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_within") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_within(st_makePoint(1, 2), st_makeBBox(0, 0, 4, 4))," +
         "st_within(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_within(st_makePoint(2, 2), st_makeBBox(0, 0, 2, 2))," +
@@ -112,7 +112,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_overlaps") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_overlaps(st_makePoint(1, 2), st_makeBBox(0, 0, 4, 4))," +
         "st_overlaps(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_overlaps(st_makeBBox(1, 1, 3, 3), st_makeBBox(2, 2, 4, 4))," +
@@ -122,7 +122,7 @@ class GeometricRelationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_relate") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_relate(st_makePoint(1, 2), st_makeBBox(0, 0, 4, 4))," +
         "st_relate(st_makeBBox(1, 1, 2, 2), st_makeBBox(1, 1, 2, 2))," +
         "st_relate(st_makePoint(2, 2), st_makePoint(2, 2))",

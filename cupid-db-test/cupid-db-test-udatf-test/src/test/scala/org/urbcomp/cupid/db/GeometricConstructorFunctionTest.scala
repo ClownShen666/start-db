@@ -23,25 +23,25 @@ class GeometricConstructorFunctionTest extends AbstractCalciteSparkFunctionTest 
   test("st_makePoint(x, y)") {
     val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
     val expected = geometryFactory.createPoint(new Coordinate(1.1, 2))
-    checkCalciteSpark("select st_makePoint(1.1, 2)", List(expected))
+    checkCalciteSparkFlink("select st_makePoint(1.1, 2)", List(expected))
   }
 
   test("st_makeBBox(lowerX, lowerY, upperX, upperY)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_makeBBox(1.2, 2, 3, 4)",
       List("POLYGON ((1.2 2, 1.2 4, 3 4, 3 2, 1.2 2))")
     )
   }
 
   test("st_makeBBox(point1, point2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_makeBBox(st_makePoint(1, 2), st_makePoint(3, 4))",
       List("POLYGON ((1 2, 1 4, 3 4, 3 2, 1 2))")
     )
   }
 
   test("st_makeCircle(center, radiusInM)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_makeCircle(st_makePoint(1, 2), 10)",
       List(
         "POLYGON ((1.000089831528412 2, 1.0000881054407826 1.999982474738195, 1.000082993510474" +

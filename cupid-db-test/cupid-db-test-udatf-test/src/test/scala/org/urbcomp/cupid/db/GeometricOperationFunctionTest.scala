@@ -34,30 +34,30 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   val lGeo: String = trajectory.getLineString.toString
 
   test("st_translate(geom, deltaX, deltaY)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_translate(st_makePoint(1, 2), 1, 1), st_translate(st_makeBBox(1, 2, 3, 4), 1, 1)",
       List("POINT (2 3)", "POLYGON ((2 3, 2 5, 4 5, 4 3, 2 3))")
     )
   }
 
   test("st_x(point)") {
-    checkCalciteSpark("select st_x(st_makePoint(1, 2))", List(1.0))
+    checkCalciteSparkFlink("select st_x(st_makePoint(1, 2))", List(1.0))
   }
 
   test("st_y(point)") {
-    checkCalciteSpark("select st_y(st_makePoint(1, 2))", List(2.0))
+    checkCalciteSparkFlink("select st_y(st_makePoint(1, 2))", List(2.0))
     checkCalciteSpark("select st_y(st_makeBBox(1, 2, 3, 4))", List(null))
   }
 
   test("st_BBox(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_BBox(st_makePoint(1, 2)), st_BBox(st_makeBBox(1, 2, 3, 4))",
       List("POINT (1 2)", "POLYGON ((1 2, 1 4, 3 4, 3 2, 1 2))")
     )
   }
 
   test("st_numPoints(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_numPoints(st_makePoint(1, 2)), st_numPoints(st_makeBBox(1, 2, 3, 4))",
       List(1, 5)
     )
@@ -68,35 +68,35 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select st_pointN(st_makePoint(1, 2), 1), st_pointN(st_makeBBox(1, 2, 3, 4), 1)",
       List(null, null)
     )
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_pointN(st_lineStringFromWKT(\'" + lGeo + "\'), 1)",
       List("POINT (108.99553 34.27859)")
     )
   }
 
   test("st_area(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_area(st_makePoint(1, 2)), st_area(st_makeBBox(1, 2, 3, 4))",
       List(0.0, 4.0)
     )
   }
 
   test("st_centroid(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_centroid(st_makePoint(1, 2)), st_centroid(st_makeBBox(1, 2, 3, 4))",
       List("POINT (1 2)", "POINT (2 3)")
     )
   }
 
   test("st_closestPoint(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_closestPoint(st_makePoint(1, 2), st_makeBBox(1, 2, 3, 4))",
       List("POINT (1 2)")
     )
   }
 
   test("st_distance(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_distance(st_makePoint(1, 2), st_makeBBox(1, 2, 3, 4)), " +
         "st_distance(st_makePoint(0, 0), st_makeBBox(1, 2, 3, 4))",
       List(0.0, Math.sqrt(5))
@@ -104,21 +104,21 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_distanceSphere(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_distanceSphere(st_makePoint(116.307683,39.978879), st_makePoint(116.337579,39.984186))",
       List(2614.7025275922806)
     )
   }
 
   test("st_distanceSpheroid(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_distanceSpheroid(st_makePoint(116.307683,39.978879), st_makePoint(116.337579,39.984186))",
       List(2620.727593714579)
     )
   }
 
   test("st_intersection(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_intersection(st_makePoint(116.307683,39.978879), st_makePoint(116.337579,39.984186)), " +
         "st_intersection(st_makeBBox(1, 2, 3, 4), st_makePoint(2, 3)), " +
         "st_intersection(st_makeBBox(1, 2, 3, 4), st_makeBBOX(2, 3, 4, 5))",
@@ -127,35 +127,35 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_length(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_length(st_makePoint(116.307683,39.978879)), st_length(st_makeBBox(1, 2, 3, 4))",
       List(0.0, 8.0)
     )
   }
 
   test("st_lengthSphere(lineString)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_lengthSphere(st_lineStringFromWKT(\'" + lGeo + "\'))",
       List(2995.567882733306)
     )
   }
 
   test("st_lengthSpheroid(lineString)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_lengthSpheroid(st_lineStringFromWKT(\'" + lGeo + "\'))",
       List(3.3267615900931954e8)
     )
   }
 
   test("st_difference(geom1, geom2)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_difference(st_makeBBox(1, 2, 3, 4), st_makeBBox(2, 3, 4, 5))",
       List("POLYGON ((1 2, 1 4, 2 4, 2 3, 3 3, 3 2, 1 2))")
     )
   }
 
   test("st_isValid(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_isValid(st_makeBBox(1, 2, 3, 4)), " +
         "st_isValid(st_polygonFromWKT('POLYGON((0 0, 1 1, 1 2, 1 1, 0 0))'))",
       List(true, false)
@@ -163,11 +163,11 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_convexHull(geom)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_convexHull(st_makePoint(116.307683,39.978879))",
       List("POINT (116.307683 39.978879)")
     )
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_convexHull(st_lineStringFromWKT(\'" + lGeo + "\'))",
       List(
         "POLYGON ((108.98991 34.25814, 108.98897 34.25815, 108.99553 34.27859, 108.99657 34.25875, 108.99654 34.25837, 108.99652 34.25826, 108.99647 34.25821, 108.99639 34.25818, 108.99066 34.25814, 108.98991 34.25814))"

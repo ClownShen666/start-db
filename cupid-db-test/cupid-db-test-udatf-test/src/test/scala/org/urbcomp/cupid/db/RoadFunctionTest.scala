@@ -85,60 +85,60 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_rs_fromGeoJSON") {
-    checkCalciteSpark("select st_rs_fromGeoJSON(\'" + rsGeoJson + "\')", List(rs))
+    checkCalciteSparkFlink("select st_rs_fromGeoJSON(\'" + rsGeoJson + "\')", List(rs))
   }
 
   test("st_rs_rsid") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_rsid(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getRoadSegmentId.toString)
     )
   }
 
   test("st_rs_geom") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_geom(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List("LINESTRING (111.37939453125 54.00776876193478, 116.3671875 53.05442186546102)")
     )
   }
 
   test("st_rs_direction") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_direction(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getDirection.toString)
     )
   }
 
   test("st_rs_speedLimitInKMPerHour") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_speedLimitInKMPerHour(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getSpeedLimit)
     )
   }
 
   test("st_rs_level") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_level(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getLevel.value)
     )
   }
 
   test("st_rs_startId") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_startId(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getStartNode.getNodeId.toString)
     )
   }
 
   test("st_rs_endId") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_endId(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getEndNode.getNodeId.toString)
     )
   }
 
   test("st_rs_lengthInKM") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_rs_lengthInKM(st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))",
       List(rs.getLengthInMeter / 1000)
     )

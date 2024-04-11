@@ -32,17 +32,20 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
     ModelGenerator.generateTrajectory("data/stayPointSegmentationTraj.txt")
 
   test("st_traj_asGeoJSON & st_traj_fromGeoJSON") {
-    checkCalciteSpark("select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(tGeo))
+    checkCalciteSparkFlink(
+      "select st_traj_asGeoJSON(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
+      List(tGeo)
+    )
   }
 
   test("st_traj_fromGeoJSON(str)") {
-    checkCalciteSpark("select st_traj_fromGeoJSON(\'" + tGeo + "\')")
+    checkCalciteSparkFlink("select st_traj_fromGeoJSON(\'" + tGeo + "\')")
   }
 
   test("st_traj_oid(Trajectory)") {}
 
   test("st_traj_tid(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_tid(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List("afab91fa68cb417c2f663924a0ba1ff92018-10-09 07:28:21.0")
     )
@@ -65,28 +68,28 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_traj_startPoint(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List("POINT (108.99553 34.27859)")
     )
   }
 
   test("st_traj_endPoint(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_endPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List("POINT (108.98897 34.25815)")
     )
   }
 
   test("st_traj_numOfPoints(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_startPoint(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List("POINT (108.99553 34.27859)")
     )
   }
 
   test("st_traj_pointN(Trajectory,int)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_pointN(st_traj_fromGeoJSON(\'" + tGeo + "\'),2)",
       List("POINT (108.99552 34.27786)")
     )
@@ -101,21 +104,21 @@ class TrajectoryFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_traj_lengthInKM(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_lengthInKM(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List(2.9989194858191373)
     )
   }
 
   test("st_traj_speedInKMPerHour(Trajectory)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_traj_speedInKMPerHour(st_traj_fromGeoJSON(\'" + tGeo + "\'))",
       List(30.24120489901651)
     )
   }
 
   test("st_traj_geom(Trajectory)") {
-    checkCalciteSpark("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(lGeo))
+    checkCalciteSparkFlink("select st_traj_geom(st_traj_fromGeoJSON(\'" + tGeo + "\'))", List(lGeo))
 
   }
 
