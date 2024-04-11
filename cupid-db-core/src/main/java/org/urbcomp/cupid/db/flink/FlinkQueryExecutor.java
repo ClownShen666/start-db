@@ -130,7 +130,7 @@ public class FlinkQueryExecutor {
             this.isRegistered = true;
         }
 
-        String sql = param.getSql();
+        String sql = new UdfVisitor(param.getSql()).getProcessedSql();
         if (sqlNode == null) {
             sqlNode = CupidDBParseDriver.parseSql(sql);
         }

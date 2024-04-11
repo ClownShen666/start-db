@@ -39,10 +39,10 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
             && !ctx.exprFuncParams().funcParam().isEmpty()) {
             for (CupidDBSqlParser.FuncParamContext funcParamContext : ctx.exprFuncParams()
                 .funcParam()) {
-                String param = funcParamContext.expr().getText();
-                processedSql = processedSql.replace(param, "st_castToGeometry(" + param + ")");
+                String param = "(" + funcParamContext.expr().getText() + ")";
+                processedSql = processedSql.replace(param, "(st_castToGeometry" + param + ")");
                 origin.append(param.replace(",", ", ")).append(", ");
-                replace.append("st_castToGeometry(").append(param).append("), ");
+                replace.append("st_castToGeometry").append(param).append(", ");
             }
             origin.delete(origin.length() - 2, origin.length()).append(")");
             replace.delete(replace.length() - 2, replace.length()).append(")");

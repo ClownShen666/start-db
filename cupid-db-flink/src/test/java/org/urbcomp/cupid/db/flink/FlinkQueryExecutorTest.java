@@ -522,24 +522,7 @@ public class FlinkQueryExecutorTest {
             produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
             // execute sql
-            stmt.executeUpdate(
-                "insert into table2 "
-                    + "select "
-                    + "int1,"
-                    + "long1,"
-                    + "float1,"
-                    + "double1,"
-                    + "string1,"
-                    + "bool1,"
-                    + "st_geometryFromWKT(st_geometryAsWKT(geometry1)),"
-                    + "st_pointFromWKT(st_pointAsWKT(point1)),"
-                    + "st_lineStringFromWKT(st_lineStringAsWKT(linestring1)),"
-                    + "st_polygonFromWKT(st_polygonAsWKT(polygon1)),"
-                    + "st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)),"
-                    + "st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)),"
-                    + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
-                    + " from table1;"
-            );
+            stmt.executeUpdate("insert into table2 select * from table1;");
 
             // read target table in kafka
             KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
@@ -628,17 +611,7 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
         // test select sql
-        flinkSqlParam.setSql(
-            "select "
-                + "st_geometryFromWKT(st_geometryAsWKT(geometry1)),"
-                + "st_pointFromWKT(st_pointAsWKT(point1)),"
-                + "st_lineStringFromWKT(st_lineStringAsWKT(linestring1)),"
-                + "st_polygonFromWKT(st_polygonAsWKT(polygon1)),"
-                + "st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)),"
-                + "st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)),"
-                + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
-                + " from table1;"
-        );
+        flinkSqlParam.setSql("select * from table1;");
         FlinkQueryExecutor flink = new FlinkQueryExecutor();
         DataStream<Row> resultStream = flink.execute(flinkSqlParam);
         List<String> expected = new ArrayList<>();
@@ -735,24 +708,7 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
         // test insert sql
-        flinkSqlParam.setSql(
-            "insert into table2 "
-                + "select "
-                + "int1,"
-                + "long1,"
-                + "float1,"
-                + "double1,"
-                + "string1,"
-                + "bool1,"
-                + "st_geometryFromWKT(st_geometryAsWKT(geometry1)),"
-                + "st_pointFromWKT(st_pointAsWKT(point1)),"
-                + "st_lineStringFromWKT(st_lineStringAsWKT(linestring1)),"
-                + "st_polygonFromWKT(st_polygonAsWKT(polygon1)),"
-                + "st_multiPointFromWKT(st_multiPointAsWKT(multipoint1)),"
-                + "st_multiLineStringFromWKT(st_multiLineStringAsWKT(multilinestring1)),"
-                + "st_multiPolygonFromWKT(st_multiPolygonAsWKT(multipolygon1))"
-                + " from table1;"
-        );
+        flinkSqlParam.setSql("insert into table2 select * from table1;");
         FlinkQueryExecutor flink = new FlinkQueryExecutor();
         flink.execute(flinkSqlParam);
 
@@ -896,9 +852,8 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
-    public void registerTest() throws Exception {
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
-        flink.registerUdf();
+    public void registerUdfTest() throws Exception {
+        new FlinkQueryExecutor().registerUdf();
     }
 
 }
