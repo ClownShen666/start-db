@@ -16,7 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.geometricconstructor
 
-import org.apache.flink.table.annotation.DataTypeHint
+import org.apache.flink.table.annotation.{DataTypeHint, FunctionHint}
 import org.locationtech.jts.geom.{Coordinate, Point}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -32,7 +32,22 @@ class st_makePointUdf extends ScalarFunction with AbstractUdf {
   override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
-  def eval(x: BigDecimal, y: BigDecimal): Point = {
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) x: BigDecimal,
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) y: BigDecimal
+  ): Point = {
+    if (x == null || y == null) return null
+    val X = x.doubleValue()
+    val Y = y.doubleValue()
+    if (X > 180 || X < -180 || Y > 90 || Y < -90) null
+    else {
+      val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
+      geometryFactory.createPoint(new Coordinate(X, Y))
+    }
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Point])
+  def eval(x: Double, y: Double): Point = {
     if (x == null || y == null) return null
     val X = x.doubleValue()
     val Y = y.doubleValue()

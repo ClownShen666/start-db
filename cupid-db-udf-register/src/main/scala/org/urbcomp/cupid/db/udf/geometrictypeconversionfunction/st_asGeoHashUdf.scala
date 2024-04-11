@@ -18,7 +18,15 @@ package org.urbcomp.cupid.db.udf.geometrictypeconversionfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
 import org.locationtech.geomesa.spark.jts.util.GeoHashUtils
-import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.{
+  Geometry,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon
+}
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -33,6 +41,52 @@ class st_asGeoHashUdf extends ScalarFunction with AbstractUdf {
       @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
       precision: Int
   ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) geom: Point,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) geom: LineString,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon]) geom: Polygon,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint]) geom: MultiPoint,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString]) geom: MultiLineString,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon]) geom: MultiPolygon,
+      precision: Int
+  ): java.lang.String = {
+    process(geom, precision)
+  }
+
+  private def process(geom: Geometry, precision: Int): java.lang.String = {
     if (geom == null) null
     else {
       GeoHashUtils.encode(geom, precision)

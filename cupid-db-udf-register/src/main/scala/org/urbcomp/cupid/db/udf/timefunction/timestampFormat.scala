@@ -37,31 +37,36 @@ class timestampFormat extends ScalarFunction with AbstractUdf {
     * @param string time format
     * @return the specified format instance
     */
-  def eval(ts: Any, string: String): String = {
+  def eval(ts: String, string: String): String = {
     if (ts == null || string == null) return null // deal with the null input
-
     val simpleDateFormat = new SimpleDateFormat(string)
-    ts match {
-      case timestamp: Timestamp =>
-        simpleDateFormat.format(new Date(timestamp.getTime))
-      case l: Long =>
-        var v = l.toString.reverse.toLong
-        var dl = 0L
-        while (v != 0) {
-          dl = dl * 10 + (v % 10)
-          v = v / 10
-        }
-        simpleDateFormat.format(new Date(dl).getTime)
-      case string: String =>
-        simpleDateFormat.format(new Date(Timestamp.valueOf(string).getTime))
-      case _ =>
-        null
-    }
+    simpleDateFormat.format(new Date(Timestamp.valueOf(ts).getTime))
 
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def eval(ts: Timestamp, string: String): String = {
+    if (ts == null || string == null) return null // deal with the null input
 
-  def udfWrapper: (Timestamp, String) => String = eval
+    val simpleDateFormat = new SimpleDateFormat(string)
+    simpleDateFormat.format(new Date(ts.getTime))
+  }
 
+  def eval(ts: Long, string: String): String = {
+    if (ts == null || string == null) return null // deal with the null input
+
+    val simpleDateFormat = new SimpleDateFormat(string)
+    var v = ts.toString.reverse.toLong
+    var dl = 0L
+    while (v != 0) {
+      dl = dl * 10 + (v % 10)
+      v = v / 10
+    }
+    simpleDateFormat.format(new Date(dl).getTime)
+  }
+
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2", "udfWrapper3")
+
+  def udfWrapper: (String, String) => String = eval
+  def udfWrapper2: (Timestamp, String) => String = eval
+  def udfWrapper3: (Long, String) => String = eval
 }

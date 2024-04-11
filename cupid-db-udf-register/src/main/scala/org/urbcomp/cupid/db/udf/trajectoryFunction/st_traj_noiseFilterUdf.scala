@@ -38,7 +38,44 @@ class st_traj_noiseFilterUdf extends ScalarFunction with AbstractUdf {
   @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
   def eval(
       @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory,
-      speedLimitInMPerS: BigDecimal
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal]) speedLimitInMPerS: BigDecimal
+  ): Trajectory = {
+    if (trajectory == null || speedLimitInMPerS == null) return null
+    val gpsPoints = trajectory.getGPSPointList
+    if (gpsPoints.length <= 1) {
+      trajectory.setTid(trajectory.getTid + "_filterNoise")
+      return trajectory
+    }
+
+    //Filter noise
+    val filterGPSPoints = new ListBuffer[GPSPoint]
+    //We assume the first point is always correct
+    var pre = gpsPoints(0)
+    filterGPSPoints += pre
+
+    var i = 1
+    while (i < gpsPoints.length) {
+      val cur = gpsPoints(i)
+      if (cur.getTime.after(pre.getTime)) {
+        val distanceInM = GeoFunctions.getDistanceInM(cur, pre)
+        val timeSpanInS = (cur.getTime.getTime - pre.getTime.getTime) / 1000.0
+        if (distanceInM / timeSpanInS <= speedLimitInMPerS.doubleValue) {
+          filterGPSPoints += cur
+          pre = cur
+        }
+      }
+      i += 1
+    }
+
+    trajectory.setTid(trajectory.getTid + "_filterNoise")
+    trajectory.setPointList(filterGPSPoints.toList.asJava)
+    trajectory
+  }
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Trajectory]) trajectory: Trajectory,
+      speedLimitInMPerS: Double
   ): Trajectory = {
     if (trajectory == null || speedLimitInMPerS == null) return null
     val gpsPoints = trajectory.getGPSPointList

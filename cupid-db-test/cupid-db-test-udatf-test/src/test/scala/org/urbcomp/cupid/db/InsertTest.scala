@@ -41,7 +41,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       "Insert into tt_test_demo (idx, ride_id, start_point) values (171, '05608CC867EBDF63', st_makePoint(2.1, 2))"
     )
-    executeQueryCheck("select count(1) from tt_test_demo", List(1))
+    checkCalciteSpark("select count(1) from tt_test_demo", List(1))
   }
 
   /**
@@ -55,7 +55,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       "insert into t_road_segment_test (a, b) values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    executeQueryCheck("select count(1) from t_road_segment_test", List(1))
+    checkCalciteSpark("select count(1) from t_road_segment_test", List(1))
   }
 
   /**
@@ -73,7 +73,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       "Insert into t1_test (idx, ride_id, start_point) values (172, '05608CC86f7EBDF3', st_makePoint(2.2, 2)), (172, '05608CC867EBDF63', st_makePoint(4.1, 2))"
     )
-    executeQueryCheck("select count(1) from t1_test", List(4))
+    checkCalciteSpark("select count(1) from t1_test", List(4))
   }
 
   /**
@@ -86,7 +86,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    executeQueryCheck("select count(1) from t_road_segment_test", List(1))
+    checkCalciteSpark("select count(1) from t_road_segment_test", List(1))
   }
 
   /**
@@ -99,7 +99,7 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\')), (3, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
     )
-    executeQueryCheck("select count(1) from t_road_segment_test", List(2))
+    checkCalciteSpark("select count(1) from t_road_segment_test", List(2))
   }
 
   /**
@@ -113,6 +113,6 @@ class InsertTest extends AbstractCalciteSparkFunctionTest {
     statement.executeUpdate("create table if not exists table2(int2 int)")
     statement.executeUpdate("insert into table2 values (1),(2),(3);")
     statement.executeUpdate("insert into table1 select int2 from table2;")
-    executeQueryCheck("select count(1) from table1;", List(3))
+    checkCalciteSpark("select count(1) from table1;", List(3))
   }
 }

@@ -47,7 +47,7 @@ class LpadUdf extends ScalarFunction with AbstractUdf {
     res + str
   }
 
-  def udfSparkEntries: List[String] = List("udfWrapper")
+  def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
   def udfWrapper: (String, Int) => String = eval
   def udfWrapper2: (String, Int, String) => String = eval

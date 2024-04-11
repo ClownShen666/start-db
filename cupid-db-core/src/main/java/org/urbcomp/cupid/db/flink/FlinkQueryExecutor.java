@@ -760,4 +760,9 @@ public class FlinkQueryExecutor {
         }
     }
 
+    // process udf in the sql
+    public String processSql(String sql) {
+        return new UdfVisitor(sql).getProcessedSql();
+    }
+
 }

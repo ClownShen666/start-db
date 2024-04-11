@@ -48,6 +48,15 @@ class toTimestamp extends ScalarFunction with AbstractUdf {
     new Timestamp(time)
   }
 
+  @throws[ParseException]
+  def eval(dateString: Character, format: Character): Timestamp = {
+    if (dateString == null || format == null) return null
+    val simpleDateFormat = new SimpleDateFormat(format.toString.trim)
+    val date = simpleDateFormat.parse(dateString.toString)
+    val time = date.getTime
+    new Timestamp(time)
+  }
+
   /**
     * Converts a date string to a timestamp
     *
@@ -87,7 +96,6 @@ class toTimestamp extends ScalarFunction with AbstractUdf {
   def udfSparkEntries: List[String] = List("udfWrapper", "udfWrapper2")
 
   def udfWrapper: (String, String) => Timestamp = eval
-
   def udfWrapper2: String => Timestamp = eval
 
 }

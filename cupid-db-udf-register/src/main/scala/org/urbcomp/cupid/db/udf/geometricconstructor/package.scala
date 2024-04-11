@@ -43,6 +43,17 @@ package object geometricconstructor {
     ans
   }
 
+  def makePoint(x: Double, y: Double): Point = {
+    val X = x.doubleValue()
+    val Y = y.doubleValue()
+    if (X > 180 || X < -180 || Y > 90 || Y < -90) return null
+    val geometryFactory = GeometryFactoryUtils.defaultGeometryFactory
+
+    val ans = geometryFactory.createPoint(new Coordinate(X, Y))
+
+    ans
+  }
+
   def makeLineString(points: List[Point]): LineString = {
     val geometryFactory: GeometryFactory = GeometryFactoryUtils.defaultGeometryFactory
     geometryFactory.createLineString(points.toStream.map(point => point.getCoordinate).toArray)

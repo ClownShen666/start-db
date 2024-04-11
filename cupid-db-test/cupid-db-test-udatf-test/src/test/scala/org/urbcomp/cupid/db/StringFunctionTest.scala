@@ -22,90 +22,100 @@ package org.urbcomp.cupid.db
   */
 class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("upper") {
-    executeQueryCheck("select upper('abcde')", List("ABCDE"))
+    checkCalciteSparkFlink("select upper('abcde')", List("ABCDE"))
   }
 
   test("lower") {
-    executeQueryCheck("select lower('ABCDE')", List("abcde"))
+    checkCalciteSparkFlink("select lower('ABCDE')", List("abcde"))
   }
 
   test("substring1") {
-    executeQueryCheck("select substring('abcde', 2, 3)", List("bcd"))
+    checkCalciteSparkFlink("select substring('abcde', 2, 3)", List("bcd"))
   }
 
   test("substring2") {
-    executeQueryCheck("select substring('abcde', 2)", List("bcde"))
+    checkCalciteSparkFlink("select substring('abcde', 2)", List("bcde"))
   }
 
   test("trim") {
-    executeQueryCheck("select trim('  abcde ')", List("abcde"))
+    checkCalciteSparkFlink("select trim('  abcde ')", List("abcde"))
   }
 
   test("concat") {
-    executeQueryCheck("select concat('1', '2'),concat(null, '2')", List("12", null))
+    checkCalciteSparkFlink("select concat('1', '2')", List("12"))
+    checkCalciteSpark("select concat(null, '2')", List(null))
   }
 
   test("reverse") {
-    executeQueryCheck("select reverse('abcde'),reverse(null)", List("edcba", null))
+    checkCalciteSparkFlink("select reverse('abcde')", List("edcba"))
+    checkCalciteSpark("select reverse(null)", List(null))
   }
 
   test("ltrim") {
-    executeQueryCheck("select ltrim('  abcde '),ltrim(null)", List("abcde ", null))
+    checkCalciteSparkFlink("select ltrim('  abcde ')", List("abcde "))
+    checkCalciteSpark("select ltrim(null)", List(null))
   }
 
   test("rtrim") {
-    executeQueryCheck("select rtrim('  abcde '),rtrim(null)", List("  abcde", null))
+    checkCalciteSparkFlink("select rtrim('  abcde ')", List("  abcde"))
+    checkCalciteSpark("select rtrim(null)", List(null))
   }
 
   test("pad") {
-    executeQueryCheck(
-      "select pad('abcde', 2, 'a'), pad(null, 5, 'a'), pad('abcde', 7, 'a')",
-      List("ab", null, "aa")
-    )
+    checkCalciteSparkFlink("select pad('abcde', 2, 'a'), pad('abcde', 7, 'a')", List("ab", "aa"))
+    checkCalciteSpark("select pad(null, 5, 'a')", List(null))
   }
 
+  //FIXME flink Invalid number of arguments to function 'LPAD'. Was expecting 3 arguments
   test("lpad1") {
-    executeQueryCheck("select lpad('abcde', 2), lpad(null, 2)", List("  abcde", null))
+    checkCalciteSpark("select lpad('abcde', 2)", List("  abcde"))
+    checkCalciteSpark("select lpad(null, 2)", List(null))
   }
 
   test("lpad2") {
-    executeQueryCheck(
-      "select lpad('abcde', 2, 'a'), lpad(null, 5, 'a'), lpad('abcde', 6, 'a')",
-      List("ab", null, "aabcde")
+    checkCalciteSparkFlink(
+      "select lpad('abcde', 2, 'a'), lpad('abcde', 6, 'a')",
+      List("ab", "aabcde")
     )
+    checkCalciteSpark("select lpad(null, 5, 'a')", List(null))
   }
 
+  //FIXME flink Invalid number of arguments to function 'LPAD'. Was expecting 3 arguments
   test("rpad1") {
-    executeQueryCheck("select rpad('abcde', 1), rpad(null, 1)", List("abcde ", null))
+    checkCalciteSpark("select rpad('abcde', 1)", List("abcde "))
+    checkCalciteSpark("select rpad(null, 1)", List(null))
   }
 
   test("rpad2") {
-    executeQueryCheck(
-      "select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e'), " +
-        "rpad('abcde', 6, null)",
-      List("a", "abcdee", null)
+    checkCalciteSparkFlink(
+      "select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e')",
+      List("a", "abcdee")
     )
+    checkCalciteSpark("select rpad('abcde', 6, null)", List(null))
   }
 
   //TODO 多字节字符测试
   test("length") {
-    executeQueryCheck("select length('abc')", List(3))
+    checkCalciteSparkFlink("select length('abc')", List(3))
   }
 
   //TODO 多字节字符测试
+  // FIXME flink
   test("charLength") {
-    executeQueryCheck("select charLength('abc')", List(3))
+    checkCalciteSpark("select charLength('abc')", List(3))
   }
 
   test("locate1") {
-    executeQueryCheck("select locate('bc', 'abcabc')", List(2))
+    checkCalciteSparkFlink("select locate('bc', 'abcabc')", List(2))
   }
 
+  //FIXME flink output: 2
   test("locate2") {
-    executeQueryCheck("select locate('bc', 'abcabc', 2), locate(null, 'abcabc', 2)", List(5, null))
+    checkCalciteSpark("select locate('bc', 'abcabc', 2)", List(5))
+    checkCalciteSpark("select locate(null, 'abcabc', 2)", List(null))
   }
 
   test("md5") {
-    executeQueryCheck("select md5('abcde')", List("AB56B4D92B40713ACC5AF89985D4B786"))
+    checkCalciteSpark("select md5('abcde')", List("AB56B4D92B40713ACC5AF89985D4B786"))
   }
 }

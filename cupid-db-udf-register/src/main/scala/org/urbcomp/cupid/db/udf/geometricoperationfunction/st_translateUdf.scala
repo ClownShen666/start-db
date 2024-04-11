@@ -17,7 +17,15 @@
 package org.urbcomp.cupid.db.udf.geometricoperationfunction
 
 import org.apache.flink.table.annotation.DataTypeHint
-import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.{
+  Geometry,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon
+}
 import org.locationtech.jts.geom.util.AffineTransformation
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
@@ -34,7 +42,51 @@ class st_translateUdf extends ScalarFunction with AbstractUdf {
       @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry]) geom: Geometry,
       deltaX: Double,
       deltaY: Double
-  ): Geometry = {
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Point]) geom: Point,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[LineString]) geom: LineString,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[Polygon]) geom: Polygon,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPoint]) geom: MultiPoint,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiLineString]) geom: MultiLineString,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  @DataTypeHint(value = "RAW", bridgedTo = classOf[Geometry])
+  def eval(
+      @DataTypeHint(value = "RAW", bridgedTo = classOf[MultiPolygon]) geom: MultiPolygon,
+      deltaX: Double,
+      deltaY: Double
+  ): Geometry = process(geom, deltaX, deltaY)
+
+  private def process(geom: Geometry, deltaX: Double, deltaY: Double): Geometry = {
     if (geom == null) null
     else {
       val at = new AffineTransformation

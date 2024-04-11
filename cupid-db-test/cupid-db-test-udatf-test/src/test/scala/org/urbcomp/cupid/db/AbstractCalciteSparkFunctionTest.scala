@@ -21,6 +21,7 @@ import org.junit.Assert.assertTrue
 import org.locationtech.jts.geom.Geometry
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.slf4j.Logger
+import org.urbcomp.cupid.db.flink.FlinkQueryExecutor
 import org.urbcomp.cupid.db.metadata.CalciteHelper
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
@@ -28,6 +29,7 @@ import org.urbcomp.cupid.db.util.{LogUtil, SqlParam}
 
 import java.sql.{Connection, ResultSet, Statement}
 import java.util.TimeZone
+import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -42,6 +44,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger
   var statement: Statement = _
+  var flinkQueryExecutor: FlinkQueryExecutor = _
 
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))
@@ -55,7 +58,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     SparkExecuteWrapper.getSparkExecute.stop()
   }
 
-  protected def executeQueryCheck(sql: String, expectsList: List[Any]*): Unit = {
+  protected def checkCalciteSpark(sql: String, expectsList: List[Any]*): Unit = {
     val rs = connect.createStatement().executeQuery(sql)
     val rsBuf = rsBuffer(rs)
     val df = SparkExecuteWrapper.getSparkExecute.executeSql(sql)
@@ -65,6 +68,29 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
       var j: Int = 0
       for (expect <- expects) {
         assertTrue(isEqual(expect, rsBuf(i)(j)))
+        j = j + 1
+      }
+      i = i + 1
+    }
+  }
+
+  protected def checkCalciteSparkFlink(sql: String, expectsList: List[Any]*): Unit = {
+    val rs = connect.createStatement().executeQuery(sql)
+    val rsBuf = rsBuffer(rs)
+    val df = SparkExecuteWrapper.getSparkExecute.executeSql(sql)
+    flinkQueryExecutor = new FlinkQueryExecutor()
+    flinkQueryExecutor.registerUdf()
+    val flinkResult = flinkQueryExecutor.getTableEnv
+      .executeSql(flinkQueryExecutor.processSql(sql))
+      .collect()
+      .asScala
+      .toList
+    var i: Int = 0
+    for (expects <- expectsList) {
+      var j: Int = 0
+      for (expect <- expects) {
+        assertTrue(isEqual(expect, rsBuf(i)(j)))
+        assertTrue(isEqual(expect, flinkResult(i).getField(j)))
         j = j + 1
       }
       i = i + 1

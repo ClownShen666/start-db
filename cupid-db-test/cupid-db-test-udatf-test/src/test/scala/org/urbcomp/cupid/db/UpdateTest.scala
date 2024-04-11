@@ -29,7 +29,7 @@ class UpdateTest extends AbstractCalciteSparkFunctionTest {
     statement.execute(
       s"update default.t_test set ride_id = 'temp', start_point = st_makePoint(3.1, 2) where idx = $id"
     )
-    executeQueryCheck(s"select ride_id from t_test where idx = $id", List("temp"))
+    checkCalciteSpark(s"select ride_id from t_test where idx = $id", List("temp"))
   }
 
 }

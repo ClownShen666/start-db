@@ -60,4 +60,43 @@ class UdfFactory extends Serializable {
   def getEngineUdfMap
       : mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]] =
     engineUdfMap
+
+  private val flinkProcessedUdf: mutable.HashSet[String] = mutable.HashSet(
+    "st_contains",
+    "st_covers",
+    "st_crosses",
+    "st_disjoint",
+    "st_equals",
+    "st_intersects",
+    "st_overlaps",
+    "st_relate",
+    "st_touches",
+    "st_within",
+    "st_area",
+    "st_BBox",
+    "st_centroid",
+    "st_closestPoint",
+    "st_convexHull",
+    "st_difference",
+    "st_distanceSphere",
+    "st_distanceSpheroid",
+    "st_distance",
+    "st_intersection",
+    "st_isValid",
+    "st_length",
+    "st_numPoints",
+    "st_x",
+    "st_y",
+    "st_asGeoJSON",
+    "st_asWKB",
+    "st_asWKT",
+    "st_castToLineString",
+    "st_castToMLineString",
+    "st_castToMPoint",
+    "st_castToMPolygon",
+    "st_castToPoint",
+    "st_castToPolygon"
+  )
+
+  def getFlinkProcessedUdf: mutable.HashSet[String] = flinkProcessedUdf
 }
