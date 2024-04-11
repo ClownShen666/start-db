@@ -23,7 +23,7 @@ import scala.io.Source
 class OtherFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("version") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select version()",
       List(Source.fromInputStream(getClass.getResourceAsStream("/version.txt")).getLines().mkString)
     )

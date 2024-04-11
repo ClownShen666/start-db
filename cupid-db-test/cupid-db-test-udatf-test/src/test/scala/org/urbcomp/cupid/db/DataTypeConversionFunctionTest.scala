@@ -19,32 +19,32 @@ package org.urbcomp.cupid.db
 class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
-    checkCalciteSparkFlink("select castToInteger('1234')", List(1234))
-    checkCalciteSparkFlink("select castToInteger(null)", List(null))
+    checkCalciteSpark("select castToInteger('1234')", List(1234))
+    checkCalciteSpark("select castToInteger(null)", List(null))
   }
 
   test("castToLong") {
-    checkCalciteSparkFlink("select castToLong('12344')", List(12344L))
-    checkCalciteSparkFlink("select castToLong(null)", List(null))
+    checkCalciteSpark("select castToLong('12344')", List(12344L))
+    checkCalciteSpark("select castToLong(null)", List(null))
   }
 
   test("castToFloat") {
-    checkCalciteSparkFlink("select castToFloat('123.1')", List(123.1f))
-    checkCalciteSparkFlink("select castToFloat(null)", List(null))
+    checkCalciteSpark("select castToFloat('123.1')", List(123.1f))
+    checkCalciteSpark("select castToFloat(null)", List(null))
   }
 
   test("castToDouble") {
-    checkCalciteSparkFlink("select castToDouble('123444555.3')", List(123444555.3d))
-    checkCalciteSparkFlink("select castToDouble(null)", List(null))
+    checkCalciteSpark("select castToDouble('123444555.3')", List(123444555.3d))
+    checkCalciteSpark("select castToDouble(null)", List(null))
   }
 
   test("castToBoolean") {
-    checkCalciteSparkFlink("select castToBoolean('true')", List(true))
-    checkCalciteSparkFlink("select castToBoolean('TRUE')", List(true))
-    checkCalciteSparkFlink("select castToBoolean('false')", List(false))
-    checkCalciteSparkFlink("select castToBoolean('FALSE')", List(false))
-    checkCalciteSparkFlink("select castToBoolean(null)", List(null))
-    checkCalciteSparkFlink("select castToBoolean('notaboolean')", List(null))
+    checkCalciteSpark("select castToBoolean('true')", List(true))
+    checkCalciteSpark("select castToBoolean('TRUE')", List(true))
+    checkCalciteSpark("select castToBoolean('false')", List(false))
+    checkCalciteSpark("select castToBoolean('FALSE')", List(false))
+    checkCalciteSpark("select castToBoolean(null)", List(null))
+    checkCalciteSpark("select castToBoolean('notaboolean')", List(null))
   }
 
   // FIXME flink the input parameter is AnyRef

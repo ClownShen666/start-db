@@ -39,22 +39,22 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   // FIXME ci failed for value mismatch, maybe caused by timezone
   ignore("currentTimestamp") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select timestampFormat(currentTimestamp(),'yyyy-MM-dd' )",
       List(new Timestamp(System.currentTimeMillis).toString.substring(0, "yyyy-MM-dd".length))
     )
   }
 
   test("timestampToLong(str)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select timestampToLong('" + DEFAULT_TIME_STR + "')",
       List(DEFAULT_TIMESTAMP.getTime)
     )
-    checkCalciteSparkFlink("select timestampToLong(null)", List(null))
+    checkCalciteSpark("select timestampToLong(null)", List(null))
   }
 
   test("timestampToLong(timestamp)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select timestampToLong(longToTimestamp(" + DEFAULT_TIMESTAMP.getTime + "))",
       List(DEFAULT_TIMESTAMP.getTime)
     )
@@ -76,80 +76,80 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("toDatetime(str, format)") {
-//    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
+//    checkCalciteSpark("select toDatetime('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
 //      List(DEFAULT_TIMESTAMP))
     //todo fixme
   }
 
   test("toDatetime(str)") {
-//    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "')",
+//    checkCalciteSpark("select toDatetime('" + DEFAULT_TIME_STR + "')",
 //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 
   test("datetimeToTimestamp") {
-//    checkCalciteSparkFlink("select datetimeToTimestamp('" + DEFAULT_TIME_STR + "')",
+//    checkCalciteSpark("select datetimeToTimestamp('" + DEFAULT_TIME_STR + "')",
 //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 
   test("timestampToDatetime") {
-//    checkCalciteSparkFlink("select timestampToDatetime('" + DEFAULT_TIME_STR + "')",
+//    checkCalciteSpark("select timestampToDatetime('" + DEFAULT_TIME_STR + "')",
 //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 
   test("currentDatetime") {
-    //checkCalciteSparkFlink("select timestampFormat(currentDatetime(), 'yyyy-MM-dd')")
+    //checkCalciteSpark("select timestampFormat(currentDatetime(), 'yyyy-MM-dd')")
     // todo fixme
   }
 
   test("datetimeFormat") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select datetimeFormat('" + DEFAULT_TIME_STR + "', 'yyyy-MM-dd')",
       List(DEFAULT_TIME_STR.substring(0, "yyyy-MM-dd".length))
     )
   }
 
   test("hour") {
-    checkCalciteSparkFlink("select hour('" + DEFAULT_TIME_STR + "')", List(11))
+    checkCalciteSpark("select hour('" + DEFAULT_TIME_STR + "')", List(11))
   }
 
   test("minute") {
-    checkCalciteSparkFlink("select minute('" + DEFAULT_TIME_STR + "')", List(21))
+    checkCalciteSpark("select minute('" + DEFAULT_TIME_STR + "')", List(21))
   }
 
   test("second") {
-    checkCalciteSparkFlink("select second('" + DEFAULT_TIME_STR + "')", List(1))
+    checkCalciteSpark("select second('" + DEFAULT_TIME_STR + "')", List(1))
   }
 
   test("week") {
-    checkCalciteSparkFlink("select week('" + DEFAULT_TIME_STR + "')", List(20))
+    checkCalciteSpark("select week('" + DEFAULT_TIME_STR + "')", List(20))
     checkCalciteSpark("select week(null)", List(null))
   }
 
   test("month") {
-    checkCalciteSparkFlink("select month('" + DEFAULT_TIME_STR + "')", List(5))
+    checkCalciteSpark("select month('" + DEFAULT_TIME_STR + "')", List(5))
   }
 
   test("year") {
-    checkCalciteSparkFlink("select year('" + DEFAULT_TIME_STR + "')", List(2021))
+    checkCalciteSpark("select year('" + DEFAULT_TIME_STR + "')", List(2021))
     checkCalciteSpark("select year(null)", List(null))
   }
 
   test("dayOfMonth") {
-    checkCalciteSparkFlink("select dayOfMonth('" + DEFAULT_TIME_STR + "')", List(20))
+    checkCalciteSpark("select dayOfMonth('" + DEFAULT_TIME_STR + "')", List(20))
   }
 
   test("dayOfWeek") {
-    checkCalciteSparkFlink("select dayOfWeek('" + DEFAULT_TIME_STR + "')", List(4))
+    checkCalciteSpark("select dayOfWeek('" + DEFAULT_TIME_STR + "')", List(4))
   }
 
   test("dayOfYear") {
-    checkCalciteSparkFlink("select dayOfYear('" + DEFAULT_TIME_STR + "')", List(140))
+    checkCalciteSpark("select dayOfYear('" + DEFAULT_TIME_STR + "')", List(140))
   }
 
   test("now") {
-    checkCalciteSparkFlink("select timestampFormat(now(), 'yyyy-MM-dd')")
+    checkCalciteSpark("select timestampFormat(now(), 'yyyy-MM-dd')")
   }
 }

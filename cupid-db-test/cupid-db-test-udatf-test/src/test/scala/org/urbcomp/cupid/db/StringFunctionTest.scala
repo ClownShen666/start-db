@@ -22,47 +22,47 @@ package org.urbcomp.cupid.db
   */
 class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   test("upper") {
-    checkCalciteSparkFlink("select upper('abcde')", List("ABCDE"))
+    checkCalciteSpark("select upper('abcde')", List("ABCDE"))
   }
 
   test("lower") {
-    checkCalciteSparkFlink("select lower('ABCDE')", List("abcde"))
+    checkCalciteSpark("select lower('ABCDE')", List("abcde"))
   }
 
   test("substring1") {
-    checkCalciteSparkFlink("select substring('abcde', 2, 3)", List("bcd"))
+    checkCalciteSpark("select substring('abcde', 2, 3)", List("bcd"))
   }
 
   test("substring2") {
-    checkCalciteSparkFlink("select substring('abcde', 2)", List("bcde"))
+    checkCalciteSpark("select substring('abcde', 2)", List("bcde"))
   }
 
   test("trim") {
-    checkCalciteSparkFlink("select trim('  abcde ')", List("abcde"))
+    checkCalciteSpark("select trim('  abcde ')", List("abcde"))
   }
 
   test("concat") {
-    checkCalciteSparkFlink("select concat('1', '2')", List("12"))
+    checkCalciteSpark("select concat('1', '2')", List("12"))
     checkCalciteSpark("select concat(null, '2')", List(null))
   }
 
   test("reverse") {
-    checkCalciteSparkFlink("select reverse('abcde')", List("edcba"))
+    checkCalciteSpark("select reverse('abcde')", List("edcba"))
     checkCalciteSpark("select reverse(null)", List(null))
   }
 
   test("ltrim") {
-    checkCalciteSparkFlink("select ltrim('  abcde ')", List("abcde "))
+    checkCalciteSpark("select ltrim('  abcde ')", List("abcde "))
     checkCalciteSpark("select ltrim(null)", List(null))
   }
 
   test("rtrim") {
-    checkCalciteSparkFlink("select rtrim('  abcde ')", List("  abcde"))
+    checkCalciteSpark("select rtrim('  abcde ')", List("  abcde"))
     checkCalciteSpark("select rtrim(null)", List(null))
   }
 
   test("pad") {
-    checkCalciteSparkFlink("select pad('abcde', 2, 'a'), pad('abcde', 7, 'a')", List("ab", "aa"))
+    checkCalciteSpark("select pad('abcde', 2, 'a'), pad('abcde', 7, 'a')", List("ab", "aa"))
     checkCalciteSpark("select pad(null, 5, 'a')", List(null))
   }
 
@@ -73,7 +73,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("lpad2") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select lpad('abcde', 2, 'a'), lpad('abcde', 6, 'a')",
       List("ab", "aabcde")
     )
@@ -87,7 +87,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("rpad2") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select rpad('abcde', 1, 'e'), rpad('abcde', 6, 'e')",
       List("a", "abcdee")
     )
@@ -96,7 +96,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   //TODO 多字节字符测试
   test("length") {
-    checkCalciteSparkFlink("select length('abc')", List(3))
+    checkCalciteSpark("select length('abc')", List(3))
   }
 
   //TODO 多字节字符测试
@@ -106,7 +106,7 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("locate1") {
-    checkCalciteSparkFlink("select locate('bc', 'abcabc')", List(2))
+    checkCalciteSpark("select locate('bc', 'abcabc')", List(2))
   }
 
   //FIXME flink output: 2

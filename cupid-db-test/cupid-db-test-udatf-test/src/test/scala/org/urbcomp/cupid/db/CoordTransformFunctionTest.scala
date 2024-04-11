@@ -29,14 +29,14 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   val rsGeoJson: String = rs.toGeoJSON
 
   test("st_BD09ToWGS84(Point)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_makePoint(1, 2))",
       List("POINT (0.9935048779206697 1.9940125213262534)")
     )
   }
 
   test("st_BD09ToWGS84(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List(
         "LINESTRING (-0.0065045583144138 -0.0060041736071982," +
@@ -46,7 +46,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List(
         "POLYGON ((0.9934856269655111 0.9939867065696584, 4.993478545947438 0.9940075719704773," +
@@ -59,7 +59,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
@@ -68,7 +68,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List(
         "MULTILINESTRING ((2.9934995619203466 3.993975880501857, 0.9934998808909472 4.994013668556448," +
@@ -79,7 +79,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(MPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_mPolygonFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1)," +
         "(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -95,7 +95,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534)," +
@@ -105,7 +105,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
@@ -114,18 +114,18 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(null)") {
-    checkCalciteSparkFlink("select st_BD09ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_BD09ToWGS84(null)", List(null))
   }
 
   test("st_WGS84ToBD09(Point)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_makePoint(1, 2))",
       List("POINT (1.006495254008945 2.005983008075984)")
     )
   }
 
   test("st_WGS84ToBD09(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List(
         "LINESTRING (0.0065 0.006, 1.0065137474659602 1.0060107474292177," +
@@ -135,7 +135,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List(
         "POLYGON ((1.0065137474659602 1.0060107474292177, 5.006518484154982 1.0059958968045013," +
@@ -148,7 +148,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), " +
@@ -158,7 +158,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List(
         "MULTILINESTRING ((3.0064983922497763 4.006022856419637, 1.006504103142296" +
@@ -169,7 +169,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(MultiPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_mPolygonFromWKT(" +
         "'MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2)),((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -184,7 +184,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
@@ -193,7 +193,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
@@ -202,18 +202,18 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(null)") {
-    checkCalciteSparkFlink("select st_BD09ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_BD09ToWGS84(null)", List(null))
   }
 
   test("st_GCJ02ToBD09(Point)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_makePoint(1, 2))",
       List("POINT (1.006495254008945 2.005983008075984)")
     )
   }
 
   test("st_GCJ02ToBD09(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List(
         "LINESTRING (0.0065 0.006, 1.0065137474659602 1.0060107474292177, " +
@@ -223,7 +223,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List(
         "POLYGON ((1.0065137474659602 1.0060107474292177, 5.006518484154982 1.0059958968045013," +
@@ -236,7 +236,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
@@ -245,7 +245,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List(
         "MULTILINESTRING ((3.0064983922497763 4.006022856419637, 1.006504103142296" +
@@ -256,7 +256,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(MultiPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_mPolygonFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))," +
         "((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -271,7 +271,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
@@ -280,7 +280,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToBD09(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((1.006495254008945 2.005983008075984), (3.0064983922497763 4.006022856419637))"
@@ -289,18 +289,18 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(null)") {
-    checkCalciteSparkFlink("select st_GCJ02ToBD09(null)", List(null))
+    checkCalciteSpark("select st_GCJ02ToBD09(null)", List(null))
   }
 
   test("st_BD09ToGCJ02(Point)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_makePoint(1, 2))",
       List("POINT (0.9935048779206697 1.9940125213262534)")
     )
   }
 
   test("st_BD09ToGCJ02(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List(
         "LINESTRING (-0.0065045583144138 -0.0060041736071982, 0.9934856269655111 0.9939867065696584," +
@@ -310,7 +310,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List(
         "POLYGON ((0.9934856269655111 0.9939867065696584, 4.993478545947438 0.9940075719704773, " +
@@ -323,7 +323,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
@@ -332,7 +332,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List(
         "MULTILINESTRING ((2.9934995619203466 3.993975880501857, 0.9934998808909472 4.994013668556448, " +
@@ -343,7 +343,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(MultiPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_mPolygonFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))," +
         "((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -358,7 +358,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
@@ -367,7 +367,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_BD09ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List(
         "MULTIPOINT ((0.9935048779206697 1.9940125213262534), (2.9934995619203466 3.993975880501857))"
@@ -376,43 +376,43 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(null)") {
-    checkCalciteSparkFlink("select st_BD09ToGCJ02(null)", List(null))
+    checkCalciteSpark("select st_BD09ToGCJ02(null)", List(null))
   }
 
   test("st_WGS84ToGCJ02(Point)") {
-    checkCalciteSparkFlink("select st_WGS84ToGCJ02(st_makePoint(1, 2))", List("POINT (1 2)"))
+    checkCalciteSpark("select st_WGS84ToGCJ02(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
 
   test("st_WGS84ToGCJ02(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List("LINESTRING (0 0, 1 1, 1 2)")
     )
   }
 
   test("st_WGS84ToGCJ02(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List("POLYGON ((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2))")
     )
   }
 
   test("st_WGS84ToGCJ02(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_WGS84ToGCJ02(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List("MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))")
     )
   }
 
   test("st_WGS84ToGCJ02(MultiPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_mPolygonFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))," +
         "((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -422,57 +422,57 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToGCJ02(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_WGS84ToGCJ02(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_WGS84ToGCJ02(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_WGS84ToGCJ02(null)") {
-    checkCalciteSparkFlink("select st_WGS84ToGCJ02(null)", List(null))
+    checkCalciteSpark("select st_WGS84ToGCJ02(null)", List(null))
   }
 
   test("st_GCJ02ToWGS84(Point)") {
-    checkCalciteSparkFlink("select st_GCJ02ToWGS84(st_makePoint(1, 2))", List("POINT (1 2)"))
+    checkCalciteSpark("select st_GCJ02ToWGS84(st_makePoint(1, 2))", List("POINT (1 2)"))
   }
 
   test("st_GCJ02ToWGS84(LineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_lineStringFromWKT('LINESTRING(0 0,1 1,1 2)'))",
       List("LINESTRING (0 0, 1 1, 1 2)")
     )
   }
 
   test("st_GCJ02ToWGS84(Polygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_polygonFromWKT('POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))'))",
       List("POLYGON ((1 1, 5 1, 5 5, 1 5, 1 1), (2 2, 2 3, 3 3, 3 2, 2 2))")
     )
   }
 
   test("st_GCJ02ToWGS84(MultiPoint)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_mPointFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_GCJ02ToWGS84(MultiLineString)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_mLineStringFromWKT('MULTILINESTRING((3 4,1 5,2 5),(-5 -8,-10 -8,-15 -4))'))",
       List("MULTILINESTRING ((3 4, 1 5, 2 5), (-5 -8, -10 -8, -15 -4))")
     )
   }
 
   test("st_GCJ02ToWGS84(MultiPolygon)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_mPolygonFromWKT('MULTIPOLYGON(((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))," +
         "((6 3,9 2,9 4,6 3)))'))",
       List(
@@ -482,20 +482,20 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToWGS84(Geometry)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4))'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_GCJ02ToWGS84(GeometryCollection)") {
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_GCJ02ToWGS84(st_geometryFromWKT('MULTIPOINT((1 2),(3 4)),LINESTRING(0 0,1 1,1 2)'))",
       List("MULTIPOINT ((1 2), (3 4))")
     )
   }
 
   test("st_GCJ02ToWGS84(null)") {
-    checkCalciteSparkFlink("select st_GCJ02ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_GCJ02ToWGS84(null)", List(null))
   }
 }
