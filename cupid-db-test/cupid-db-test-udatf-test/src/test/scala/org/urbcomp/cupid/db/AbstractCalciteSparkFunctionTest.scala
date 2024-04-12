@@ -44,12 +44,13 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger
   var statement: Statement = _
-  var flinkQueryExecutor: FlinkQueryExecutor = _
+  var flinkQueryExecutor: FlinkQueryExecutor = new FlinkQueryExecutor()
 
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))
     connect = CalciteHelper.createConnection()
     statement = connect.createStatement()
+    flinkQueryExecutor.registerUdf()
   }
 
   override protected def afterAll(): Unit = {
@@ -78,8 +79,6 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     val rs = connect.createStatement().executeQuery(sql)
     val rsBuf = rsBuffer(rs)
     val df = SparkExecuteWrapper.getSparkExecute.executeSql(sql)
-    flinkQueryExecutor = new FlinkQueryExecutor()
-    flinkQueryExecutor.registerUdf()
     val flinkResult = flinkQueryExecutor.getTableEnv
       .executeSql(flinkQueryExecutor.processSql(sql))
       .collect()

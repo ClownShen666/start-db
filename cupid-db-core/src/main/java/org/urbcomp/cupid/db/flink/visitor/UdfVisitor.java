@@ -40,9 +40,8 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
             for (CupidDBSqlParser.FuncParamContext funcParamContext : ctx.exprFuncParams()
                 .funcParam()) {
                 String param = funcParamContext.expr().getText();
-                processedSql = processedSql.replace(param, "st_castToGeometry(" + param + ")");
-                origin.append(param.replace(",", ", ")).append(", ");
-                replace.append("st_castToGeometry(").append(param).append("), ");
+                origin.append(param).append(",");
+                replace.append("st_castToGeometry(").append(param).append("),");
             }
             origin.delete(origin.length() - 2, origin.length()).append(")");
             replace.delete(replace.length() - 2, replace.length()).append(")");
@@ -52,8 +51,8 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
     }
 
     public UdfVisitor(String sql) {
-        processedSql = sql;
-        CharStream charStream = CharStreams.fromString(sql);
+        processedSql = sql.replace(", ", ",");
+        CharStream charStream = CharStreams.fromString(processedSql);
         CupidDBSqlLexer lexer = new CupidDBSqlLexer(charStream);
         lexer.removeErrorListeners();
         CupidDBSqlParser parser = new CupidDBSqlParser(new CommonTokenStream(lexer));
