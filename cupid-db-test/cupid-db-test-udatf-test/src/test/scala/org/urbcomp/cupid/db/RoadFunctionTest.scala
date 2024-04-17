@@ -49,7 +49,7 @@ class RoadFunctionTest extends AbstractCalciteSparkFunctionTest {
         "insert into t_road_segment_test values (2, st_rs_fromGeoJSON(\'" + rsGeoJson + "\'))"
       )
     }
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_rn_shortestPath(st_rn_makeRoadNetwork(collect_list(b))," +
         " st_makePoint(111.37939453125,54.00776876193478)," +
         " st_makePoint(116.3671875,53.05442186546102)) from t_road_segment_test",
