@@ -27,7 +27,7 @@ class RoadFunctionTest3 extends AbstractCalciteSparkFunctionTest {
   test("st_rn_reachableConcaveHull") {
     // This test cost much memory so renew spark session to drop some temp view to get more memory
     SparkExecuteWrapper.getSparkExecute.renewSparkSession()
-    checkCalciteSparkFlink(
+    checkCalciteSpark(
       "select st_rn_reachableConcaveHull(st_rn_fromGeoJson(\'"
         + rnGeoJson + "\'),st_makePoint(108.98897,34.25815), 180.0, \'Drive\')",
       List(
