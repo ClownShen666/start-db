@@ -61,7 +61,7 @@ class UdfFactory extends Serializable {
       : mutable.HashMap[DataEngine.Value, mutable.Map[String, Class[_ <: AbstractUdf]]] =
     engineUdfMap
 
-  private val flinkProcessedUdf: mutable.HashSet[String] = mutable.HashSet(
+  private val castToGeometryUdf: mutable.HashSet[String] = mutable.HashSet(
     "st_contains",
     "st_covers",
     "st_crosses",
@@ -98,5 +98,10 @@ class UdfFactory extends Serializable {
     "st_castToPolygon"
   )
 
-  def getFlinkProcessedUdf: mutable.HashSet[String] = flinkProcessedUdf
+  private val castToStringUdf: mutable.HashSet[String] =
+    mutable.HashSet("castToString", "parseDouble", "parseInteger", "parseLong")
+
+  def getCastToGeometryUdf: mutable.HashSet[String] = castToGeometryUdf
+
+  def getCastToStringUdf: mutable.HashSet[String] = castToStringUdf
 }
