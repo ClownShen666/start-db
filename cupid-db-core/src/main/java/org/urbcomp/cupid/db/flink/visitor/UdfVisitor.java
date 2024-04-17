@@ -79,7 +79,6 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
     }
 
     public String getProcessedSql() {
-        System.out.println("-----------" + processedSql);
         return processedSql;
     }
 
