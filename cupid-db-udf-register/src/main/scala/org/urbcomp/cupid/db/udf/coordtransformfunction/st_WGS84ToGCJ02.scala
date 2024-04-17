@@ -117,6 +117,11 @@ class st_WGS84ToGCJ02 extends ScalarFunction with AbstractUdf {
     transformer.roadSegmentTransform(st)
   }
 
+  def eval(st: String): String = {
+    if (st == null) return null
+    else return st
+  }
+
   def udfSparkEntries: List[String] =
     List("udfWrapper", "udfWrapper2", "udfWrapper3", "udfWrapper4")
 
