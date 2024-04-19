@@ -48,10 +48,8 @@ class MathFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("toDegrees") {
-    checkCalciteSparkFlink(
-      "select toDegrees(1), toDegrees(null)",
-      List(BigDecimal.valueOf(57.29577951308232), null)
-    )
+    checkCalciteSparkFlink("select toDegrees(1)", List(BigDecimal.valueOf(57.29577951308232)))
+    checkCalciteSpark("select toDegrees(null)", List(null))
   }
 
   test("abs") {

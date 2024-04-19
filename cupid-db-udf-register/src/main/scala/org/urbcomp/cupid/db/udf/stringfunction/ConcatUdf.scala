@@ -23,7 +23,8 @@ import org.apache.flink.table.functions.ScalarFunction
 class ConcatUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "concat"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def eval(str1: String, str2: String): String =
     if (str1 == null || str2 == null) null else str1.concat(str2)

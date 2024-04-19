@@ -24,7 +24,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   val DEFAULT_DATETIME: LocalDateTime = LocalDateTime.of(2021, 5, 20, 11, 21, 1, 234000000)
   val DEFAULT_TIMESTAMP: Timestamp = Timestamp.valueOf(DEFAULT_TIME_STR)
   val DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS"
-  //FIXME flink No match found for function signature toTimestamp(<CHARACTER>, <CHARACTER>)
+
   test("toTimestamp(str, format)") {
     checkCalciteSpark(
       "select toTimestamp(\'" + DEFAULT_TIME_STR + "\', \'" + DEFAULT_FORMAT + "\')",
@@ -32,7 +32,6 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  //FIXME flink No match found for function signature toTimestamp(<CHARACTER>)
   test("toTimestamp(str)") {
     checkCalciteSpark("select toTimestamp(\'" + DEFAULT_TIME_STR + "\')", List(DEFAULT_TIMESTAMP))
   }
@@ -50,7 +49,7 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
       "select timestampToLong('" + DEFAULT_TIME_STR + "')",
       List(DEFAULT_TIMESTAMP.getTime)
     )
-    checkCalciteSparkFlink("select timestampToLong(null)", List(null))
+    checkCalciteSpark("select timestampToLong(null)", List(null))
   }
 
   test("timestampToLong(timestamp)") {
@@ -60,7 +59,6 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
     )
   }
 
-  // FIXME flink output format
   test("longToTimestamp(long)") {
     checkCalciteSpark(
       "select longToTimestamp(" + DEFAULT_TIMESTAMP.getTime + ")",
@@ -76,26 +74,26 @@ class TimeFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("toDatetime(str, format)") {
-//    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
-//      List(DEFAULT_TIMESTAMP))
+    //    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "', '" + DEFAULT_FORMAT + "')",
+    //      List(DEFAULT_TIMESTAMP))
     //todo fixme
   }
 
   test("toDatetime(str)") {
-//    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "')",
-//      List(DEFAULT_TIMESTAMP))
+    //    checkCalciteSparkFlink("select toDatetime('" + DEFAULT_TIME_STR + "')",
+    //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 
   test("datetimeToTimestamp") {
-//    checkCalciteSparkFlink("select datetimeToTimestamp('" + DEFAULT_TIME_STR + "')",
-//      List(DEFAULT_TIMESTAMP))
+    //    checkCalciteSparkFlink("select datetimeToTimestamp('" + DEFAULT_TIME_STR + "')",
+    //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 
   test("timestampToDatetime") {
-//    checkCalciteSparkFlink("select timestampToDatetime('" + DEFAULT_TIME_STR + "')",
-//      List(DEFAULT_TIMESTAMP))
+    //    checkCalciteSparkFlink("select timestampToDatetime('" + DEFAULT_TIME_STR + "')",
+    //      List(DEFAULT_TIMESTAMP))
     // todo fixme
   }
 

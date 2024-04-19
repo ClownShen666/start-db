@@ -23,7 +23,8 @@ import org.apache.flink.table.functions.ScalarFunction
 class LocateUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "locate"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def eval(subStr: String, str: String): Integer =
     if (subStr == null || str == null) null

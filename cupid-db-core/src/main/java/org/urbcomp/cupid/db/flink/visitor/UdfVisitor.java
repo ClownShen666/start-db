@@ -62,8 +62,7 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
                 replace.delete(replace.length() - 2, replace.length()).append("))");
             }
         }
-        processedSql = processedSql.replace(origin, replace)
-            .replace("null", "CAST(null as STRING)");
+        processedSql = processedSql.replace(origin, replace);
         return visitChildren(ctx);
     }
 

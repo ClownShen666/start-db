@@ -20,22 +20,22 @@ class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
     checkCalciteSparkFlink("select castToInteger('1234')", List(1234))
-    checkCalciteSparkFlink("select castToInteger(null)", List(null))
+    checkCalciteSpark("select castToInteger(null)", List(null))
   }
 
   test("castToLong") {
     checkCalciteSparkFlink("select castToLong('12344')", List(12344L))
-    checkCalciteSparkFlink("select castToLong(null)", List(null))
+    checkCalciteSpark("select castToLong(null)", List(null))
   }
 
   test("castToFloat") {
     checkCalciteSparkFlink("select castToFloat('123.1')", List(123.1f))
-    checkCalciteSparkFlink("select castToFloat(null)", List(null))
+    checkCalciteSpark("select castToFloat(null)", List(null))
   }
 
   test("castToDouble") {
     checkCalciteSparkFlink("select castToDouble('123444555.3')", List(123444555.3d))
-    checkCalciteSparkFlink("select castToDouble(null)", List(null))
+    checkCalciteSpark("select castToDouble(null)", List(null))
   }
 
   test("castToBoolean") {
@@ -43,23 +43,23 @@ class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
     checkCalciteSparkFlink("select castToBoolean('TRUE')", List(true))
     checkCalciteSparkFlink("select castToBoolean('false')", List(false))
     checkCalciteSparkFlink("select castToBoolean('FALSE')", List(false))
-    checkCalciteSparkFlink("select castToBoolean(null)", List(null))
-    checkCalciteSparkFlink("select castToBoolean('notaboolean')", List(null))
+    checkCalciteSpark("select castToBoolean(null)", List(null))
+    checkCalciteSpark("select castToBoolean('notaboolean')", List(null))
   }
 
   test("castToString") {
     checkCalciteSparkFlink("select castToString(1234)", List("1234"))
-    checkCalciteSparkFlink("select castToString(null)", List(null))
+    checkCalciteSpark("select castToString(null)", List(null))
   }
 
   test("parseInteger") {
     checkCalciteSparkFlink("select parseInteger('1234')", List(1234))
-    checkCalciteSparkFlink("select parseInteger(null)", List(null))
+    checkCalciteSpark("select parseInteger(null)", List(null))
   }
 
   test("parseLong") {
     checkCalciteSparkFlink("select parseLong('1234')", List(1234L))
-    checkCalciteSparkFlink("select parseLong(null)", List(null))
+    checkCalciteSpark("select parseLong(null)", List(null))
   }
 
   test("parseDouble") {

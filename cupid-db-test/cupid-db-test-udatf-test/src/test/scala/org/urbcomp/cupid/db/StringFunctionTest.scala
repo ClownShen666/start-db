@@ -66,7 +66,6 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     checkCalciteSpark("select pad(null, 5, 'a')", List(null))
   }
 
-  //FIXME flink Invalid number of arguments to function 'LPAD'. Was expecting 3 arguments
   test("lpad1") {
     checkCalciteSpark("select lpad('abcde', 2)", List("  abcde"))
     checkCalciteSpark("select lpad(null, 2)", List(null))
@@ -80,7 +79,6 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     checkCalciteSpark("select lpad(null, 5, 'a')", List(null))
   }
 
-  //FIXME flink Invalid number of arguments to function 'LPAD'. Was expecting 3 arguments
   test("rpad1") {
     checkCalciteSpark("select rpad('abcde', 1)", List("abcde "))
     checkCalciteSpark("select rpad(null, 1)", List(null))
@@ -100,7 +98,6 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   //TODO 多字节字符测试
-  // FIXME flink
   test("charLength") {
     checkCalciteSpark("select charLength('abc')", List(3))
   }
@@ -109,7 +106,6 @@ class StringFunctionTest extends AbstractCalciteSparkFunctionTest {
     checkCalciteSparkFlink("select locate('bc', 'abcabc')", List(2))
   }
 
-  //FIXME flink output: 2
   test("locate2") {
     checkCalciteSpark("select locate('bc', 'abcabc', 2)", List(5))
     checkCalciteSpark("select locate(null, 'abcabc', 2)", List(null))

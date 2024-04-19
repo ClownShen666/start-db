@@ -47,7 +47,7 @@ class ToDegrees extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(angRad: Double): BigDecimal = {
+  def eval(angRad: java.lang.Double): BigDecimal = {
     if (angRad == null) return null
     val res = Math.toDegrees(angRad.doubleValue)
     BigDecimal.valueOf(res)

@@ -27,7 +27,8 @@ class Floor extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "floor"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
   def eval(
@@ -38,7 +39,7 @@ class Floor extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(a: Double): BigDecimal = {
+  def eval(a: java.lang.Double): BigDecimal = {
     if (a == null) return null
     BigDecimal.valueOf(Math.floor(a.doubleValue))
   }
