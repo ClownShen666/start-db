@@ -25,7 +25,6 @@ import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.util.GeoFunctions
 
 import java.math.BigDecimal
-import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 import scala.collection.mutable.ListBuffer
 
@@ -68,7 +67,7 @@ class st_traj_noiseFilterUdf extends ScalarFunction with AbstractUdf {
     }
 
     trajectory.setTid(trajectory.getTid + "_filterNoise")
-    trajectory.setPointList(filterGPSPoints.toList.asJava)
+    trajectory.setPointList(filterGPSPoints)
     trajectory
   }
 
@@ -105,7 +104,7 @@ class st_traj_noiseFilterUdf extends ScalarFunction with AbstractUdf {
     }
 
     trajectory.setTid(trajectory.getTid + "_filterNoise")
-    trajectory.setPointList(filterGPSPoints.toList.asJava)
+    trajectory.setPointList(filterGPSPoints)
     trajectory
   }
 

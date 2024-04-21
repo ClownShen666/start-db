@@ -27,7 +27,8 @@ class Log2 extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "log2"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   /**
     * Returns the base 2 logarithm of a double value (num).
@@ -45,7 +46,7 @@ class Log2 extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(num: Double): BigDecimal = {
+  def eval(num: java.lang.Double): BigDecimal = {
     if (num == null || num.doubleValue <= 0) return null
     val res = Math.log(num.doubleValue) / Math.log(2.0d)
     BigDecimal.valueOf(res)

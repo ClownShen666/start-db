@@ -32,19 +32,35 @@ public class UdfVisitor extends CupidDBSqlBaseVisitor<Void> {
     @Override
     public Void visitExprFunc(CupidDBSqlParser.ExprFuncContext ctx) {
         UdfFactory udfFactory = new UdfFactory();
-        HashSet<String> hashSet = udfFactory.getFlinkProcessedUdf();
+        HashSet<String> castToGeometryUdf = udfFactory.getCastToGeometryUdf();
+        HashSet<String> castToStringUdf = udfFactory.getCastToStringUdf();
         StringBuilder origin = new StringBuilder(ctx.ident().getText()).append("(");
         StringBuilder replace = new StringBuilder(ctx.ident().getText()).append("(");
-        if (hashSet.contains(ctx.ident().getText())
-            && !ctx.exprFuncParams().funcParam().isEmpty()) {
-            for (CupidDBSqlParser.FuncParamContext funcParamContext : ctx.exprFuncParams()
-                .funcParam()) {
-                String param = funcParamContext.expr().getText();
-                origin.append(param).append(",");
-                replace.append("st_castToGeometry(").append(param).append("),");
+        if (!ctx.exprFuncParams().funcParam().isEmpty()) {
+
+            // add st_castToGeometry
+            if (castToGeometryUdf.contains(ctx.ident().getText())) {
+                for (CupidDBSqlParser.FuncParamContext funcParamContext : ctx.exprFuncParams()
+                    .funcParam()) {
+                    String param = funcParamContext.expr().getText();
+                    origin.append(param).append(",");
+                    replace.append("st_castToGeometry(").append(param).append("),");
+                }
+                origin.delete(origin.length() - 2, origin.length()).append(")");
+                replace.delete(replace.length() - 2, replace.length()).append(")");
             }
-            origin.delete(origin.length() - 2, origin.length()).append(")");
-            replace.delete(replace.length() - 2, replace.length()).append(")");
+
+            // add cast(param as STRING)
+            if (castToStringUdf.contains(ctx.ident().getText())) {
+                for (CupidDBSqlParser.FuncParamContext funcParamContext : ctx.exprFuncParams()
+                    .funcParam()) {
+                    String param = funcParamContext.expr().getText();
+                    origin.append(param).append(",");
+                    replace.append("CAST(").append(param).append(" as STRING),");
+                }
+                origin.delete(origin.length() - 1, origin.length()).append(")");
+                replace.delete(replace.length() - 2, replace.length()).append("))");
+            }
         }
         processedSql = processedSql.replace(origin, replace);
         return visitChildren(ctx);

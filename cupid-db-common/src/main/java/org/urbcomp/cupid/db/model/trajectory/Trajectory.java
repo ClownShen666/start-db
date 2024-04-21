@@ -31,6 +31,7 @@ import org.urbcomp.cupid.db.model.point.SpatialPoint;
 import org.urbcomp.cupid.db.serializer.TrajDeserializer;
 import org.urbcomp.cupid.db.serializer.TrajSerializer;
 import org.urbcomp.cupid.db.util.*;
+import scala.collection.mutable.ListBuffer;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -137,6 +138,13 @@ public class Trajectory implements java.io.Serializable {
      */
     public Trajectory setPointList(List<GPSPoint> gpsPointList) {
         this.gpsPointList = gpsPointList;
+        return this;
+    }
+
+    public Trajectory setPointList(ListBuffer<GPSPoint> gpsPointList) {
+        List<GPSPoint> javaList = new ArrayList<>();
+        gpsPointList.foreach(point -> javaList.add(point));
+        this.gpsPointList = javaList;
         return this;
     }
 

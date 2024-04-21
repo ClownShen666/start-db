@@ -47,7 +47,7 @@ class Pow extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(a: Double, b: Double): BigDecimal = {
+  def eval(a: java.lang.Double, b: java.lang.Double): BigDecimal = {
     if (a == null || b == null) return null
     val res = Math.pow(a.doubleValue, b.doubleValue)
     BigDecimal.valueOf(res)

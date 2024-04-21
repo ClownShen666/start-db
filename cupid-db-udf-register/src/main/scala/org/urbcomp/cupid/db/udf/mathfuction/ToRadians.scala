@@ -47,7 +47,7 @@ class ToRadians extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(angDeg: Double): BigDecimal = {
+  def eval(angDeg: java.lang.Double): BigDecimal = {
     if (angDeg == null) return null
     val res = Math.toRadians(angDeg.doubleValue)
     BigDecimal.valueOf(res)

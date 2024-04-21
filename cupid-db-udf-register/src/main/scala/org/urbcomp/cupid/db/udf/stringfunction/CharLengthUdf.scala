@@ -23,7 +23,8 @@ import org.apache.flink.table.functions.ScalarFunction
 class CharLengthUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "charLength"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def eval(str: String): Integer =
     if (str == null) null else str.length

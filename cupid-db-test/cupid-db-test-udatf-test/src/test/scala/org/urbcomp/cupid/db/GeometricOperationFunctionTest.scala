@@ -46,7 +46,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("st_y(point)") {
     checkCalciteSparkFlink("select st_y(st_makePoint(1, 2))", List(2.0))
-    checkCalciteSpark("select st_y(st_makeBBox(1, 2, 3, 4))", List(null))
+    checkCalciteSparkFlink("select st_y(st_makeBBox(1, 2, 3, 4))", List(null))
   }
 
   test("st_BBox(geom)") {
@@ -64,7 +64,7 @@ class GeometricOperationFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_pointN(geom, n)") {
-    checkCalciteSpark(
+    checkCalciteSparkFlink(
       "select st_pointN(st_makePoint(1, 2), 1), st_pointN(st_makeBBox(1, 2, 3, 4), 1)",
       List(null, null)
     )

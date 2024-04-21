@@ -25,7 +25,8 @@ import scala.collection.mutable
 class LpadUdf extends ScalarFunction with AbstractUdf {
   override def name(): String = "lpad"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
+  // There is an udf with the same name in flink
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
 
   def eval(str: String, len: Int): String = {
     if (str == null) null

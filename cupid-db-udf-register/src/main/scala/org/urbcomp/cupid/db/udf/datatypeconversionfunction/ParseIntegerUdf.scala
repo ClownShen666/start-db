@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.udf.datatypeconversionfunction
 
+import org.apache.flink.table.annotation.DataTypeHint
 import org.urbcomp.cupid.db.udf.{AbstractUdf, DataEngine}
 import org.urbcomp.cupid.db.udf.DataEngine.{Calcite, Flink, Spark}
 import org.apache.flink.table.functions.ScalarFunction
@@ -24,11 +25,18 @@ class ParseIntegerUdf extends ScalarFunction with AbstractUdf {
 
   override def name(): String = "parseInteger"
 
-  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark)
+  override def registerEngines(): List[DataEngine.Value] = List(Calcite, Spark, Flink)
 
-  def eval(num: AnyRef): java.lang.Integer = {
+  def eval(@DataTypeHint("RAW") num: AnyRef): java.lang.Integer = {
     Option(num) match {
       case Some(n) => n.toString.toInt
+      case _       => null
+    }
+  }
+
+  def eval(num: String): java.lang.Integer = {
+    Option(num) match {
+      case Some(n) => n.toInt
       case _       => null
     }
   }

@@ -114,7 +114,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToWGS84(null)") {
-    checkCalciteSparkFlink("select st_BD09ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_BD09ToWGS84(null)", List(null))
   }
 
   test("st_WGS84ToBD09(Point)") {
@@ -202,7 +202,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToBD09(null)") {
-    checkCalciteSparkFlink("select st_BD09ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_BD09ToWGS84(null)", List(null))
   }
 
   test("st_GCJ02ToBD09(Point)") {
@@ -289,7 +289,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToBD09(null)") {
-    checkCalciteSparkFlink("select st_GCJ02ToBD09(null)", List(null))
+    checkCalciteSpark("select st_GCJ02ToBD09(null)", List(null))
   }
 
   test("st_BD09ToGCJ02(Point)") {
@@ -376,7 +376,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_BD09ToGCJ02(null)") {
-    checkCalciteSparkFlink("select st_BD09ToGCJ02(null)", List(null))
+    checkCalciteSpark("select st_BD09ToGCJ02(null)", List(null))
   }
 
   test("st_WGS84ToGCJ02(Point)") {
@@ -436,7 +436,7 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_WGS84ToGCJ02(null)") {
-    checkCalciteSparkFlink("select st_WGS84ToGCJ02(null)", List(null))
+    checkCalciteSpark("select st_WGS84ToGCJ02(null)", List(null))
   }
 
   test("st_GCJ02ToWGS84(Point)") {
@@ -496,6 +496,6 @@ class CoordTransformFunctionTest extends AbstractCalciteSparkFunctionTest {
   }
 
   test("st_GCJ02ToWGS84(null)") {
-    checkCalciteSparkFlink("select st_GCJ02ToWGS84(null)", List(null))
+    checkCalciteSpark("select st_GCJ02ToWGS84(null)", List(null))
   }
 }

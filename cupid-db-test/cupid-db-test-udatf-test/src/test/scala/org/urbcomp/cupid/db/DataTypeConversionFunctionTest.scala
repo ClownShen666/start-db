@@ -20,22 +20,22 @@ class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
 
   test("castToInteger") {
     checkCalciteSparkFlink("select castToInteger('1234')", List(1234))
-    checkCalciteSparkFlink("select castToInteger(null)", List(null))
+    checkCalciteSpark("select castToInteger(null)", List(null))
   }
 
   test("castToLong") {
     checkCalciteSparkFlink("select castToLong('12344')", List(12344L))
-    checkCalciteSparkFlink("select castToLong(null)", List(null))
+    checkCalciteSpark("select castToLong(null)", List(null))
   }
 
   test("castToFloat") {
     checkCalciteSparkFlink("select castToFloat('123.1')", List(123.1f))
-    checkCalciteSparkFlink("select castToFloat(null)", List(null))
+    checkCalciteSpark("select castToFloat(null)", List(null))
   }
 
   test("castToDouble") {
     checkCalciteSparkFlink("select castToDouble('123444555.3')", List(123444555.3d))
-    checkCalciteSparkFlink("select castToDouble(null)", List(null))
+    checkCalciteSpark("select castToDouble(null)", List(null))
   }
 
   test("castToBoolean") {
@@ -43,31 +43,30 @@ class DataTypeConversionFunctionTest extends AbstractCalciteSparkFunctionTest {
     checkCalciteSparkFlink("select castToBoolean('TRUE')", List(true))
     checkCalciteSparkFlink("select castToBoolean('false')", List(false))
     checkCalciteSparkFlink("select castToBoolean('FALSE')", List(false))
-    checkCalciteSparkFlink("select castToBoolean(null)", List(null))
-    checkCalciteSparkFlink("select castToBoolean('notaboolean')", List(null))
+    checkCalciteSpark("select castToBoolean(null)", List(null))
+    checkCalciteSpark("select castToBoolean('notaboolean')", List(null))
   }
 
-  // FIXME flink the input parameter is AnyRef
   test("castToString") {
-    checkCalciteSpark("select castToString(1234)", List("1234"))
+    checkCalciteSparkFlink("select castToString(1234)", List("1234"))
     checkCalciteSpark("select castToString(null)", List(null))
   }
 
-  // FIXME flink the input parameter is AnyRef
   test("parseInteger") {
-    checkCalciteSpark("select parseInteger('1234')", List(1234))
+    checkCalciteSparkFlink("select parseInteger('1234')", List(1234))
     checkCalciteSpark("select parseInteger(null)", List(null))
   }
 
-  // FIXME flink the input parameter is AnyRef
   test("parseLong") {
-    checkCalciteSpark("select parseLong('1234')", List(1234L))
+    checkCalciteSparkFlink("select parseLong('1234')", List(1234L))
     checkCalciteSpark("select parseLong(null)", List(null))
   }
 
-  // FIXME flink the input parameter is AnyRef
   test("parseDouble") {
-    checkCalciteSpark("select parseDouble('12345678901234567890')", List(12345678901234567890d))
-    checkCalciteSpark("select parseDouble(null)", List(null))
+    checkCalciteSparkFlink(
+      "select parseDouble('12345678901234567890')",
+      List(12345678901234567890d)
+    )
+    checkCalciteSparkFlink("select parseDouble(null)", List(null))
   }
 }

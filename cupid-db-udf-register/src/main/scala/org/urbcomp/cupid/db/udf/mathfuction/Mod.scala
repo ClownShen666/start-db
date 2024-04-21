@@ -42,7 +42,7 @@ class Mod extends ScalarFunction with AbstractUdf {
   }
 
   @DataTypeHint(value = "RAW", bridgedTo = classOf[BigDecimal])
-  def eval(a: Double, b: Double): BigDecimal = {
+  def eval(a: java.lang.Double, b: java.lang.Double): BigDecimal = {
     if (a == null || b == null) null
     else {
       val res = a.doubleValue % b.doubleValue
