@@ -15,7 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.executor
+import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
+import org.urbcomp.cupid.db.flink.KafkaListenerThread
+import org.urbcomp.cupid.db.flink.index.GridIndex
 
+import java.time.Duration
+import java.util
+import java.util.Properties
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.geotools.data.DataStoreFinder
@@ -60,6 +67,8 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           new Table(0L /* unused */, db.getId, tableName, storageEngine)
         )
 
+        val fieldTypeList = new util.ArrayList[String]
+
         // set field and index
         val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
@@ -79,7 +88,8 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           } else {
             sfb.add(name, classType)
           }
-          val field = new Field(0, tableId, name, dataType, 0);
+          val field = new Field(0, tableId, name, dataType, 0)
+          fieldTypeList.add(dataType)
           MetadataAccessUtil.insertField(field)
           fieldMap.put(name, field)
         })
@@ -91,6 +101,41 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         // create stream table(topic) in kafka
         if (n.union || n.stream) {
           createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
+          val minLongitude = 105.0
+          val maxLongitude = 110.0
+          val minLatitude = 28.108
+          val maxLatitude = 32.20
+
+          val kafkaListener = new Thread(() => {
+            val props: Properties = new Properties
+            props.put("bootstrap.servers", "localhost:9092")
+            props.put("group.id", "test-consumer-group")
+            props.put("key.deserializer", classOf[StringDeserializer].getName)
+            props.put("value.deserializer", classOf[StringDeserializer].getName)
+            props.put("auto.offset.reset", "earliest")
+            val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+
+            consumer.subscribe(java.util.Collections.singletonList(getKafkaTopic(createdTable)))
+
+            var running = true
+            val gridIndex =
+              new GridIndex(minLongitude, maxLongitude, minLatitude, maxLatitude, 5000)
+            KafkaListenerThread.threadRunningMap.put(tableName, true)
+            gridIndex.setFieldTypeList(fieldTypeList)
+
+            while (running) {
+              val records: ConsumerRecords[String, String] = consumer.poll(Duration.ofMillis(1000))
+              records.forEach(record => {
+                gridIndex
+                  .addSpatialObject(record.value(), tableName, record.offset())
+              })
+              running = KafkaListenerThread.threadRunningMap.get(tableName)
+            }
+            consumer.close()
+
+          })
+          kafkaListener.setName(tableName)
+          KafkaListenerThread.getInstance().submit(kafkaListener)
         }
 
         // create table in hbase

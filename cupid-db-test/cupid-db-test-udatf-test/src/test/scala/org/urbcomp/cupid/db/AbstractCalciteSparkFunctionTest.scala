@@ -44,7 +44,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
   val log: Logger = LogUtil.getLogger
   var statement: Statement = _
-  var flinkQueryExecutor: FlinkQueryExecutor = new FlinkQueryExecutor()
+  var flinkQueryExecutor: FlinkQueryExecutor = FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE
 
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))

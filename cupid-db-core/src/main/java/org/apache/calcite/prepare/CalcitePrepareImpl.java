@@ -82,7 +82,6 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
-import org.urbcomp.cupid.db.flink.FlinkQueryExecutor;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.flink.visitor.InsertIntoTableVisitor;
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
@@ -102,6 +101,8 @@ import java.sql.Types;
 import java.util.*;
 
 import static org.apache.calcite.util.Static.RESOURCE;
+import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE;
+import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.sqlNodeCache;
 
 /**
  * Shit just got real.
@@ -715,7 +716,8 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 // TODO: show stream query result, now return null result
                 FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
                 flinkSqlParam.setSql(sql);
-                new FlinkQueryExecutor(sqlNode).execute(flinkSqlParam);
+                sqlNodeCache.set(sqlNode);
+                FLINK_EXECUTOR_INSTANCE.execute(flinkSqlParam);
                 return (MetadataResult<T>) MetadataResult.buildResult(
                     new String[0],
                     new ArrayList<>()

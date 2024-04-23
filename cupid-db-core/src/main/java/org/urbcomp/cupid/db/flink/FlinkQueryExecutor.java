@@ -36,8 +36,11 @@ import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.functions.UserDefinedFunction;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
+import org.apache.kafka.common.TopicPartition;
 import org.locationtech.jts.geom.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
+import org.urbcomp.cupid.db.flink.cache.GlobalCache;
+import org.urbcomp.cupid.db.flink.index.GridIndex;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.SparkRowToFlinkRow;
 import org.urbcomp.cupid.db.flink.visitor.*;
@@ -59,6 +62,7 @@ import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
@@ -68,14 +72,15 @@ import org.slf4j.Logger;
 import org.urbcomp.cupid.db.util.LogUtil;
 import scala.collection.JavaConverters;
 
-public class FlinkQueryExecutor {
+public enum FlinkQueryExecutor {
+    FLINK_EXECUTOR_INSTANCE;
+
+    public static final ThreadLocal<SqlNode> sqlNodeCache = new ThreadLocal<>();
     private boolean isRegistered = false;
     private final Logger logger = LogUtil.getLogger();
     private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
     private StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-
-    private SqlNode sqlNode = null;
 
     public StreamExecutionEnvironment getEnv() {
         return env;
@@ -91,12 +96,6 @@ public class FlinkQueryExecutor {
 
     public void setTableEnv(StreamTableEnvironment tableEnv) {
         this.tableEnv = tableEnv;
-    }
-
-    public FlinkQueryExecutor() {}
-
-    public FlinkQueryExecutor(SqlNode sqlNode) {
-        this.sqlNode = sqlNode;
     }
 
     public DataStream<Row> execute(FlinkSqlParam param) {
@@ -131,6 +130,10 @@ public class FlinkQueryExecutor {
         }
 
         String sql = new UdfVisitor(param.getSql()).getProcessedSql();
+        SqlNode sqlNode;
+        try (ThreadLocalCleaner ignored = new ThreadLocalCleaner(sqlNodeCache)) {
+            sqlNode = sqlNodeCache.get();
+        }
         if (sqlNode == null) {
             sqlNode = CupidDBParseDriver.parseSql(sql);
         }
@@ -433,13 +436,33 @@ public class FlinkQueryExecutor {
             // create kafkaSource
             String topicName = getKafkaTopic(tableList.get(i));
             String groupId = getKafkaGroup(dbTableNameList.get(i));
-            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-                .setBootstrapServers(param.getBootstrapServers())
-                .setTopics(topicName)
-                .setGroupId(groupId)
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setValueOnlyDeserializer(new SimpleStringSchema())
-                .build();
+            KafkaSource<String> kafkaSource;
+            // todo:
+            if ("table_withGridIndex".equals(tableNameList.get(i))) {
+                Map<TopicPartition, Long> offsets = new HashMap<>();
+                // now default only 1 partition
+                TopicPartition partition = new TopicPartition(topicName, 0);
+                offsets.put(
+                    partition,
+                    GridIndex.tableQueryTimeOffset.get(tableNameList.get(i).toLowerCase())
+                );
+                System.out.println("偏移量" + offsets.get(partition));
+                kafkaSource = KafkaSource.<String>builder()
+                    .setBootstrapServers(param.getBootstrapServers())
+                    .setTopics(topicName)
+                    .setGroupId(groupId)
+                    .setStartingOffsets(OffsetsInitializer.offsets(offsets))
+                    .setValueOnlyDeserializer(new SimpleStringSchema())
+                    .build();
+            } else {
+                kafkaSource = KafkaSource.<String>builder()
+                    .setBootstrapServers(param.getBootstrapServers())
+                    .setTopics(topicName)
+                    .setGroupId(groupId)
+                    .setStartingOffsets(OffsetsInitializer.earliest())
+                    .setValueOnlyDeserializer(new SimpleStringSchema())
+                    .build();
+            }
 
             // convert string stream to row stream
             List<Field> fieldList = tableList.get(i).getFieldList();
@@ -450,13 +473,42 @@ public class FlinkQueryExecutor {
                 fieldNameList.add(field.getName());
             }
             StringToRow stringToRow = new StringToRow(fieldNameList, fieldTypeList);
-            DataStream<Row> source = getEnv().fromSource(
+
+            List<String> filteredData = new ArrayList<>();
+            // 模拟使用网格索引并设置网格参数和查询参数
+            if ("table_withGridIndex".equals(tableNameList.get(i))) {
+                // 重庆市范围
+                GridIndex gridIndex = new GridIndex(105.0, 110.0, 28.108, 32.20, 5000);
+                filteredData = gridIndex.querySpatialObjects(
+                    107.0,
+                    30.108,
+                    109.0,
+                    31.20,
+                    tableNameList.get(i).toLowerCase()
+                );
+                // todo:delete
+                AtomicInteger count = new AtomicInteger();
+                GlobalCache.grid.asMap().forEach((k, v) -> count.addAndGet(v.size()));
+                System.out.println(
+                    "过滤比例：" + (double) (count.get() - filteredData.size()) / count.get()
+                );
+            }
+            DataStream<String> source = getEnv().fromSource(
                 kafkaSource,
                 WatermarkStrategy.noWatermarks(),
                 "source"
-            ).map(stringToRow).returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+            );
+
+            DataStream<Row> rowSource;
+            if ("table_withGridIndex".equals(tableNameList.get(i))) {
+                rowSource = source.union(getEnv().fromCollection(filteredData))
+                    .map(stringToRow)
+                    .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+            } else rowSource = source.map(stringToRow)
+                .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+
             // create sourceTable in tableEnv
-            getTableEnv().createTemporaryView(tableNameList.get(i), source);
+            getTableEnv().createTemporaryView(tableNameList.get(i), rowSource);
         }
     }
 
