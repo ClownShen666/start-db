@@ -45,12 +45,16 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
   val log: Logger = LogUtil.getLogger
   var statement: Statement = _
   var flinkQueryExecutor: FlinkQueryExecutor = FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE
-  flinkQueryExecutor.registerUdf()
-
+  var isReg = false
   override protected def beforeAll(): Unit = {
     SqlParam.CACHE.set(new SqlParam("root", "default"))
     connect = CalciteHelper.createConnection()
     statement = connect.createStatement()
+    if (!isReg) {
+      flinkQueryExecutor.registerUdf()
+      isReg = true
+    }
+
   }
 
   override protected def afterAll(): Unit = {

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
 import static org.urbcomp.cupid.db.flink.TestUtil.*;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
@@ -612,7 +613,7 @@ public class FlinkQueryExecutorTest {
 
         // test select sql
         flinkSqlParam.setSql("select * from table1;");
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        FlinkQueryExecutor flink = FLINK_EXECUTOR_INSTANCE;
         DataStream<Row> resultStream = flink.execute(flinkSqlParam);
         List<String> expected = new ArrayList<>();
         expected.add(
@@ -709,7 +710,7 @@ public class FlinkQueryExecutorTest {
 
         // test insert sql
         flinkSqlParam.setSql("insert into table2 select * from table1;");
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        FlinkQueryExecutor flink = FLINK_EXECUTOR_INSTANCE;
         flink.execute(flinkSqlParam);
 
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
@@ -815,7 +816,7 @@ public class FlinkQueryExecutorTest {
         produceKafkaMessage("localhost:9092", topicList.get(1), recordList);
 
         // load table and test
-        FlinkQueryExecutor flink = new FlinkQueryExecutor();
+        FlinkQueryExecutor flink = FLINK_EXECUTOR_INSTANCE;
         flink.loadTables(
             flinkSqlParam,
             visitor.getTableList(),
@@ -853,7 +854,7 @@ public class FlinkQueryExecutorTest {
     @Ignore
     @Test
     public void registerUdfTest() throws Exception {
-        new FlinkQueryExecutor().registerUdf();
+        FLINK_EXECUTOR_INSTANCE.registerUdf();
     }
 
 }
