@@ -76,7 +76,7 @@ public enum FlinkQueryExecutor {
     FLINK_EXECUTOR_INSTANCE;
 
     public static final ThreadLocal<SqlNode> sqlNodeCache = new ThreadLocal<>();
-    private boolean isRegistered = false;
+    private volatile boolean isRegistered = false;
     private final Logger logger = LogUtil.getLogger();
     private StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -124,9 +124,9 @@ public enum FlinkQueryExecutor {
         }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
 
-        if (preEnv != getEnv() || !isRegistered) {
+        if (preEnv != getEnv()) {
             registerUdf();
-            this.isRegistered = true;
+
         }
 
         String sql = new UdfVisitor(param.getSql()).getProcessedSql();
@@ -800,16 +800,24 @@ public enum FlinkQueryExecutor {
     }
 
     public void registerUdf() {
-        java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters
-            .mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink()))
-            .asJava();
-        for (Map.Entry<String, Class<? extends AbstractUdf>> udf : udfMap.entrySet()) {
-            getTableEnv().createTemporaryFunction(
-                udf.getKey(),
-                (Class<? extends UserDefinedFunction>) udf.getValue()
-            );
-            logger.info("Flink registers udf: " + udf.getKey());
+        if (!isRegistered) {
+            synchronized (this) {
+
+                java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters
+                    .mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink()))
+                    .asJava();
+                for (Map.Entry<String, Class<? extends AbstractUdf>> udf : udfMap.entrySet()) {
+                    getTableEnv().createTemporaryFunction(
+                        udf.getKey(),
+                        (Class<? extends UserDefinedFunction>) udf.getValue()
+                    );
+                    logger.info("Flink registers udf: " + udf.getKey());
+                }
+                isRegistered = true; // 将标记设为已运行
+
+            }
         }
+
     }
 
     // process udf in the sql

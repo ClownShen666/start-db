@@ -50,7 +50,7 @@ abstract class AbstractCalciteSparkFunctionTest extends FunSuite with BeforeAndA
     SqlParam.CACHE.set(new SqlParam("root", "default"))
     connect = CalciteHelper.createConnection()
     statement = connect.createStatement()
-
+    flinkQueryExecutor.registerUdf()
   }
 
   override protected def afterAll(): Unit = {
