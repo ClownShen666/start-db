@@ -32,13 +32,14 @@
     </select>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id"
             parameterType="org.urbcomp.cupid.db.metadata.entity.Table">
-        INSERT INTO sys_table(`db_id`, `name`, `storage_engine`) VALUE (#{table.dbId}, #{table.name}, #{table.storageEngine});
+        INSERT INTO sys_table(`db_id`, `name`, `storage_engine`, `from_tables`) VALUE (#{table.dbId}, #{table.name}, #{table.storageEngine}, #{table.fromTables});
     </insert>
     <update id="update">
         UPDATE sys_table
         SET name=#{table.name},
         storage_engine = #{table.storageEngine},
-        db_id = #{table.dbId}
+        db_id = #{table.dbId},
+        from_tables = #{table.fromtables}
         WHERE id = #{table.id}
         and delete_time = 0;
     </update>

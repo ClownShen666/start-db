@@ -23,7 +23,7 @@ import java.time.Duration
 import java.util
 import java.util.Properties
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.calcite.sql.SqlIdentifier
+import org.apache.calcite.sql.{SqlBasicCall, SqlIdentifier, SqlJoin}
 import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.geotools.data.DataStoreFinder
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder
@@ -37,8 +37,9 @@ import org.urbcomp.cupid.db.transformer.{
   RoadSegmentAndGeomesaTransformer,
   TrajectoryAndFeatureTransformer
 }
-import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil}
+import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
 import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser
 
 import scala.collection.JavaConverters._
 
@@ -54,7 +55,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
       if (n.ifNotExists) {
         return MetadataResult.buildDDLResult(0)
       } else {
-        throw new IllegalArgumentException("table already exist " + tableName)
+        throw new IllegalArgumentException("table already exist: " + tableName)
       }
     }
 
@@ -62,17 +63,25 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     MetadataAccessUtil.withRollback(
       _ => {
         // create metadata table
-        val storageEngine = if (n.union) "union" else if (n.stream) "kafka" else "hbase"
-        affectedRows = MetadataAccessUtil.insertTable(
-          new Table(0L /* unused */, db.getId, tableName, storageEngine)
-        )
-
-        val fieldTypeList = new util.ArrayList[String]
+        val sql = SqlParam.CACHE.get().getSql
+        if (sql.contains("from")) {
+          var fromTableList: Array[String] = Array.empty[String]
+          fromTableList = sql.split("from")(1).split(";")(0).split(",").map(_.trim)
+          val fromTables = fromTableList.mkString(",")
+          val table = new Table(0L /* unused */, db.getId, tableName, "union")
+          table.setFromTables(fromTables)
+          affectedRows = MetadataAccessUtil.insertTable(table)
+        } else {
+          val storageEngine = if (n.union) "union" else if (n.stream) "kafka" else "hbase"
+          affectedRows = MetadataAccessUtil.insertTable(
+            new Table(0L /* unused */, db.getId, tableName, storageEngine)
+          )
+        }
 
         // set field and index
+        val fieldTypeList = new util.ArrayList[String]
         val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
-
         val sfb = new SimpleFeatureTypeBuilder
         val schemaName = MetadataUtil.makeSchemaName(tableId)
         sfb.setName(schemaName)

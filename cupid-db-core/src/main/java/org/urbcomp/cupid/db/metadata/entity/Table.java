@@ -38,6 +38,8 @@ public class Table extends AbstractEntity {
 
     private List<Field> fieldList;
 
+    private String fromTables;
+
     public Table(long id, long dbId, String name, String storageEngine) {
         super(id, name);
         this.dbId = dbId;
@@ -66,6 +68,14 @@ public class Table extends AbstractEntity {
 
     public void setFieldList(List<Field> fieldList) {
         this.fieldList = fieldList;
+    }
+
+    public String getFromTables() {
+        return fromTables;
+    }
+
+    public void setFromTables(String fromTables) {
+        this.fromTables = fromTables;
     }
 
     @Override
