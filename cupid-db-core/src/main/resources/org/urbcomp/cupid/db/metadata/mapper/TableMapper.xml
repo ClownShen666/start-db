@@ -39,7 +39,7 @@
         SET name=#{table.name},
         storage_engine = #{table.storageEngine},
         db_id = #{table.dbId},
-        from_tables = #{table.fromtables}
+        from_tables = #{table.fromTables}
         WHERE id = #{table.id}
         and delete_time = 0;
     </update>
