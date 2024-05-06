@@ -50,6 +50,16 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     stmt.executeUpdate(createTableSQL)
   }
 
+  test("test create union table from tables") {
+    val uniqueId = generateUniqueId()
+    val createTableSQL =
+      s"""CREATE UNION TABLE start_db_table_test_%s (
+         |    idx Integer
+         |    ) from table1, table2;""".format(uniqueId).stripMargin
+    val stmt = connect.createStatement()
+    stmt.executeUpdate(createTableSQL)
+  }
+
   test("test create table") {
     val uniqueId = generateUniqueId()
     val createTableSQL = s"""CREATE TABLE start_db_table_test_%s (

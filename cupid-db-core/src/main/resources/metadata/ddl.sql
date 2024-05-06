@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `sys_table`
     `db_id`          INT          NOT NULL,
     `name`           VARCHAR(200) NOT NULL,
     `storage_engine` VARCHAR(200) NOT NULL,
+    `from_tables`    VARCHAR(200),
     `created_date`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `modified_date`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     `delete_time`    BIGINT       NOT NULL DEFAULT 0 COMMENT '删除时间',

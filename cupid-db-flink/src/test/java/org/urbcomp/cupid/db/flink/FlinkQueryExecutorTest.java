@@ -80,7 +80,57 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
-    public void parseSqlTest() throws SQLException {
+    public void unionSelectSqlTest() throws Exception {
+        // // create table
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("create table if not exists table1(idd int);");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("create stream table if not exists table2(idd int);");
+            stmt.executeUpdate("drop table if exists table3");
+            stmt.executeUpdate(
+                "create union table if not exists table3(idd int) from table1, table2;"
+            );
+            stmt.executeUpdate("insert into table1 values(1)");
+            stmt.executeQuery("insert into table2 select idd from table3");
+
+            // read target table in kafka
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+                "select * from table2;"
+            );
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("localhost:9092")
+                .setTopics(getKafkaTopic(tableList.get(0)))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+            DataStream<String> insertStream = env.fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            );
+
+            // test insert result
+            List<String> expected = new ArrayList<>();
+            expected.add("1");
+            checkTable(tableEnv, tableEnv.fromDataStream(insertStream), expected);
+
+            // delete topic
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("drop table if exists table3");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Ignore
+    @Test
+    public void parseSqlTest() {
         // // create table
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
@@ -493,7 +543,7 @@ public class FlinkQueryExecutorTest {
 
             // get topic names
             SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-                "select * from table1 inner join table2;"
+                "select * from table1, table2;"
             );
             List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
                 selectVisitor.getDbTableList()
@@ -679,7 +729,7 @@ public class FlinkQueryExecutorTest {
 
         // get topic names
         SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-            "select * from table1 inner join table2;"
+            "select * from table1, table2;"
         );
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             selectVisitor.getDbTableList()
@@ -781,7 +831,7 @@ public class FlinkQueryExecutorTest {
 
         // get topic names
         SelectFromTableVisitor visitor = new SelectFromTableVisitor(
-            "select * from table1 inner join table2;"
+            "select * from table1, table2;"
         );
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
             visitor.getDbTableList()
