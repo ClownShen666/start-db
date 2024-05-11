@@ -202,6 +202,17 @@ public enum FlinkQueryExecutor {
                         selectVisitor.getAllTables(param);
                         List<String> streamTableList = selectVisitor.getStreamTableList();
                         List<String> dimensionTableList = selectVisitor.getDimensionTableList();
+                        List<Field> fieldList = MetadataAccessUtil.getFields(
+                            param.getUserName(),
+                            param.getDbName(),
+                            tableNameList.get(0)
+                        );
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Field field : fieldList) {
+                            stringBuilder.append(field.getName()).append(",");
+                        }
+                        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+                        sql = sql.replace("*", stringBuilder.toString());
 
                         // get dimension query sql
                         String dimensionSql = sql;
@@ -210,6 +221,15 @@ public enum FlinkQueryExecutor {
                             dimensionSql = dimensionSql.concat(
                                 " union " + sql.replace(unionTable, dimensionTableList.get(i))
                             );
+                        }
+                        if (selectVisitor.isUnionFromPointAndTrajectory()) {
+                            List<String> trajectoryTables = selectVisitor.getTrajectoryTableList();
+                            for (String trajectoryTable : trajectoryTables) {
+                                dimensionSql = dimensionSql.replace(
+                                    trajectoryTable,
+                                    trajectoryTable + "_point"
+                                );
+                            }
                         }
 
                         // get stream query sql

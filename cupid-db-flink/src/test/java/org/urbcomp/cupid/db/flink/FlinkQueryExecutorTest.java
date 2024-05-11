@@ -32,6 +32,8 @@ import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
+import org.urbcomp.cupid.db.model.sample.ModelGenerator;
+import org.urbcomp.cupid.db.model.trajectory.Trajectory;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -81,9 +83,10 @@ public class FlinkQueryExecutorTest {
     @Ignore
     @Test
     public void unionSelectSqlTest() throws Exception {
-        // // create table
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
+
+            // create table
             stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate("create table if not exists table1(idd int);");
             stmt.executeUpdate("drop table if exists table2");
@@ -120,9 +123,63 @@ public class FlinkQueryExecutorTest {
             expected.add("1");
             checkTable(tableEnv, tableEnv.fromDataStream(insertStream), expected);
 
-            // delete topic
+            // drop table
+            stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate("drop table if exists table2");
             stmt.executeUpdate("drop table if exists table3");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Ignore
+    @Test
+    public void unionFromPointAndTrajectoryTest() throws Exception {
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+
+            // create table and insert
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("create table if not exists table1(idd int, tt Trajectory);");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("create stream table if not exists table2(idd int, pp Point);");
+            Trajectory trajectory = ModelGenerator.generateTrajectory();
+            String tGeo = trajectory.toGeoJSON();
+            stmt.execute("INSERT INTO table1 values (1, st_traj_fromGeoJSON(\'" + tGeo + "\'))");
+            stmt.executeUpdate("drop table if exists table3");
+            stmt.executeUpdate(
+                "create union table if not exists table3(idd int, pp Point) from table1, table2;"
+            );
+            stmt.executeUpdate("insert into table2 select * from table3");
+
+            // read target table in kafka
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+                "select * from table2;"
+            );
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("localhost:9092")
+                .setTopics(getKafkaTopic(tableList.get(0)))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+            DataStream<String> insertStream = env.fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            );
+
+            // test insert result
+            checkTableNotNull(tableEnv, tableEnv.fromDataStream(insertStream));
+
+            // drop table
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("drop table if exists table3");
+            stmt.executeUpdate("drop table if exists table1_point");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

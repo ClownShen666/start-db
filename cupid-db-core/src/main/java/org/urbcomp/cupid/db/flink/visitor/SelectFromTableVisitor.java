@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
+import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlBaseVisitor;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlLexer;
 import org.urbcomp.cupid.db.parser.parser.CupidDBSqlParser;
@@ -41,6 +42,10 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     private List<String> dimensionTableList = new ArrayList<>();
 
+    private boolean unionFromPointAndTrajectory = false;
+
+    private List<String> trajectoryTableList = new ArrayList<>();
+
     public List<String> getTableList() {
         return tableList;
     }
@@ -55,6 +60,14 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
     public List<String> getDimensionTableList() {
         return dimensionTableList;
+    }
+
+    public boolean isUnionFromPointAndTrajectory() {
+        return unionFromPointAndTrajectory;
+    }
+
+    public List<String> getTrajectoryTableList() {
+        return trajectoryTableList;
     }
 
     public SelectFromTableVisitor(String sql) {
@@ -112,12 +125,30 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
 
                 // union from tables
                 if (table.getFromTables() != null) {
+                    boolean hasPoint = false;
+                    boolean hasTrajectory = false;
+
                     String[] tableList = table.getFromTables().split(",");
                     for (String tableName1 : tableList) {
                         // skip tables already processed
                         if (historyTables.contains(tableName1)) {
                             continue;
                         }
+
+                        List<Field> fields = MetadataAccessUtil.getFields(
+                            param.getUserName(),
+                            param.getDbName(),
+                            tableName1
+                        );
+                        for (Field field : fields) {
+                            if (field.getType().equals("Point")) {
+                                hasPoint = true;
+                            } else if (field.getType().equals("Trajectory")) {
+                                hasTrajectory = true;
+                                trajectoryTableList.add(tableName1);
+                            }
+                        }
+
                         org.urbcomp.cupid.db.metadata.entity.Table table1 = MetadataAccessUtil
                             .getTable(user, db, tableName1);
                         if (table1.getStorageEngine().equals("kafka")) {
@@ -129,6 +160,10 @@ public class SelectFromTableVisitor extends CupidDBSqlBaseVisitor<Void> {
                         } else {
                             unionTables.add(tableName1);
                         }
+                    }
+
+                    if (hasPoint && hasTrajectory) {
+                        unionFromPointAndTrajectory = true;
                     }
                 }
             } else if (table.getStorageEngine().equals("kafka")) {
