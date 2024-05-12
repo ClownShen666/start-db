@@ -72,6 +72,7 @@ case class ShowCreateTableExecutor(n: SqlShowCreateTable) extends BaseExecutor {
             .toList
           val indexType = index.getIndexType match {
             case "attr" => IndexType.ATTRIBUTE
+            case "grid" => IndexType.GRID
             case _      => IndexType.SPATIAL
           }
 

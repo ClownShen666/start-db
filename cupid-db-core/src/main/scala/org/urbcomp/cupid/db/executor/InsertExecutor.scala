@@ -26,6 +26,7 @@ import org.apache.calcite.sql.{
   SqlUnresolvedFunction
 }
 import org.geotools.data.{DataStoreFinder, Transaction}
+import org.locationtech.geomesa.index.api.GeoMesaFeatureIndex
 import org.locationtech.geomesa.utils.io.WithClose
 import org.urbcomp.cupid.db.config.ExecuteEngine
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
@@ -35,8 +36,8 @@ import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 import org.urbcomp.cupid.db.util.{MetadataUtil, SqlParam}
 import org.urbcomp.cupid.db.utils.SqlLiteralHandler
-import scala.collection.mutable.ArrayBuffer
 
+import scala.collection.mutable.ArrayBuffer
 import java.sql.ResultSet
 import java.util
 

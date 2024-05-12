@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package org.urbcomp.cupid.db.parser.parser;
+package org.urbcomp.cupid.db.parser.parser;// Generated from CupidDBSql.g4 by ANTLR 4.9.2
 
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 

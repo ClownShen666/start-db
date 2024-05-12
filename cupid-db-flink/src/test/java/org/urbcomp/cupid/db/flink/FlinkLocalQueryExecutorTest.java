@@ -17,10 +17,13 @@
 package org.urbcomp.cupid.db.flink;
 
 import org.apache.flink.table.api.Table;
+
 import org.junit.*;
+
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
+
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -29,7 +32,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.getTables;
 import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
@@ -46,53 +48,6 @@ public class FlinkLocalQueryExecutorTest {
         flinkSqlParam.setTestNum(1);
         flinkSqlParam.setLocal(true);
         FlinkSqlParam.CACHE.set(flinkSqlParam);
-    }
-
-    @Ignore
-    @Test
-    public void GridIndexTest() {
-        try (Connection connect = CalciteHelper.createConnection()) {
-            Statement stmt = connect.createStatement();
-            stmt.executeUpdate("drop table if exists table_1");
-            stmt.executeUpdate(
-                "create stream table if not exists table_1(" + "idx int," + "point1 Point)"
-            );
-
-            // get topic
-            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
-                "select * from table_1;"
-            );
-            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                selectVisitor.getDbTableList()
-            );
-            List<String> topicList = new ArrayList<>();
-            topicList.add(getKafkaTopic(tableList.get(0)));
-
-            // produce message
-            List<String> recordList = new ArrayList<>();
-            Random random = new Random();
-
-            double minLongitude = 105.0;
-            double maxLongitude = 110.0;
-            double minLatitude = 28.0;
-            double maxLatitude = 32.20;
-            for (int i = 0; i < 10000; i++) {
-                double longitude = minLongitude + (maxLongitude - minLongitude) * random
-                    .nextDouble();
-                double latitude = minLatitude + (maxLatitude - minLatitude) * random.nextDouble();
-                recordList.add("+I[" + i + ",," + "POINT (" + longitude + " " + latitude + ")]");
-            }
-
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
-            // 5s后再执行查询
-            Thread.sleep(5000);
-            stmt.executeQuery("select * from table_1");
-            stmt.executeUpdate("drop table table_1");
-
-        } catch (SQLException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @Ignore
