@@ -155,8 +155,12 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
               val stmt = connect.createStatement()
 
               // create point table
-              stmt.executeUpdate("drop table if exists " + map._1 + "_point")
-              stmt.executeUpdate("create table if not exists " + map._1 + "_point " + unionColumns)
+              val pointTable = MetadataAccessUtil.getTable(userName, dbName, map._1 + "_point")
+              if (pointTable == null) {
+                stmt.executeUpdate(
+                  "create table if not exists " + map._1 + "_point " + unionColumns
+                )
+              }
 
               // query trajectory table
               val result = stmt.executeQuery((selectSql + map._1).replace(pointFieldName, map._2))
@@ -182,10 +186,12 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
             })
 
             // insert data into point table
-            val connect = CalciteHelper.createConnection()
-            val stmt = connect.createStatement()
-            stmt.executeUpdate(insertSql.toString())
-            connect.close()
+            if (!insertSql.toString().equals("insert into ")) {
+              val connect = CalciteHelper.createConnection()
+              val stmt = connect.createStatement()
+              stmt.executeUpdate(insertSql.toString())
+              connect.close()
+            }
           }
         }
 

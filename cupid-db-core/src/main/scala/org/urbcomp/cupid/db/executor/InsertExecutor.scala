@@ -101,6 +101,7 @@ case class InsertExecutor(n: SqlInsert) extends BaseExecutor {
     }
 
     // insert data
+    var trajectoryFieldName: String = null
     var affectRows = 0
     val params = ExecutorUtil.getDataStoreParams(userName, dbName)
     val dataStore = DataStoreFinder.getDataStore(params)
@@ -129,6 +130,7 @@ case class InsertExecutor(n: SqlInsert) extends BaseExecutor {
               ExecutorUtil.writeRoadSegment(name, sf, rs)
             case traj: Trajectory =>
               ExecutorUtil.writeTrajectory(name, sf, traj)
+              trajectoryFieldName = name
             case _ =>
               sf.setAttribute(name, i.get(x))
           }
@@ -139,6 +141,63 @@ case class InsertExecutor(n: SqlInsert) extends BaseExecutor {
       }
     }
     dataStore.dispose()
+
+    // update point table
+    val pointTableName = tableName + "_point"
+    val pointTable = MetadataAccessUtil.getTable(userName, dbName, pointTableName)
+    if (pointTable != null) {
+      val pointFields = MetadataAccessUtil.getFields(userName, dbName, pointTableName)
+      val fieldSet: util.HashSet[String] = new util.HashSet[String]()
+      var pointFieldName: String = null
+      pointFields.forEach(field => {
+        fieldSet.add(field.getName)
+        if (field.getType.equals("Point")) {
+          pointFieldName = field.getName
+        }
+      })
+      val params = ExecutorUtil.getDataStoreParams(userName, dbName)
+      val dataStore = DataStoreFinder.getDataStore(params)
+      val schemaName = MetadataUtil.makeSchemaName(pointTable.getId)
+      WithClose(dataStore.getFeatureWriterAppend(schemaName, Transaction.AUTO_COMMIT)) { writer =>
+        resultObjs.foreach { insertObj =>
+          val count = insertObj.size()
+          var index = 0
+          for (x <- 0 until count) {
+            if (n.getTargetColumnList == null) {
+              if (fields.get(x).getName.equals(trajectoryFieldName)) {
+                index = x
+              }
+            } else {
+              if (n.getTargetColumnList.get(x).toString.equals(trajectoryFieldName)) {
+                index = x
+              }
+            }
+          }
+          insertObj
+            .get(index)
+            .asInstanceOf[Trajectory]
+            .getGPSPointList
+            .forEach(point => {
+              val sf = writer.next()
+              for (x <- 0 until count) {
+                if (x != index) {
+                  if (n.getTargetColumnList == null && fieldSet.contains(fields.get(x).getName)) {
+                    sf.setAttribute(fields.get(x).getName, insertObj.get(x))
+                  } else if (n.getTargetColumnList != null && fieldSet
+                               .contains(n.getTargetColumnList.get(x).toString)) {
+                    sf.setAttribute(n.getTargetColumnList.get(x).toString, insertObj.get(x))
+                  }
+                } else {
+                  sf.setAttribute(pointFieldName, point)
+                }
+              }
+              writer.write()
+            })
+        }
+      }
+      dataStore.dispose()
+    }
+
     MetadataResult.buildDDLResult(affectRows)
   }
 
