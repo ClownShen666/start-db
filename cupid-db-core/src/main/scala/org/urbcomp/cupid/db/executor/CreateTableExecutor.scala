@@ -20,6 +20,8 @@ import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
+import org.apache.calcite.sql.{SqlIdentifier}
+import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.geotools.data.DataStoreFinder
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder
 import org.locationtech.geomesa.utils.io.WithClose
@@ -41,11 +43,16 @@ import org.urbcomp.cupid.db.transformer.{
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
+import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
+import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
 import java.time.Duration
 import java.util
 import java.util.Properties
 import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
 
@@ -59,7 +66,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
       if (n.ifNotExists) {
         return MetadataResult.buildDDLResult(0)
       } else {
-        throw new IllegalArgumentException("table already exist " + tableName)
+        throw new IllegalArgumentException("table already exist: " + tableName)
       }
     }
 
@@ -67,22 +74,31 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     MetadataAccessUtil.withRollback(
       _ => {
         // create metadata table
-        val storageEngine = if (n.union) "union" else if (n.stream) "kafka" else "hbase"
-        affectedRows = MetadataAccessUtil.insertTable(
-          new Table(0L /* unused */, db.getId, tableName, storageEngine)
-        )
-
-        val fieldTypeList = new util.ArrayList[String]
+        val sql = SqlParam.CACHE.get().getSql
+        var fromTableList: Array[String] = Array.empty[String]
+        if (n.union && sql.contains("from")) {
+          fromTableList = sql.split("from")(1).split(";")(0).split(",").map(_.trim)
+          val fromTables = fromTableList.mkString(",")
+          val table = new Table(0L /* unused */, db.getId, tableName, "union")
+          table.setFromTables(fromTables)
+          affectedRows = MetadataAccessUtil.insertTable(table)
+        } else {
+          val storageEngine = if (n.union) "union" else if (n.stream) "kafka" else "hbase"
+          affectedRows = MetadataAccessUtil.insertTable(
+            new Table(0L /* unused */, db.getId, tableName, storageEngine)
+          )
+        }
 
         // set field and index
+        val fieldTypeList = new util.ArrayList[String]
         val createdTable = MetadataAccessUtil.getTable(userName, dbName, tableName)
         val tableId = createdTable.getId
-
         val sfb = new SimpleFeatureTypeBuilder
         val schemaName = MetadataUtil.makeSchemaName(tableId)
         sfb.setName(schemaName)
 
         val fieldMap = collection.mutable.Map[String, Field]()
+        var pointFieldName = ""
         n.columnList.forEach(column => {
           val node = column.asInstanceOf[SqlColumnDeclaration]
           val name = node.name.names.get(0)
@@ -92,6 +108,9 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
             sfb.add(name, classType, 4326)
           } else {
             sfb.add(name, classType)
+          }
+          if (DataTypeUtils.isPoint(dataType)) {
+            pointFieldName = name
           }
           val field = new Field(0, tableId, name, dataType, 0)
           fieldTypeList.add(dataType)
@@ -103,6 +122,82 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         checkIndexNames(indexes)
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
         val fieldList = MetadataAccessUtil.getFields(userName, dbName, tableName)
+
+        // union from point and trajectory tables
+        // currently assume a point/trajectory table only has one point/trajectory field
+        if (fromTableList.nonEmpty) {
+          var hasPoint = false
+          var pointFieldName = ""
+          val trajectoryMap = new scala.collection.mutable.HashMap[String, String]
+          fromTableList.foreach(fromTableName => {
+            val fields = MetadataAccessUtil.getFields(userName, dbName, fromTableName)
+            fields.forEach(field => {
+              if (field.getType.equals("Point")) {
+                hasPoint = true
+                pointFieldName = field.getName
+              } else if (field.getType.equals("Trajectory")) {
+                trajectoryMap += fromTableName -> field.getName
+              }
+            })
+          })
+
+          // create point table from trajectory table in hbase
+          if (hasPoint && trajectoryMap.nonEmpty) {
+            val unionFields = new mutable.StringBuilder()
+            val unionColumns = new mutable.StringBuilder("(")
+            val fieldList = new ListBuffer[String]
+            n.columnList.forEach(column => {
+              val node = column.asInstanceOf[SqlColumnDeclaration]
+              unionFields.append(node.name.names.get(0)).append(",")
+              unionColumns
+                .append(node.name.names.get(0))
+                .append(" ")
+                .append(node.dataType.getTypeName.names.get(0))
+                .append(",")
+              fieldList.append(node.name.names.get(0))
+            })
+            unionFields.deleteCharAt(unionFields.length - 1)
+            unionColumns.deleteCharAt(unionColumns.length - 1).append(")")
+            val selectSql = new mutable.StringBuilder("select " + unionFields + " from ")
+            val insertSql = new mutable.StringBuilder("insert into ")
+            trajectoryMap.foreach(map => {
+              val connect = CalciteHelper.createConnection()
+              val stmt = connect.createStatement()
+
+              // create point table
+              stmt.executeUpdate("drop table if exists " + map._1 + "_point")
+              stmt.executeUpdate("create table if not exists " + map._1 + "_point " + unionColumns)
+
+              // query trajectory table
+              val result = stmt.executeQuery((selectSql + map._1).replace(pointFieldName, map._2))
+              connect.close()
+
+              // get insert sql
+              while (result.next()) {
+                val trajectory = result.getObject(map._2, classOf[Trajectory])
+                insertSql.append(map._1 + "_point values ")
+                trajectory.getGPSPointList.forEach(point => {
+                  insertSql.append("(")
+                  fieldList.foreach(field => {
+                    if (field.equals(pointFieldName)) {
+                      insertSql.append("st_pointFromWKT(\'" + point + "\'),")
+                    } else {
+                      insertSql.append(result.getObject(field) + ",")
+                    }
+                  })
+                  insertSql.deleteCharAt(insertSql.length - 1).append("),")
+                })
+                insertSql.deleteCharAt(insertSql.length - 1)
+              }
+            })
+
+            // insert data into point table
+            val connect = CalciteHelper.createConnection()
+            val stmt = connect.createStatement()
+            stmt.executeUpdate(insertSql.toString())
+            connect.close()
+          }
+        }
 
         // create stream table(topic) in kafka
         if (n.union || n.stream) {

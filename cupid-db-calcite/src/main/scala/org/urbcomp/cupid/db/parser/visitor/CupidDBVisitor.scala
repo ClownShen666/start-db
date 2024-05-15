@@ -668,6 +668,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
     val ifNotExists = null != ctx.T_EXISTS()
     val union = null != ctx.T_UNION()
     val stream = null != ctx.T_STREAM()
+    val from = if (null != ctx.fromClause()) visitFromClause(ctx.fromClause()) else null
     val query = if (null != ctx.create_table_definition().selectStmt()) {
       visitSelectStmt(ctx.create_table_definition().selectStmt())
     } else null
@@ -739,6 +740,7 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
       ifNotExists,
       stream,
       union,
+      from,
       tableName,
       new SqlNodeList(columnList, pos),
       new SqlNodeList(indexList, pos),
