@@ -20,11 +20,8 @@ import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.calcite.sql.{SqlIdentifier}
-import org.apache.calcite.sql.ddl.SqlColumnDeclaration
 import org.geotools.data.DataStoreFinder
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder
-import org.locationtech.geomesa.utils.io.WithClose
 import org.urbcomp.cupid.db.config.ExecuteEngine
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.flink.cache.GlobalCache
@@ -43,8 +40,7 @@ import org.urbcomp.cupid.db.transformer.{
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
-import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
-import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
 import java.time.Duration

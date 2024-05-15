@@ -51,7 +51,6 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.metadata.entity.Index;
-import org.urbcomp.cupid.db.model.data.DataExportType;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.udf.AbstractUdf;
 import org.urbcomp.cupid.db.udf.DataEngine$;
@@ -62,8 +61,6 @@ import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
