@@ -106,16 +106,12 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
 
         // create stream table(topic) in kafka
         if (n.union || n.stream) {
-          if (n.stream) {
-            val updateSql = SqlParam.CACHE
-              .get()
-              .getSql
-              .replace("stream", "")
-              .replace("STREAM", "")
-              .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
-            executeUpdate(removeGridIndexClause(updateSql))
-          }
-
+          val updateSql = SqlParam.CACHE
+            .get()
+            .getSql
+            .replace("stream", "")
+            .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
+          executeUpdate(removeGridIndexClause(updateSql))
           val userDbTableKey = MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
           KafkaListenerThread.threadRunningMap.put(userDbTableKey, true)
 
@@ -259,10 +255,13 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
   private def executeUpdate[R](updateSql: String) = {
     val connection = CalciteHelper.createConnection()
     val statement = connection.createStatement()
+    val prevEngine = SqlParam.CACHE.get().getExecuteEngine
     // force use calcite engine when run select for insert
     try {
+      SqlParam.CACHE.get().setExecuteEngine(ExecuteEngine.CALCITE)
       statement.executeUpdate(updateSql)
     } finally {
+      SqlParam.CACHE.get().setExecuteEngine(prevEngine)
       statement.close()
       connection.close()
     }
