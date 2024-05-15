@@ -197,12 +197,16 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
 
         // create stream table(topic) in kafka
         if (n.union || n.stream) {
-          val updateSql = SqlParam.CACHE
-            .get()
-            .getSql
-            .replace("stream", "")
-            .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
-          executeUpdate(removeGridIndexClause(updateSql))
+          // create batch table corresponding to the stream table
+          if (n.stream) {
+            val updateSql = SqlParam.CACHE
+              .get()
+              .getSql
+              .replace("stream", "")
+              .replace("STREAM", "")
+              .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
+            executeUpdate(removeGridIndexClause(updateSql))
+          }
           val userDbTableKey = MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
           KafkaListenerThread.threadRunningMap.put(userDbTableKey, true)
 

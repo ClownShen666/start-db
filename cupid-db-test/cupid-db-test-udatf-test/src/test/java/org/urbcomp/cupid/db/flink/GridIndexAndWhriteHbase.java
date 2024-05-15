@@ -23,7 +23,7 @@ import org.locationtech.jts.io.ParseException;
 import org.urbcomp.cupid.db.flink.cache.GlobalCache;
 import org.urbcomp.cupid.db.flink.index.GridIndex;
 import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter;
-import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
+import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.entity.Table;
 import org.urbcomp.cupid.db.util.MetadataUtil;
