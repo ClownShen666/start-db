@@ -151,10 +151,8 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
                 })
                 running = KafkaListenerThread.threadRunningMap.get(userDbTableKey)
               }
-
               consumer.close()
               jedis.close()
-
             })
             kafkaListener.setName(userDbTableKey)
             KafkaListenerThread.getInstance().submit(kafkaListener)
