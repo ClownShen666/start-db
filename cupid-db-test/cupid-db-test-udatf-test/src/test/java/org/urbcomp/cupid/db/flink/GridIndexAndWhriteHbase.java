@@ -19,17 +19,15 @@ package org.urbcomp.cupid.db.flink;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.locationtech.jts.io.ParseException;
 import org.urbcomp.cupid.db.flink.cache.GlobalCache;
 import org.urbcomp.cupid.db.flink.index.GridIndex;
 import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter;
-import org.urbcomp.cupid.db.flink.visitor.*;
+import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.entity.Table;
 import org.urbcomp.cupid.db.util.MetadataUtil;
 import redis.clients.jedis.Jedis;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,7 +45,7 @@ public class GridIndexAndWhriteHbase extends AbstractFlinkTest {
 
     @Ignore
     @Test
-    public void streamDataWriteToHbaseTest() throws IOException, ParseException {
+    public void streamDataWriteToHbaseTest() {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
             stmt.executeUpdate("drop table if exists table_2");
