@@ -44,6 +44,7 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
     }
 
     val affectedRows = MetadataAccessUtil.dropTable(userName, dbName, tableName)
+    MetadataAccessUtil.dropTable(userName, dbName, tableName + "_point")
 
     // TODO transform start db type
     MetadataResult.buildDDLResult(affectedRows.toInt)

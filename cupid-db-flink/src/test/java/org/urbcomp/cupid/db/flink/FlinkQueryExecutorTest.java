@@ -180,7 +180,61 @@ public class FlinkQueryExecutorTest {
             stmt.executeUpdate("drop table if exists table1");
             stmt.executeUpdate("drop table if exists table2");
             stmt.executeUpdate("drop table if exists table3");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Ignore
+    @Test
+    public void pointTableUpdateTest() throws Exception {
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+
+            // create table and insert
             stmt.executeUpdate("drop table if exists table1_point");
+            stmt.executeUpdate("create table if not exists table1_point(idd int, pp Point);");
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("create table if not exists table1(idd int, tt Trajectory);");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("create stream table if not exists table2(idd int, pp Point);");
+            Trajectory trajectory = ModelGenerator.generateTrajectory();
+            String tGeo = trajectory.toGeoJSON();
+            stmt.execute("INSERT INTO table1 values (1, st_traj_fromGeoJSON(\'" + tGeo + "\'))");
+            stmt.executeUpdate("drop table if exists table3");
+            stmt.executeUpdate(
+                "create union table if not exists table3(idd int, pp Point) from table1, table2;"
+            );
+
+            stmt.executeUpdate("insert into table2 select * from table3");
+
+            // read target table in kafka
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+                "select * from table2;"
+            );
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("localhost:9092")
+                .setTopics(getKafkaTopic(tableList.get(0)))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+            DataStream<String> insertStream = env.fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            );
+
+            // test insert result
+            checkTableNotNull(tableEnv, tableEnv.fromDataStream(insertStream));
+
+            // drop table
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("drop table if exists table3");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
