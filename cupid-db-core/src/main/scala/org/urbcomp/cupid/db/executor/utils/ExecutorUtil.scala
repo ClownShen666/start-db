@@ -17,13 +17,13 @@
 package org.urbcomp.cupid.db.executor.utils
 
 import org.apache.calcite.sql.SqlIdentifier
+
 import org.locationtech.jts.geom.LineString
-import org.opengis.feature.simple.SimpleFeature
+import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.urbcomp.cupid.db.common.{ConfigProvider, ConfigurationConstants}
-import org.urbcomp.cupid.db.config.DynamicConfig
+
 import org.urbcomp.cupid.db.model.roadnetwork.RoadSegment
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
-import org.urbcomp.cupid.db.spark.SparkQueryExecutor.log
 import org.urbcomp.cupid.db.util.{GeoFunctions, SqlParam, WKTUtils}
 
 import java.util
@@ -31,15 +31,17 @@ import scala.collection.JavaConverters.asScalaBufferConverter
 
 /**
   * universal methods for executors
+  *
   * @author Wang Bohong
   * */
 object ExecutorUtil {
 
   /**
     * write road segment instance
+    *
     * @param name field name
-    * @param sf simple feature
-    * @param rs road segment instance
+    * @param sf   simple feature
+    * @param rs   road segment instance
     */
   def writeRoadSegment(name: String, sf: SimpleFeature, rs: RoadSegment): Unit = {
     val item = rs.getPoints.asScala
@@ -56,8 +58,9 @@ object ExecutorUtil {
 
   /**
     * write trajectory instance
+    *
     * @param name field name
-    * @param sf simple feature
+    * @param sf   simple feature
     * @param traj trajectory instance
     */
   def writeTrajectory(name: String, sf: SimpleFeature, traj: Trajectory): Unit = {

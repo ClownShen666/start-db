@@ -79,6 +79,8 @@ public class SqlIndexDeclaration extends SqlCall {
             case ATTRIBUTE:
                 writer.keyword("ATTRIBUTE");
                 break;
+            case GRID:
+                writer.keyword("GRID");
             default:
                 throw new AssertionError("unexpected: " + indexType);
         }

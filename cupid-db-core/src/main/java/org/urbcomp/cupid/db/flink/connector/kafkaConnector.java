@@ -20,7 +20,9 @@ import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter;
 import org.urbcomp.cupid.db.util.MetadataUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -39,6 +41,23 @@ public class kafkaConnector {
         String userName = SqlParam.CACHE.get().getUserName();
         String dbName = dbTableName.split("\\.")[0];
         return MetadataUtil.makeCatalog(userName, dbName);
+    }
+
+    public static String getHbaseKafkaGroup(String userName, String dbName) {
+        return KafkaToHBaseWriter.HBASE_KAFKA_GROUP_SUFFIX + MetadataUtil.makeCatalog(
+            userName,
+            dbName
+        );
+    }
+
+    public static Properties getKafkaGeneralProps(String groupId) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("group.id", groupId);
+        props.put("key.deserializer", StringDeserializer.class.getName());
+        props.put("value.deserializer", StringDeserializer.class.getName());
+        props.put("auto.offset.reset", "earliest");
+        return props;
     }
 
     public static void createKafkaTopic(String ip, String topicName) {
@@ -79,7 +98,6 @@ public class kafkaConnector {
             );
             try {
                 RecordMetadata metadata = (RecordMetadata) producer.send(record).get();
-                System.out.println(metadata.offset());
             } catch (Exception e) {
                 e.printStackTrace();
             }

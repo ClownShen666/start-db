@@ -41,6 +41,7 @@ import org.locationtech.jts.geom.*;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.flink.cache.GlobalCache;
 import org.urbcomp.cupid.db.flink.index.GridIndex;
+import org.urbcomp.cupid.db.flink.kafka.ThreadLocalCleaner;
 import org.urbcomp.cupid.db.flink.processfunction.JoinProcess;
 import org.urbcomp.cupid.db.flink.visitor.*;
 import org.urbcomp.cupid.db.flink.serializer.StringToRow;
@@ -49,22 +50,22 @@ import org.urbcomp.cupid.db.metadata.CalciteHelper;
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
+import org.urbcomp.cupid.db.metadata.entity.Index;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.udf.AbstractUdf;
 import org.urbcomp.cupid.db.udf.DataEngine$;
 import org.urbcomp.cupid.db.udf.UdfFactory;
+import org.urbcomp.cupid.db.util.*;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
 
 import org.slf4j.Logger;
-import org.urbcomp.cupid.db.util.LogUtil;
 import scala.collection.JavaConverters;
 
 public enum FlinkQueryExecutor {
@@ -443,16 +444,19 @@ public enum FlinkQueryExecutor {
             String topicName = getKafkaTopic(tableList.get(i));
             String groupId = getKafkaGroup(dbTableNameList.get(i));
             KafkaSource<String> kafkaSource;
-            // todo:
-            if ("table_withGridIndex".equals(tableNameList.get(i))) {
+            boolean isGridIndex = isGridIndex(param, tableNameList.get(i));
+            String userDbTableKey = MetadataUtil.combineUserDbTableKey(
+                param.getUserName(),
+                param.getDbName(),
+                tableList.get(i).getName()
+            );                // 重庆市范围
+
+            if (isGridIndex) {
                 Map<TopicPartition, Long> offsets = new HashMap<>();
                 // now default only 1 partition
                 TopicPartition partition = new TopicPartition(topicName, 0);
-                offsets.put(
-                    partition,
-                    GridIndex.tableQueryTimeOffset.get(tableNameList.get(i).toLowerCase())
-                );
-                System.out.println("偏移量" + offsets.get(partition));
+                offsets.put(partition, GridIndex.tableQueryTimeOffset.get(userDbTableKey));
+
                 kafkaSource = KafkaSource.<String>builder()
                     .setBootstrapServers(param.getBootstrapServers())
                     .setTopics(topicName)
@@ -481,22 +485,23 @@ public enum FlinkQueryExecutor {
             StringToRow stringToRow = new StringToRow(fieldNameList, fieldTypeList);
 
             List<String> filteredData = new ArrayList<>();
-            // 模拟使用网格索引并设置网格参数和查询参数
-            if ("table_withGridIndex".equals(tableNameList.get(i))) {
-                // 重庆市范围
-                GridIndex gridIndex = new GridIndex(105.0, 110.0, 28.108, 32.20, 5000);
+
+            if (isGridIndex) {
+
+                GridIndex gridIndex = new GridIndex(
+                    105.0,
+                    110.0,
+                    28.108,
+                    32.20,
+                    5000,
+                    GlobalCache.pool.getResource()
+                );
                 filteredData = gridIndex.querySpatialObjects(
                     107.0,
                     30.108,
                     109.0,
                     31.20,
-                    tableNameList.get(i).toLowerCase()
-                );
-                // todo:delete
-                AtomicInteger count = new AtomicInteger();
-                GlobalCache.grid.asMap().forEach((k, v) -> count.addAndGet(v.size()));
-                System.out.println(
-                    "过滤比例：" + (double) (count.get() - filteredData.size()) / count.get()
+                    userDbTableKey
                 );
             }
             DataStream<String> source = getEnv().fromSource(
@@ -506,16 +511,33 @@ public enum FlinkQueryExecutor {
             );
 
             DataStream<Row> rowSource;
-            if ("table_withGridIndex".equals(tableNameList.get(i))) {
+            if (isGridIndex) {
                 rowSource = source.union(getEnv().fromCollection(filteredData))
                     .map(stringToRow)
                     .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
-            } else rowSource = source.map(stringToRow)
-                .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+            } else {
+                rowSource = source.map(stringToRow)
+                    .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+            }
 
             // create sourceTable in tableEnv
             getTableEnv().createTemporaryView(tableNameList.get(i), rowSource);
         }
+    }
+
+    public static boolean isGridIndex(FlinkSqlParam param, String tableName) {
+        boolean isGridIndex = false;
+        for (Index index : MetadataAccessUtil.getIndexes(
+            param.getUserName(),
+            param.getDbName(),
+            tableName
+        )) {
+            if ("grid".equals(index.getIndexType())) {
+                isGridIndex = true;
+                break;
+            }
+        }
+        return isGridIndex;
     }
 
     public void checkInsert(
@@ -819,7 +841,7 @@ public enum FlinkQueryExecutor {
                     );
                     logger.info("Flink registers udf: " + udf.getKey());
                 }
-                isRegistered = true; // 将标记设为已运行
+                isRegistered = true;
 
             }
         }

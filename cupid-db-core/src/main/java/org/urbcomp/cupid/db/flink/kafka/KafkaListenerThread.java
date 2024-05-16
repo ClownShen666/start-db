@@ -14,13 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.urbcomp.cupid.db.flink;
+package org.urbcomp.cupid.db.flink.kafka;
 
 import java.util.concurrent.*;
 
 public class KafkaListenerThread {
     private static volatile ThreadPoolExecutor instance;
     public final static ConcurrentMap<String, Boolean> threadRunningMap = new ConcurrentHashMap<>();
+
+    public static void endKafkaListening(String userDbTableKey) {
+        threadRunningMap.put(userDbTableKey, false);
+    }
 
     private KafkaListenerThread() {}
 

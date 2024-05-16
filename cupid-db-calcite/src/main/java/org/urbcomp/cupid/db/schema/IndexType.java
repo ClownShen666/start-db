@@ -27,5 +27,6 @@ package org.urbcomp.cupid.db.schema;
  */
 public enum IndexType {
     SPATIAL,
-    ATTRIBUTE;
+    ATTRIBUTE,
+    GRID
 }

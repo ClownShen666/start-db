@@ -705,9 +705,9 @@ class CupidDBVisitor(user: String, db: String) extends CupidDBSqlBaseVisitor[Any
           var indexType: IndexType = null
           if (i.T_SPATIAL() != null) {
             indexType = IndexType.SPATIAL
-          } else {
+          } else if (i.T_ATTRIBUTE() != null) {
             indexType = IndexType.ATTRIBUTE
-          }
+          } else indexType = IndexType.GRID
 
           var indexName: SqlIdentifier = null
           if (i.ident() != null) {

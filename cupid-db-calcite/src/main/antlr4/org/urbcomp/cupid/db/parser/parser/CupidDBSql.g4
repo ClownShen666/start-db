@@ -101,7 +101,7 @@ create_table_columns :
 create_table_columns_item :
        column_name dtype dtype_attr* create_table_column_inline_cons*
      | (T_CONSTRAINT qident)? create_table_column_cons
-     | (T_SPATIAL|T_ATTRIBUTE) T_INDEX ident? key_list index_type_decl?
+     | (T_SPATIAL|T_ATTRIBUTE|T_GRID) T_INDEX ident? key_list index_type_decl?
      ;
 
 key_list:
@@ -1198,6 +1198,7 @@ T_GLOBAL          : G L O B A L ;
 T_GO              : G O ;
 T_GRANT           : G R A N T ;
 T_GRANTS          : G R A N T S ;
+T_GRID            : G R I D ;
 T_GROUP           : G R O U P ;
 T_HANDLER         : H A N D L E R ;
 T_HASH            : H A S H ;

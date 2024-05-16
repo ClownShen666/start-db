@@ -16,23 +16,32 @@
  */
 package org.urbcomp.cupid.db.flink.index;
 
+import lombok.Data;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.urbcomp.cupid.db.flink.cache.GlobalCache;
+import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter;
+import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
+import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.util.GeoFunctions;
+import org.urbcomp.cupid.db.util.MetadataUtil;
+import org.urbcomp.cupid.db.util.UserDbTable;
+import redis.clients.jedis.Jedis;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Data
 public class GridIndex {
     public GridIndex(
         double minLongitude,
         double maxLongitude,
         double minLatitude,
         double maxLatitude,
-        int gridSize
+        int gridSize,
+        Jedis jedis
     ) {
         this.minLongitude = minLongitude;
         // 经度范围
@@ -47,6 +56,7 @@ public class GridIndex {
         )) / gridSize);
         this.midLatitude = (int) ((minLatitude + maxLatitude) / 2);
         this.midLongitude = (int) ((minLongitude + maxLongitude) / 2);
+        this.jedis = jedis;
     }
 
     public static final ConcurrentMap<String, Long> tableQueryTimeOffset =
@@ -57,6 +67,8 @@ public class GridIndex {
     private int gridSize;
     private int midLatitude;
     private int midLongitude;
+
+    private Jedis jedis;
 
     public List<String> getFieldTypeList() {
         return fieldTypeList;
@@ -69,8 +81,8 @@ public class GridIndex {
     private int rows;
     private List<String> fieldTypeList;
 
-    private void updateQueryTimeOffset(String tableName, long offset) {
-        tableQueryTimeOffset.put(tableName.toLowerCase(), offset);
+    private void updateQueryTimeOffset(String userDbTableKey, long offset) {
+        tableQueryTimeOffset.put(userDbTableKey, offset);
     }
 
     public Point getPointFromRowStr(String rowStr, List<String> fieldTypeList)
@@ -84,12 +96,12 @@ public class GridIndex {
                 return (Point) reader.read(columnList[i]);
             }
         }
-        return null;
+        throw new IllegalArgumentException("Invalid index no fields");
 
     }
 
     // 计算空间对象所在网格的编号
-    private String calculateGridId(Point point, String tableName) {
+    private String calculateGridId(Point point, String userDbTableKey) {
 
         // 将经纬度映射到网格中，然后根据网格大小计算网格编号
         int row = (int) GeoFunctions.getDistanceInM(
@@ -105,23 +117,63 @@ public class GridIndex {
             midLongitude
         ) / gridSize;
         // 二维坐标转换为唯一编号
-        return tableName + (row * rows + col);
+        return userDbTableKey + (row * rows + col);
     }
 
-    public void addSpatialObject(String rowStr, String tableName, long offset)
+    public void addSpatialObject(String rowStr, String userDbTableKey, long offset, long timestamp)
         throws ParseException {
-        updateQueryTimeOffset(tableName, offset);
+
+        updateQueryTimeOffset(userDbTableKey, offset);
 
         Point obj = getPointFromRowStr(rowStr, fieldTypeList);
         if (obj == null) return;
         // 计算对象所在网格的编号
-        String gridId = calculateGridId(obj, tableName);
-
+        String gridId = calculateGridId(obj, userDbTableKey);
         // 将对象加入对应网格
-        if (GlobalCache.grid.getIfPresent(gridId) == null) {
-            GlobalCache.grid.put(gridId, new ArrayList<>());
-        }
-        Objects.requireNonNull(GlobalCache.grid.getIfPresent(gridId)).add(rowStr);
+        if (!jedis.exists(gridId)) {
+            jedis.rpush(gridId, rowStr);
+            jedis.expire(gridId, GlobalCache.KAFKA_DATA_TTL);
+        } else jedis.rpush(gridId, rowStr);
+        // 保存第一条数据的时间
+        if (!GlobalCache.girdIdLatestTimestamp.asMap().containsKey(gridId))
+            GlobalCache.girdIdLatestTimestamp.put(gridId, timestamp);
+
+        Optional<Long> optionalTimestamp = Optional.ofNullable(
+            GlobalCache.girdIdLatestTimestamp.getIfPresent(gridId)
+        );
+        optionalTimestamp.ifPresent(val -> {
+            if ((timestamp - val) > GlobalCache.KAFKA_DATA_TTL
+                || jedis.objectIdletime(gridId) >= GlobalCache.KAFKA_DATA_TTL) {
+                List<String> strRowList = jedis.lrange(userDbTableKey, 0, -1);
+
+                UserDbTable userDbTable = MetadataUtil.splitUserDbTable(userDbTableKey);
+                MetadataAccessorFromDb accessor = new MetadataAccessorFromDb();
+                List<Field> fieldList = accessor.getFields(
+                    userDbTable.getUsername(),
+                    userDbTable.getDbName(),
+                    userDbTable.getTableName()
+                );
+
+                List<String> fieldTypeList = new ArrayList<>();
+                List<String> fieldNameList = new ArrayList<>();
+                for (Field field : fieldList) {
+                    fieldTypeList.add(field.getType());
+                    fieldNameList.add(field.getName());
+                }
+                // Write into geomesa-hbase
+                KafkaToHBaseWriter.write(
+                    userDbTable.getUsername(),
+                    userDbTable.getDbName(),
+                    userDbTable.getTableName(),
+                    strRowList,
+                    fieldNameList,
+                    fieldTypeList
+                );
+                // delete
+                jedis.del(gridId);
+            }
+        });
+
     }
 
     // 根据空间范围查询网格内的空间对象
@@ -130,15 +182,18 @@ public class GridIndex {
         double y1,
         double x2,
         double y2,
-        String tableName
+        String userDbTableKey
     ) {
-        Set<String> gridIds = getIntersectedGridIds(x1, y1, x2, y2, tableName);
+        Set<String> gridIds = getIntersectedGridIds(x1, y1, x2, y2, userDbTableKey);
         List<String> result = new ArrayList<>();
         // 遍历与查询范围相交的网格，将其中的空间对象加入结果列表
         for (String gridId : gridIds) {
-            if (GlobalCache.grid.getIfPresent(gridId) != null) {
-                result.addAll(Objects.requireNonNull(GlobalCache.grid.getIfPresent(gridId)));
+            if (jedis.exists(gridId)) {
+                result.addAll(jedis.lrange(gridId, 0, -1));
             }
+            // if (GlobalCache.grid.getIfPresent(gridId) != null) {
+            // result.addAll(Objects.requireNonNull(GlobalCache.grid.getIfPresent(gridId)));
+            // }
         }
         return result;
     }
@@ -149,7 +204,7 @@ public class GridIndex {
         double y1,
         double x2,
         double y2,
-        String tableName
+        String userDbTableKey
     ) {
         Set<String> intersectedGridIds = new HashSet<>();
         // 根据查询范围的实际边界计算相交的网格编号
@@ -172,7 +227,7 @@ public class GridIndex {
         // 遍历相交的网格范围，计算网格编号
         for (int i = startRow; i <= endRow; i++) {
             for (int j = startCol; j <= endCol; j++) {
-                intersectedGridIds.add(tableName + (i * rows + j));
+                intersectedGridIds.add(userDbTableKey + (i * rows + j));
             }
         }
         return intersectedGridIds;

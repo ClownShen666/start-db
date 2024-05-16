@@ -15,19 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.executor
-import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
-import org.urbcomp.cupid.db.flink.KafkaListenerThread
-import org.urbcomp.cupid.db.flink.index.GridIndex
 
-import java.time.Duration
-import java.util
-import java.util.Properties
-import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.calcite.sql.{SqlIdentifier}
+import org.apache.calcite.sql.SqlIdentifier
 import org.apache.calcite.sql.ddl.SqlColumnDeclaration
+import org.apache.kafka.clients.consumer.{Consumer, ConsumerRecords, KafkaConsumer}
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.geotools.data.DataStoreFinder
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder
+import org.urbcomp.cupid.db.config.ExecuteEngine
 import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
+import org.urbcomp.cupid.db.flink.cache.GlobalCache
+import org.urbcomp.cupid.db.flink.connector.kafkaConnector
+import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.flink.index.GridIndex
+import org.urbcomp.cupid.db.flink.kafka.KafkaListenerThread
+import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.{CalciteHelper, MetadataAccessUtil}
 import org.urbcomp.cupid.db.metadata.entity.{Field, Index, Table}
@@ -38,9 +40,12 @@ import org.urbcomp.cupid.db.transformer.{
   TrajectoryAndFeatureTransformer
 }
 import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
-import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{createKafkaTopic, getKafkaTopic}
+
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
+import java.time.Duration
+import java.util
+import java.util.Properties
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -112,6 +117,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         val indexes = getIndexes(tableId, fieldMap.toMap, n)
         checkIndexNames(indexes)
         indexes.foreach(index => MetadataAccessUtil.insertIndex(index))
+        val fieldList = MetadataAccessUtil.getFields(userName, dbName, tableName)
 
         // union from point and trajectory tables
         // currently assume a point/trajectory table only has one point/trajectory field
@@ -191,42 +197,95 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
 
         // create stream table(topic) in kafka
         if (n.union || n.stream) {
+          // create batch table corresponding to the stream table
+          if (n.stream) {
+            val updateSql = SqlParam.CACHE
+              .get()
+              .getSql
+              .replace("stream", "")
+              .replace("STREAM", "")
+              .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
+            executeUpdate(removeGridIndexClause(updateSql))
+          }
+          val userDbTableKey = MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
+          KafkaListenerThread.threadRunningMap.put(userDbTableKey, true)
+
           createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
-          val minLongitude = 105.0
-          val maxLongitude = 110.0
-          val minLatitude = 28.108
-          val maxLatitude = 32.20
+          if (n.stream && isGridIndex(indexes)) {
+            val minLongitude = 105.0
+            val maxLongitude = 110.0
+            val minLatitude = 28.108
+            val maxLatitude = 32.20
+            val kafkaListener = new Thread(() => {
+              val props: Properties = new Properties
+              props.put("bootstrap.servers", "localhost:9092")
+              props.put("group.id", KafkaToHBaseWriter.HBASE_KAFKA_GROUP_SUFFIX)
+              props.put("key.deserializer", classOf[StringDeserializer].getName)
+              props.put("value.deserializer", classOf[StringDeserializer].getName)
+              props.put("auto.offset.reset", "earliest")
+              val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+              consumer.subscribe(java.util.Collections.singletonList(getKafkaTopic(createdTable)))
 
-          val kafkaListener = new Thread(() => {
-            val props: Properties = new Properties
-            props.put("bootstrap.servers", "localhost:9092")
-            props.put("group.id", "test-consumer-group")
-            props.put("key.deserializer", classOf[StringDeserializer].getName)
-            props.put("value.deserializer", classOf[StringDeserializer].getName)
-            props.put("auto.offset.reset", "earliest")
-            val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+              var running = true
+              val jedis = GlobalCache.pool.getResource
+              val gridIndex =
+                new GridIndex(minLongitude, maxLongitude, minLatitude, maxLatitude, 5000, jedis)
+              gridIndex.setFieldTypeList(fieldTypeList)
+              while (running) {
+                val records: ConsumerRecords[String, String] =
+                  consumer.poll(Duration.ofMillis(1000))
+                records.forEach(record => {
+                  gridIndex
+                    .addSpatialObject(
+                      record.value(),
+                      userDbTableKey,
+                      record.offset(),
+                      record.timestamp()
+                    )
 
-            consumer.subscribe(java.util.Collections.singletonList(getKafkaTopic(createdTable)))
+                })
+                running = KafkaListenerThread.threadRunningMap.get(userDbTableKey)
+              }
+              consumer.close()
+              jedis.close()
+            })
+            kafkaListener.setName(userDbTableKey)
+            KafkaListenerThread.getInstance().submit(kafkaListener)
+          }
 
-            var running = true
-            val gridIndex =
-              new GridIndex(minLongitude, maxLongitude, minLatitude, maxLatitude, 5000)
-            KafkaListenerThread.threadRunningMap.put(tableName, true)
-            gridIndex.setFieldTypeList(fieldTypeList)
+          if (n.stream && !isGridIndex(indexes)) {
+            val kafkaListener = new Thread(() => {
 
-            while (running) {
-              val records: ConsumerRecords[String, String] = consumer.poll(Duration.ofMillis(1000))
-              records.forEach(record => {
-                gridIndex
-                  .addSpatialObject(record.value(), tableName, record.offset())
-              })
-              running = KafkaListenerThread.threadRunningMap.get(tableName)
-            }
-            consumer.close()
+              val props: Properties = kafkaConnector
+                .getKafkaGeneralProps(kafkaConnector.getHbaseKafkaGroup(userName, dbName))
+              var running = true
+              val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+              consumer.subscribe(
+                java.util.Collections
+                  .singletonList(
+                    getKafkaTopic(MetadataAccessUtil.getTable(userName, dbName, tableName))
+                  )
+              )
+              while (running) {
+                val records: ConsumerRecords[String, String] =
+                  consumer.poll(Duration.ofMillis(1000))
+                KafkaToHBaseWriter.write(
+                  userName,
+                  dbName,
+                  tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX,
+                  records,
+                  getFieldNameList(fieldList),
+                  getFieldTypeList(fieldList)
+                )
+                running = KafkaListenerThread.threadRunningMap.get(userDbTableKey)
 
-          })
-          kafkaListener.setName(tableName)
-          KafkaListenerThread.getInstance().submit(kafkaListener)
+              }
+              consumer.close()
+            })
+            kafkaListener.setName(userDbTableKey)
+            KafkaListenerThread.getInstance().submit(kafkaListener)
+          }
+
         }
 
         // create table in hbase
@@ -244,7 +303,6 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           var sft = sfb.buildFeatureType()
           sft = new TrajectoryAndFeatureTransformer().getGeoMesaSFT(sft)
           sft = new RoadSegmentAndGeomesaTransformer().getGeoMesaSFT(sft)
-
           // allow mixed geometry types for support cupid-db type `Geometry`
           sft.getUserData.put("geomesa.mixed.geometries", java.lang.Boolean.TRUE)
 
@@ -254,7 +312,6 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
             })
             .mkString(",")
           sft.getUserData.put("geomesa.indices.enabled", geomesaIndexDecl)
-
           dataStore.createSchema(sft)
         }
       },
@@ -263,7 +320,52 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     MetadataResult.buildDDLResult(affectedRows.toInt)
   }
 
-  private def formatName(colName: String, order: Int): String = {
+  private def getFieldNameList(filedList: util.List[Field]): util.ArrayList[String] = {
+    val fieldNameList = new util.ArrayList[String]
+    filedList.forEach(f => fieldNameList.add(f.getName))
+    fieldNameList
+  }
+
+  private def getFieldTypeList(filedList: util.List[Field]): util.ArrayList[String] = {
+    val fieldTypeList = new util.ArrayList[String]
+    filedList.forEach(f => fieldTypeList.add(f.getType))
+    fieldTypeList
+  }
+
+  private def removeGridIndexClause(originalString: String): String = {
+    val indexStart = originalString.indexOf("GRID INDEX")
+    if (indexStart != -1) {
+      val indexEnd = originalString.indexOf(")", indexStart) + 1
+      if (indexEnd != -1) {
+        val prefix = originalString.substring(0, indexStart)
+        val suffix = originalString.substring(indexEnd)
+        return prefix.replaceAll(",\\s*$", "") + suffix
+      }
+    }
+    originalString
+  }
+
+  private def executeUpdate[R](updateSql: String) = {
+    val connection = CalciteHelper.createConnection()
+    val statement = connection.createStatement()
+    val prevEngine = SqlParam.CACHE.get().getExecuteEngine
+    // force use calcite engine when run select for insert
+    try {
+      SqlParam.CACHE.get().setExecuteEngine(ExecuteEngine.CALCITE)
+      statement.executeUpdate(updateSql)
+    } finally {
+      SqlParam.CACHE.get().setExecuteEngine(prevEngine)
+      statement.close()
+      connection.close()
+    }
+  }
+
+  private def isGridIndex(indexes: Array[Index]): Boolean = {
+    indexes.foreach(s => if ("grid".equals(s.getIndexType)) return true)
+    false
+  }
+
+  private def formatName(colName: String, order: Int) = {
     s"$colName${if (order == 1) "" else s"_$order"}"
   }
 
@@ -313,6 +415,8 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
             else "xz2t"
           case _ => throw new IllegalArgumentException("index type mismatch columns")
         }
+      case IndexType.GRID =>
+        "grid"
       case _ =>
         throw new IllegalArgumentException("unexpected index type " + indexType.name())
     }

@@ -24,6 +24,7 @@ import org.junit.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class TestUtil {
@@ -51,6 +52,21 @@ public class TestUtil {
                 "+I[" + rows.get(i) + "]",
                 resultList.get(i)
             );
+        }
+    }
+
+    public static void checkTable2(StreamTableEnvironment tableEnv, Table sink, List<String> rows)
+        throws Exception {
+        DataStream<Row> resultStream = tableEnv.toDataStream(sink, Row.class);
+        int num = rows.size();
+        List<String> resultList = resultStream.executeAndCollect(num)
+            .stream()
+            .map(Row::toString)
+            .collect(Collectors.toList());
+        Collections.sort(rows);
+        Collections.sort(resultList);
+        for (int i = 0; i < num; i++) {
+            Assert.assertEquals("result is not as expected", rows.get(i), resultList.get(i));
         }
     }
 
@@ -82,5 +98,23 @@ public class TestUtil {
             String field2 = row.getField(1).toString();
             Assert.assertEquals("two fields are not equal", field1, field2);
         }
+    }
+
+    public static void addRandomData(List<String> recordList) {
+        Random random = new Random();
+        double minLongitude = 105.0;
+        double maxLongitude = 110.0;
+        double minLatitude = 28.0;
+        double maxLatitude = 32.20;
+        for (int i = 0; i < 100; i++) {
+            double longitude = minLongitude + (maxLongitude - minLongitude) * random.nextDouble();
+            double latitude = minLatitude + (maxLatitude - minLatitude) * random.nextDouble();
+            recordList.add("+I[" + i + ",," + "POINT (" + longitude + " " + latitude + ")]");
+        }
+    }
+
+    public static void addRandomData(List<String> recordList, List<String> expected) {
+        addRandomData(recordList);
+        expected.addAll(recordList);
     }
 }

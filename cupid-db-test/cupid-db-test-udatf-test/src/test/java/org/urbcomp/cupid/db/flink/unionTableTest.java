@@ -16,22 +16,13 @@
  */
 package org.urbcomp.cupid.db.flink;
 
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.junit.BeforeClass;
+
 import org.junit.Ignore;
 import org.junit.Test;
-import org.urbcomp.cupid.db.config.ExecuteEngine;
+
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
 import org.urbcomp.cupid.db.metadata.CalciteHelper;
-import org.urbcomp.cupid.db.util.FlinkSqlParam;
-import org.urbcomp.cupid.db.util.SqlParam;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -44,18 +35,7 @@ import static org.urbcomp.cupid.db.flink.TestUtil.checkTable;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.produceKafkaMessage;
 
-public class unionTableTest {
-    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-    static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
-    static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
-
-    @BeforeClass
-    public static void setParam() {
-        SqlParam.CACHE.set(sqlParam);
-        flinkSqlParam.setTestNum(1);
-        FlinkSqlParam.CACHE.set(flinkSqlParam);
-    }
+public class unionTableTest extends AbstractFlinkTest {
 
     @Ignore
     @Test
@@ -251,18 +231,7 @@ public class unionTableTest {
             );
 
             // read target table in kafka
-            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-                .setBootstrapServers("localhost:9092")
-                .setTopics(topicList.get(1))
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setValueOnlyDeserializer(new SimpleStringSchema())
-                .build();
-            DataStream<String> insertStream = env.fromSource(
-                kafkaSource,
-                WatermarkStrategy.noWatermarks(),
-                "kafkaSource",
-                TypeInformation.of(String.class)
-            );
+            DataStream<String> insertStream = getDataStream(topicList.get(1));
 
             // test insert result
             List<String> expected = new ArrayList<>();
@@ -305,4 +274,5 @@ public class unionTableTest {
             throw new RuntimeException(e);
         }
     }
+
 }
