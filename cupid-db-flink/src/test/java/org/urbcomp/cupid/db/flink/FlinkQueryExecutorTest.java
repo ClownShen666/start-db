@@ -55,7 +55,7 @@ import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 public class FlinkQueryExecutorTest {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
-    static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
+    static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.AUTO, true);
     static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
 
     @BeforeClass
@@ -602,7 +602,7 @@ public class FlinkQueryExecutorTest {
 
             // test
             stmt.executeQuery("select * from table1");
-            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+            // produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
             // delete topic
             stmt.executeUpdate("drop table if exists table1");

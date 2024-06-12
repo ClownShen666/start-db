@@ -172,7 +172,7 @@ public class DynamicConfig {
     }
 
     public static String getSparkRedisHost() {
-        return properties.getProperty("spark.redis.host", "192.168.4.51");
+        return properties.getProperty("spark.redis.host", "10.242.6.21");
     }
 
     public static int getSparkRedisPort() {
@@ -180,6 +180,6 @@ public class DynamicConfig {
     }
 
     public static String getSparkRedisAuth() {
-        return properties.getProperty("spark.redis.auth", "");
+        return properties.getProperty("spark.redis.auth", "123qwe");
     }
 }

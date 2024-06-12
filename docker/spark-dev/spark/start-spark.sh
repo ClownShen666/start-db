@@ -1,6 +1,5 @@
-#start-spark.sh
 #!/bin/bash
-. "/opt/spark/bin/load-spark-env.sh"
+source "/opt/spark/bin/load-spark-env.sh"
 # When the spark work_load is master run class org.apache.spark.deploy.master.Master
 if [ "$SPARK_WORKLOAD" == "master" ];
 then
