@@ -25,6 +25,7 @@ ADD ./${LIVY_PACKAGE}.tgz $BASE_HOME
 
 COPY ./livy.conf $LIVY_HOME/conf/
 COPY ./log4j.properties $LIVY_HOME/conf/
+USER root
 RUN mkdir -p $LIVY_LOG
 
 ENTRYPOINT $LIVY_HOME/bin/livy-server

@@ -28,7 +28,9 @@ import java.util.concurrent.TimeoutException;
 public interface ISparkSubmitter {
 
     static ISparkSubmitter getInstance(ExecuteEngine engine) {
-        if (engine == ExecuteEngine.SPARK || engine == ExecuteEngine.FLINK) {
+        if (engine == ExecuteEngine.SPARK
+            || engine == ExecuteEngine.FLINK
+            || engine == ExecuteEngine.AUTO) {
             return new LocalSparkSubmitter();
         }
         return LivySubmitter.getSingleton();
