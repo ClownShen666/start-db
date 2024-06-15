@@ -164,6 +164,8 @@ class TableExecutorTest extends AbstractCalciteSparkFunctionTest {
     val rs = stmt.executeQuery("show tables")
     rs.next()
     assertNotNull(rs.getString(1))
+    assertNotNull(rs.getString(2))
+    assertNotNull(rs.getString(3))
   }
 
   test("test show index") {

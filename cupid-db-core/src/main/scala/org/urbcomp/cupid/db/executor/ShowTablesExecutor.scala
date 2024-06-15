@@ -36,9 +36,22 @@ case class ShowTablesExecutor(n: SqlShowTables) extends BaseExecutor {
     val dbName = param.getDbName
 
     val tables = MetadataAccessUtil.getTables(userName, dbName)
-    val tableNames = tables.asScala.map(d => Array(d.getName.asInstanceOf[AnyRef])).toArray
+    val tableDetails = tables.asScala
+      .map(
+        d =>
+          Array(
+            d.getId.asInstanceOf[AnyRef],
+            d.getName.asInstanceOf[AnyRef],
+            d.getStorageEngine.asInstanceOf[AnyRef]
+          )
+      )
+      .toArray
+
     MetadataResult
-      .buildResult(Array("Tables"), java.util.Arrays.asList(tableNames: _*))
+      .buildResult(
+        Array("TableID", "TableName", "StorageEngine"),
+        java.util.Arrays.asList(tableDetails: _*)
+      )
       .asInstanceOf[MetadataResult[Array]]
   }
 }
