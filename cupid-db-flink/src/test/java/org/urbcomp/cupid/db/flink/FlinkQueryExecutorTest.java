@@ -83,6 +83,70 @@ public class FlinkQueryExecutorTest {
 
     @Ignore
     @Test
+    public void writeQueryResultToKafkaTest() {
+        try (Connection connect = CalciteHelper.createConnection()) {
+            Statement stmt = connect.createStatement();
+
+            // create table
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("create stream table if not exists table1(idd int, point1 Point);");
+            stmt.executeUpdate("drop table if exists table2");
+            stmt.executeUpdate("create stream table if not exists table2(idd int, point1 Point);");
+
+            // produce message in kafka
+            SelectFromTableVisitor selectVisitor = new SelectFromTableVisitor(
+                "select * from table1, table2;"
+            );
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
+                selectVisitor.getDbTableList()
+            );
+            List<String> topicList = new ArrayList<>();
+            topicList.add(getKafkaTopic(tableList.get(0)));
+            topicList.add(getKafkaTopic(tableList.get(1)));
+            List<String> recordList = new ArrayList<>();
+            recordList.add("+I[1,,POINT (90 90)]");
+            produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
+            recordList.clear();
+            recordList.add("+I[2,,POINT (45 45)]");
+            produceKafkaMessage("localhost:9092", topicList.get(1), recordList);
+
+            // read target table in kafka
+            FlinkQueryExecutor flinkQueryExecutor = FLINK_EXECUTOR_INSTANCE;
+            String topicName = flinkQueryExecutor.getMD5(
+                flinkSqlParam.getUserName() + "select * from table1, table2"
+            );
+
+            KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("localhost:9092")
+                .setTopics(topicName)
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+            DataStream<String> resultStream = env.fromSource(
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "kafkaSource",
+                TypeInformation.of(String.class)
+            );
+
+            // test
+            stmt.executeQuery("select * from table1, table2");
+            List<String> expected = new ArrayList<>();
+            expected.add(
+                "{\"idd\":\"1\",\"point1\":\"POINT (90 90)\",\"idd\":\"2\",\"point1\":\"POINT (45 45)\"}"
+            );
+            checkTable(tableEnv, tableEnv.fromDataStream(resultStream), expected);
+
+            // drop table
+            stmt.executeUpdate("drop table if exists table1");
+            stmt.executeUpdate("drop table if exists table2");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Ignore
+    @Test
     public void unionSelectSqlTest() throws Exception {
         try (Connection connect = CalciteHelper.createConnection()) {
             Statement stmt = connect.createStatement();
