@@ -59,14 +59,15 @@ import org.urbcomp.cupid.db.util.*;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.SqlParam;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.*;
 
-import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaGroup;
-import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.getKafkaTopic;
-
 import org.slf4j.Logger;
 import scala.collection.JavaConverters;
+
+import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 public enum FlinkQueryExecutor {
     FLINK_EXECUTOR_INSTANCE;
@@ -176,8 +177,8 @@ public enum FlinkQueryExecutor {
                         );
 
                         // get stream join dimension result, parse mix sql in JoinProcess
-                        return streamJoin.process(new JoinProcess(sql));
-
+                        streamJoin.process(new JoinProcess(sql));
+                        return streamJoin;
                     }
                     return null;
                 }
@@ -289,6 +290,11 @@ public enum FlinkQueryExecutor {
                                     "select * from dimensionResult union " + streamSql
                                 )
                             );
+                            writeQueryResultToKafka(
+                                param,
+                                resultStream,
+                                selectFieldVisitor.getFieldNameList()
+                            );
 
                         } catch (SQLException e) {
                             throw new RuntimeException(e);
@@ -333,6 +339,11 @@ public enum FlinkQueryExecutor {
                         // get stream query result
                         loadTables(param, tableNameList, dbTableNameList, tableList);
                         resultStream = getTableEnv().toChangelogStream(getTableEnv().sqlQuery(sql));
+                        writeQueryResultToKafka(
+                            param,
+                            resultStream,
+                            new SelectFieldVisitor(sql).getFieldNameList()
+                        );
                     }
 
                     // execute and return result stream
@@ -853,4 +864,57 @@ public enum FlinkQueryExecutor {
         return new UdfVisitor(sql).getProcessedSql();
     }
 
+    public void writeQueryResultToKafka(
+        FlinkSqlParam param,
+        DataStream<Row> dataStream,
+        List<String> fieldNameList
+    ) {
+        String topicName = getMD5(param.getUserName() + param.getSql());
+        deleteKafkaTopic(param.getBootstrapServers(), topicName);
+        createKafkaTopic(param.getBootstrapServers(), topicName);
+        KafkaSink<String> sink = KafkaSink.<String>builder()
+            .setBootstrapServers(param.getBootstrapServers())
+            .setRecordSerializer(
+                KafkaRecordSerializationSchema.builder()
+                    .setTopic(topicName)
+                    .setValueSerializationSchema(new SimpleStringSchema())
+                    .build()
+            )
+            .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+            .build();
+        dataStream.map(row -> rowToJson(row, fieldNameList)).sinkTo(sink);
+    }
+
+    public String getMD5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String rowToJson(Row row, List<String> fieldNameList) {
+        StringBuilder jsonBuilder = new StringBuilder("{");
+        for (int i = 0; i < row.getArity(); i++) {
+            jsonBuilder.append("\"")
+                .append(fieldNameList.get(i))
+                .append("\":\"")
+                .append(row.getField(i))
+                .append("\"");
+            if (i < row.getArity() - 1) {
+                jsonBuilder.append(",");
+            }
+        }
+        jsonBuilder.append("}");
+        return jsonBuilder.toString();
+    }
 }
