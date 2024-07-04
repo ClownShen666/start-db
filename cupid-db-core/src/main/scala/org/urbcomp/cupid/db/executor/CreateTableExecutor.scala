@@ -39,8 +39,7 @@ import org.urbcomp.cupid.db.transformer.{
   RoadSegmentAndGeomesaTransformer,
   TrajectoryAndFeatureTransformer
 }
-import org.urbcomp.cupid.db.util.{DataTypeUtils, MetadataUtil, SqlParam}
-
+import org.urbcomp.cupid.db.util.{DataTypeUtils, FlinkSqlParam, MetadataUtil, SqlParam}
 import org.urbcomp.cupid.db.model.trajectory.Trajectory
 
 import java.time.Duration
@@ -71,7 +70,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
       _ => {
         // create metadata table
         val sql = SqlParam.CACHE.get().getSql
-        var fromTableList: Array[String] = Array.empty[String]
+        var fromTableList = Array.empty[String]
         if (n.union && sql.contains("from")) {
           fromTableList = sql.split("from")(1).split(";")(0).split(",").map(_.trim)
           val fromTables = fromTableList.mkString(",")
@@ -205,31 +204,34 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
         if (n.union || n.stream) {
           // create batch table corresponding to the stream table
           if (n.stream) {
-            val updateSql = SqlParam.CACHE
-              .get()
-              .getSql
-              .replace("stream", "")
-              .replace("STREAM", "")
-              .replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
+            val updateSql = removeFirstStream(
+              SqlParam.CACHE
+                .get()
+                .getSql
+            ).replace(tableName, tableName + KafkaToHBaseWriter.BATCH_TABLE_SUFFIX)
             executeUpdate(removeGridIndexClause(updateSql))
           }
           val userDbTableKey = MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
           KafkaListenerThread.threadRunningMap.put(userDbTableKey, true)
 
-          createKafkaTopic("localhost:9092", getKafkaTopic(createdTable))
+          createKafkaTopic(
+            SqlParam.CACHE.get().getKafkaBootstrapServers,
+            getKafkaTopic(createdTable)
+          )
           if (n.stream && isGridIndex(indexes)) {
             val minLongitude = 105.0
             val maxLongitude = 110.0
             val minLatitude = 28.108
             val maxLatitude = 32.20
+            val ip = SqlParam.CACHE.get().getKafkaBootstrapServers
             val kafkaListener = new Thread(() => {
-              val props: Properties = new Properties
-              props.put("bootstrap.servers", "localhost:9092")
+              val props = new Properties
+              props.put("bootstrap.servers", ip)
               props.put("group.id", KafkaToHBaseWriter.HBASE_KAFKA_GROUP_SUFFIX)
               props.put("key.deserializer", classOf[StringDeserializer].getName)
               props.put("value.deserializer", classOf[StringDeserializer].getName)
               props.put("auto.offset.reset", "earliest")
-              val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+              val consumer = new KafkaConsumer[String, String](props)
               consumer.subscribe(java.util.Collections.singletonList(getKafkaTopic(createdTable)))
 
               var running = true
@@ -238,7 +240,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
                 new GridIndex(minLongitude, maxLongitude, minLatitude, maxLatitude, 5000, jedis)
               gridIndex.setFieldTypeList(fieldTypeList)
               while (running) {
-                val records: ConsumerRecords[String, String] =
+                val records =
                   consumer.poll(Duration.ofMillis(1000))
                 records.forEach(record => {
                   gridIndex
@@ -262,10 +264,10 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           if (n.stream && !isGridIndex(indexes)) {
             val kafkaListener = new Thread(() => {
 
-              val props: Properties = kafkaConnector
+              val props = kafkaConnector
                 .getKafkaGeneralProps(kafkaConnector.getHbaseKafkaGroup(userName, dbName))
               var running = true
-              val consumer: Consumer[String, String] = new KafkaConsumer[String, String](props)
+              val consumer = new KafkaConsumer[String, String](props)
               consumer.subscribe(
                 java.util.Collections
                   .singletonList(
@@ -273,7 +275,7 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
                   )
               )
               while (running) {
-                val records: ConsumerRecords[String, String] =
+                val records =
                   consumer.poll(Duration.ofMillis(1000))
                 KafkaToHBaseWriter.write(
                   userName,
@@ -336,6 +338,14 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
     val fieldTypeList = new util.ArrayList[String]
     filedList.forEach(f => fieldTypeList.add(f.getType))
     fieldTypeList
+  }
+
+  private def removeFirstStream(input: String): String = {
+    val original = input
+    val index = input.toLowerCase().indexOf("stream")
+    if (index != -1)
+      return original.substring(0, index) + original.substring(index + "stream".length)
+    original
   }
 
   private def removeGridIndexClause(originalString: String): String = {

@@ -69,8 +69,7 @@ import scala.collection.JavaConverters;
 
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
-public enum FlinkQueryExecutor {
-    FLINK_EXECUTOR_INSTANCE;
+public class FlinkQueryExecutor {
 
     public static final ThreadLocal<SqlNode> sqlNodeCache = new ThreadLocal<>();
     private volatile boolean isRegistered = false;
@@ -123,7 +122,6 @@ public enum FlinkQueryExecutor {
 
         if (preEnv != getEnv()) {
             registerUdf();
-
         }
 
         String sql = new UdfVisitor(param.getSql()).getProcessedSql().replace(";", "");
@@ -349,12 +347,13 @@ public enum FlinkQueryExecutor {
                     // execute and return result stream
                     try {
                         if (param.getTestNum() == 0) {
-                            getEnv().execute();
+                            String jobId = getEnv().executeAsync().getJobID().toString();
+                            FlinkSqlParam.CACHE.get().setJobId(jobId);
                         } else {
                             resultStream.executeAndCollect(param.getTestNum());
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("execute stream sql error: " + sql + "\n" + e);
                     }
 
                     return resultStream;
@@ -378,7 +377,8 @@ public enum FlinkQueryExecutor {
                     FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
                     flinkSqlParam.setSql(selectSql);
                     sqlNodeCache.set(CupidDBParseDriver.parseSql(selectSql));
-                    DataStream<Row> resultStream = FLINK_EXECUTOR_INSTANCE.execute(flinkSqlParam);
+
+                    DataStream<Row> resultStream = execute(flinkSqlParam);
 
                     // write result to kafka
                     org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
@@ -394,12 +394,13 @@ public enum FlinkQueryExecutor {
                     // execute and return query result
                     try {
                         if (param.getTestNum() == 0) {
-                            getEnv().execute();
+                            String jobId = getEnv().executeAsync().getJobID().toString();
+                            FlinkSqlParam.CACHE.get().setJobId(jobId);
                         } else {
                             resultStream.executeAndCollect(param.getTestNum());
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("execute stream sql error: " + sql + "\n" + e);
                     }
                     return resultStream;
                 }
@@ -757,6 +758,7 @@ public enum FlinkQueryExecutor {
             String[] dbTableName = dbTable.split("\\.");
             String dbName = dbTableName[0];
             String tableName = dbTableName[1];
+
             org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
                 userName,
                 dbName,
@@ -882,7 +884,21 @@ public enum FlinkQueryExecutor {
             )
             .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
             .build();
-        dataStream.map(row -> rowToJson(row, fieldNameList)).sinkTo(sink);
+        dataStream.map(row -> {
+            StringBuilder jsonBuilder = new StringBuilder("{");
+            for (int i = 0; i < row.getArity(); i++) {
+                jsonBuilder.append("\"")
+                    .append(fieldNameList.get(i))
+                    .append("\":\"")
+                    .append(row.getField(i))
+                    .append("\"");
+                if (i < row.getArity() - 1) {
+                    jsonBuilder.append(",");
+                }
+            }
+            jsonBuilder.append("}");
+            return jsonBuilder.toString();
+        }).sinkTo(sink);
     }
 
     public String getMD5(String input) {

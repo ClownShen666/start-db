@@ -53,15 +53,6 @@ public class GlobalCache {
         config.setMaxWaitMillis(1000);
     }
 
-    public static JedisPool pool = new JedisPool(config, "localhost", 6379);
-
-    public static void main(String[] args) {
-        try (Jedis jedis = pool.getResource()) {
-
-            for (String key : jedis.keys("*")) {
-                jedis.del(key);
-            }
-        }
-    }
+    public static JedisPool pool = new JedisPool(config, "redis", 6379);
 
 }

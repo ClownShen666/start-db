@@ -7,12 +7,8 @@ services:
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-    networks:
-      - kafka-net
     expose:
-      - "8079"
-
-
+      - "8081"
   taskmanager:
     image: flink:1.17.0
     depends_on:
@@ -20,14 +16,21 @@ services:
     command: taskmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-    networks:
-      - kafka-net
+
+  redis:
+    image: redis:latest
+    environment:
+      REDIS_PASSWORD: 123456
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
+
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2281:2181"
-    networks:
-      - kafka-net
+
   kafka:
     image: wurstmeister/kafka:2.13-2.7.0
     ports:
@@ -49,10 +52,44 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - kafka-net
     depends_on:
       - zookeeper
-networks:
-  kafka-net:
-    driver: bridge
+  mysql-local:
+    image: 'mysql:5.7'
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: cupid_db
+      MYSQL_USER: cupid_db
+      MYSQL_PASSWORD: cupid_db
+      MYSQL_DATABASE: meta_data
+    ports:
+      - '3306:3306'
+
+  geomesa-hbase-local:
+    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
+    hostname: geomesa-hbase-local
+    ports:
+      - '2181:2181'
+      - '16000:16000'
+      - '16020:16020'
+  cupid-db:
+    build:
+      context: ./cupid-db
+      dockerfile: ../cupid-db/Dockerfile
+    ports:
+        - "8000:8000"
+    depends_on:
+      - mysql-local
+      - geomesa-hbase-local
+#  ss-proxy:
+#    image: cluster-apache-spark
+##    image: ss-proxy:1.0.0
+#    volumes:
+#      - ./conf:/usr/local/ss-proxy/conf
+#    environment:
+#      PORT: 3307
+#    ports:
+#      - '3307:3307'
+#    depends_on:
+#      - cupid-db

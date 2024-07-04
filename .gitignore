@@ -34,4 +34,4 @@ target
 **/dependency-reduced-pom.xml
 
 metastore_db/*
-
+/docker/new-all/mysql/data/*

@@ -37,6 +37,7 @@ public abstract class AbstractFlinkTest {
     StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
     static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
     static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
+    FlinkQueryExecutor flink = new FlinkQueryExecutor();
 
     @BeforeClass
     public static void setParam() {
@@ -60,12 +61,11 @@ public abstract class AbstractFlinkTest {
         );
     }
 
-    public static org.apache.flink.table.api.Table getFlinkQueryTable(
+    public org.apache.flink.table.api.Table getFlinkQueryTable(
         SelectFromTableVisitor selectVisitor,
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList,
         String sql
     ) {
-        FlinkQueryExecutor flink = FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE;
         flink.loadTables(
             flinkSqlParam,
             selectVisitor.getTableList(),

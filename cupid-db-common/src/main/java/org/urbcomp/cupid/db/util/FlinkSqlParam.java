@@ -19,9 +19,19 @@ package org.urbcomp.cupid.db.util;
 import java.util.List;
 
 public class FlinkSqlParam extends SqlParam {
-    public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
+    public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
+    private String jobId = null;
     private String host = null;
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
     private Integer port = null;
     private String jarFilesPath = null;
 
@@ -49,7 +59,7 @@ public class FlinkSqlParam extends SqlParam {
         this.jarFilesPath = jarFilesPath;
     }
 
-    private String bootstrapServers;
+    private String bootstrapServers = "kafka:9093";
 
     private boolean streamJoinDimension = false;
 
@@ -73,7 +83,7 @@ public class FlinkSqlParam extends SqlParam {
         this.setExecuteEngine(sqlParam.getExecuteEngine());
         this.setSql(sqlParam.getSql());
         this.setLocal(sqlParam.isLocal());
-        this.bootstrapServers = "localhost:9092";
+        this.bootstrapServers = "kafka:9093";
     }
 
     public String getBootstrapServers() {

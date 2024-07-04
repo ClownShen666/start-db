@@ -41,6 +41,7 @@ import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 public class FlinkLocalQueryExecutorTest {
     static SqlParam sqlParam = new SqlParam("root", "default", ExecuteEngine.FLINK, true);
     static FlinkSqlParam flinkSqlParam = new FlinkSqlParam(sqlParam);
+    FlinkQueryExecutor flink = new FlinkQueryExecutor();
 
     @BeforeClass
     public static void setParam() {
@@ -91,7 +92,6 @@ public class FlinkLocalQueryExecutorTest {
 
         produceKafkaMessage("localhost:9092", topicList.get(0), recordList);
 
-        FlinkQueryExecutor flink = FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE;
         flink.loadTables(
             flinkSqlParam,
             selectVisitor.getTableList(),

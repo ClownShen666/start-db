@@ -82,6 +82,7 @@ import org.apache.calcite.util.Pair;
 import org.apache.calcite.util.Util;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.executor.CupidDBExecutorFactory;
+import org.urbcomp.cupid.db.flink.FlinkQueryExecutor;
 import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.flink.visitor.InsertIntoTableVisitor;
 import org.urbcomp.cupid.db.flink.visitor.SelectFromTableVisitor;
@@ -101,7 +102,6 @@ import java.sql.Types;
 import java.util.*;
 
 import static org.apache.calcite.util.Static.RESOURCE;
-import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE;
 import static org.urbcomp.cupid.db.flink.FlinkQueryExecutor.sqlNodeCache;
 
 /**
@@ -714,14 +714,24 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())
                 && isStreamSql(sqlNode, sqlParam)) {
                 // TODO: show stream query result, now return null result
-                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                FlinkSqlParam flinkSqlParam = new FlinkSqlParam(SqlParam.CACHE.get());
+                flinkSqlParam.setLocal(false);
+                flinkSqlParam.setHost("jobmanager");
+                flinkSqlParam.setPort(8081);
+                flinkSqlParam.setJarFilesPath(
+                    "cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
+                );
+                flinkSqlParam.setBootstrapServers("kafka:9093");
+                FlinkSqlParam.CACHE.set(flinkSqlParam);
                 flinkSqlParam.setSql(sql);
                 sqlNodeCache.set(sqlNode);
-                FLINK_EXECUTOR_INSTANCE.execute(flinkSqlParam);
-                return (MetadataResult<T>) MetadataResult.buildResult(
-                    new String[0],
-                    new ArrayList<>()
+
+                FlinkQueryExecutor flinkQueryExecutor = new FlinkQueryExecutor();
+                flinkQueryExecutor.execute(flinkSqlParam);
+                List<Object[]> rs = Collections.singletonList(
+                    new Object[] { FlinkSqlParam.CACHE.get().getJobId() }
                 );
+                return (MetadataResult<T>) MetadataResult.buildResult(new String[] { "jobId" }, rs);
             }
 
             // currently spark only execute select && loadData

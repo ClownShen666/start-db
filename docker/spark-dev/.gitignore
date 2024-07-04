@@ -2,3 +2,4 @@
 ./livy/spark-3.0.2-bin-hadoop3.2.tgz
 ./livy/apache-livy-0.8.0-incubating-SNAPSHOT_2.12-bin.tgz
 incubator-livy/
+./docker/new-all/mysql/data/*

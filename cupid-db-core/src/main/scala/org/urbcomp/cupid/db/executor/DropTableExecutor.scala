@@ -21,6 +21,8 @@ import org.urbcomp.cupid.db.executor.utils.ExecutorUtil
 import org.urbcomp.cupid.db.infra.{BaseExecutor, MetadataResult}
 import org.urbcomp.cupid.db.metadata.MetadataAccessUtil
 import org.urbcomp.cupid.db.flink.connector.kafkaConnector.{deleteKafkaTopic, getKafkaTopic}
+import org.urbcomp.cupid.db.flink.kafka.KafkaListenerThread
+import org.urbcomp.cupid.db.util.{FlinkSqlParam, MetadataUtil, SqlParam}
 
 case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
   override def execute[Int](): MetadataResult[Int] = {
@@ -40,7 +42,10 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
     // drop stream table(topic) in kafka
     val storageEngine = existedTable.getStorageEngine
     if (storageEngine.equals("union") || storageEngine.equals("kafka")) {
-      deleteKafkaTopic("localhost:9092", getKafkaTopic(existedTable))
+      KafkaListenerThread.endKafkaListening(
+        MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
+      )
+      deleteKafkaTopic(SqlParam.CACHE.get().getKafkaBootstrapServers, getKafkaTopic(existedTable))
     }
 
     val affectedRows = MetadataAccessUtil.dropTable(userName, dbName, tableName)

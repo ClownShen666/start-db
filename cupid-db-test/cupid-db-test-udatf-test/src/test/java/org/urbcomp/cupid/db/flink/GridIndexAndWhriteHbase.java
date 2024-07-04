@@ -150,11 +150,7 @@ public class GridIndexAndWhriteHbase extends AbstractFlinkTest {
             ).stream().map(s -> s.replace(",,", ", ")).collect(Collectors.toList());
 
             // check table
-            checkTable2(
-                FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE.getTableEnv(),
-                table1,
-                filteredData
-            );
+            checkTable2(flink.getTableEnv(), table1, filteredData);
 
         } catch (SQLException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -207,7 +203,7 @@ public class GridIndexAndWhriteHbase extends AbstractFlinkTest {
             );
 
             // check table
-            checkTable2(FlinkQueryExecutor.FLINK_EXECUTOR_INSTANCE.getTableEnv(), table1, expected);
+            checkTable2(flink.getTableEnv(), table1, expected);
 
         } catch (SQLException | InterruptedException e) {
             throw new RuntimeException(e);
