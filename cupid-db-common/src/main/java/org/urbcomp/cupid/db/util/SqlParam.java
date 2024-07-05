@@ -52,8 +52,6 @@ public class SqlParam {
 
     private boolean isLocal = true;
 
-    private String kafkaBootstrapServers = "kafka:9093";
-
     public SqlParam() {}
 
     public SqlParam(String userName, String dbName) {
@@ -147,11 +145,4 @@ public class SqlParam {
         this.options = options;
     }
 
-    public String getKafkaBootstrapServers() {
-        return kafkaBootstrapServers;
-    }
-
-    public void setKafkaBootstrapServers(String kafkaBootstrapServer) {
-        this.kafkaBootstrapServers = kafkaBootstrapServer;
-    }
 }

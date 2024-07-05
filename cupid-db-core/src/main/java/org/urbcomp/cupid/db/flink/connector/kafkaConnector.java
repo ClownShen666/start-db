@@ -23,6 +23,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.urbcomp.cupid.db.flink.storage.KafkaToHBaseWriter;
+import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.MetadataUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -32,6 +33,7 @@ import java.util.Properties;
 import java.util.Set;
 
 public class kafkaConnector {
+    // 开发环境用localhost:9092，生产环境用kafka:9093
 
     public static String getKafkaTopic(org.urbcomp.cupid.db.metadata.entity.Table table) {
         return MetadataUtil.makeSchemaName(table.getId());
@@ -52,7 +54,7 @@ public class kafkaConnector {
 
     public static Properties getKafkaGeneralProps(String groupId) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "kafka:9093");
+        props.put("bootstrap.servers", FlinkSqlParam.BOOST_STRAP_SERVERS);
         props.put("group.id", groupId);
         props.put("key.deserializer", StringDeserializer.class.getName());
         props.put("value.deserializer", StringDeserializer.class.getName());

@@ -1,5 +1,71 @@
 version: '3.3'
 services:
+  spark-master:
+    image: cluster-apache-spark:latest
+    ports:
+      - "8084:8080"
+      - "7077:7077"
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    profiles:
+      - cluster
+  spark-worker-a:
+    image: cluster-apache-spark:latest
+    ports:
+      - "8083:8080"
+      - "7000:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-a
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    profiles:
+      - cluster
+  spark-worker-b:
+    image: cluster-apache-spark:latest
+    ports:
+      - "8082:8080"
+      - "7001:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-b
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    profiles:
+      - cluster
+  livy:
+    hostname: livy-local
+    image: livy:latest
+    ports:
+      - "8998:8998"
+    volumes:
+      - ./apps:/opt/spark-apps
+    depends_on:
+      - spark-master
+      - spark-worker-a
+      - spark-worker-b
+    profiles:
+      - cluster
   jobmanager:
     image: flink:1.17.0
     ports:
@@ -82,6 +148,9 @@ services:
     depends_on:
       - mysql-local
       - geomesa-hbase-local
+
+
+
 #  ss-proxy:
 #    image: cluster-apache-spark
 ##    image: ss-proxy:1.0.0

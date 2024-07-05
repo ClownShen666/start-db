@@ -45,7 +45,7 @@ case class DropTableExecutor(n: SqlDropTable) extends BaseExecutor {
       KafkaListenerThread.endKafkaListening(
         MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
       )
-      deleteKafkaTopic(SqlParam.CACHE.get().getKafkaBootstrapServers, getKafkaTopic(existedTable))
+      deleteKafkaTopic(FlinkSqlParam.BOOST_STRAP_SERVERS, getKafkaTopic(existedTable))
     }
 
     val affectedRows = MetadataAccessUtil.dropTable(userName, dbName, tableName)

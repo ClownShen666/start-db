@@ -214,19 +214,15 @@ case class CreateTableExecutor(n: SqlCupidCreateTable) extends BaseExecutor {
           val userDbTableKey = MetadataUtil.combineUserDbTableKey(userName, dbName, tableName)
           KafkaListenerThread.threadRunningMap.put(userDbTableKey, true)
 
-          createKafkaTopic(
-            SqlParam.CACHE.get().getKafkaBootstrapServers,
-            getKafkaTopic(createdTable)
-          )
+          createKafkaTopic(FlinkSqlParam.BOOST_STRAP_SERVERS, getKafkaTopic(createdTable))
           if (n.stream && isGridIndex(indexes)) {
             val minLongitude = 105.0
             val maxLongitude = 110.0
             val minLatitude = 28.108
             val maxLatitude = 32.20
-            val ip = SqlParam.CACHE.get().getKafkaBootstrapServers
             val kafkaListener = new Thread(() => {
               val props = new Properties
-              props.put("bootstrap.servers", ip)
+              props.put("bootstrap.servers", FlinkSqlParam.BOOST_STRAP_SERVERS)
               props.put("group.id", KafkaToHBaseWriter.HBASE_KAFKA_GROUP_SUFFIX)
               props.put("key.deserializer", classOf[StringDeserializer].getName)
               props.put("value.deserializer", classOf[StringDeserializer].getName)
