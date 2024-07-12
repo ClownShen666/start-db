@@ -24,6 +24,7 @@ import org.apache.calcite.avatica.remote.Service.Response;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.urbcomp.cupid.db.config.ExecuteEngine;
 import org.urbcomp.cupid.db.server.AuthenticationHelper;
+import org.urbcomp.cupid.db.util.FlinkSqlParam;
 import org.urbcomp.cupid.db.util.LogUtil;
 import org.urbcomp.cupid.db.util.SqlParam;
 
@@ -112,6 +113,16 @@ public abstract class AbstractHandler<T> implements Handler<T> {
                     info
                 );
                 SqlParam.CACHE.set(param);
+                if (ExecuteEngine.FLINK.equals(param.getExecuteEngine())) {
+                    FlinkSqlParam flinkSqlParam = new FlinkSqlParam(param);
+                    flinkSqlParam.setLocal(false);
+                    flinkSqlParam.setHost("jobmanager");
+                    flinkSqlParam.setPort(8081);
+                    flinkSqlParam.setJarFilesPath(
+                        "cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
+                    );
+                    FlinkSqlParam.CACHE.set(flinkSqlParam);
+                }
                 SqlParam.setParam(openConnection.connectionId, param);
             } else {
                 // get connectionId from request

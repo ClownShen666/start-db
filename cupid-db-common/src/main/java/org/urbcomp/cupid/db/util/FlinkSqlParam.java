@@ -22,7 +22,6 @@ public class FlinkSqlParam extends SqlParam {
 
     public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
-    // 开发环境用localhost:9092，生产环境用kafka:9093
     public static String BOOST_STRAP_SERVERS = "kafka:9093";
     private String jobId = null;
     private String host = null;

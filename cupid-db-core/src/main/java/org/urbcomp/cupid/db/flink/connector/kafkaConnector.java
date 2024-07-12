@@ -33,7 +33,6 @@ import java.util.Properties;
 import java.util.Set;
 
 public class kafkaConnector {
-    // 开发环境用localhost:9092，生产环境用kafka:9093
 
     public static String getKafkaTopic(org.urbcomp.cupid.db.metadata.entity.Table table) {
         return MetadataUtil.makeSchemaName(table.getId());

@@ -714,23 +714,11 @@ public class CalcitePrepareImpl implements CalcitePrepare {
             if (ExecuteEngine.isFlink(sqlParam.getExecuteEngine())
                 && isStreamSql(sqlNode, sqlParam)) {
                 // TODO: show stream query result, now return null result
-                FlinkSqlParam flinkSqlParam;
-
-                if ("kafka:9093".equals(FlinkSqlParam.BOOST_STRAP_SERVERS)) {
-                    flinkSqlParam = new FlinkSqlParam(SqlParam.CACHE.get());
-                    flinkSqlParam.setLocal(false);
-                    flinkSqlParam.setHost("jobmanager");
-                    flinkSqlParam.setPort(8081);
-                    flinkSqlParam.setJarFilesPath(
-                        "cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
-                    );
-                    flinkSqlParam.setSql(sql);
-                    FlinkSqlParam.CACHE.set(flinkSqlParam);
-                } else flinkSqlParam = FlinkSqlParam.CACHE.get();
-
                 sqlNodeCache.set(sqlNode);
 
                 FlinkQueryExecutor flinkQueryExecutor = new FlinkQueryExecutor();
+                FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
+                flinkSqlParam.setSql(sql);
                 flinkQueryExecutor.execute(flinkSqlParam);
                 List<Object[]> rs = Collections.singletonList(
                     new Object[] { FlinkSqlParam.CACHE.get().getJobId() }
