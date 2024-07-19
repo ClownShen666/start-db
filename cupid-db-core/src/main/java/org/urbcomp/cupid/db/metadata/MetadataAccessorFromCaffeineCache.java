@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,57 +40,57 @@ public class MetadataAccessorFromCaffeineCache implements IMetadataCacheCaller {
 
     private final IMetadataAccessor real;
     private final LoadingCache<String, User> USER_CACHE = Caffeine.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .maximumSize(256)
-            .build(new CacheLoader<String, User>() {
-                @CheckForNull
-                @Override
-                public User load(@Nonnull String username) throws Exception {
-                    return real.getUser(username);
-                }
-            });
+        .expireAfterAccess(1, TimeUnit.HOURS)
+        .maximumSize(256)
+        .build(new CacheLoader<String, User>() {
+            @CheckForNull
+            @Override
+            public User load(@Nonnull String username) throws Exception {
+                return real.getUser(username);
+            }
+        });
 
     private final LoadingCache<String, Database> DB_CACHE = Caffeine.newBuilder()
-            .initialCapacity(16)
-            .maximumSize(256)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Database>() {
-                @CheckForNull
-                @Override
-                public Database load(@Nonnull String key) throws Exception {
-                    final String[] items = key.split(SPLITTER);
-                    return real.getDatabase(items[0], items[1]);
-                }
-            });
+        .initialCapacity(16)
+        .maximumSize(256)
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build(new CacheLoader<String, Database>() {
+            @CheckForNull
+            @Override
+            public Database load(@Nonnull String key) throws Exception {
+                final String[] items = key.split(SPLITTER);
+                return real.getDatabase(items[0], items[1]);
+            }
+        });
 
     private final LoadingCache<String, Table> TABLE_CACHE = Caffeine.newBuilder()
-            .initialCapacity(16)
-            .maximumSize(256)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Table>() {
-                @CheckForNull
-                @Override
-                public Table load(@Nonnull String key) throws Exception {
-                    final String[] items = key.split(SPLITTER);
-                    if (items.length >= 3) {
-                        return real.getTable(items[0], items[1], items[2]);
-                    }
-                    return real.getTable(Long.parseLong(items[0]), items[1]);
+        .initialCapacity(16)
+        .maximumSize(256)
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build(new CacheLoader<String, Table>() {
+            @CheckForNull
+            @Override
+            public Table load(@Nonnull String key) throws Exception {
+                final String[] items = key.split(SPLITTER);
+                if (items.length >= 3) {
+                    return real.getTable(items[0], items[1], items[2]);
                 }
-            });
+                return real.getTable(Long.parseLong(items[0]), items[1]);
+            }
+        });
 
     private final LoadingCache<String, Job> JOB_CACHE = Caffeine.newBuilder()
-            .initialCapacity(16)
-            .maximumSize(256)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Job>() {
-                @CheckForNull
-                @Override
-                public Job load(@Nonnull String key) throws Exception {
-                    final String[] items = key.split(SPLITTER);
-                    return real.getJob(items[0], items[1]);
-                }
-            });
+        .initialCapacity(16)
+        .maximumSize(256)
+        .expireAfterAccess(10, TimeUnit.MINUTES)
+        .build(new CacheLoader<String, Job>() {
+            @CheckForNull
+            @Override
+            public Job load(@Nonnull String key) throws Exception {
+                final String[] items = key.split(SPLITTER);
+                return real.getJob(items[0], items[1]);
+            }
+        });
 
     public MetadataAccessorFromCaffeineCache(IMetadataAccessor real) {
         this.real = real;
@@ -197,7 +197,7 @@ public class MetadataAccessorFromCaffeineCache implements IMetadataCacheCaller {
 
     @Override
     public long updateJobName(long id, String jobName) {
-        return real.updateJobName(id,jobName);
+        return real.updateJobName(id, jobName);
     }
 
     @Override

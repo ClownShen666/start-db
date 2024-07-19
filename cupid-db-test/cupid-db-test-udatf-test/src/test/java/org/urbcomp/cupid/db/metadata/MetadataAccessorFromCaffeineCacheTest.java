@@ -160,7 +160,7 @@ public class MetadataAccessorFromCaffeineCacheTest {
 
         @Override
         public Job getJob(String userName, String jobName) {
-            return new Job(0L,JOB_NAME, 1,"sql");
+            return new Job(0L, JOB_NAME, 1, "sql");
         }
 
         @Override
@@ -169,7 +169,7 @@ public class MetadataAccessorFromCaffeineCacheTest {
         }
 
         @Override
-        public long updateJobName(long id,String jobName) {
+        public long updateJobName(long id, String jobName) {
             return 0;
         }
     }
