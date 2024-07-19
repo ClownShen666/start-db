@@ -39,7 +39,6 @@ public class FlinkSqlParam extends SqlParam {
 
     private String streamResTopic;
 
-
     public String getJobId() {
         return jobId;
     }

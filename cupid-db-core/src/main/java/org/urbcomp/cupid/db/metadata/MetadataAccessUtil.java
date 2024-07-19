@@ -47,8 +47,8 @@ public class MetadataAccessUtil {
         return ACCESSOR.insertJob(job);
     }
 
-    public static long updateJobName(long jobId,String jobName) {
-        return ACCESSOR.updateJobName(jobId,jobName);
+    public static long updateJobName(long jobId, String jobName) {
+        return ACCESSOR.updateJobName(jobId, jobName);
     }
 
     /**

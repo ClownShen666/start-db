@@ -16,7 +16,6 @@
  */
 package org.urbcomp.cupid.db.metadata;
 
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.urbcomp.cupid.db.metadata.accessor.*;
 
 /**

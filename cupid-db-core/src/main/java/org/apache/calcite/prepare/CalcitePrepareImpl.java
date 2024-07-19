@@ -718,15 +718,20 @@ public class CalcitePrepareImpl implements CalcitePrepare {
 
                 FlinkQueryExecutor flinkQueryExecutor = new FlinkQueryExecutor();
                 FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
-                if(flinkSqlParam == null) {
+                if (flinkSqlParam == null) {
                     flinkSqlParam = makeFlinkSqlParamByParamCache();
                 }
                 flinkSqlParam.setSql(sql);
                 flinkQueryExecutor.execute(flinkSqlParam);
                 List<Object[]> rs = Collections.singletonList(
-                    new Object[] { FlinkSqlParam.CACHE.get().getJobId() }
+                    new Object[] {
+                        FlinkSqlParam.CACHE.get().getJobId(),
+                        FlinkSqlParam.CACHE.get().getStreamResTopic() }
                 );
-                return (MetadataResult<T>) MetadataResult.buildResult(new String[] { "jobId" }, rs);
+                return (MetadataResult<T>) MetadataResult.buildResult(
+                    new String[] { "jobId", "streamResTopic" },
+                    rs
+                );
             }
 
             // currently spark only execute select && loadData
@@ -930,7 +935,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 if (dimensionTableNum > 0) {
                     FlinkSqlParam flinkSqlParam = FlinkSqlParam.CACHE.get();
 
-                    if(flinkSqlParam == null) {
+                    if (flinkSqlParam == null) {
                         flinkSqlParam = makeFlinkSqlParamByParamCache();
                     }
                     if (tableNameList.size() > 1) {
@@ -958,9 +963,7 @@ public class CalcitePrepareImpl implements CalcitePrepare {
         flinkSqlParam.setLocal(false);
         flinkSqlParam.setHost("jobmanager");
         flinkSqlParam.setPort(8081);
-        flinkSqlParam.setJarFilesPath(
-                "cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar"
-        );
+        flinkSqlParam.setJarFilesPath("cupid-db-flink-1.0.0-SNAPSHOT-jar-with-dependencies.jar");
         return flinkSqlParam;
     }
 
