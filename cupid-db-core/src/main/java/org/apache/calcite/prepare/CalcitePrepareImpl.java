@@ -724,9 +724,14 @@ public class CalcitePrepareImpl implements CalcitePrepare {
                 flinkSqlParam.setSql(sql);
                 flinkQueryExecutor.execute(flinkSqlParam);
                 List<Object[]> rs = Collections.singletonList(
-                    new Object[] { FlinkSqlParam.CACHE.get().getJobId() }
+                    new Object[] {
+                        FlinkSqlParam.CACHE.get().getJobId(),
+                        FlinkSqlParam.CACHE.get().getStreamResTopic() }
                 );
-                return (MetadataResult<T>) MetadataResult.buildResult(new String[] { "jobId" }, rs);
+                return (MetadataResult<T>) MetadataResult.buildResult(
+                    new String[] { "jobId", "streamResTopic" },
+                    rs
+                );
             }
 
             // currently spark only execute select && loadData
