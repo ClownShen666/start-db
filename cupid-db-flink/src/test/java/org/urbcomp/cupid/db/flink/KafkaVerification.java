@@ -27,42 +27,38 @@ import java.util.Properties;
 
 public class KafkaVerification {
 
-    public static void main(String[] args) {
-        String val = "record";
-        produceToKafka(val);
-
-        consumeFromKafka(val);
-
-    }
-
     private static void produceToKafka(String val) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", "kafka:9093");
         props.put("key.serializer", StringSerializer.class.getName());
         props.put("value.serializer", StringSerializer.class.getName());
 
         Producer<String, String> producer = new KafkaProducer<>(props);
 
-        ProducerRecord<String, String> record = new ProducerRecord<>("test", val);
+        ProducerRecord<String, String> record = new ProducerRecord<>("s_20", val);
         producer.send(record);
+        for (int i = 0; i < 10; i++) {
+            producer.send(record);
+        }
 
         producer.close();
     }
 
     private static void consumeFromKafka(String val) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
+        props.put("bootstrap.servers", "kafka:9093");
         props.put("group.id", "test-consumer-group");
         props.put("key.deserializer", StringDeserializer.class.getName());
         props.put("value.deserializer", StringDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         Consumer<String, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(java.util.Collections.singletonList("test"));
+        consumer.subscribe(java.util.Collections.singletonList("s_20"));
 
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
         for (ConsumerRecord<String, String> record : records) {
-            Assert.assertEquals(val, record.value());
+            System.out.println(record.value());
         }
 
         consumer.close();

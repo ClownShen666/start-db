@@ -80,6 +80,28 @@ CREATE TABLE `sys_index`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
 
+drop table if exists sys_job;
+create table `sys_job`
+(
+    `id`            INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id`       INT          NOT NULL,
+    `name`          VARCHAR(200) NOT NULL,
+    `sql`           VARCHAR(2048) NOT NULL ,
+    `start_time`    BIGINT       NOT NULL DEFAULT 0 COMMENT '流查询开始时间',
+    `duration`      INT          NOT NULL DEFAULT 0 COMMENT '流查询持续时间',
+    `end_time`      BIGINT       NOT NULL DEFAULT 0 COMMENT '流查询结束时间',
+    `state`         TINYINT      NOT NULL DEFAULT 0 COMMENT '流查询状态，0:running,1:failed,2:finish,3:canceled',
+    `created_date`     timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `modified_date`    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `delete_time`   BIGINT       NOT NULL DEFAULT 0 COMMENT '删除时间',
+    INDEX idx_user_id_name (`user_id`, `name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
+
+
+
+
 -- 插入测试用户、库、表，DDL好了后就没必要手动插入了, 密码是 cupid-db
 INSERT INTO sys_user(id, name, password) VALUE (1, 'root', '8c63375da3a78421a04ed427367d8e89');
 INSERT INTO sys_database(id, user_id, name) VALUE (1, 1, 'default');

@@ -43,6 +43,14 @@ public class MetadataAccessUtil {
         new MetadataAccessorFromDb()
     );
 
+    public static long insertJob(Job job) {
+        return ACCESSOR.insertJob(job);
+    }
+
+    public static long updateJobName(long jobId,String jobName) {
+        return ACCESSOR.updateJobName(jobId,jobName);
+    }
+
     /**
      * check if table exists
      *

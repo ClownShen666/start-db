@@ -17,10 +17,7 @@
 package org.urbcomp.cupid.db.metadata;
 
 import org.junit.Test;
-import org.urbcomp.cupid.db.metadata.entity.Database;
-import org.urbcomp.cupid.db.metadata.entity.Field;
-import org.urbcomp.cupid.db.metadata.entity.Table;
-import org.urbcomp.cupid.db.metadata.entity.User;
+import org.urbcomp.cupid.db.metadata.entity.*;
 
 import java.util.List;
 
@@ -35,6 +32,8 @@ public class MetadataAccessorFromCaffeineCacheTest {
     private final static String USERNAME = "jimo";
     private final static String DBNAME = "db";
     private final static String TABLE_NAME = "table";
+
+    private final static String JOB_NAME = "job";
 
     @Test
     public void testCache() {
@@ -53,6 +52,9 @@ public class MetadataAccessorFromCaffeineCacheTest {
 
         final User user = m.getUser(USERNAME);
         assertEquals(USER_ID, user.getId());
+
+        final Job job = m.getJob(USERNAME, JOB_NAME);
+        assertEquals(JOB_NAME, job.getName());
 
         assertTrue(m.dropUser(USERNAME) >= 0);
         assertTrue(m.dropDatabase(USERNAME, DBNAME) >= 0);
@@ -138,6 +140,36 @@ public class MetadataAccessorFromCaffeineCacheTest {
 
         @Override
         public long dropUser(String userName) {
+            return 0;
+        }
+
+        @Override
+        public long insertJob(Job job) {
+            return 0;
+        }
+
+        @Override
+        public long updateJob(Job job) {
+            return 0;
+        }
+
+        @Override
+        public List<Job> getJobs(String userName) {
+            return null;
+        }
+
+        @Override
+        public Job getJob(String userName, String jobName) {
+            return new Job(0L,JOB_NAME, 1,"sql");
+        }
+
+        @Override
+        public long dropJob(String userName, String jobName) {
+            return 0;
+        }
+
+        @Override
+        public long updateJobName(long id,String jobName) {
             return 0;
         }
     }

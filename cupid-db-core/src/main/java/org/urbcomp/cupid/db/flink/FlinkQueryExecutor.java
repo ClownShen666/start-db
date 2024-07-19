@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -51,6 +51,8 @@ import org.urbcomp.cupid.db.metadata.MetadataAccessUtil;
 import org.urbcomp.cupid.db.metadata.MetadataAccessorFromDb;
 import org.urbcomp.cupid.db.metadata.entity.Field;
 import org.urbcomp.cupid.db.metadata.entity.Index;
+import org.urbcomp.cupid.db.metadata.entity.Job;
+import org.urbcomp.cupid.db.metadata.entity.User;
 import org.urbcomp.cupid.db.parser.driver.CupidDBParseDriver;
 import org.urbcomp.cupid.db.udf.AbstractUdf;
 import org.urbcomp.cupid.db.udf.DataEngine$;
@@ -70,6 +72,7 @@ import scala.collection.JavaConverters;
 import static org.urbcomp.cupid.db.flink.connector.kafkaConnector.*;
 
 public class FlinkQueryExecutor {
+
 
     public static final ThreadLocal<SqlNode> sqlNodeCache = new ThreadLocal<>();
     private volatile boolean isRegistered = false;
@@ -94,8 +97,16 @@ public class FlinkQueryExecutor {
         this.tableEnv = tableEnv;
     }
 
-    public DataStream<Row> execute(FlinkSqlParam param) {
+    public DataStream<Row> execute(FlinkSqlParam param){
         if (param != null) {
+            User user = MetadataAccessUtil.getUser(param.getUserName());
+            Job job = new Job(0L/* unused */, ""/* unused */, user.getId(),param.getSql());
+
+            long affectRow = MetadataAccessUtil.insertJob(job);
+            if (affectRow > 0) {
+                param.setStreamResTopic(MetadataUtil.makeStreamResTopic(job.getId()));
+            } else throw new IllegalStateException("insert job failed.");
+
             FlinkSqlParam.CACHE.set(param);
             SqlParam.CACHE.set(param);
         } else {
@@ -106,16 +117,16 @@ public class FlinkQueryExecutor {
 
         if (!param.isLocal()) {
             if (param.getHost() == null
-                || param.getPort() == null
-                || param.getJarFilesPath() == null) {
+                    || param.getPort() == null
+                    || param.getJarFilesPath() == null) {
                 throw new IllegalArgumentException("Flink remote parameters are null.");
             }
             setEnv(
-                StreamExecutionEnvironment.createRemoteEnvironment(
-                    param.getHost(),
-                    param.getPort(),
-                    param.getJarFilesPath()
-                )
+                    StreamExecutionEnvironment.createRemoteEnvironment(
+                            param.getHost(),
+                            param.getPort(),
+                            param.getJarFilesPath()
+                    )
             );
         }
         setTableEnv(StreamTableEnvironment.create(getEnv()));
@@ -164,14 +175,14 @@ public class FlinkQueryExecutor {
                         List<String> tableNameList = selectVisitor.getTableList();
                         List<String> dbTableNameList = selectVisitor.getDbTableList();
                         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                            dbTableNameList
+                                dbTableNameList
                         );
                         loadTables(param, tableNameList, dbTableNameList, tableList);
                         JoinVisitor joinVisitor = new JoinVisitor(sql, param);
 
                         // get stream join result
                         DataStream<Row> streamJoin = getTableEnv().toChangelogStream(
-                            getTableEnv().sqlQuery(joinVisitor.getStreamJoinSql())
+                                getTableEnv().sqlQuery(joinVisitor.getStreamJoinSql())
                         );
 
                         // get stream join dimension result, parse mix sql in JoinProcess
@@ -189,7 +200,7 @@ public class FlinkQueryExecutor {
                     List<String> tableNameList = selectVisitor.getTableList();
                     List<String> dbTableNameList = selectVisitor.getDbTableList();
                     List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = getTables(
-                        dbTableNameList
+                            dbTableNameList
                     );
                     DataStream<Row> resultStream;
 
@@ -203,9 +214,9 @@ public class FlinkQueryExecutor {
                         List<String> streamTableList = selectVisitor.getStreamTableList();
                         List<String> dimensionTableList = selectVisitor.getDimensionTableList();
                         List<Field> fieldList = MetadataAccessUtil.getFields(
-                            param.getUserName(),
-                            param.getDbName(),
-                            tableNameList.get(0)
+                                param.getUserName(),
+                                param.getDbName(),
+                                tableNameList.get(0)
                         );
                         StringBuilder stringBuilder = new StringBuilder();
                         for (Field field : fieldList) {
@@ -219,15 +230,15 @@ public class FlinkQueryExecutor {
                         String unionTable = tableNameList.get(0);
                         for (int i = 1; i < dimensionTableList.size(); i++) {
                             dimensionSql = dimensionSql.concat(
-                                " union " + sql.replace(unionTable, dimensionTableList.get(i))
+                                    " union " + sql.replace(unionTable, dimensionTableList.get(i))
                             );
                         }
                         if (selectVisitor.isUnionFromPointAndTrajectory()) {
                             List<String> trajectoryTables = selectVisitor.getTrajectoryTableList();
                             for (String trajectoryTable : trajectoryTables) {
                                 dimensionSql = dimensionSql.replace(
-                                    trajectoryTable,
-                                    trajectoryTable + "_point"
+                                        trajectoryTable,
+                                        trajectoryTable + "_point"
                                 );
                             }
                         }
@@ -236,7 +247,7 @@ public class FlinkQueryExecutor {
                         String streamSql = sql;
                         for (int i = 1; i < streamTableList.size(); i++) {
                             streamSql = streamSql.concat(
-                                " union " + sql.replace(unionTable, streamTableList.get(i))
+                                    " union " + sql.replace(unionTable, streamTableList.get(i))
                             );
                         }
 
@@ -260,38 +271,38 @@ public class FlinkQueryExecutor {
                             }
                             if (flinkRowResult.isEmpty()) {
                                 throw new IllegalArgumentException(
-                                    "dimension query result is null"
+                                        "dimension query result is null"
                                 );
                             }
 
                             // get union query result stream
                             getTableEnv().createTemporaryView(
-                                "dimensionResult",
-                                getEnv().fromCollection(flinkRowResult)
-                                    .returns(
-                                        getRowTypeInfo(
-                                            selectFieldVisitor.getFieldNameList(),
-                                            selectFieldVisitor.getFieldTypeList()
-                                        )
-                                    )
+                                    "dimensionResult",
+                                    getEnv().fromCollection(flinkRowResult)
+                                            .returns(
+                                                    getRowTypeInfo(
+                                                            selectFieldVisitor.getFieldNameList(),
+                                                            selectFieldVisitor.getFieldTypeList()
+                                                    )
+                                            )
                             );
                             SelectFromTableVisitor selectFromTableVisitor =
-                                new SelectFromTableVisitor(streamSql);
+                                    new SelectFromTableVisitor(streamSql);
                             loadTables(
-                                param,
-                                selectFromTableVisitor.getTableList(),
-                                selectFromTableVisitor.getDbTableList(),
-                                getTables(selectFromTableVisitor.getDbTableList())
+                                    param,
+                                    selectFromTableVisitor.getTableList(),
+                                    selectFromTableVisitor.getDbTableList(),
+                                    getTables(selectFromTableVisitor.getDbTableList())
                             );
                             resultStream = getTableEnv().toChangelogStream(
-                                getTableEnv().sqlQuery(
-                                    "select * from dimensionResult union " + streamSql
-                                )
+                                    getTableEnv().sqlQuery(
+                                            "select * from dimensionResult union " + streamSql
+                                    )
                             );
                             writeQueryResultToKafka(
-                                param,
-                                resultStream,
-                                selectFieldVisitor.getFieldNameList()
+                                    param,
+                                    resultStream,
+                                    selectFieldVisitor.getFieldNameList()
                             );
 
                         } catch (SQLException e) {
@@ -338,9 +349,9 @@ public class FlinkQueryExecutor {
                         loadTables(param, tableNameList, dbTableNameList, tableList);
                         resultStream = getTableEnv().toChangelogStream(getTableEnv().sqlQuery(sql));
                         writeQueryResultToKafka(
-                            param,
-                            resultStream,
-                            new SelectFieldVisitor(sql).getFieldNameList()
+                                param,
+                                resultStream,
+                                new SelectFieldVisitor(sql).getFieldNameList()
                         );
                     }
 
@@ -348,11 +359,23 @@ public class FlinkQueryExecutor {
                     try {
                         if (param.getTestNum() == 0) {
                             String jobId = getEnv().executeAsync().getJobID().toString();
-                            FlinkSqlParam.CACHE.get().setJobId(jobId);
+
+                            // update job name
+                            long affectRow = MetadataAccessUtil.updateJobName(
+                                    MetadataUtil.parseJobIdFromTopic(param.getStreamResTopic()), jobId);
+
+                            if (affectRow > 0) FlinkSqlParam.CACHE.get().setJobId(jobId);
+                            else throw new IllegalStateException("update name of job failed.");
+
                         } else {
                             resultStream.executeAndCollect(param.getTestNum());
                         }
                     } catch (Exception e) {
+                        try {
+                            getEnv().close();
+                        } catch (Exception ex) {
+                            throw new RuntimeException(ex);
+                        }
                         logger.error("execute stream sql error: " + sql + "\n" + e);
                     }
 
@@ -382,12 +405,12 @@ public class FlinkQueryExecutor {
 
                     // write result to kafka
                     org.urbcomp.cupid.db.metadata.entity.Table insertTable = getTable(
-                        insertVisitor.getDbTable()
+                            insertVisitor.getDbTable()
                     );
                     checkInsert(
-                        getTableEnv().fromDataStream(resultStream),
-                        fieldVisitor.getFieldNameList(),
-                        insertTable
+                            getTableEnv().fromDataStream(resultStream),
+                            fieldVisitor.getFieldNameList(),
+                            insertTable
                     );
                     insertTable(param, resultStream, insertTable);
 
@@ -395,7 +418,10 @@ public class FlinkQueryExecutor {
                     try {
                         if (param.getTestNum() == 0) {
                             String jobId = getEnv().executeAsync().getJobID().toString();
-                            FlinkSqlParam.CACHE.get().setJobId(jobId);
+                            long affectRow = MetadataAccessUtil.updateJobName(
+                                    MetadataUtil.parseJobIdFromTopic(param.getStreamResTopic()),jobId);
+                            if (affectRow > 0) FlinkSqlParam.CACHE.get().setJobId(jobId);
+                            else throw new IllegalStateException("update name of job failed.");
                         } else {
                             resultStream.executeAndCollect(param.getTestNum());
                         }
@@ -410,21 +436,21 @@ public class FlinkQueryExecutor {
     }
 
     public void loadTable(
-        FlinkSqlParam param,
-        String tableName,
-        String dbTableName,
-        org.urbcomp.cupid.db.metadata.entity.Table table
+            FlinkSqlParam param,
+            String tableName,
+            String dbTableName,
+            org.urbcomp.cupid.db.metadata.entity.Table table
     ) {
         // create kafkaSource
         String topicName = getKafkaTopic(table);
         String groupId = getKafkaGroup(dbTableName);
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-            .setBootstrapServers(param.getBootstrapServers())
-            .setTopics(topicName)
-            .setGroupId(groupId)
-            .setStartingOffsets(OffsetsInitializer.earliest())
-            .setValueOnlyDeserializer(new SimpleStringSchema())
-            .build();
+                .setBootstrapServers(param.getBootstrapServers())
+                .setTopics(topicName)
+                .setGroupId(groupId)
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
 
         // convert string stream to row stream
         List<Field> fieldList = table.getFieldList();
@@ -436,9 +462,9 @@ public class FlinkQueryExecutor {
         }
         StringToRow stringToRow = new StringToRow(fieldNameList, fieldTypeList);
         DataStream<Row> source = getEnv().fromSource(
-            kafkaSource,
-            WatermarkStrategy.noWatermarks(),
-            "source"
+                kafkaSource,
+                WatermarkStrategy.noWatermarks(),
+                "source"
         ).map(stringToRow).returns(getRowTypeInfo(fieldNameList, fieldTypeList));
 
         // create sourceTable in tableEnv
@@ -446,10 +472,10 @@ public class FlinkQueryExecutor {
     }
 
     public void loadTables(
-        FlinkSqlParam param,
-        List<String> tableNameList,
-        List<String> dbTableNameList,
-        List<org.urbcomp.cupid.db.metadata.entity.Table> tableList
+            FlinkSqlParam param,
+            List<String> tableNameList,
+            List<String> dbTableNameList,
+            List<org.urbcomp.cupid.db.metadata.entity.Table> tableList
     ) {
         for (int i = 0; i < tableList.size(); i++) {
             // create kafkaSource
@@ -458,9 +484,9 @@ public class FlinkQueryExecutor {
             KafkaSource<String> kafkaSource;
             boolean isGridIndex = isGridIndex(param, tableNameList.get(i));
             String userDbTableKey = MetadataUtil.combineUserDbTableKey(
-                param.getUserName(),
-                param.getDbName(),
-                tableList.get(i).getName()
+                    param.getUserName(),
+                    param.getDbName(),
+                    tableList.get(i).getName()
             );                // 重庆市范围
 
             if (isGridIndex) {
@@ -470,20 +496,20 @@ public class FlinkQueryExecutor {
                 offsets.put(partition, GridIndex.tableQueryTimeOffset.get(userDbTableKey));
 
                 kafkaSource = KafkaSource.<String>builder()
-                    .setBootstrapServers(param.getBootstrapServers())
-                    .setTopics(topicName)
-                    .setGroupId(groupId)
-                    .setStartingOffsets(OffsetsInitializer.offsets(offsets))
-                    .setValueOnlyDeserializer(new SimpleStringSchema())
-                    .build();
+                        .setBootstrapServers(param.getBootstrapServers())
+                        .setTopics(topicName)
+                        .setGroupId(groupId)
+                        .setStartingOffsets(OffsetsInitializer.offsets(offsets))
+                        .setValueOnlyDeserializer(new SimpleStringSchema())
+                        .build();
             } else {
                 kafkaSource = KafkaSource.<String>builder()
-                    .setBootstrapServers(param.getBootstrapServers())
-                    .setTopics(topicName)
-                    .setGroupId(groupId)
-                    .setStartingOffsets(OffsetsInitializer.earliest())
-                    .setValueOnlyDeserializer(new SimpleStringSchema())
-                    .build();
+                        .setBootstrapServers(param.getBootstrapServers())
+                        .setTopics(topicName)
+                        .setGroupId(groupId)
+                        .setStartingOffsets(OffsetsInitializer.earliest())
+                        .setValueOnlyDeserializer(new SimpleStringSchema())
+                        .build();
             }
 
             // convert string stream to row stream
@@ -501,35 +527,35 @@ public class FlinkQueryExecutor {
             if (isGridIndex) {
 
                 GridIndex gridIndex = new GridIndex(
-                    105.0,
-                    110.0,
-                    28.108,
-                    32.20,
-                    5000,
-                    GlobalCache.pool.getResource()
+                        105.0,
+                        110.0,
+                        28.108,
+                        32.20,
+                        5000,
+                        GlobalCache.pool.getResource()
                 );
                 filteredData = gridIndex.querySpatialObjects(
-                    107.0,
-                    30.108,
-                    109.0,
-                    31.20,
-                    userDbTableKey
+                        107.0,
+                        30.108,
+                        109.0,
+                        31.20,
+                        userDbTableKey
                 );
             }
             DataStream<String> source = getEnv().fromSource(
-                kafkaSource,
-                WatermarkStrategy.noWatermarks(),
-                "source"
+                    kafkaSource,
+                    WatermarkStrategy.noWatermarks(),
+                    "source"
             );
 
             DataStream<Row> rowSource;
             if (isGridIndex) {
                 rowSource = source.union(getEnv().fromCollection(filteredData))
-                    .map(stringToRow)
-                    .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+                        .map(stringToRow)
+                        .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
             } else {
                 rowSource = source.map(stringToRow)
-                    .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
+                        .returns(getRowTypeInfo(fieldNameList, fieldTypeList));
             }
 
             // create sourceTable in tableEnv
@@ -540,9 +566,9 @@ public class FlinkQueryExecutor {
     public static boolean isGridIndex(FlinkSqlParam param, String tableName) {
         boolean isGridIndex = false;
         for (Index index : MetadataAccessUtil.getIndexes(
-            param.getUserName(),
-            param.getDbName(),
-            tableName
+                param.getUserName(),
+                param.getDbName(),
+                tableName
         )) {
             if ("grid".equals(index.getIndexType())) {
                 isGridIndex = true;
@@ -553,9 +579,9 @@ public class FlinkQueryExecutor {
     }
 
     public void checkInsert(
-        Table resultTable,
-        List<String> fieldNameList,
-        org.urbcomp.cupid.db.metadata.entity.Table insertTable
+            Table resultTable,
+            List<String> fieldNameList,
+            org.urbcomp.cupid.db.metadata.entity.Table insertTable
     ) {
         ResolvedSchema schema = resultTable.getResolvedSchema();
         List<String> insertTableFieldTypeList = new ArrayList<>();
@@ -578,135 +604,135 @@ public class FlinkQueryExecutor {
             switch (resultTableFieldTypeList.get(i).toString()) {
                 case "INT":
                     if (!insertTableFieldTypeList.get(i).equals("int")
-                        && !insertTableFieldTypeList.get(i).equals("Integer")) {
+                            && !insertTableFieldTypeList.get(i).equals("Integer")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: INT insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: INT insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "BIGINT":
                     if (!insertTableFieldTypeList.get(i).equals("Long")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: BIGINT insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: BIGINT insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "FLOAT":
                     if (!insertTableFieldTypeList.get(i).equals("Float")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: FLOAT insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: FLOAT insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "DOUBLE":
                     if (!insertTableFieldTypeList.get(i).equals("Double")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: DOUBLE insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: DOUBLE insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "STRING":
                     if (!insertTableFieldTypeList.get(i).equals("String")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: STRING insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: STRING insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "BOOLEAN":
                     if (!insertTableFieldTypeList.get(i).equals("Bool")
-                        && !insertTableFieldTypeList.get(i).equals("Boolean")) {
+                            && !insertTableFieldTypeList.get(i).equals("Boolean")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: BOOLEAN insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: BOOLEAN insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.Geometry', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("Geometry")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: Geometry insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: Geometry insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.Point', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("Point")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: Point insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: Point insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.LineString', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("LineString")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: LineString insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: LineString insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.Polygon', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("Polygon")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: Polygon insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: Polygon insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.MultiPoint', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("MultiPoint")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: MultiPoint insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: MultiPoint insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.MultiLineString', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("MultiLineString")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: MultiLineString insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: MultiLineString insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 case "RAW('org.locationtech.jts.geom.MultiPolygon', '...')":
                     if (!insertTableFieldTypeList.get(i).equals("MultiPolygon")) {
                         throw new IllegalArgumentException(
-                            "insert field type doesn't match: MultiPolygon insert into "
-                                + insertTableFieldTypeList.get(i)
+                                "insert field type doesn't match: MultiPolygon insert into "
+                                        + insertTableFieldTypeList.get(i)
                         );
                     }
                     break;
                 default:
                     throw new UnsupportedOperationException(
-                        "Unsupported insert field type: " + insertTableFieldTypeList.get(i)
+                            "Unsupported insert field type: " + insertTableFieldTypeList.get(i)
                     );
             }
         }
     }
 
     public void insertTable(
-        FlinkSqlParam param,
-        DataStream<Row> resultStream,
-        org.urbcomp.cupid.db.metadata.entity.Table table
+            FlinkSqlParam param,
+            DataStream<Row> resultStream,
+            org.urbcomp.cupid.db.metadata.entity.Table table
     ) {
         // create kafkaSink
         String topicName = getKafkaTopic(table);
         KafkaSink<String> sink = KafkaSink.<String>builder()
-            .setBootstrapServers(param.getBootstrapServers())
-            .setRecordSerializer(
-                KafkaRecordSerializationSchema.builder()
-                    .setTopic(topicName)
-                    .setValueSerializationSchema(new SimpleStringSchema())
-                    .build()
-            )
-            .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-            .build();
+                .setBootstrapServers(param.getBootstrapServers())
+                .setRecordSerializer(
+                        KafkaRecordSerializationSchema.builder()
+                                .setTopic(topicName)
+                                .setValueSerializationSchema(new SimpleStringSchema())
+                                .build()
+                )
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
 
         // convert row stream to formatted string stream
         DataStream<String> insertStream = resultStream.map(row -> {
@@ -729,9 +755,9 @@ public class FlinkQueryExecutor {
         String dbName = dbTableName[0];
         String tableName = dbTableName[1];
         org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
-            userName,
-            dbName,
-            tableName
+                userName,
+                dbName,
+                tableName
         );
         if (table == null) {
             throw new IllegalArgumentException("Table Not Exists: " + tableName);
@@ -749,7 +775,7 @@ public class FlinkQueryExecutor {
     }
 
     public static List<org.urbcomp.cupid.db.metadata.entity.Table> getTables(
-        List<String> dbTableList
+            List<String> dbTableList
     ) {
         List<org.urbcomp.cupid.db.metadata.entity.Table> tableList = new ArrayList<>();
         for (String dbTable : dbTableList) {
@@ -760,9 +786,9 @@ public class FlinkQueryExecutor {
             String tableName = dbTableName[1];
 
             org.urbcomp.cupid.db.metadata.entity.Table table = MetadataAccessUtil.getTable(
-                userName,
-                dbName,
-                tableName
+                    userName,
+                    dbName,
+                    tableName
             );
             if (table == null) {
                 throw new IllegalArgumentException("Table Not Exists: " + tableName);
@@ -831,7 +857,7 @@ public class FlinkQueryExecutor {
                         break;
                     default:
                         throw new UnsupportedOperationException(
-                            "Unsupported field type: " + fieldTypeList.get(i)
+                                "Unsupported field type: " + fieldTypeList.get(i)
                         );
                 }
             }
@@ -845,12 +871,12 @@ public class FlinkQueryExecutor {
             synchronized (this) {
 
                 java.util.Map<String, Class<? extends AbstractUdf>> udfMap = JavaConverters
-                    .mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink()))
-                    .asJava();
+                        .mapAsJavaMapConverter(new UdfFactory().getUdfMap(DataEngine$.MODULE$.Flink()))
+                        .asJava();
                 for (Map.Entry<String, Class<? extends AbstractUdf>> udf : udfMap.entrySet()) {
                     getTableEnv().createTemporaryFunction(
-                        udf.getKey(),
-                        (Class<? extends UserDefinedFunction>) udf.getValue()
+                            udf.getKey(),
+                            (Class<? extends UserDefinedFunction>) udf.getValue()
                     );
                     logger.info("Flink registers udf: " + udf.getKey());
                 }
@@ -867,31 +893,33 @@ public class FlinkQueryExecutor {
     }
 
     public void writeQueryResultToKafka(
-        FlinkSqlParam param,
-        DataStream<Row> dataStream,
-        List<String> fieldNameList
+            FlinkSqlParam param,
+            DataStream<Row> dataStream,
+            List<String> fieldNameList
     ) {
-        String topicName = getMD5(param.getUserName() + param.getSql());
-        deleteKafkaTopic(param.getBootstrapServers(), topicName);
-        createKafkaTopic(param.getBootstrapServers(), topicName);
+        //get topic
+        String topicName = param.getStreamResTopic();
+        deleteKafkaTopic(FlinkSqlParam.BOOST_STRAP_SERVERS, topicName);
+        createKafkaTopic(FlinkSqlParam.BOOST_STRAP_SERVERS, topicName);
+        logger.info("write query result to kafka: " + topicName);
         KafkaSink<String> sink = KafkaSink.<String>builder()
-            .setBootstrapServers(param.getBootstrapServers())
-            .setRecordSerializer(
-                KafkaRecordSerializationSchema.builder()
-                    .setTopic(topicName)
-                    .setValueSerializationSchema(new SimpleStringSchema())
-                    .build()
-            )
-            .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-            .build();
+                .setBootstrapServers(param.getBootstrapServers())
+                .setRecordSerializer(
+                        KafkaRecordSerializationSchema.builder()
+                                .setTopic(topicName)
+                                .setValueSerializationSchema(new SimpleStringSchema())
+                                .build()
+                )
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
         dataStream.map(row -> {
             StringBuilder jsonBuilder = new StringBuilder("{");
             for (int i = 0; i < row.getArity(); i++) {
                 jsonBuilder.append("\"")
-                    .append(fieldNameList.get(i))
-                    .append("\":\"")
-                    .append(row.getField(i))
-                    .append("\"");
+                        .append(fieldNameList.get(i))
+                        .append("\":\"")
+                        .append(row.getField(i))
+                        .append("\"");
                 if (i < row.getArity() - 1) {
                     jsonBuilder.append(",");
                 }
@@ -922,10 +950,10 @@ public class FlinkQueryExecutor {
         StringBuilder jsonBuilder = new StringBuilder("{");
         for (int i = 0; i < row.getArity(); i++) {
             jsonBuilder.append("\"")
-                .append(fieldNameList.get(i))
-                .append("\":\"")
-                .append(row.getField(i))
-                .append("\"");
+                    .append(fieldNameList.get(i))
+                    .append("\":\"")
+                    .append(row.getField(i))
+                    .append("\"");
             if (i < row.getArity() - 1) {
                 jsonBuilder.append(",");
             }

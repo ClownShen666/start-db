@@ -16,6 +16,7 @@
  */
 package org.urbcomp.cupid.db.metadata;
 
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.urbcomp.cupid.db.metadata.accessor.*;
 
 /**
@@ -64,5 +65,9 @@ class AccessorFactory {
 
     public static IndexAccessor getIndexAccessor() {
         return new IndexAccessor();
+    }
+
+    public static JobAccessor getJobAccessor() {
+        return new JobAccessor();
     }
 }

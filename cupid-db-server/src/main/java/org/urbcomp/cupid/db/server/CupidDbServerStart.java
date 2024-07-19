@@ -35,8 +35,8 @@ public class CupidDbServerStart {
     }
 
     public static void start() throws Exception {
-        LivySubmitter.getSingleton();
-        SparkExecutor.getSparkSession();
+//        LivySubmitter.getSingleton();
+//        SparkExecutor.getSparkSession();
         final RemoteServer remoteServer = new RemoteServer(DynamicConfig.getRemoteServerPort());
         remoteServer.start();
         // open for test grpc

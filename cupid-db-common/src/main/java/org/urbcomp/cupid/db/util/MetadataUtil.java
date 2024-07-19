@@ -72,4 +72,22 @@ public class MetadataUtil {
     public static String makeSchemaName(long tableId) {
         return String.format("t_%d", tableId);
     }
+
+    public static String makeStreamResTopic(long jobId) {
+        return String.format("s_%d", jobId);
+    }
+
+    public static long parseJobIdFromTopic(String topic) {
+        if (topic != null && topic.startsWith("s_")) {
+            try {
+                return Long.parseLong(topic.substring(2));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid Job ID format: " + topic, e);
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid topic format: " + topic);
+        }
+    }
+
+
 }

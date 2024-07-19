@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,20 +10,14 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.metadata;
 
-import org.urbcomp.cupid.db.metadata.accessor.DatabaseAccessor;
-import org.urbcomp.cupid.db.metadata.accessor.FieldAccessor;
-import org.urbcomp.cupid.db.metadata.accessor.TableAccessor;
-import org.urbcomp.cupid.db.metadata.accessor.UserAccessor;
-import org.urbcomp.cupid.db.metadata.entity.Database;
-import org.urbcomp.cupid.db.metadata.entity.Field;
-import org.urbcomp.cupid.db.metadata.entity.Table;
-import org.urbcomp.cupid.db.metadata.entity.User;
+import org.urbcomp.cupid.db.metadata.accessor.*;
+import org.urbcomp.cupid.db.metadata.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +152,7 @@ public class MetadataAccessorFromDb implements IMetadataAccessor {
     @Override
     public User getUser(String userName) {
         return noRollback(
-            v -> AccessorFactory.getUserAccessor().selectByFidAndName(-1 /* not used */, userName)
+                v -> AccessorFactory.getUserAccessor().selectByFidAndName(-1 /* not used */, userName)
         );
     }
 
@@ -170,5 +164,50 @@ public class MetadataAccessorFromDb implements IMetadataAccessor {
     @Override
     public long dropUser(String userName) {
         return 0;
+    }
+
+    @Override
+    public long insertJob(Job job) {
+        return noRollback(v -> AccessorFactory.getJobAccessor().insert(job));
+    }
+
+    @Override
+    public long updateJob(Job job) {
+        return noRollback(v -> AccessorFactory.getJobAccessor().update(job));
+    }
+
+    @Override
+    public List<Job> getJobs(String userName) {
+        return noRollback(v -> {
+            final User user = getUser(userName);
+            if (user == null) return new ArrayList<>(1);
+            return AccessorFactory.getJobAccessor().selectAllByFid(user.getId());
+        });
+    }
+
+    @Override
+    public Job getJob(String userName, String jobName) {
+        return noRollback(v -> {
+            UserAccessor userAccessor = AccessorFactory.getUserAccessor();
+            JobAccessor jobAccessor = AccessorFactory.getJobAccessor();
+            User user = userAccessor.selectByFidAndName(0L, userName);
+            if (user == null) return null;
+            return jobAccessor.selectByFidAndName(user.getId(), jobName);
+        });
+    }
+
+    @Override
+    public long dropJob(String userName, String jobName) {
+        return noRollback(v -> {
+            final Job job = getJob(userName, jobName);
+            if (job == null) return 0L;
+            final long jobId = job.getId();
+            return AccessorFactory.getJobAccessor().deleteById(jobId);
+        });
+    }
+
+    @Override
+    public long updateJobName(long id, String name) {
+        return noRollback(v -> AccessorFactory.getJobAccessor().updateName(id, name));
     }
 }

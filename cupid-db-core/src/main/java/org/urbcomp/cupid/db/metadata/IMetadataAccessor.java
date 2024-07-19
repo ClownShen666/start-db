@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2022  ST-Lab
  *
  * This program is free software: you can redistribute it and/or modify
@@ -10,16 +10,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.urbcomp.cupid.db.metadata;
 
-import org.urbcomp.cupid.db.metadata.entity.Database;
-import org.urbcomp.cupid.db.metadata.entity.Field;
-import org.urbcomp.cupid.db.metadata.entity.Table;
-import org.urbcomp.cupid.db.metadata.entity.User;
+import org.urbcomp.cupid.db.metadata.entity.*;
 
 import java.util.List;
 
@@ -56,4 +53,16 @@ public interface IMetadataAccessor {
     long insertUser(User user);
 
     long dropUser(String userName);
+
+    long insertJob(Job job);
+
+    long updateJob(Job job);
+
+    List<Job> getJobs(String userName);
+
+    Job getJob(String userName, String jobName);
+
+    long dropJob(String userName, String jobName);
+
+    long updateJobName(long id, String jobName);
 }

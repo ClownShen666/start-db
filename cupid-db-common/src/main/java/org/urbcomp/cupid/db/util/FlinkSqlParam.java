@@ -23,8 +23,22 @@ public class FlinkSqlParam extends SqlParam {
     public static final ThreadLocal<FlinkSqlParam> CACHE = new ThreadLocal<>();
 
     public static String BOOST_STRAP_SERVERS = "kafka:9093";
+    /**
+     * this is job id of flink job
+     */
     private String jobId = null;
     private String host = null;
+
+    public String getStreamResTopic() {
+        return streamResTopic;
+    }
+
+    public void setStreamResTopic(String streamResTopic) {
+        this.streamResTopic = streamResTopic;
+    }
+
+    private String streamResTopic;
+
 
     public String getJobId() {
         return jobId;
