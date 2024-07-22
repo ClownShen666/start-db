@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-package org.urbcomp.cupid.db.parser.parser;// Generated from CupidDBSql.g4 by ANTLR 4.9.2
+package org.urbcomp.cupid.db.parser.parser;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

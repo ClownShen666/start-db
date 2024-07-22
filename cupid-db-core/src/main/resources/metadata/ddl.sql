@@ -98,8 +98,16 @@ create table `sys_job`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-
-
+DROP TABLE IF EXISTS `sys_history_operation`;
+CREATE TABLE `sys_history_operation`
+(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `sql_statement` varchar(2048) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+    `status` tinyint(1) NOT NULL,
+    `operation_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 394 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic STATS_PERSISTENT = 1;
 
 
 -- 插入测试用户、库、表，DDL好了后就没必要手动插入了, 密码是 cupid-db
