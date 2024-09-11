@@ -7,7 +7,7 @@
 - hadoop 
 - hbase
 - mysql
-- cupid-server
+- start-server
 
 其中 spark-cluster和livy有定制改动，需要本地准备
 
@@ -65,12 +65,12 @@ docker build -t livy:0.8.0 .
 cd -
 ```
 
-**cupid-server**
-需要提前在根目录执行`mvn package`准备好cupid-server jar 包.
+**start-server**
+需要提前在根目录执行`mvn package`准备好start-server jar 包.
 
 ```
-cd cupid
-docker build -t cupid-server:2.0.0 .
+cd start
+docker build -t start-server:2.0.0 .
 cd -
 ```
 
@@ -88,7 +88,7 @@ livy: http://localhost:8998/
 hadoop: http://localhost:9870/
 
 
-cupid server: 对应的jdbc服务端口号8848 
+start server: 对应的jdbc服务端口号8848 
 ## 添加hosts
 为了使得本地能通过docker里的主机名访问到对应的spark和hbase等服务，需添加以下hosts
 
@@ -102,13 +102,13 @@ cupid server: 对应的jdbc服务端口号8848
 并将代码中对应的服务配置替换成对应的主机名
 
 
-## 准备cupid-spark jar
+## 准备start-spark jar
 
-进入cupid-db目录
-更新cupid-spark jar包
+进入start-db目录
+更新start-spark jar包
 ```
-mvn package -pl cupid-db-spark -am -Dmaven.test.skip=true
-cp cupid-db-spark/target/cupid-db-spark-1.0.0-SNAPSHOT.jar docker/spark-dev/apps/cupid-db-spark-shaded.jar
+mvn package -pl start-db-spark -am -Dmaven.test.skip=true
+cp start-db-spark/target/start-db-spark-1.0.0-SNAPSHOT.jar docker/spark-dev/apps/start-db-spark-shaded.jar
 ```
 
 至此即可以在IDE中启动spark server后测试`spark-cluster`模式
@@ -142,7 +142,7 @@ bin/spark-submit --class org.apache.spark.examples.SparkPi --master spark://loca
 
 ```shell
 # CREATING A LIVY SESSION
-curl -X POST -d '{"kind": "spark","driverMemory":"512M","executorMemory":"512M", "jars":["/opt/spark-apps/cupid-db-spark-1.0.0-SNAPSHOT.jar"]}' -H "Content-Type: application/json" http://localhost:8998/sessions/
+curl -X POST -d '{"kind": "spark","driverMemory":"512M","executorMemory":"512M", "jars":["/opt/spark-apps/start-db-spark-1.0.0-SNAPSHOT.jar"]}' -H "Content-Type: application/json" http://localhost:8998/sessions/
 
 # SUBMITTING A SIMPLE LOGIC TO TEST SPARK SHELL
 curl -X POST -d '{"code": "1 + 1"}' -H "Content-Type: application/json" http://localhost:8998/sessions/0/statements

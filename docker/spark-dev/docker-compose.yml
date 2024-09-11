@@ -81,9 +81,9 @@ services:
 #    hostname: mysql-local
 #    image: 'mysql:5.7'
 #    environment:
-#      MYSQL_ROOT_PASSWORD: cupid_db
-#      MYSQL_USER: cupid_db
-#      MYSQL_PASSWORD: cupid_db
+#      MYSQL_ROOT_PASSWORD: start_db
+#      MYSQL_USER: start_db
+#      MYSQL_PASSWORD: start_db
 #      MYSQL_DATABASE: meta_data
 #    ports:
 #      - '3306:3306'
@@ -91,7 +91,7 @@ services:
 #      - local
 #      - cluster
 #  geomesa-hbase:
-#    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
+#    image: spatiotemporallab/geomesa-hbase-start:1.0.0
 #    hostname: geomesa-hbase-local
 #    ports:
 #      - '2181:2181'
@@ -102,11 +102,11 @@ services:
 #    profiles:
 #      - local
 #      - cluster
-#  cupid-sever:
-#    hostname: cupid-server
-#    image: 'cupid-server:2.0.0'
+#  start-sever:
+#    hostname: start-server
+#    image: 'start-server:2.0.0'
 #    environment:
-#      CUPID_PORT: 8848
+#      START_PORT: 8848
 #    volumes:
 #      - ./apps:/opt/apps
 #    profiles:

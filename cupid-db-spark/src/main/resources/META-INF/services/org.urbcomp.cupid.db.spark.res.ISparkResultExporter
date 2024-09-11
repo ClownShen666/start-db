@@ -1,3 +1,0 @@
-org.urbcomp.cupid.db.spark.res.SparkResult2RemoteExporter
-org.urbcomp.cupid.db.spark.res.ShowSparkResultExporter
-org.urbcomp.cupid.db.spark.res.SparkResult2HdfsExporter

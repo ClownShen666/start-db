@@ -5,27 +5,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.urbcomp</groupId>
-    <artifactId>cupid-db</artifactId>
+    <artifactId>start-db</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <modules>
-        <module>cupid-db-common</module>
-        <module>cupid-db-test</module>
-        <module>cupid-db-avatica-core</module>
-        <module>cupid-db-calcite</module>
-        <module>cupid-db-jdbc-driver</module>
-        <module>cupid-db-cmd</module>
-        <module>cupid-db-core</module>
-        <module>cupid-db-server</module>
-        <module>cupid-db-spark</module>
-        <module>cupid-db-store</module>
-        <module>cupid-db-flink</module>
-        <module>cupid-db-udf-register</module>
-        <module>cupid-db-spark-catalyst-fix</module>
-        <module>cupid-db-spark-sql-fix</module>
-        <module>cupid-db-spark-core</module>
-        <module>cupid-db-serializer</module>
-        <module>cupid-db-geomesa-jts-fix</module>
+        <module>start-db-common</module>
+        <module>start-db-test</module>
+        <module>start-db-avatica-core</module>
+        <module>start-db-calcite</module>
+        <module>start-db-jdbc-driver</module>
+        <module>start-db-cmd</module>
+        <module>start-db-core</module>
+        <module>start-db-server</module>
+        <module>start-db-spark</module>
+        <module>start-db-store</module>
+        <module>start-db-flink</module>
+        <module>start-db-udf-register</module>
+        <module>start-db-spark-catalyst-fix</module>
+        <module>start-db-spark-sql-fix</module>
+        <module>start-db-spark-core</module>
+        <module>start-db-serializer</module>
+        <module>start-db-geomesa-jts-fix</module>
     </modules>
 
     <properties>
@@ -288,7 +288,7 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- Cupid Shaded -->
+            <!-- Start Shaded -->
             <dependency>
                 <groupId>io.github.Spatio-Temporal-Lab</groupId>
                 <artifactId>cupid-shaded-avatica-core</artifactId>
@@ -296,50 +296,50 @@
             </dependency>
 
 
-            <!-- Cupid DB -->
+            <!-- Start DB -->
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-common</artifactId>
+                <artifactId>start-db-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-serializer</artifactId>
+                <artifactId>start-db-serializer</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-core</artifactId>
+                <artifactId>start-db-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-spark-core</artifactId>
+                <artifactId>start-db-spark-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-spark-catalyst-fix</artifactId>
+                <artifactId>start-db-spark-catalyst-fix</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-spark-sql-fix</artifactId>
+                <artifactId>start-db-spark-sql-fix</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-geomesa-jts-fix</artifactId>
+                <artifactId>start-db-geomesa-jts-fix</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-udf-register</artifactId>
+                <artifactId>start-db-udf-register</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.urbcomp</groupId>
-                <artifactId>cupid-db-spark</artifactId>
+                <artifactId>start-db-spark</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
