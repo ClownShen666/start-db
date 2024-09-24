@@ -14,19 +14,19 @@ docker push spatiotemporallab/geomesa-hbase:base
 1.打包索引模块
 
 ```shell
-mvn package -pl cupid-db-store -am -Dmaven.test.skip=true
+mvn package -pl start-db-store -am -Dmaven.test.skip=true
 ```
 
-2.将打好的包cupid-db-store-1.0.0-SNAPSHOT.jar复制到当前目录
+2.将打好的包start-db-store-1.0.0-SNAPSHOT.jar复制到当前目录
 
 3.构建镜像
 
 ```shell
-docker build -t spatiotemporallab/geomesa-hbase-cupid:1.0.0 .
+docker build -t spatiotemporallab/geomesa-hbase-start:1.0.0 .
 ```
 
 4.push镜像
 
 ```shell
-docker push spatiotemporallab/geomesa-hbase-cupid:1.0.0
+docker push spatiotemporallab/geomesa-hbase-start:1.0.0
 ```

@@ -1,14 +1,14 @@
-# Contributing to CUPID-DB
+# Contributing to START-DB
 
 ### Running environment setup
 
-Running environment need to be setup before build or test CUPID-DB.
+Running environment need to be setup before build or test START-DB.
 
 1. Please follow [Docker Setup](docker/local/README.md) and confirm
 2. init mysql schema
 
 ```shell
-mvn test exec:java -f cupid-db-test/cupid-db-test-embedded-mysql/pom.xml
+mvn test exec:java -f start-db-test/start-db-test-embedded-mysql/pom.xml
 ```
 
 then
@@ -21,11 +21,11 @@ run successfully.
 
 ### Importing the project into IntelliJ IDEA
 
-CUPID-DB builds using Java 8. When importing into IntelliJ you will need to define an appropriate SDK.or more details on
+START-DB builds using Java 8. When importing into IntelliJ you will need to define an appropriate SDK.or more details on
 defining an SDK in IntelliJ please refer
 to [their documentation](https://www.jetbrains.com/help/idea/sdk.html#define-sdk).
 
-You can import the CUPID-DB project into IntelliJ IDEA via:
+You can import the START-DB project into IntelliJ IDEA via:
 
 - Select **File > Open**
 - In the subsequent dialog navigate to the root `pom.xml` file
@@ -33,7 +33,7 @@ You can import the CUPID-DB project into IntelliJ IDEA via:
 
 #### Checkstyle
 
-You can install [Checkstyle] plugin to check the CUPID-DB code.
+You can install [Checkstyle] plugin to check the START-DB code.
 
 1. Open **File > Settings> Tools > CheckStyle**
 2. Select CheckStyle version `9.3`
@@ -42,7 +42,7 @@ You can install [Checkstyle] plugin to check the CUPID-DB code.
 
 ### Formatting
 
-CUPID-DB code is automatically formatted with [spotless], backed by the Eclipse formatter. You can do the same in
+START-DB code is automatically formatted with [spotless], backed by the Eclipse formatter. You can do the same in
 IntelliJ with the [Eclipse Code Formatter] so that you can apply the correct formatting directly in your IDE.
 
 **Java Code Style**
@@ -69,33 +69,33 @@ command `mvn spotless:apply`.
 
 ### Local Testing
 
-Cupid server can be started by running `main` of `org.urbcomp.cupid.db.server.CupidDbServerStart`.
+Start server can be started by running `main` of `org.urbcomp.start.db.server.StartDbServerStart`.
 
-To connect to server in local, Cupid DB provide a command line client `cupid-db-cmd`. 
-It can be started from IDE by running `main` function of`org.urbcomp.cupid.db.cmd.Main`. 
+To connect to server in local, Start DB provide a command line client `start-db-cmd`. 
+It can be started from IDE by running `main` function of`org.urbcomp.start.db.cmd.Main`. 
 
 To set username or password, you need to edit running configuration of IDE or by adding
 ```
         ... parseArgs(args);
         cmdArg.username = "root";
-        cmdArg.password = "cupid-db";
+        cmdArg.password = "start-db";
 ```
 before connecting server.
 
 ### Run packaged jars
 
-After running `mvn clean package`, Cupid fat jar for server and client is packaged.
+After running `mvn clean package`, Start fat jar for server and client is packaged.
 
-Server can be found under `<cupid>/cupid-db-server/target/cupid-db.jar`. 
-Running cmd `java -jar cupid-db.jar` will start server.
+Server can be found under `<start>/start-db-server/target/start-db.jar`. 
+Running cmd `java -jar start-db.jar` will start server.
 
-Cupid command line client is under `<cupid>/cupid-db-cmd/target/cupid-db-cmd.jar`. 
-To connect server from console, run cmd `java -jar cupid-db-cmd.jar -u <user> -p <password> -engine <calcite|spark_local>`
+Start command line client is under `<start>/start-db-cmd/target/start-db-cmd.jar`. 
+To connect server from console, run cmd `java -jar start-db-cmd.jar -u <user> -p <password> -engine <calcite|spark_local>`
 .
 
-### Cupid JDBC Driver Usage
+### Start JDBC Driver Usage
 
-See examples under `<cupid>/cupid-db-jdbc-driver/src/test/java/org/urbcomp/cupid/db/jdbc/DriverTest.java`
+See examples under `<start>/start-db-jdbc-driver/src/test/java/org/urbcomp/start/db/jdbc/DriverTest.java`
 
 [checkstyle]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 

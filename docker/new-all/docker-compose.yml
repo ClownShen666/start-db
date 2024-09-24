@@ -128,24 +128,24 @@ services:
     volumes:
       - /var/lib/mysql:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: cupid_db
-      MYSQL_USER: cupid_db
-      MYSQL_PASSWORD: cupid_db
+      MYSQL_ROOT_PASSWORD: start_db
+      MYSQL_USER: start_db
+      MYSQL_PASSWORD: start_db
       MYSQL_DATABASE: meta_data
     ports:
       - '3306:3306'
 
   geomesa-hbase-local:
-    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
+    image: spatiotemporallab/geomesa-hbase-start:1.0.0
     hostname: geomesa-hbase-local
     ports:
       - '2181:2181'
       - '16000:16000'
       - '16020:16020'
-  cupid-db:
+  start-db:
     build:
-      context: ./cupid-db
-      dockerfile: ../cupid-db/Dockerfile
+      context: ./start-db
+      dockerfile: ../start-db/Dockerfile
     ports:
         - "8000:8000"
     depends_on:
