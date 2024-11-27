@@ -83,7 +83,6 @@ services:
     command: taskmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-
   redis:
     image: redis:latest
     environment:
@@ -123,10 +122,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - zookeeper
-  mysql-local:
+  mysql:
     image: 'mysql:5.7'
-    volumes:
-      - /var/lib/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: start_db
       MYSQL_USER: start_db
@@ -134,21 +131,22 @@ services:
       MYSQL_DATABASE: meta_data
     ports:
       - '3306:3306'
-
   geomesa-hbase-local:
-    image: spatiotemporallab/geomesa-hbase-start:1.0.0
+    image: spatiotemporallab/geomesa-hbase-cupid:1.0.0
     hostname: geomesa-hbase-local
     ports:
       - '2181:2181'
       - '16000:16000'
       - '16020:16020'
   start-db:
-    build:
-      context: ./start-db
-      dockerfile: ../start-db/Dockerfile
+    image: new-all-start-db:latest # 替换为您导出的镜像名称
+#    build:
+#      context: ./start-db
+#      dockerfile: ../start-db/Dockerfile
     ports:
-        - "8000:8000"
+      - "8000:8000"
     depends_on:
-      - mysql-local
+      - mysql
       - geomesa-hbase-local
       - livy
+
